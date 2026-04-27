@@ -74,7 +74,13 @@ if (!localStorage.getItem('fl_admin_key')) {
 function loadConfig() {
   try {
     const saved = JSON.parse(localStorage.getItem('fl_config') || '{}');
-    return Object.assign({}, FL_DEFAULTS, saved);
+    var merged = Object.assign({}, FL_DEFAULTS, saved);
+    // Ensure Supabase credentials from config.js are never lost
+    if (window.FL && window.FL.SUPABASE_URL) merged.SUPABASE_URL = window.FL.SUPABASE_URL;
+    if (window.FL && window.FL.SUPABASE_ANON_KEY) merged.SUPABASE_ANON_KEY = window.FL.SUPABASE_ANON_KEY;
+    if (window.FL && window.FL.MAPBOX_TOKEN) merged.MAPBOX_TOKEN = window.FL.MAPBOX_TOKEN;
+    if (window.FL && window.FL.IG_TOKEN) merged.IG_TOKEN = window.FL.IG_TOKEN;
+    return merged;
   } catch(e) { return Object.assign({}, FL_DEFAULTS); }
 }
 
