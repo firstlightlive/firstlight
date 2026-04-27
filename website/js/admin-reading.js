@@ -287,7 +287,8 @@ function markDailyRuleRead(btn) {
   }
   if (typeof markSaved === 'function') markSaved();
 
-  // No Supabase sync for daily rules — localStorage only
+  // Sync to Supabase
+  syncReadingLog(todayStr, 'daily_rule', ruleNum);
 
   // Refresh streak display
   var streakData = computeReadingStreak();
@@ -299,12 +300,10 @@ function markDailyRuleRead(btn) {
 
 // ── SYNC TO SUPABASE ──
 async function syncReadingLog(date, type, ruleNumber) {
-  if (typeof SB === 'undefined' || !SB.init()) return;
+  if (typeof sbFetch !== 'function') return;
   try {
-    // Check if today's entry already exists (no unique constraint on date)
     var existing = await sbFetch('reading_log', 'GET', null, '?date=eq.' + date + '&type=eq.' + type);
-    if (existing && existing.length > 0) return; // Already synced
-    // Insert new entry (no on_conflict — table uses auto-increment id)
+    if (existing && existing.length > 0) return;
     await sbFetch('reading_log', 'POST', {
       date: date,
       type: type,
@@ -316,6 +315,26 @@ async function syncReadingLog(date, type, ruleNumber) {
     console.warn('[Reading] Sync failed:', e);
   }
 }
+
+// ── BACKFILL: sync any localStorage reading entries to Supabase ──
+function backfillReadingLog() {
+  if (typeof sbFetch !== 'function') return;
+  var streakStart = new Date('2026-02-10');
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    if (key && key.startsWith('fl_daily_rule_read_')) {
+      var date = key.replace('fl_daily_rule_read_', '');
+      if (date.length === 10) {
+        var dayNum = Math.floor((new Date(date) - streakStart) / 86400000) + 1;
+        var ruleNum = ((dayNum - 1) % 25) + 1;
+        syncReadingLog(date, 'daily_rule', ruleNum);
+      }
+    }
+  }
+}
+
+// Run backfill on page load (only syncs missing entries, safe to run multiple times)
+setTimeout(backfillReadingLog, 3000);
 
 // ── READING STREAK (wrapper) ──
 function getReadingStreak() {
