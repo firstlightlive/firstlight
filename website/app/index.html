@@ -6417,7 +6417,6 @@ function fallbackThumb(cv,fname){
 // INSTAGRAM GRAPH API — CAROUSEL + STORY PUBLISHER
 // ═══════════════════════════════════════════════════════
 const _IG_ACCOUNT='17841466893616231';
-const _IG_TOKEN=localStorage.getItem('fl_ig_token')||'';
 const _GCS_UPLOAD='https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync?action=upload';
 
 function _igLog(elId,msg,color){
@@ -6482,22 +6481,18 @@ async function _uploadCanvasToGCS(canvasId,filename){
   throw new Error('Upload failed on both Supabase and GCS');
 }
 
-// ── IG Graph API — server-side via Cloud Function proxy — BULLETPROOF ──
-const _IG_PROXY='https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-ig-proxy';
+// ── IG Graph API — 100% server-side, token NEVER in browser ──
+const _IG_SYNC_URL='https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync';
 const _ADMIN_KEY=['b8464678b573c885','c449958a9ea760c0','8b01279d01d3a1f9','96fc92b7364f10b7'].join('');
 
 async function _igAPI(endpoint,params){
-  params.access_token=_IG_TOKEN;
-  const qs=Object.keys(params).map(k=>k+'='+encodeURIComponent(params[k])).join('&');
-  const url='https://graph.facebook.com/v21.0/'+endpoint+'?'+qs;
-
-  // METHOD 1: Cloud Function proxy (BULLETPROOF — server-side, no CORS)
+  // Token is injected server-side — never sent from browser
   try{
-    console.log('[IG] Method 1: Cloud Function proxy...');
-    const res=await fetch(_IG_PROXY,{
-      method:'POST',signal:AbortSignal.timeout(25000),
+    console.log('[IG] Server proxy: '+endpoint);
+    const res=await fetch(_IG_SYNC_URL+'?action=ig-proxy',{
+      method:'POST',signal:AbortSignal.timeout(30000),
       headers:{'Content-Type':'application/json','X-Admin-Key':_ADMIN_KEY},
-      body:JSON.stringify({url:url})
+      body:JSON.stringify({endpoint:endpoint,params:params})
     });
     if(res.ok){
       const d=await res.json();
@@ -6507,22 +6502,16 @@ async function _igAPI(endpoint,params){
         const msg=d.error.error_user_msg||d.error.message||JSON.stringify(d.error);
         throw new Error(msg);
       }
+      return d;
     }else{
-      console.warn('[IG] Proxy HTTP',res.status);
+      const errText=await res.text();
+      console.warn('[IG] Proxy HTTP',res.status,errText);
+      throw new Error('Server proxy error: '+res.status);
     }
   }catch(e){
-    console.warn('[IG] Method 1:',e.message);
-    if(e.message&&(e.message.includes('OAuthException')||e.message.includes('media')||e.message.includes('image')))throw e;
+    console.error('[IG] Proxy failed:',e.message);
+    throw new Error(e.message||'Publishing failed. Use DOWNLOAD button to post manually.');
   }
-
-  // METHOD 2: Direct browser fetch (works on desktop Chrome)
-  try{
-    console.log('[IG] Method 2: Direct browser fetch...');
-    const res=await fetch(url,{method:'POST',signal:AbortSignal.timeout(12000)});
-    if(res.ok){const d=await res.json();if(d&&d.id)return d;if(d&&d.error)throw new Error(d.error.error_user_msg||d.error.message);}
-  }catch(e){console.warn('[IG] Method 2:',e.message);}
-
-  throw new Error('Publishing failed. Use DOWNLOAD button to post manually.');
 }
 
 // Create IG carousel container item

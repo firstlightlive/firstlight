@@ -622,6 +622,14 @@
         </div>
       </div>
 
+      <!-- APPLE HEALTH -->
+      <div class="cc-group" data-group="health">
+        <div class="cc-group-header"><span class="cc-arrow">▶</span> ❤️ APPLE HEALTH</div>
+        <div class="cc-group-items">
+          <div class="cc-item" data-panel="health-dashboard"><span class="cc-icon">📊</span> Health Dashboard</div>
+        </div>
+      </div>
+
       <!-- LIFE CALENDAR -->
       <div class="cc-group" data-group="lifecal">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 📅 LIFE CALENDAR</div>
@@ -2772,6 +2780,30 @@
       </div>
 
       <!-- ════════════════════════════════════════════════
+           PANEL: APPLE HEALTH DASHBOARD
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-health-dashboard">
+        <div class="cc-panel-header">
+          <div class="cc-panel-title">APPLE HEALTH</div>
+          <div class="cc-panel-desc">Next-gen health analytics — Sleep, Heart, Fitness, Activity — powered by Apple Watch</div>
+        </div>
+
+        <!-- Range selector -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="btn btn-outline health-range-btn" data-range="7" onclick="healthSetRange(7)" style="font-size:11px;padding:6px 14px">7D</button>
+          <button class="btn btn-outline health-range-btn active" data-range="30" onclick="healthSetRange(30)" style="font-size:11px;padding:6px 14px">30D</button>
+          <button class="btn btn-outline health-range-btn" data-range="90" onclick="healthSetRange(90)" style="font-size:11px;padding:6px 14px">90D</button>
+          <button class="btn btn-outline health-range-btn" data-range="180" onclick="healthSetRange(180)" style="font-size:11px;padding:6px 14px">6M</button>
+          <button class="btn btn-outline health-range-btn" data-range="365" onclick="healthSetRange(365)" style="font-size:11px;padding:6px 14px">1Y</button>
+          <button class="btn btn-outline health-range-btn" data-range="9999" onclick="healthSetRange(9999)" style="font-size:11px;padding:6px 14px">ALL</button>
+        </div>
+
+        <div id="health-dashboard-content">
+          <div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);font-family:'IBM Plex Mono',monospace;font-size:12px">Loading health data...</div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
            PANEL: LIFE CALENDAR
            ════════════════════════════════════════════════ -->
       <div class="cc-panel" id="p-life-calendar">
@@ -2938,6 +2970,7 @@
   <script src="js/admin-sync.js"></script>
   <script src="js/admin-sync-panel.js"></script>
   <script src="js/admin-tomorrow.js"></script>
+  <script src="js/admin-health.js"></script>
   <script src="js/admin-life-calendar.js"></script>
   <script src="js/admin-init.js"></script>
 

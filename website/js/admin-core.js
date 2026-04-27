@@ -58,6 +58,7 @@ function switchPanel(panelId) {
   if (panelId === 'sync-center') { if (typeof renderSyncCenter === 'function') renderSyncCenter(); }
   if (panelId === 'journal-archive') { if (typeof renderJournalCalendar === 'function') renderJournalCalendar(); }
   if (panelId === 'life-calendar') { if (typeof renderLifeCalendar === 'function') renderLifeCalendar(); }
+  if (panelId === 'health-dashboard') { if (typeof loadHealthData === 'function') loadHealthData(); }
 }
 
 // Legacy support — map old switchTab calls to switchPanel
