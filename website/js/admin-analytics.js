@@ -136,7 +136,31 @@ function buildCalHeatMap() {
 
   var daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   var firstDayOfWeek = month.getDay();
+  var monthStr = month.getFullYear() + '-' + String(month.getMonth()+1).padStart(2,'0');
 
+  // Fetch from Supabase first, fallback to localStorage
+  if (typeof sbFetch === 'function') {
+    sbFetch('daily_rituals', 'GET', null, '?date=gte.' + monthStr + '-01&date=lte.' + monthStr + '-' + daysInMonth + '&select=date,period,done_indices,completion_pct')
+    .then(function(data) {
+      var ritualMap = {};
+      if (data && data.length) {
+        for (var i = 0; i < data.length; i++) {
+          var r = data[i];
+          if (!ritualMap[r.date]) ritualMap[r.date] = {};
+          ritualMap[r.date][r.period] = { done: (r.done_indices || []).length, pct: r.completion_pct || 0 };
+        }
+      }
+      _renderCalGrid(container, month, daysInMonth, firstDayOfWeek, ritualMap);
+    })
+    .catch(function() {
+      _renderCalGrid(container, month, daysInMonth, firstDayOfWeek, null);
+    });
+  } else {
+    _renderCalGrid(container, month, daysInMonth, firstDayOfWeek, null);
+  }
+}
+
+function _renderCalGrid(container, month, daysInMonth, firstDayOfWeek, ritualMap) {
   var html = '';
   ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(function(d) {
     html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);text-align:center;padding:4px">' + d + '</div>';
@@ -148,13 +172,38 @@ function buildCalHeatMap() {
 
   for (var d = 1; d <= daysInMonth; d++) {
     var dateKey = month.getFullYear() + '-' + String(month.getMonth()+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-    var mornDone = JSON.parse(localStorage.getItem('fl_rituals_morning_' + dateKey) || '[]').length;
-    var eveDone = JSON.parse(localStorage.getItem('fl_rituals_evening_' + dateKey) || '[]').length;
-    var pct = Math.round(((mornDone / 42 + eveDone / 41) / 2) * 100);
 
+    var mornDone = 0, eveDone = 0, midDone = 0, pct = 0;
+
+    // Try Supabase data first
+    if (ritualMap && ritualMap[dateKey]) {
+      var rm = ritualMap[dateKey];
+      mornDone = rm.morning ? rm.morning.done : 0;
+      midDone = rm.midday ? rm.midday.done : 0;
+      eveDone = rm.evening ? rm.evening.done : 0;
+      // Use average of available period percentages
+      var periods = 0, totalPct = 0;
+      if (rm.morning) { totalPct += rm.morning.pct; periods++; }
+      if (rm.midday) { totalPct += rm.midday.pct; periods++; }
+      if (rm.evening) { totalPct += rm.evening.pct; periods++; }
+      pct = periods > 0 ? Math.round(totalPct / periods) : 0;
+    }
+
+    // Fallback to localStorage
+    if (mornDone === 0 && eveDone === 0) {
+      var lsMorn = JSON.parse(localStorage.getItem('fl_rituals_morning_' + dateKey) || '[]');
+      var lsEve = JSON.parse(localStorage.getItem('fl_rituals_evening_' + dateKey) || '[]');
+      mornDone = lsMorn.length;
+      eveDone = lsEve.length;
+      if (mornDone > 0 || eveDone > 0) {
+        pct = Math.round(((mornDone / 42 + eveDone / 41) / 2) * 100);
+      }
+    }
+
+    var totalDone = mornDone + midDone + eveDone;
     var bg = 'var(--bg3)';
     var textColor = 'var(--text-dim)';
-    if (mornDone > 0 || eveDone > 0) {
+    if (totalDone > 0) {
       if (pct >= 90) { bg = 'rgba(0,229,160,0.25)'; textColor = 'var(--green)'; }
       else if (pct >= 60) { bg = 'rgba(0,212,255,0.2)'; textColor = 'var(--cyan)'; }
       else if (pct >= 30) { bg = 'rgba(245,166,35,0.2)'; textColor = 'var(--gold)'; }
@@ -166,7 +215,7 @@ function buildCalHeatMap() {
 
     html += '<div style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:' + bg + ';border-radius:6px;cursor:pointer;' + border + '" title="' + dateKey + ': ' + pct + '% complete">';
     html += '<div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:' + textColor + '">' + d + '</div>';
-    if (mornDone > 0 || eveDone > 0) {
+    if (totalDone > 0) {
       html += '<div style="font-family:var(--font-mono);font-size:8px;color:' + textColor + ';opacity:0.7">' + pct + '%</div>';
     }
     html += '</div>';
