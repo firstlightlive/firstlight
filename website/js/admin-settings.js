@@ -229,31 +229,32 @@ async function quickUploadToGCS(files) {
   var folder = document.getElementById('quickUploadFolder').value;
   var progress = document.getElementById('quickUploadProgress');
   var results = document.getElementById('quickUploadResults');
-  var GCS_URL = 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=upload';
-
   results.innerHTML = '';
   progress.textContent = 'Uploading ' + files.length + ' file(s)...';
   progress.style.color = 'var(--gold)';
+
+  var sbUrl = FL.SUPABASE_URL;
+  var sbKey = FL.SUPABASE_ANON_KEY;
 
   for (var i = 0; i < files.length; i++) {
     try {
       progress.textContent = 'Uploading ' + (i + 1) + '/' + files.length + '...';
       var file = files[i];
-      var base64 = await readFileAsBase64(file);
       var ext = '.' + (file.name.split('.').pop() || 'jpg');
-      var name = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+      var name = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + Date.now();
+      var path = folder + '/' + name + ext;
 
-      var res = await fetch(GCS_URL, {
+      var res = await fetch(sbUrl + '/storage/v1/object/media/' + path, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ folder: folder, filename: name, ext: ext, data: base64 })
+        headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey, 'Content-Type': file.type || 'application/octet-stream', 'x-upsert': 'true' },
+        body: file
       });
-      var data = await res.json();
 
-      if (data.success) {
+      if (res.ok) {
+        var fileUrl = sbUrl + '/storage/v1/object/public/media/' + path;
         results.innerHTML += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:8px;background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.12);border-radius:6px">' +
-          (file.type.startsWith('image/') ? '<img src="' + data.url + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px">' : '<span style="font-size:20px">📄</span>') +
-          '<input type="text" class="form-input" value="' + data.url + '" readonly style="font-size:9px;flex:1;color:var(--green);cursor:text" onclick="this.select();document.execCommand(\'copy\')">' +
+          (file.type.startsWith('image/') ? '<img src="' + fileUrl + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px">' : '<span style="font-size:20px">📄</span>') +
+          '<input type="text" class="form-input" value="' + fileUrl + '" readonly style="font-size:9px;flex:1;color:var(--green);cursor:text" onclick="this.select();document.execCommand(\'copy\')">' +
           '<span style="font-family:var(--font-mono);font-size:8px;color:var(--green)">✓</span></div>';
       } else {
         results.innerHTML += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--red);margin-bottom:4px">✗ ' + file.name + ': ' + (data.error || 'Failed') + '</div>';

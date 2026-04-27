@@ -224,47 +224,36 @@ renderRaceList();
 // GCS PHOTO UPLOAD FOR RACES
 // ══════════════════════════════════════
 
-var GCS_UPLOAD_URL = 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=upload';
-
-// Cloud Function is always available
+// Upload directly to Supabase Storage (free, permanent, no GCS)
 async function checkGCSServer() {
   return true;
 }
 
 async function uploadToGCS(file, folder) {
-  var adminKey = localStorage.getItem('fl_admin_key') || '';
-
   return new Promise(function(resolve, reject) {
-    var reader = new FileReader();
-    reader.onerror = function() { reject('Failed to read file'); };
-    reader.onload = function() {
-      try {
-        var dataUrl = reader.result;
-        var ext = file.name.split('.').pop() || 'jpg';
-        var name = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + Date.now() + '.' + ext;
+    try {
+      var ext = file.name.split('.').pop() || 'jpg';
+      var name = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + Date.now() + '.' + ext;
+      var path = folder + '/' + name;
+      var sbUrl = FL.SUPABASE_URL;
+      var sbKey = FL.SUPABASE_ANON_KEY;
 
-        fetch(GCS_UPLOAD_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
-          body: JSON.stringify({ data: dataUrl, filename: name, folder: folder })
-        })
-        .then(function(r) {
-          if (!r.ok) throw new Error('Server returned HTTP ' + r.status);
-          return r.json();
-        })
-        .then(function(data) {
-          var url = data.url || data.publicUrl;
-          if (url) {
-            console.log('[GCS] Uploaded: ' + url);
-            resolve(url);
-          } else {
-            reject(data.error || 'Upload failed — no URL returned');
-          }
-        })
-        .catch(function(e) { reject(e.message || 'Network error'); });
-      } catch(e) { reject(e.message || 'Processing error'); }
-    };
-    reader.readAsDataURL(file);
+      fetch(sbUrl + '/storage/v1/object/media/' + path, {
+        method: 'POST',
+        headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey, 'Content-Type': file.type || 'image/jpeg', 'x-upsert': 'true' },
+        body: file
+      })
+      .then(function(r) {
+        if (!r.ok) throw new Error('Upload HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function() {
+        var url = sbUrl + '/storage/v1/object/public/media/' + path;
+        console.log('[Storage] Uploaded: ' + url);
+        resolve(url);
+      })
+      .catch(function(e) { reject(e.message || 'Upload failed'); });
+    } catch(e) { reject(e.message || 'Processing error'); }
   });
 }
 

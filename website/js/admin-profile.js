@@ -3,7 +3,6 @@
 // Upload photos to GCS via Cloud Function
 // ═══════════════════════════════════════════
 
-var GCS_UPLOAD = 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=upload';
 var _ADMIN_KEY_FALLBACK = localStorage.getItem('fl_admin_key');
 function _getAdminKey() { return localStorage.getItem('fl_admin_key') || _ADMIN_KEY_FALLBACK; }
 
@@ -73,7 +72,7 @@ function saveProfile() {
   flashBtn(document.querySelector('#p-profile .btn-primary'), 'SAVED');
 }
 
-// ── UNIVERSAL GCS UPLOAD — works for profile, about, any photo ──
+// ── UNIVERSAL UPLOAD — direct to Supabase Storage (free, permanent) ──
 async function _uploadPhotoToGCS(file, folder, filenamePrefix, statusEl) {
   if (!file) return null;
   if (!file.type.startsWith('image/')) {
@@ -88,20 +87,18 @@ async function _uploadPhotoToGCS(file, folder, filenamePrefix, statusEl) {
   if (statusEl) { statusEl.textContent = 'Uploading...'; statusEl.style.color = 'var(--gold)'; }
 
   try {
-    var dataUrl = await new Promise(function(resolve, reject) {
-      var reader = new FileReader();
-      reader.onload = function() { resolve(reader.result); };
-      reader.onerror = function() { reject(new Error('Failed to read file')); };
-      reader.readAsDataURL(file);
-    });
-
     var ext = file.name.split('.').pop() || 'jpg';
     var filename = filenamePrefix + '_' + Date.now() + '.' + ext;
+    var path = folder + '/' + filename;
 
-    var res = await fetch(GCS_UPLOAD, {
+    var sbUrl = FL.SUPABASE_URL;
+    var sbKey = FL.SUPABASE_ANON_KEY;
+    var contentType = file.type || 'image/jpeg';
+
+    var res = await fetch(sbUrl + '/storage/v1/object/media/' + path, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': _getAdminKey() },
-      body: JSON.stringify({ data: dataUrl, filename: filename, folder: folder })
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey, 'Content-Type': contentType, 'x-upsert': 'true' },
+      body: file
     });
 
     if (!res.ok) {
@@ -109,14 +106,11 @@ async function _uploadPhotoToGCS(file, folder, filenamePrefix, statusEl) {
       throw new Error('HTTP ' + res.status + ': ' + errText.substring(0, 100));
     }
 
-    var data = await res.json();
-    var url = data.url || data.publicUrl;
-    if (!url) throw new Error(data.error || 'No URL returned');
-
+    var url = sbUrl + '/storage/v1/object/public/media/' + path;
     if (statusEl) { statusEl.textContent = 'Uploaded'; statusEl.style.color = 'var(--green)'; }
     return url;
   } catch(e) {
-    console.error('[Profile Upload]', e);
+    console.error('[Upload]', e);
     if (statusEl) { statusEl.textContent = 'Failed: ' + e.message; statusEl.style.color = 'var(--red)'; }
     return null;
   }
