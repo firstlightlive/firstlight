@@ -56,8 +56,8 @@ const FL_DEFAULTS = {
   TAGLINE: 'No end date. No finish line. INFINITE.',
   CITY: 'Bangalore, India',
   MEDIA_BASE_URL: '',           // S3/GCP bucket base URL
-  SUPABASE_URL: (window.FL && FL.SUPABASE_URL) || '',
-  SUPABASE_ANON_KEY: (window.FL && FL.SUPABASE_ANON_KEY) || '',
+  SUPABASE_URL: (window.FL && window.FL.SUPABASE_URL) || '',
+  SUPABASE_ANON_KEY: (window.FL && window.FL.SUPABASE_ANON_KEY) || '',
   VERIFICATION_SOURCE: 'Apple Watch + Strava',
   MARATHON_TARGET: 'Standard Chartered Singapore Marathon',
   MARATHON_DATE: '2026-12-06',
