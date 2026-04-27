@@ -1,0 +1,63 @@
+{
+  "hosting": {
+    "site": "firstlightlive-5012b",
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "**/.*",
+      "*.sql",
+      "*.md",
+      "*.zip",
+      "*.docx",
+      "*.pdf",
+      "*.mp4",
+      "*.PNG",
+      "*.secret",
+      "*.key",
+      "node_modules/**",
+      "scripts/**",
+      "supabase/**",
+      "cloud-function/**",
+      "_archive/**"
+    ],
+    "headers": [
+      {
+        "source": "**/*.js",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, must-revalidate"},
+          {"key": "X-Content-Type-Options", "value": "nosniff"}
+        ]
+      },
+      {
+        "source": "**/*.css",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, must-revalidate"},
+          {"key": "X-Content-Type-Options", "value": "nosniff"}
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"},
+          {"key": "X-Content-Type-Options", "value": "nosniff"},
+          {"key": "X-Frame-Options", "value": "SAMEORIGIN"},
+          {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"}
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          {"key": "X-Content-Type-Options", "value": "nosniff"},
+          {"key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains"},
+          {"key": "X-Frame-Options", "value": "SAMEORIGIN"},
+          {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"},
+          {"key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()"},
+          {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://storage.googleapis.com https://*.supabase.co https://*.cdninstagram.com https://*.fbcdn.net https://scontent.cdninstagram.com https://api.mapbox.com data: blob:; connect-src 'self' https://edgnudrbysybefbqyijq.supabase.co https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net https://firstlight-sync-4b3niql4ha-el.a.run.app https://storage.googleapis.com https://www.strava.com https://script.google.com https://generativelanguage.googleapis.com https://api.openai.com; media-src 'self' blob:; frame-src 'self'; worker-src 'self' blob:;"}
+        ]
+      }
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
+  }
+}

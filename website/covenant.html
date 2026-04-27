@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>The Iron Covenant — FIRST LIGHT</title>
+  <meta name="description" content="The 5 disciplines and 25 rules that govern every day. The Iron Covenant of First Light.">
+  <meta name="keywords" content="discipline rules, iron covenant, fitness rules, morning protocol, food code, digital fortress, accountability system">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://firstlight.live/covenant.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       THE IRON SCROLL — Cinematic Covenant Redesign
+       ═══════════════════════════════════════════════════════ */
+
+    /* --- Film grain + scan-line overlay --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+    }
+
+    /* --- Animated cyan underline keyframes --- */
+    @keyframes underline-expand {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    /* --- Rotating gradient border for clause boxes --- */
+    @keyframes border-rotate {
+      0%   { --border-angle: 0deg; }
+      100% { --border-angle: 360deg; }
+    }
+    @property --border-angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    /* --- Reveal / fade-in on scroll --- */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* --- Declaration line stagger --- */
+    .declaration-line.reveal.visible {
+      animation: fadeInUp 0.7s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .declaration-line:nth-child(2).reveal.visible  { animation-delay: 0.05s; }
+    .declaration-line:nth-child(3).reveal.visible  { animation-delay: 0.10s; }
+    .declaration-line:nth-child(4).reveal.visible  { animation-delay: 0.15s; }
+    .declaration-line:nth-child(5).reveal.visible  { animation-delay: 0.20s; }
+    .declaration-line:nth-child(6).reveal.visible  { animation-delay: 0.25s; }
+    .declaration-line:nth-child(7).reveal.visible  { animation-delay: 0.30s; }
+    .declaration-line:nth-child(8).reveal.visible  { animation-delay: 0.35s; }
+    .declaration-line:nth-child(9).reveal.visible  { animation-delay: 0.40s; }
+    .declaration-line:nth-child(10).reveal.visible { animation-delay: 0.45s; }
+
+    /* --- Penalty red glow pulse --- */
+    @keyframes penalty-pulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(255,68,68,0.15), inset 0 0 8px rgba(255,68,68,0.03); }
+      50%      { box-shadow: 0 0 20px rgba(255,68,68,0.3), inset 0 0 16px rgba(255,68,68,0.06); }
+    }
+
+    /* --- Gold shimmer for pull-quote --- */
+    @keyframes gold-shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    /* ── PAGE HEADER — massive serif banner ── */
+    .page-header {
+      position: relative;
+      padding: clamp(80px, 14vw, 160px) 0 clamp(48px, 8vw, 80px);
+      text-align: center;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(0,212,255,0.03) 0%, transparent 70%);
+    }
+    .page-header .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 6px;
+      color: var(--cyan);
+      opacity: 0.5;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.4rem, 8vw, 5.5rem);
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: clamp(2px, 0.8vw, 10px);
+      line-height: 1.1;
+      margin: 0 0 20px;
+      position: relative;
+      display: inline-block;
+    }
+    .page-header h1::after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 2px;
+      margin-top: 16px;
+      background: var(--cyan);
+      transform-origin: left;
+      animation: underline-expand 1.2s cubic-bezier(0.22,1,0.36,1) 0.4s both;
+    }
+    .page-header p {
+      font-family: var(--font-mono);
+      font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      margin-top: 8px;
+    }
+
+    /* ── COVENANT SECTIONS ── */
+    .covenant-section {
+      position: relative;
+      padding: clamp(48px, 6vw, 72px) 0;
+      border-bottom: 1px solid rgba(0,212,255,0.05);
+      overflow: hidden;
+    }
+    .covenant-section:last-of-type {
+      border-bottom: none;
+    }
+
+    /* --- Watermark discipline numbers --- */
+    .discipline-watermark {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(8rem, 22vw, 16rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--cyan);
+      opacity: 0.04;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+
+    .discipline-header {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .discipline-num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 900;
+      color: var(--cyan);
+      opacity: 0.3;
+      line-height: 1;
+    }
+    .discipline-title {
+      font-family: var(--font-mono);
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    /* ── RULE LIST + ITEMS ── */
+    .rule-list {
+      padding-left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      z-index: 1;
+    }
+    .rule-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      font-family: var(--font-mono);
+      font-size: clamp(12px, 1.6vw, 14px);
+      color: var(--text-muted);
+      line-height: 1.7;
+      padding: 10px 16px;
+      border-left: 2px solid transparent;
+      border-radius: 0 8px 8px 0;
+      transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+    }
+    .rule-item:hover {
+      border-left-color: var(--cyan);
+      background: rgba(0,212,255,0.03);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .rule-item::before {
+      content: '';
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      margin-top: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      opacity: 0.35;
+    }
+
+    /* ── PENALTY BOX — pulsing red glow ── */
+    .rule-penalty {
+      margin-top: 20px;
+      padding: 16px 22px;
+      background: rgba(255,68,68,0.04);
+      border: 1px solid rgba(255,68,68,0.2);
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--red);
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 1;
+      animation: penalty-pulse 3s ease-in-out infinite;
+    }
+
+    /* ── CLAUSE BOXES — animated gradient border ── */
+    .clause-box {
+      position: relative;
+      margin-top: 20px;
+      padding: 22px 24px;
+      border-radius: 12px;
+      z-index: 1;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid transparent;
+      background-clip: padding-box;
+    }
+    .clause-box::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 13px;
+      padding: 1px;
+      background: conic-gradient(
+        from var(--border-angle, 0deg),
+        rgba(252,76,2,0.4),
+        rgba(0,212,255,0.2),
+        rgba(245,166,35,0.3),
+        rgba(252,76,2,0.4)
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: border-rotate 6s linear infinite;
+      pointer-events: none;
+    }
+    .clause-box.clause-cyan::before {
+      background: conic-gradient(
+        from var(--border-angle, 0deg),
+        rgba(0,212,255,0.4),
+        rgba(245,166,35,0.15),
+        rgba(0,230,118,0.2),
+        rgba(0,212,255,0.4)
+      );
+    }
+    .clause-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* ── DECLARATION — glass card with gold ── */
+    .declaration {
+      padding: clamp(60px, 10vw, 100px) 0;
+      text-align: center;
+    }
+    .declaration-card {
+      background: rgba(0,212,255,0.02);
+      border: 1px solid rgba(245,166,35,0.08);
+      border-radius: 16px;
+      padding: clamp(32px, 5vw, 56px) clamp(20px, 4vw, 48px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .declaration-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 6px;
+      margin-bottom: 48px;
+      text-transform: uppercase;
+    }
+    .declaration-line {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1.6vw, 1rem);
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 1px;
+      line-height: 1.6;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(245,166,35,0.04);
+    }
+    .declaration-line:last-of-type {
+      border-bottom: none;
+    }
+    .declaration-line .line-num {
+      color: var(--gold);
+      opacity: 0.7;
+      font-weight: 700;
+    }
+
+    /* ── IKIGAI PULL QUOTE — gold shimmer ── */
+    .ikigai {
+      text-align: center;
+      padding: clamp(48px, 8vw, 80px) 0 40px;
+      max-width: 740px;
+      margin: 0 auto;
+    }
+    .ikigai p {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.9;
+      letter-spacing: 0.5px;
+      background: linear-gradient(
+        90deg,
+        var(--gold) 0%,
+        #FFD700 25%,
+        #FFA500 50%,
+        #FFD700 75%,
+        var(--gold) 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gold-shimmer 6s linear infinite;
+    }
+
+    /* ── PRINT BUTTON ── */
+    .print-btn {
+      margin-top: 32px;
+    }
+
+    /* ── SEPARATOR ── */
+    .sep {
+      opacity: 0.15;
+    }
+
+    /* ── SCROLL REVEAL OBSERVER — injected via inline script ── */
+
+    /* ── PRINT ── */
+    @media print {
+      body::before, body::after { display: none !important; }
+      .nav, .nav-mobile, .footer, .print-btn { display: none !important; }
+      body { background: #000; }
+      .declaration-line { font-size: 12px; }
+      .discipline-watermark { display: none; }
+      .clause-box::before { display: none; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+
+    /* ── MOBILE FINE-TUNE ── */
+    @media (max-width: 480px) {
+      .discipline-watermark {
+        font-size: 7rem;
+        right: -5px;
+        top: 0;
+      }
+      .clause-box {
+        padding: 16px 14px;
+      }
+      .rule-item {
+        padding: 8px 10px;
+        gap: 10px;
+      }
+      .declaration-card {
+        padding: 24px 16px;
+      }
+    }
+  </style>
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:title" content="The Iron Covenant — FIRST LIGHT">
+  <meta property="og:description" content="5 disciplines. 25 rules. The code that governs every day.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live/covenant.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Iron Covenant — FIRST LIGHT">
+  <meta name="twitter:description" content="5 disciplines. 25 rules. The code that governs every day.">
+  <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
+</head>
+<body>
+
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link active">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link active">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+<script>
+(function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
+</script>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="section-label reveal">THE COVENANT</div>
+    <h1 class="reveal">THE IRON COVENANT</h1>
+    <p class="reveal">The 5 disciplines and 25 rules that govern every day.</p>
+  </div>
+</div>
+
+<main class="container">
+
+  <!-- DISCIPLINE 1 -->
+  <section class="covenant-section reveal">
+    <div class="discipline-watermark">01</div>
+    <div class="discipline-header">
+      <span class="discipline-num">01</span>
+      <span class="discipline-title">FOOD CODE</span>
+    </div>
+    <div class="rule-list">
+      <div class="rule-item">No frying</div>
+      <div class="rule-item">No sugar (raw fruits only — no juices, no sweets)</div>
+      <div class="rule-item">No alcohol</div>
+      <div class="rule-item">No smoking</div>
+      <div class="rule-item">No cold drinks</div>
+      <div class="rule-item">No junk food</div>
+    </div>
+    <div class="rule-penalty">VIOLATION PENALTY: 20km walk, uploaded with proof. <a href="accountability.html" style="color:var(--cyan);text-decoration:underline">View the public ledger →</a></div>
+  </section>
+
+  <!-- DISCIPLINE 2 -->
+  <section class="covenant-section reveal">
+    <div class="discipline-watermark">02</div>
+    <div class="discipline-header">
+      <span class="discipline-num">02</span>
+      <span class="discipline-title">MORNING PROTOCOL</span>
+    </div>
+    <div class="rule-list">
+      <div class="rule-item">Wake before 4:00 AM (Brahma Muhurta — pre-dawn sacred window, 3:30-5:30 AM)</div>
+      <div class="rule-item">Run before 6:00 AM — <strong style="color:var(--red)">EVERY DAY. ZERO REST DAYS. NO EXCEPTIONS.</strong></div>
+      <div class="rule-item">Gym session — strength training mandatory. Max 1-2 rest days per week.</div>
+      <div class="rule-item">All sessions complete before the world wakes</div>
+      <div class="rule-item">Apple Watch / Garmin + Strava verified — GPS proof on every run, every gym — <a href="strava.html" style="color:var(--cyan);text-decoration:underline">view live data →</a></div>
+    </div>
+
+    <!-- RACE DAY CLAUSE -->
+    <div class="clause-box">
+      <div class="clause-label" style="color:#FC4C02">RACE DAY CLAUSE</div>
+      <div class="rule-list" style="gap:8px">
+        <div class="rule-item">Applies to <strong style="color:var(--text)">Ultra Marathon, Marathon, Half Marathon, and any registered race that starts before 6:00 AM</strong></div>
+        <div class="rule-item">BIB number must be uploaded to the <a href="marathon.html" style="color:var(--cyan);text-decoration:underline">Races</a> page and posted on <a href="https://www.instagram.com/firstlightlive" style="color:#E1306C;text-decoration:underline" target="_blank">Instagram</a> before race day as public proof of registration</div>
+        <div class="rule-item">The race itself counts as the day's run — no separate morning run required</div>
+        <div class="rule-item">Instagram carousel and reel may be delayed on race day — the race takes priority</div>
+        <div class="rule-item">If the race starts <strong style="color:var(--red)">after 6:00 AM</strong> — the regular 5 km morning run must still happen before the race. No exceptions.</div>
+        <div class="rule-item"><strong style="color:var(--text)">Running is never excused.</strong> Only the post timing gets flexibility. The run happens — either on the race course or before it.</div>
+      </div>
+    </div>
+
+    <!-- FLIGHT TRAVEL CLAUSE -->
+    <div class="clause-box clause-cyan">
+      <div class="clause-label" style="color:var(--cyan)">FLIGHT TRAVEL CLAUSE — RED-EYE WINDOW</div>
+      <div class="rule-list" style="gap:8px">
+        <div class="rule-item">If flight departs between <strong style="color:var(--text)">00:30 AM and 06:00 AM</strong> — the morning run window is physically impossible</div>
+        <div class="rule-item">Upon landing, walk <strong style="color:var(--text)">5 km from the airport</strong> — GPS verified via Strava. No cab until the walk is done.</div>
+        <div class="rule-item">The walk must happen immediately after landing — no hotel first, no delays</div>
+        <div class="rule-item">Instagram post can be delayed until after the walk is complete and uploaded</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCIPLINE 3 -->
+  <section class="covenant-section reveal">
+    <div class="discipline-watermark">03</div>
+    <div class="discipline-header">
+      <span class="discipline-num">03</span>
+      <span class="discipline-title">DIGITAL FORTRESS</span>
+    </div>
+    <div class="rule-list">
+      <div class="rule-item">No device enters the home — phone stays in car, no exceptions</div>
+      <div class="rule-item">No social media before morning protocol complete</div>
+      <div class="rule-item">Zero notifications during deep work blocks</div>
+      <div class="rule-item">Laptop stays at office — never brought home</div>
+    </div>
+  </section>
+
+  <!-- DISCIPLINE 4 -->
+  <section class="covenant-section reveal">
+    <div class="discipline-watermark">04</div>
+    <div class="discipline-header">
+      <span class="discipline-num">04</span>
+      <span class="discipline-title">SPIRITUALITY</span>
+    </div>
+    <div class="rule-list">
+      <div class="rule-item">Daily Japa (mantra meditation) — morning and evening</div>
+      <div class="rule-item">Nasya (Ayurvedic nasal cleansing) every morning</div>
+      <div class="rule-item">Temple visit — phone stays in the car</div>
+      <div class="rule-item">Ekadashi (bi-monthly sacred fast) fasting observed — twice per month</div>
+    </div>
+  </section>
+
+  <!-- DISCIPLINE 5 -->
+  <section class="covenant-section reveal">
+    <div class="discipline-watermark">05</div>
+    <div class="discipline-header">
+      <span class="discipline-num">05</span>
+      <span class="discipline-title">COMMAND CENTER</span>
+    </div>
+    <div class="rule-list">
+      <div class="rule-item">Every metric tracked in the FirstLight application — sleep, run, gym, food, mood, rituals</div>
+      <div class="rule-item">93+ daily rituals across morning, midday, and evening — each one checked off</div>
+      <div class="rule-item">Strava + Instagram auto-synced daily — no manual intervention</div>
+      <div class="rule-item">Historical data is permanently locked — even admin cannot modify past records</div>
+      <div class="rule-item">No day goes unrecorded. The system is the witness.</div>
+    </div>
+  </section>
+
+  <!-- Separator -->
+  <div class="sep" style="margin:40px auto;max-width:200px"></div>
+
+  <!-- THE FIRST LIGHT DECLARATION -->
+  <section class="declaration">
+    <div class="declaration-card">
+      <div class="declaration-title reveal">THE FIRST LIGHT DECLARATION</div>
+      <div class="declaration-line reveal"><span class="line-num">ONE</span> — I wake before the sun. Every day. No negotiation.</div>
+      <div class="declaration-line reveal"><span class="line-num">TWO</span> — I run before 6 AM. Rain, travel, pain — irrelevant.</div>
+      <div class="declaration-line reveal"><span class="line-num">THREE</span> — I train my body and mind. Every session earned, never skipped.</div>
+      <div class="declaration-line reveal"><span class="line-num">FOUR</span> — I follow the food code. Seven rules. Zero tolerance.</div>
+      <div class="declaration-line reveal"><span class="line-num">FIVE</span> — I document everything. The Command Center tracks it. The <a href="accountability.html" style="color:var(--cyan)">Accountability Ledger</a> is public. Historical records are immutable — even I cannot change them.</div>
+      <div class="declaration-line reveal"><span class="line-num">SIX</span> — I stake ₹<span data-stake-daily>15,000</span> every single day. Miss once and a stranger collects. <span style="color:var(--gold)">₹<span data-unclaimed>—</span></span> unclaimed so far.</div>
+      <div class="declaration-line reveal"><span class="line-num">SEVEN</span> — I control my devices. They do not control me.</div>
+      <div class="declaration-line reveal"><span class="line-num">EIGHT</span> — I honour the spiritual disciplines. Japa. Nasya. Brahma Muhurta.</div>
+      <div class="declaration-line reveal"><span class="line-num">NINE</span> — I am not trying to win. I am refusing to stop.</div>
+    </div>
+  </section>
+
+  <!-- Ikigai Closing -->
+  <div class="ikigai reveal">
+    <p>"This is not a challenge. This is not a phase. This is the architecture of the man I am building — one morning at a time."</p>
+  </div>
+
+  <!-- Print Button -->
+  <div class="text-center print-btn reveal" style="padding-bottom:80px">
+    <button class="btn btn-outline" onclick="window.print()">PRINT / SAVE PDF</button>
+  </div>
+
+</main>
+
+<!-- Scroll reveal observer -->
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(function(e){ e.classList.add('visible'); }); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); io.unobserve(entry.target); }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(function(el){ io.observe(el); });
+})();
+</script>
+
+<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
+
+<script src="app.js"></script>
+</body>
+</html>
+ 

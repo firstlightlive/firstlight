@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>How It Works — FIRST LIGHT</title>
+  <meta name="description" content="50 database tables. 130+ daily checkpoints. 8 cloud syncs. Real-time cross-device sync. The engineering behind the infinite streak.">
+  <meta name="keywords" content="fitness system architecture, accountability technology, Strava integration, real-time sync, discipline engineering, personal OS">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://firstlight.live/system.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:title" content="How It Works — FIRST LIGHT">
+  <meta property="og:description" content="50 tables. 130+ daily items. 8 cloud syncs. The engineering behind an infinite streak.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live/system.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How It Works — FIRST LIGHT">
+  <meta name="twitter:description" content="50 tables. 130+ daily items. The engineering behind an infinite streak.">
+  <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
+  <style>
+    /* ═══════════════════════════════════════════════
+       THE MACHINE BLUEPRINT — Cinematic System Page
+       ═══════════════════════════════════════════════ */
+
+    /* Film grain overlay on body */
+    body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.008) 2px,rgba(255,255,255,0.008) 4px);
+      mix-blend-mode:overlay}
+
+    /* Scan line effect */
+    body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;opacity:0.03;
+      background:repeating-linear-gradient(180deg,transparent 0px,transparent 1px,rgba(0,212,255,0.15) 1px,transparent 2px);
+      background-size:100% 4px;animation:scanDrift 8s linear infinite}
+    @keyframes scanDrift{0%{background-position:0 0}100%{background-position:0 100px}}
+
+    /* ─── HERO ─── */
+    .sys-hero{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+
+    /* Circuit grid pattern */
+    .sys-hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;
+      background:
+        repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(0,212,255,0.04) 59px,rgba(0,212,255,0.04) 60px),
+        repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(0,212,255,0.04) 59px,rgba(0,212,255,0.04) 60px);
+      mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,black 20%,transparent 70%);
+      -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,black 20%,transparent 70%)}
+
+    /* Radial glow */
+    .sys-hero::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;
+      background:radial-gradient(circle at 50% 30%,rgba(0,212,255,0.06) 0%,transparent 50%),
+      radial-gradient(circle at 30% 70%,rgba(245,166,35,0.03) 0%,transparent 40%),
+      radial-gradient(circle at 70% 60%,rgba(0,230,118,0.03) 0%,transparent 40%)}
+
+    .sys-section{padding:100px 24px;max-width:920px;margin:0 auto;position:relative}
+    .sys-divider{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);margin:0 auto}
+
+    /* Section headers — cinematic serif */
+    .section-num{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:6px;margin-bottom:12px;position:relative;display:inline-block}
+    .section-num::before,.section-num::after{content:'';position:absolute;top:50%;width:40px;height:1px;opacity:0.2}
+    .section-num::before{right:calc(100% + 12px)}
+    .section-num::after{left:calc(100% + 12px)}
+
+    /* ─── TIMELINE ─── */
+    .tl-wrap{position:relative;padding-left:56px;max-width:640px;margin:0 auto}
+    .tl-line{position:absolute;left:22px;top:0;bottom:0;width:2px;
+      background:linear-gradient(180deg,#00D4FF 0%,#00E676 20%,#E1306C 35%,#F5A623 50%,#FF5252 60%,#00D4FF 75%,#FF5252 100%);opacity:0.2;
+      overflow:visible}
+    /* Animated pulse traveling down the line */
+    .tl-line::after{content:'';position:absolute;left:-3px;top:0;width:8px;height:60px;
+      background:linear-gradient(180deg,transparent,rgba(0,212,255,0.8),transparent);
+      border-radius:4px;animation:linePulse 3s ease-in-out infinite;filter:blur(2px)}
+    @keyframes linePulse{0%{top:-60px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+
+    .tl-node{position:relative;margin-bottom:36px}
+    .tl-node:last-child{margin-bottom:0}
+    .tl-dot{position:absolute;left:-50px;top:6px;width:14px;height:14px;border-radius:50%;box-shadow:0 0 16px currentColor,0 0 32px currentColor;animation:dotGlow 2s ease-in-out infinite alternate}
+    @keyframes dotGlow{0%{box-shadow:0 0 8px currentColor,0 0 16px currentColor}100%{box-shadow:0 0 20px currentColor,0 0 40px currentColor}}
+    .tl-time{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;margin-bottom:6px}
+    .tl-title{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#E8EDF2;letter-spacing:1px;margin-bottom:6px}
+    .tl-desc{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.8}
+    .tl-alert{padding:10px 14px;background:rgba(255,82,82,0.05);border-left:2px solid #FF5252;border-radius:0 8px 8px 0;margin-top:8px}
+
+    /* ─── DATA FLOW — Glass morphism pills ─── */
+    .flow-container{position:relative;max-width:740px;margin:0 auto;padding:20px 0}
+    .flow-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+    .flow-node{padding:14px 20px;border-radius:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.5px;text-align:center;min-width:110px;position:relative;
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      box-shadow:0 4px 24px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);
+      transition:transform 0.3s,box-shadow 0.3s}
+    .flow-node:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 8px 32px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08)}
+    .flow-arrow{font-family:'IBM Plex Mono',monospace;font-size:18px;color:rgba(0,212,255,0.4);animation:flowPulse 2s ease-in-out infinite;text-shadow:0 0 12px rgba(0,212,255,0.3)}
+    @keyframes flowPulse{0%,100%{opacity:0.3;transform:translateX(0);text-shadow:0 0 8px rgba(0,212,255,0.2)}50%{opacity:0.9;transform:translateX(4px);text-shadow:0 0 20px rgba(0,212,255,0.6)}}
+
+    /* ─── UNBREAKABLE LAYERS — Glass cards ─── */
+    .layer{padding:22px 28px;margin-bottom:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;border-radius:12px;display:flex;align-items:center;gap:16px;
+      transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);cursor:default;position:relative;overflow:hidden;
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .layer::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;transition:width 0.4s,opacity 0.4s}
+    .layer:hover{transform:translateX(12px) scale(1.01);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .layer:hover::before{width:5px;opacity:1}
+    .layer:hover .layer-desc{opacity:1;max-height:100px;margin-top:4px}
+    .layer-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;opacity:0.2;min-width:36px;transition:opacity 0.4s}
+    .layer:hover .layer-num{opacity:0.5}
+    .layer-title{font-weight:700;color:#E8EDF2;min-width:160px;letter-spacing:1px}
+    .layer-desc{color:#8a9bb0;font-size:11px;line-height:1.7;transition:opacity 0.4s,max-height 0.4s}
+
+    /* Layer accent colors */
+    .layer:nth-child(1)::before{background:#00D4FF}
+    .layer:nth-child(2)::before{background:#F5A623}
+    .layer:nth-child(3)::before{background:#FF5252}
+    .layer:nth-child(4)::before{background:#00E676}
+    .layer:nth-child(5)::before{background:#E040FB}
+
+    /* ─── TECH STACK — Terminal aesthetic ─── */
+    .tech-stack-terminal{max-width:640px;margin:0 auto;padding:28px 28px 20px;background:rgba(0,0,0,0.5);
+      border:1px solid rgba(0,230,118,0.15);border-radius:12px;position:relative;overflow:hidden;
+      box-shadow:0 0 40px rgba(0,230,118,0.03),inset 0 0 60px rgba(0,0,0,0.3)}
+    .tech-stack-terminal::before{content:'● ● ●';position:absolute;top:12px;left:16px;font-size:8px;letter-spacing:6px;color:rgba(0,230,118,0.3)}
+    .tech-stack-terminal::after{content:'system.config';position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(0,230,118,0.2);letter-spacing:2px}
+
+    .tech-row{display:flex;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid rgba(0,230,118,0.06);font-family:'IBM Plex Mono',monospace;position:relative}
+    .tech-row::before{content:'>';color:rgba(0,230,118,0.3);font-size:10px;margin-right:4px}
+    .tech-label{font-size:10px;letter-spacing:2px;min-width:100px;font-weight:700}
+    .tech-val{font-size:11px;color:rgba(0,230,118,0.6);transition:color 0.3s}
+    .tech-row:hover .tech-val{color:rgba(0,230,118,0.9)}
+
+    /* ─── COST — Gold shimmer ─── */
+    .cost-num{font-family:'Playfair Display',serif;font-size:clamp(100px,25vw,180px);font-weight:900;line-height:1;
+      background:linear-gradient(135deg,#F5A623 0%,#FFD700 25%,#F5A623 50%,#FFD700 75%,#F5A623 100%);
+      background-size:200% 200%;
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      animation:goldShimmer 3s ease-in-out infinite;
+      filter:drop-shadow(0 0 60px rgba(245,166,35,0.25));
+      letter-spacing:-4px}
+    @keyframes goldShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    /* ─── FEATURE GRID — Glass cards with glow ─── */
+    .feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+    .feat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px;
+      transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);position:relative;overflow:hidden;
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,rgba(0,212,255,0.3),transparent);opacity:0;transition:opacity 0.4s}
+    .feat-card:hover{border-color:rgba(0,212,255,0.25);transform:translateY(-4px);
+      box-shadow:0 12px 40px rgba(0,0,0,0.3),0 0 30px rgba(0,212,255,0.05)}
+    .feat-card:hover::before{opacity:1}
+    .feat-icon{font-size:28px;margin-bottom:16px;display:inline-flex;align-items:center;justify-content:center;
+      width:52px;height:52px;border-radius:14px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.1)}
+    .feat-card:nth-child(2) .feat-icon{background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.1)}
+    .feat-card:nth-child(3) .feat-icon{background:rgba(224,64,251,0.06);border-color:rgba(224,64,251,0.1)}
+    .feat-card:nth-child(4) .feat-icon{background:rgba(255,82,82,0.06);border-color:rgba(255,82,82,0.1)}
+    .feat-card:nth-child(5) .feat-icon{background:rgba(0,230,118,0.06);border-color:rgba(0,230,118,0.1)}
+    .feat-card:nth-child(6) .feat-icon{background:rgba(225,48,108,0.06);border-color:rgba(225,48,108,0.1)}
+    .feat-card:nth-child(7) .feat-icon{background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.1)}
+    .feat-card:nth-child(8) .feat-icon{background:rgba(255,82,82,0.06);border-color:rgba(255,82,82,0.1)}
+    .feat-card:nth-child(9) .feat-icon{background:rgba(0,212,255,0.06);border-color:rgba(0,212,255,0.1)}
+    .feat-card:nth-child(10) .feat-icon{background:rgba(252,76,2,0.06);border-color:rgba(252,76,2,0.1)}
+    .feat-card:nth-child(11) .feat-icon{background:rgba(224,64,251,0.06);border-color:rgba(224,64,251,0.1)}
+    .feat-card:nth-child(12) .feat-icon{background:rgba(0,230,118,0.06);border-color:rgba(0,230,118,0.1)}
+    .feat-title{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:#E8EDF2;letter-spacing:1px;margin-bottom:8px}
+    .feat-desc{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7}
+
+    /* ─── STAT BAR — Glass with accent top line ─── */
+    .stat-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:720px;margin:0 auto}
+    .stat-item{text-align:center;padding:24px 8px 20px;border-radius:14px;position:relative;overflow:hidden;
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      background:rgba(255,255,255,0.02);transition:transform 0.3s,box-shadow 0.3s}
+    .stat-item::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;border-radius:0 0 2px 2px;transition:all 0.3s}
+    .stat-item:nth-child(1)::before{background:#00D4FF;box-shadow:0 0 12px rgba(0,212,255,0.3)}
+    .stat-item:nth-child(2)::before{background:#00E676;box-shadow:0 0 12px rgba(0,230,118,0.3)}
+    .stat-item:nth-child(3)::before{background:#F5A623;box-shadow:0 0 12px rgba(245,166,35,0.3)}
+    .stat-item:nth-child(4)::before{background:#E040FB;box-shadow:0 0 12px rgba(224,64,251,0.3)}
+    .stat-item:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+    .stat-item:hover::before{left:10%;right:10%}
+    .stat-num{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,42px);font-weight:900;line-height:1}
+    .stat-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:2px;color:#5a6a7a;margin-top:8px}
+
+    /* ─── CTA — Animated border ─── */
+    .cta-link{display:inline-block;padding:14px 32px;border:1px solid rgba(0,212,255,0.2);border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--cyan);text-decoration:none;transition:all 0.3s;margin:6px;position:relative;overflow:hidden}
+    .cta-link::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(0,212,255,0.08),transparent);
+      transition:left 0.5s}
+    .cta-link:hover{background:rgba(0,212,255,0.06);border-color:rgba(0,212,255,0.5);
+      box-shadow:0 0 20px rgba(0,212,255,0.1);transform:translateY(-2px)}
+    .cta-link:hover::before{left:100%}
+
+    /* ─── PHASE 2 — Blueprint dashed border ─── */
+    .phase2-card{position:relative;overflow:hidden;border-radius:14px}
+    .phase2-card::before{content:'';position:absolute;inset:-2px;border-radius:16px;padding:2px;
+      background:conic-gradient(from 0deg,#00D4FF,#00E676,#F5A623,#E040FB,#00D4FF);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;
+      animation:borderRotate 6s linear infinite;opacity:0.3}
+    @keyframes borderRotate{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+
+    /* ─── CLOSING SECTION — Cinematic glow ─── */
+    .closing-section{position:relative;overflow:hidden}
+    .closing-section::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:800px;
+      background:radial-gradient(circle,rgba(0,212,255,0.06) 0%,rgba(245,166,35,0.03) 30%,transparent 60%);pointer-events:none}
+
+    /* ─── SCROLL REVEAL enhancements ─── */
+    .reveal{opacity:0;transform:translateY(40px);transition:opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94),transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width:600px){
+      .stat-bar{grid-template-columns:repeat(2,1fr);gap:10px}
+      .tl-wrap{padding-left:44px}
+      .tl-dot{left:-30px;width:10px;height:10px}
+      .tl-line{left:16px}
+      .flow-row{flex-direction:column;gap:8px}
+      .flow-arrow{transform:rotate(90deg)}
+      .layer{flex-direction:column;align-items:flex-start;gap:6px;padding:18px 20px}
+      .layer-title{min-width:auto}
+      .layer-num{font-size:22px}
+      .tech-row{flex-direction:column;gap:4px}
+      .tech-stack-terminal{padding:28px 16px 16px}
+      .feat-grid{grid-template-columns:1fr}
+      .cost-num{letter-spacing:-2px}
+      .sys-section{padding:80px 20px}
+    }
+
+    @media(max-width:375px){
+      .stat-bar{gap:8px}
+      .stat-item{padding:18px 4px 16px}
+      .stat-num{font-size:24px}
+      .flow-node{min-width:90px;padding:12px 14px;font-size:10px}
+      .feat-card{padding:20px}
+      .layer{padding:16px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link active">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link active">HOW IT WORKS</a></div>
+<script>
+(function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 1 — THE OPENING
+     ═══════════════════════════════════════════════════════════ -->
+<section class="sys-hero">
+  <div style="position:relative;z-index:1;max-width:700px">
+    <!-- THE ENGINEERING — Hero word -->
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:6px;color:rgba(255,255,255,0.15);margin-bottom:20px">[ SYSTEM ARCHITECTURE ]</div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(2.2rem,9vw,4.5rem);font-weight:900;letter-spacing:2px;line-height:1;margin-bottom:6px">
+      <span style="color:rgba(255,255,255,0.08)">HOW THE</span>
+    </div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(2.8rem,12vw,6rem);font-weight:900;letter-spacing:2px;line-height:1;margin-bottom:6px">
+      <span style="background:linear-gradient(135deg,#00D4FF 0%,#00E676 50%,#00D4FF 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 40px rgba(0,212,255,0.2));animation:goldShimmer 4s ease-in-out infinite">SYSTEM</span>
+    </div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(2.8rem,12vw,6rem);font-weight:900;letter-spacing:2px;line-height:1;margin-bottom:28px">
+      <span style="color:rgba(255,255,255,0.08)">WORKS</span>
+    </div>
+
+    <!-- The tagline — #2 visual weight, the identity line -->
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(1rem,3.2vw,1.4rem);font-weight:400;color:#F5A623;letter-spacing:0.5px;line-height:1.5;margin-bottom:32px;font-style:italic;position:relative;display:inline-block">
+      <span style="position:absolute;left:-16px;top:-2px;font-size:24px;opacity:0.2;font-style:normal;color:#F5A623">"</span>
+      Built by a Engineer<br>who doesn't believe in motivation.
+      <span style="font-size:24px;opacity:0.2;font-style:normal;color:#F5A623">"</span>
+    </div>
+
+    <!-- The punchline -->
+    <div style="margin-bottom:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:clamp(0.85rem,2.8vw,1.1rem);font-weight:500;color:#5a6a7a;letter-spacing:0.5px">Most people use apps to track habits.</span>
+    </div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,5vw,2.6rem);font-weight:900;letter-spacing:1px;line-height:1.2;margin-bottom:28px">
+      <span style="background:linear-gradient(135deg,#00D4FF,#00E676);-webkit-background-clip:text;-webkit-text-fill-color:transparent">I built the app.</span>
+    </h1>
+
+    <!-- Description — smallest, just context -->
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;line-height:1.8;max-width:480px;margin:0 auto 44px;letter-spacing:0.3px">A single-person accountability OS — engineered from scratch to be stronger than willpower, excuses, or any weak moment at 3 AM.</p>
+
+    <div class="stat-bar">
+      <div class="stat-item" style="border:1px solid rgba(0,212,255,0.12)">
+        <div class="stat-num" style="color:#00D4FF">50</div>
+        <div class="stat-label">DATABASE<br>TABLES</div>
+      </div>
+      <div class="stat-item" style="border:1px solid rgba(0,230,118,0.12)">
+        <div class="stat-num" style="color:#00E676">130<span style="font-size:60%;opacity:0.6">+</span></div>
+        <div class="stat-label">DAILY<br>CHECKPOINTS</div>
+      </div>
+      <div class="stat-item" style="border:1px solid rgba(245,166,35,0.12)">
+        <div class="stat-num" style="color:#F5A623">8</div>
+        <div class="stat-label">CLOUD SYNCS<br>PER DAY</div>
+      </div>
+      <div class="stat-item" style="border:1px solid rgba(224,64,251,0.12)">
+        <div class="stat-num" style="color:#E040FB">&lt;1<span style="font-size:50%;opacity:0.6">s</span></div>
+        <div class="stat-label">CROSS-DEVICE<br>SYNC</div>
+      </div>
+    </div>
+
+    <div style="margin-top:48px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(0,212,255,0.4);letter-spacing:4px;animation:pulse 2s infinite">↓ SCROLL TO EXPLORE ↓</div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 3 — THE DATA FLOW
+     ═══════════════════════════════════════════════════════════ -->
+<section class="sys-section reveal" style="border-top:1px solid rgba(0,212,255,0.06)">
+  <div style="text-align:center;margin-bottom:40px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:#00D4FF;margin-bottom:12px;opacity:0.7">SECTION 02</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.2rem,4vw,2rem);font-weight:900;color:#E8EDF2;letter-spacing:1px">THE DATA FLOW</h2>
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;margin-top:8px">How data moves from your wrist to the world.</p>
+  </div>
+
+  <div class="flow-container">
+    <div class="flow-row">
+      <div class="flow-node" style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);color:#00D4FF">⌚ WATCH<div style="font-size:8px;color:#5a6a7a;margin-top:4px">GPS + HR + PACE</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(252,76,2,0.06);border:1px solid rgba(252,76,2,0.15);color:#FC4C02">STRAVA<div style="font-size:8px;color:#5a6a7a;margin-top:4px">API v3</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);color:#F5A623">GOOGLE CLOUD<div style="font-size:8px;color:#5a6a7a;margin-top:4px">FUNCTIONS</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.15);color:#00E676">DATABASE<div style="font-size:8px;color:#5a6a7a;margin-top:4px">50 TABLES</div></div>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-node" style="background:rgba(225,48,108,0.06);border:1px solid rgba(225,48,108,0.15);color:#E1306C">📸 PHONE<div style="font-size:8px;color:#5a6a7a;margin-top:4px">PHOTO + POST</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(225,48,108,0.06);border:1px solid rgba(225,48,108,0.15);color:#E1306C">INSTAGRAM<div style="font-size:8px;color:#5a6a7a;margin-top:4px">GRAPH API v21</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);color:#F5A623">GOOGLE CLOUD<div style="font-size:8px;color:#5a6a7a;margin-top:4px">STORAGE (GCS)</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.15);color:#00E676">PERMANENT<div style="font-size:8px;color:#5a6a7a;margin-top:4px">ARCHIVE</div></div>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-node" style="background:rgba(224,64,251,0.06);border:1px solid rgba(224,64,251,0.15);color:#E040FB">💻 ANY DEVICE<div style="font-size:8px;color:#5a6a7a;margin-top:4px">LAPTOP · TABLET · PHONE</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(224,64,251,0.06);border:1px solid rgba(224,64,251,0.15);color:#E040FB">WEBSOCKET<div style="font-size:8px;color:#5a6a7a;margin-top:4px">REAL-TIME SYNC</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:rgba(224,64,251,0.06);border:1px solid rgba(224,64,251,0.15);color:#E040FB">ALL DEVICES<div style="font-size:8px;color:#5a6a7a;margin-top:4px">&lt; 1 SECOND</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 4 — THE UNBREAKABLE LAYERS
+     ═══════════════════════════════════════════════════════════ -->
+<section class="sys-section reveal" style="border-top:1px solid rgba(0,212,255,0.06)">
+  <div style="text-align:center;margin-bottom:40px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:#FF5252;margin-bottom:12px;opacity:0.7">SECTION 03</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.2rem,4vw,2rem);font-weight:900;color:#E8EDF2;letter-spacing:1px">THE UNBREAKABLE LAYERS</h2>
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;margin-top:8px">Five layers of protection. Each one makes cheating harder. Together — impossible.</p>
+  </div>
+
+  <div style="max-width:700px;margin:0 auto">
+    <div class="layer" style="background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1)">
+      <div class="layer-num" style="color:#00D4FF">5</div>
+      <div class="layer-title" style="color:#00D4FF">PUBLIC EYES</div>
+      <div class="layer-desc">Anyone on the internet can verify and claim ₹<span data-stake-daily>15,000</span> if the 6 AM deadline is missed. The accountability is not private — it's global.</div>
+    </div>
+    <div class="layer" style="background:rgba(245,166,35,0.04);border:1px solid rgba(245,166,35,0.1)">
+      <div class="layer-num" style="color:#F5A623">4</div>
+      <div class="layer-title" style="color:#F5A623">IMMUTABLE DATABASE</div>
+      <div class="layer-desc">PostgreSQL triggers physically reject DELETE and UPDATE on sealed records. Even with admin access, the data won't change.</div>
+    </div>
+    <div class="layer" style="background:rgba(255,82,82,0.04);border:1px solid rgba(255,82,82,0.1)">
+      <div class="layer-num" style="color:#FF5252">3</div>
+      <div class="layer-title" style="color:#FF5252">MIDNIGHT LOCK</div>
+      <div class="layer-desc">At 12:00 AM, all data for the day becomes read-only. The application code refuses to write to any past date. No grace period.</div>
+    </div>
+    <div class="layer" style="background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.1)">
+      <div class="layer-num" style="color:#00E676">2</div>
+      <div class="layer-title" style="color:#00E676">CLOUD AUTOMATION</div>
+      <div class="layer-desc">8 daily cloud syncs run on Google's servers. Carousel, reel, and stories publish directly to Instagram via API. Even if every device I own dies, the cloud still pulls, verifies, publishes, and stores.</div>
+    </div>
+    <div class="layer" style="background:rgba(224,64,251,0.04);border:1px solid rgba(224,64,251,0.1)">
+      <div class="layer-num" style="color:#E040FB">1</div>
+      <div class="layer-title" style="color:#E040FB">GPS PROOF</div>
+      <div class="layer-desc">Strava GPS traces are satellite-verified. Heart rate is biometric. You cannot fake a 10km run — the physics won't allow it.</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:36px;padding:20px 24px;max-width:600px;margin-left:auto;margin-right:auto;background:rgba(255,82,82,0.03);border:1px solid rgba(255,82,82,0.08);border-radius:10px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.8;font-style:italic">"To cheat, you'd need to hack Strava's satellite GPS, bypass PostgreSQL database triggers, override Google Cloud Functions, fake Instagram's API timestamps, and do it all before midnight — while the entire internet watches."</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION — THE JUDGE (Autonomous Punishment System)
+     ═══════════════════════════════════════════════════════════ -->
+<section class="sys-section reveal" style="border-top:1px solid rgba(0,212,255,0.06)">
+  <div style="text-align:center;margin-bottom:40px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:#FF5252;margin-bottom:12px;opacity:0.7">SECTION 04</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.2rem,4vw,2rem);font-weight:900;color:#E8EDF2;letter-spacing:1px">THE JUDGE</h2>
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;margin-top:8px">The system doesn't just track. It punishes. Automatically. Publicly. Permanently.</p>
+  </div>
+
+  <div style="max-width:640px;margin:0 auto">
+
+    <!-- The flow -->
+    <div style="position:relative;padding-left:28px;border-left:2px solid rgba(255,82,82,0.2)">
+
+      <!-- Step 1 -->
+      <div style="margin-bottom:28px;position:relative">
+        <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#FF5252;box-shadow:0 0 12px rgba(255,82,82,0.4)"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#FF5252;margin-bottom:6px">STEP 1 — RULE BROKEN</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">The system detects the violation.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">When a rule is broken, the admin logs a slip. The moment it's submitted — the system takes over. The admin has no more control.</div>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="margin-bottom:28px;position:relative">
+        <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#F5A623;box-shadow:0 0 12px rgba(245,166,35,0.4)"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#F5A623;margin-bottom:6px">STEP 2 — PUNISHMENT AUTO-ASSIGNED</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">The system decides the penalty. Not the admin.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">Standard violation: <span style="color:#F5A623">20km walk</span> with GPS proof. Fortress breach: <span style="color:#FF5252">50km walk + 5km run OR 100km cycling.</span> The code assigns it. No negotiation. No appeal.</div>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="margin-bottom:28px;position:relative">
+        <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#E040FB;box-shadow:0 0 12px rgba(224,64,251,0.4)"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#E040FB;margin-bottom:6px">STEP 3 — PUBLISHED INSTANTLY</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">The slip goes live on the <a href="accountability.html" style="color:#00D4FF;text-decoration:none">public accountability ledger</a> — instantly.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">Date. Rule broken. Penalty status: <span style="color:#FF5252;font-weight:700">RED — PENDING.</span> Anyone on the internet can see it. The admin cannot hide it, delete it, or make it private. The database trigger rejects the attempt.</div>
+      </div>
+
+      <!-- Step 4 -->
+      <div style="margin-bottom:28px;position:relative">
+        <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#00D4FF;box-shadow:0 0 12px rgba(0,212,255,0.4)"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#00D4FF;margin-bottom:6px">STEP 4 — STRAVA GPS VERIFICATION</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">The server reads GPS distance directly from Strava. Not from the admin.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">The admin selects a real Strava Walk or Ride activity. The <span style="color:#00D4FF">database trigger</span> then reads the actual distance from the Strava table — not from the browser. The admin can't type a fake number. Cycling counts at 0.5x (need double). The activity must have happened <span style="color:#00D4FF">after the slip date</span> — no old walks. Each activity can only be used for <span style="color:#00D4FF">one penalty</span>.</div>
+      </div>
+
+      <!-- Step 5 -->
+      <div style="margin-bottom:28px;position:relative">
+        <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#E040FB;box-shadow:0 0 12px rgba(224,64,251,0.4)"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#E040FB;margin-bottom:6px">STEP 5 — ESCALATION ENGINE</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">7 days to complete. Then it gets worse. Every single day.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">After a 7-day grace period, the penalty escalates by <span style="color:#FF5252;font-weight:700">+3 km per day</span>. Day 8: 23 km. Day 15: 44 km. Caps at <span style="color:#FF5252;font-weight:700">70 km</span> — then a new cascade penalty spawns at 25 km, which also escalates. The chain never ends until every penalty is walked. The escalation is computed <span style="color:#E040FB">by the database server</span> — not the browser. Changing your device clock does nothing.</div>
+      </div>
+
+      <!-- Step 6 -->
+      <div style="position:relative">
+        <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#00E676;box-shadow:0 0 12px rgba(0,230,118,0.4)"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#00E676;margin-bottom:6px">PERMANENT RECORD</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">Cleared ≠ Erased. The scar remains. Forever.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">Every slip — the date, the rule, the penalty, the Strava proof — lives permanently on the <a href="accountability.html" style="color:#00D4FF;text-decoration:none">public accountability ledger</a>. 10 years from now, you'll still see it. The proof URL is write-once — can never be changed. The status is one-way — CLEARED can never revert to PENDING. That's the point. Consequences should leave marks.</div>
+      </div>
+
+    </div>
+
+    <!-- The punchline box -->
+    <div style="margin-top:40px;padding:24px;background:rgba(255,82,82,0.04);border:1px solid rgba(255,82,82,0.12);border-radius:12px;text-align:center">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:#E8EDF2;line-height:1.8;letter-spacing:0.5px">
+        The admin built the system.<br>
+        <span style="color:#FF5252">The system now controls the admin.</span>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;margin-top:12px;line-height:1.6">
+        He can't delete slips. He can't fake distance. He can't use old walks. He can't change proof after it's set.<br>
+        He can only do one thing — walk the punishment and let the GPS prove it.
+      </div>
+    </div>
+
+    <!-- 8-layer fortress diagram -->
+    <div style="margin-top:32px;padding:24px;background:linear-gradient(135deg,rgba(0,212,255,0.03),rgba(0,230,118,0.03));border:1px solid rgba(0,212,255,0.1);border-radius:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-1px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,#00D4FF,#00E676,transparent);opacity:0.4"></div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;color:#00D4FF;font-weight:700;margin-bottom:20px;text-align:center">8-LAYER TAMPER-PROOF FORTRESS</div>
+
+      <div style="display:flex;flex-direction:column;gap:6px;max-width:500px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,82,82,0.06);border-left:3px solid #FF5252;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FF5252;font-weight:700;min-width:16px">01</span><span style="color:#8a9bb0">DELETE physically blocked by database trigger</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(245,166,35,0.06);border-left:3px solid #F5A623;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#F5A623;font-weight:700;min-width:16px">02</span><span style="color:#8a9bb0">Core fields frozen after insert — immutable trigger</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,212,255,0.06);border-left:3px solid #00D4FF;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#00D4FF;font-weight:700;min-width:16px">03</span><span style="color:#8a9bb0">GPS distance read from Strava DB — not browser</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,230,118,0.06);border-left:3px solid #00E676;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#00E676;font-weight:700;min-width:16px">04</span><span style="color:#8a9bb0">Strava table write-locked — only Cloud Function syncs</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(224,64,251,0.06);border-left:3px solid #E040FB;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#E040FB;font-weight:700;min-width:16px">05</span><span style="color:#8a9bb0">Escalation computed server-side using server clock</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(252,76,2,0.06);border-left:3px solid #FC4C02;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FC4C02;font-weight:700;min-width:16px">06</span><span style="color:#8a9bb0">Activity date must be after slip date — no old walks</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border-left:3px solid #E8EDF2;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#E8EDF2;font-weight:700;min-width:16px">07</span><span style="color:#8a9bb0">Unique index — one activity per penalty, no reuse</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,82,82,0.06);border-left:3px solid #FF5252;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FF5252;font-weight:700;min-width:16px">08</span><span style="color:#8a9bb0">One-way status — CLEARED can never revert to PENDING</span></div>
+      </div>
+
+      <div style="text-align:center;margin-top:20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#E8EDF2;font-weight:700;line-height:1.8">
+        To cheat this system, the admin would need to<br>
+        <span style="background:linear-gradient(135deg,#FF5252,#FF8A80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">hack Strava's GPS satellites.</span>
+      </div>
+    </div>
+
+    <!-- Phase 2 teaser -->
+    <div class="phase2-card" style="margin-top:24px;padding:24px;background:linear-gradient(135deg,rgba(0,212,255,0.04),rgba(0,230,118,0.04));border:1px solid rgba(0,212,255,0.08);border-radius:14px;position:relative;overflow:hidden">
+      <!-- Animated border glow -->
+      <div style="position:absolute;top:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,#00D4FF,#00E676,transparent);opacity:0.5"></div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;padding:4px 10px;border-radius:4px;background:rgba(245,166,35,0.15);color:#F5A623">IN DEVELOPMENT</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#E8EDF2;letter-spacing:1px">PHASE 2 — AUTO-PAY</span>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:600;line-height:1.8;margin-bottom:12px">
+        The final evolution: the system pays the penalty itself.
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.8;margin-bottom:16px">
+        When the streak breaks, ₹<span data-stake-daily>15,000</span> is <span style="color:#00D4FF;font-weight:600">automatically deducted</span> from a dedicated Axis Bank account and sent directly to the first person who claims it. No manual transfer. No delay. No human in the loop. The system pays the penalty on its own — the moment a miss is verified.
+      </div>
+
+      <!-- Progress indicators -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+        <div style="padding:10px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.12);border-radius:8px;text-align:center">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#00E676;font-weight:700;letter-spacing:1px">DONE</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:#5a6a7a;margin-top:4px">Penalty system<br>built & live</div>
+        </div>
+        <div style="padding:10px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px;text-align:center">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#F5A623;font-weight:700;letter-spacing:1px">IN PROGRESS</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:#5a6a7a;margin-top:4px">Dedicated Axis Bank<br>account setup</div>
+        </div>
+        <div style="padding:10px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.12);border-radius:8px;text-align:center">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#00D4FF;font-weight:700;letter-spacing:1px">NEXT</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:#5a6a7a;margin-top:4px">Payment API<br>integration</div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;font-style:italic;line-height:1.7">
+        The machine doesn't just track discipline. It will enforce consequences with real money — automatically. No human approval. No second chances. Every comment timestamped to the millisecond — first claim wins. The code decides. The bank pays.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 5 — THE FEATURES
+     ═══════════════════════════════════════════════════════════ -->
+<section class="sys-section reveal" style="border-top:1px solid rgba(0,212,255,0.06)">
+  <div style="text-align:center;margin-bottom:40px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:#00E676;margin-bottom:12px;opacity:0.7">SECTION 05</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.2rem,4vw,2rem);font-weight:900;color:#E8EDF2;letter-spacing:1px">THE SAFETY NET</h2>
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;margin-top:8px">Every feature exists because a failure scenario was imagined — and eliminated.</p>
+  </div>
+
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">⌚</div>
+      <div class="feat-title">ANY WATCH. ONE SYSTEM.</div>
+      <div class="feat-desc">Apple Watch, Garmin, COROS, Polar — doesn't matter. The watch records every run, every heartbeat. GPS verified. No phone needed. Change watches 10 times — nothing breaks.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📱</div>
+      <div class="feat-title">ZERO DEVICE DEPENDENCY</div>
+      <div class="feat-desc">Phone dies? iPad breaks? Laptop stolen? The streak still syncs. The cloud doesn't sleep. The watch records offline and uploads whenever it finds internet. The system is stronger than any single device.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">REAL-TIME SYNC</div>
+      <div class="feat-desc">Update on laptop — tablet sees it in under 1 second. WebSocket connection. Not polling. Not refreshing. Instant. Works offline too — queues changes, syncs when back online. Zero data lost. Ever.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <div class="feat-title">8-LAYER TAMPER-PROOF</div>
+      <div class="feat-desc">Delete triggers. Frozen fields. Server-side GPS verification. Write-locked Strava data. Server-side escalation. Date enforcement. Unique activity index. One-way status. Even the admin can't cheat — he'd need to hack Strava's satellites. <a href="accountability.html" style="color:#00D4FF">View the architecture →</a></div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔄</div>
+      <div class="feat-title">SELF-HEALING TOKENS</div>
+      <div class="feat-desc">Strava tokens expire every 6 hours. Instagram tokens expire every 60 days. The system auto-refreshes them via Google Cloud. No human touches a token. The machine maintains itself.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📤</div>
+      <div class="feat-title">ONE-CLICK INSTAGRAM PUBLISH</div>
+      <div class="feat-desc">Carousel, Reel, and Story — all publish directly to Instagram from the generator. Caption, hashtags, first comment, website link — all automated. No downloading, no manual upload, no copy-paste.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📈</div>
+      <div class="feat-title">ESCALATING STAKES</div>
+      <div class="feat-desc">₹15,000/day for the first 100 days. ₹20,000 after Day 100. ₹25,000 after Day 200. ₹30,000 after one year. The system auto-computes the stake and cumulative pool. The longer the streak, the more it hurts to break.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💰</div>
+      <div class="feat-title">₹<span data-stake-daily>15,000</span> EVERY DAY</div>
+      <div class="feat-desc">Not a one-time bet. Not a monthly thing. <span style="color:#FF5252">Every. Single. Day.</span> Miss once = someone gets paid within 24 hours. The money is real. The stakes are permanent.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🌍</div>
+      <div class="feat-title">ANYONE CAN CLAIM</div>
+      <div class="feat-desc">This isn't private accountability. Anyone on the internet can check, verify, and claim ₹<span data-stake-daily>15,000</span> if the 6 AM deadline is missed. Comment on Instagram, DM, or message here — first claim wins.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚖️</div>
+      <div class="feat-title">ESCALATING PUNISHMENT</div>
+      <div class="feat-desc">Miss the 7-day deadline? Penalty grows +3km/day until 70km cap. Then a NEW penalty spawns. The chain never ends. Cycling counts at 0.5x. Each penalty needs its own single-stretch Strava activity. <a href="accountability.html" style="color:#00D4FF">View the ledger →</a></div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📡</div>
+      <div class="feat-title">OFFLINE-FIRST</div>
+      <div class="feat-desc">No internet? App works fully offline. Every change queues locally. The moment signal returns, everything syncs in order. Zero data lost — ever. Local edits always win over remote data for 5 minutes after saving.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🏗️</div>
+      <div class="feat-title">BUILT FOR 10 YEARS</div>
+      <div class="feat-desc">50 database tables. 8 daily cloud syncs. Auto-archival to cold storage. Self-renewing API tokens. Cross-device WebSocket sync. This system will outlive the devices that built it.</div>
+    </div>
+  </div>
+
+  <!-- STAKE ESCALATION SCHEDULE -->
+  <div style="margin-top:48px;max-width:640px;margin-left:auto;margin-right:auto;padding:28px 28px 20px;background:rgba(0,0,0,0.5);border:1px solid rgba(245,166,35,0.15);border-radius:12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 0 40px rgba(245,166,35,0.03),inset 0 0 60px rgba(0,0,0,0.3)">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:3px;color:#F5A623;margin-bottom:20px;text-align:center">STAKE ESCALATION SCHEDULE</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="padding:14px 16px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAY 1 — 100</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">₹15,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
+      </div>
+      <div style="padding:14px 16px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAY 101 — 200</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">₹20,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
+      </div>
+      <div style="padding:14px 16px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAY 201 — 365</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">₹25,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
+      </div>
+      <div style="padding:14px 16px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAY 366+</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#FF5252">₹30,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
+      </div>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;margin-top:16px;text-align:center;line-height:1.7;font-style:italic">The longer the streak, the more it costs to break. The system auto-computes the active stake.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 6 — THE TECH STACK
+     ═══════════════════════════════════════════════════════════ -->
+<section class="sys-section reveal" style="border-top:1px solid rgba(0,212,255,0.06)">
+  <div style="text-align:center;margin-bottom:40px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:#E040FB;margin-bottom:12px;opacity:0.7">SECTION 06</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.2rem,4vw,2rem);font-weight:900;color:#E8EDF2;letter-spacing:1px">THE TECH STACK</h2>
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;margin-top:8px">For those who want to look under the hood.</p>
+  </div>
+
+  <div class="tech-stack-terminal">
+    <div class="tech-row">
+      <div class="tech-label" style="color:#00D4FF">FRONTEND</div>
+      <div class="tech-val">Vanilla JavaScript · Zero frameworks · 30 modules · 14 pages</div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-label" style="color:#00E676">DATABASE</div>
+      <div class="tech-val">Supabase PostgreSQL · 50 tables · Row Level Security · Immutable triggers</div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-label" style="color:#F5A623">STORAGE</div>
+      <div class="tech-val">Google Cloud Storage · Auto-archive to Coldline · Lifecycle policies</div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-label" style="color:#FC4C02">HOSTING</div>
+      <div class="tech-val">Firebase Hosting · Custom domain · Global CDN · SSL</div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-label" style="color:#E040FB">SYNC</div>
+      <div class="tech-val">Supabase Realtime WebSocket · Offline queue · Pull-on-focus · &lt;1s latency</div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-label" style="color:#E1306C">APIs</div>
+      <div class="tech-val">Strava API v3 · Instagram Graph API v21 (read + publish) · Auto-refreshing OAuth tokens · Direct carousel, reel &amp; story publishing</div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-label" style="color:#FF5252">AUTOMATION</div>
+      <div class="tech-val">Google Cloud Functions · Cloud Scheduler · 8 daily cron jobs · Zero human intervention</div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-label" style="color:#F5A623">SECURITY</div>
+      <div class="tech-val">Supabase Auth · Row Level Security · 8 immutability triggers · Server-side escalation · Strava GPS cross-validation · Write-locked data tables · Secret Manager</div>
+    </div>
+    <div class="tech-row" style="border-bottom:none">
+      <div class="tech-label" style="color:#8a9bb0">DESIGN</div>
+      <div class="tech-val">IBM Plex Mono + Inter · Dark-first · Mobile-first · 44px touch targets · Safe area insets</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:32px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;line-height:1.8;font-style:italic">
+    "No React. No Next.js. No npm install. No build step.<br>
+    30 JavaScript files. 14 pages. Publishes to Instagram. Runs forever."
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 7 — THE COST (The Punchline)
+     ═══════════════════════════════════════════════════════════ -->
+<section class="sys-section reveal" style="text-align:center;border-top:1px solid rgba(0,212,255,0.06);padding:100px 24px">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:#5a6a7a;margin-bottom:16px;opacity:0.7">SECTION 07</div>
+  <div style="font-family:'Playfair Display',serif;font-size:clamp(1rem,3vw,1.3rem);color:#8a9bb0;letter-spacing:1px;margin-bottom:32px;font-style:italic">This entire system costs</div>
+
+  <div class="cost-num">₹4</div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#8a9bb0;letter-spacing:4px;margin-top:12px">PER MONTH</div>
+
+  <div style="margin-top:32px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;line-height:2;max-width:500px;margin-left:auto;margin-right:auto">
+    50 database tables. 8 daily cloud syncs.<br>
+    Real-time WebSocket. Auto-archival.<br>
+    Self-healing tokens. GPS verification.<br>
+    <span style="color:#F5A623">Less than a cup of chai.</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 8 — THE CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+<section class="reveal closing-section" style="padding:100px 24px 120px;text-align:center;position:relative;overflow:hidden">
+  <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(0,212,255,0.05) 0%,transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.2),rgba(245,166,35,0.2),rgba(0,230,118,0.2),transparent)"></div>
+
+  <div style="max-width:640px;margin:0 auto;position:relative;z-index:1">
+    <div style="font-size:20px;color:#00D4FF;margin-bottom:20px;opacity:0.5">◆</div>
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(1.2rem,3.8vw,1.8rem);font-weight:700;line-height:1.6;letter-spacing:0.5px;margin-bottom:36px">
+      <span style="color:#E8EDF2">"The only thing that can break this streak</span><br>
+      <span style="color:#E8EDF2">is </span><span style="background:linear-gradient(135deg,#FF5252,#FF8A80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">choosing to stay in bed.</span><br>
+      <span style="color:#E8EDF2">Everything else has been </span><span style="background:linear-gradient(135deg,#00D4FF,#00E676);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">engineered out.</span><span style="color:#E8EDF2">"</span>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:32px">
+      <a href="index.html" class="cta-link">VIEW STREAK</a>
+      <a href="proof.html" class="cta-link">SEE EVIDENCE</a>
+      <a href="accountability.html" class="cta-link">CHECK LEDGER</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COMMENTS ═══ -->
+<section class="section" id="community" style="max-width:800px;margin:0 auto;padding:40px 20px 60px">
+  <div class="section-label">LEAVE A COMMENT</div>
+  <h2 class="section-title" style="margin-bottom:8px">Questions? Thoughts?</h2>
+  <p class="text-muted" style="font-size:14px;margin-bottom:24px">Ask anything about how the system works. Anonymous is fine.</p>
+
+  <div class="cm-compose">
+    <div class="cm-compose-header">
+      <span class="cm-compose-icon">💬</span>
+      <span class="cm-compose-label">DROP A COMMENT</span>
+      <span class="cm-badge" id="cmBadge">0</span>
+    </div>
+    <textarea class="cm-textarea" id="cmInput" placeholder="Ask a question or share your thoughts... anonymous is fine." maxlength="500" rows="3"></textarea>
+    <div id="cmImagePreview"></div>
+    <div class="cm-compose-footer">
+      <span class="cm-char-count" id="cmCharCount">0/500</span>
+      <button onclick="cmAttachImage()" style="background:transparent;border:1px solid rgba(0,212,255,0.15);color:var(--text-dim);padding:8px 14px;border-radius:8px;font-family:var(--font-mono);font-size:11px;cursor:pointer;letter-spacing:1px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseout="this.style.borderColor='rgba(0,212,255,0.15)';this.style.color='var(--text-dim)'">📷 PHOTO</button>
+      <a class="cm-edit-profile" id="cmEditProfile" onclick="showIdentityModal();return false" style="display:none">EDIT PROFILE</a>
+      <button class="cm-post-btn" id="cmPostBtn" onclick="postComment()">POST COMMENT</button>
+    </div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:8px;letter-spacing:0.5px">No sign-up needed. Post anonymously or <a onclick="showIdentityModal();return false" style="color:var(--cyan);cursor:pointer;text-decoration:underline">set your name</a>.</div>
+  </div>
+
+  <div class="cm-feed" id="cmFeed" style="max-height:none;overflow:visible">
+    <div id="cmMilestone"></div>
+    <div id="cmCommentList"></div>
+  </div>
+  <button class="cm-load-more" id="cmLoadMore" style="display:none" onclick="loadMoreComments()">LOAD MORE COMMENTS</button>
+</section>
+
+<!-- IDENTITY MODAL -->
+<div class="cm-modal" id="cmModal" style="display:none">
+  <div class="cm-modal-box">
+    <div class="section-label" style="margin-bottom:16px">FIRST TIME HERE?</div>
+    <h3>Join the Watch</h3>
+    <p>Your name appears publicly. Mobile & UPI stored privately — only used for stake payouts if the streak breaks.</p>
+    <div style="margin-bottom:16px"><label class="form-label">DISPLAY NAME *</label><input type="text" class="form-input" id="cmName" placeholder="Your name" maxlength="30"></div>
+    <div style="margin-bottom:16px"><label class="form-label">MOBILE NUMBER</label><input type="tel" class="form-input" id="cmMobile" placeholder="+91 98765 43210" maxlength="15"></div>
+    <div style="margin-bottom:24px"><label class="form-label">UPI ID</label><input type="text" class="form-input" id="cmUPI" placeholder="name@upi" maxlength="50"></div>
+    <button class="btn btn-primary w-full" onclick="saveIdentity()">SAVE & CONTINUE</button>
+    <button class="btn btn-outline w-full mt-2" onclick="postAnonymous()" style="margin-top:8px">POST ANONYMOUSLY</button>
+    <button class="btn btn-outline w-full mt-2" onclick="closeIdentityModal()" style="margin-top:4px;border-color:rgba(255,255,255,0.1);color:var(--text-dim)">CANCEL</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.550C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
+
+<script src="app.js"></script>
+<script>
+  // Scroll reveal
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+
+  // Init comments on system page
+  if (document.getElementById('cmFeed')) {
+    setCommentPageSource('system');
+    loadComments();
+    checkMilestone();
+    if (getVisitorIdentity()) document.getElementById('cmEditProfile').style.display = 'inline';
+    document.getElementById('cmInput').addEventListener('input', function() {
+      document.getElementById('cmCharCount').textContent = this.value.length + '/500';
+    });
+  }
+</script>
+</body>
+</html>
+ 

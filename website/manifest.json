@@ -1,0 +1,19 @@
+{
+  "name": "First Light",
+  "short_name": "FirstLight",
+  "description": "Daily fitness accountability. ₹15,000 on the line. No end date.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0A0C10",
+  "theme_color": "#0A0C10",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+ 

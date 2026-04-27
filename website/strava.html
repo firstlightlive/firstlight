@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>FIRST LIGHT — Fitness Ledger</title>
+  <meta name="description" content="Every step. Every heartbeat. Every climb. The complete fitness ledger powered by Strava.">
+  <meta name="keywords" content="Strava profile, running stats, fitness ledger, pace trends, heart rate zones, marathon training, Bangalore runner">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://firstlight.live/strava.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root{--strava:#FC4C02;--strava-dim:rgba(252,76,2,0.15);--strava-glow:rgba(252,76,2,0.3)}
+
+    /* ── ANIMATED BACKGROUND GRAIN ── */
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(252,76,2,0.005) 2px,rgba(252,76,2,0.005) 4px);mix-blend-mode:overlay}
+
+    /* ── HEADER — cinematic entrance ── */
+    .sv-header{text-align:center;padding:140px 0 60px;max-width:900px;margin:0 auto;position:relative}
+    .sv-header::before{content:'';position:absolute;top:40px;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(252,76,2,0.08) 0%,transparent 65%);pointer-events:none}
+    .sv-header h1{font-family:'IBM Plex Mono',monospace;font-size:clamp(2rem,6vw,3.5rem);font-weight:700;letter-spacing:0.1em;background:linear-gradient(135deg,#FC4C02,#FF8A50,#FC4C02);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;position:relative}
+    .sv-header p{font-family:'Inter',sans-serif;color:var(--text-dim,#8a9bb0);font-size:1rem;max-width:500px;margin:0 auto}
+    .sv-powered{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:rgba(252,76,2,0.6);letter-spacing:3px;margin-bottom:16px}
+    .sv-powered svg{vertical-align:-3px;margin-right:4px}
+
+    /* ── HERO STATS — glassmorphism ── */
+    .sv-hero{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:920px;margin:0 auto 56px;padding:0 20px}
+    @media(max-width:600px){.sv-hero{grid-template-columns:repeat(2,1fr);gap:10px}}
+    .sv-hero-card{background:rgba(252,76,2,0.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(252,76,2,0.1);border-radius:16px;padding:28px 16px;text-align:center;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+    .sv-hero-card:hover{border-color:rgba(252,76,2,0.3);transform:translateY(-2px)}
+    .sv-hero-card::after{content:'';position:absolute;top:-1px;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--strava),transparent);opacity:0.3}
+    .sv-hero-val{font-family:'IBM Plex Mono',monospace;font-size:clamp(1.8rem,4.5vw,2.8rem);font-weight:700;color:#fff;line-height:1}
+    .sv-hero-unit{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--strava);margin-top:4px;letter-spacing:2px}
+    .sv-hero-label{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;letter-spacing:0.14em;color:var(--text-dim);margin-top:10px;text-transform:uppercase}
+
+    /* ── SECTIONS ── */
+    .sv-section{max-width:920px;margin:0 auto;padding:0 20px 56px}
+    .sv-section-title{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:4px;color:var(--strava);font-weight:700;margin-bottom:24px;text-transform:uppercase;position:relative;padding-left:16px}
+    .sv-section-title::before{content:'';position:absolute;left:0;top:1px;bottom:1px;width:3px;background:var(--strava);border-radius:2px}
+
+    /* ── PERSONAL RECORDS — glowing cards ── */
+    .sv-pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media(max-width:600px){.sv-pr-grid{grid-template-columns:repeat(2,1fr)}}
+    .sv-pr-card{background:linear-gradient(145deg,rgba(252,76,2,0.04),rgba(252,76,2,0.01));border:1px solid rgba(252,76,2,0.1);border-radius:14px;padding:20px 14px;text-align:center;transition:border-color 0.3s,box-shadow 0.3s}
+    .sv-pr-card:hover{border-color:rgba(252,76,2,0.3);box-shadow:0 0 24px rgba(252,76,2,0.08)}
+    .sv-pr-dist{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--strava);letter-spacing:2px;margin-bottom:6px;font-weight:700}
+    .sv-pr-time{font-family:'IBM Plex Mono',monospace;font-size:1.5rem;font-weight:700;color:#fff}
+    .sv-pr-date{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim);margin-top:6px}
+
+    /* ── MONTHLY BARS — gradient bars ── */
+    .sv-monthly{display:flex;flex-direction:column;gap:10px}
+    .sv-month-row{display:flex;align-items:center;gap:12px}
+    .sv-month-label{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--text-dim);min-width:36px;font-weight:700}
+    .sv-month-bar-wrap{flex:1;height:32px;background:rgba(255,255,255,0.02);border-radius:6px;overflow:hidden;position:relative;cursor:pointer;transition:background 0.2s}
+    .sv-month-bar-wrap:hover{background:rgba(255,255,255,0.04)}
+    .sv-month-bar{height:100%;border-radius:6px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center}
+    .sv-month-bar-run{background:linear-gradient(90deg,var(--strava),#FF8A50)}
+    .sv-month-bar-walk{background:linear-gradient(90deg,#00E676,#69F0AE)}
+    .sv-month-bar-swim{background:linear-gradient(90deg,#00B0FF,#40C4FF)}
+    .sv-month-bar-other{background:linear-gradient(90deg,#AB47BC,#CE93D8)}
+    .sv-month-val{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:#fff;min-width:70px;text-align:right;font-weight:700}
+
+    /* ── HEATMAP ── */
+    .sv-streak{display:flex;gap:3px;flex-wrap:wrap;justify-content:center}
+    .sv-streak-day{width:13px;height:13px;border-radius:3px;transition:transform 0.15s,box-shadow 0.15s}
+    .sv-streak-day:hover{transform:scale(1.8);box-shadow:0 0 8px rgba(252,76,2,0.4);z-index:1}
+
+    /* ── ACTIVITY CARDS — premium feel ── */
+    .sv-activities{display:flex;gap:14px;overflow-x:auto;padding:8px 0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:rgba(252,76,2,0.15) transparent}
+    .sv-activities::-webkit-scrollbar{height:4px}
+    .sv-activities::-webkit-scrollbar-thumb{background:rgba(252,76,2,0.2);border-radius:2px}
+    .sv-act-card{flex:0 0 270px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;overflow:hidden;scroll-snap-align:start;transition:border-color 0.3s,transform 0.3s,box-shadow 0.3s}
+    .sv-act-card:hover{border-color:rgba(252,76,2,0.25);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .sv-act-map{height:100px;display:flex;align-items:center;justify-content:center;font-size:32px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(252,76,2,0.06),rgba(252,76,2,0.02))}
+    .sv-act-map img{z-index:1}
+    .sv-act-map .sv-type-badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:3px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--strava);font-weight:700;letter-spacing:2px}
+    .sv-act-body{padding:16px}
+    .sv-act-date{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:1px}
+    .sv-act-name{font-family:'IBM Plex Mono',monospace;font-size:0.85rem;font-weight:700;color:#fff;margin:6px 0}
+    .sv-act-stats{display:flex;gap:14px;margin-top:10px}
+    .sv-act-stat{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--text-dim)}
+    .sv-act-stat strong{color:#fff;font-size:0.8rem}
+
+    /* ── HR ZONES — vivid gradient ── */
+    .sv-hr-zones{display:flex;height:36px;border-radius:8px;overflow:hidden;gap:2px}
+    .sv-hr-zone{display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;font-weight:700;color:rgba(0,0,0,0.7);transition:flex 0.6s cubic-bezier(0.4,0,0.2,1)}
+
+    /* ── PACE CHART ── */
+    .sv-pace-chart{display:flex;align-items:flex-end;gap:6px;height:140px}
+    .sv-pace-bar{flex:1;background:linear-gradient(180deg,var(--strava),#FF8A50);border-radius:4px 4px 0 0;transition:height 0.6s cubic-bezier(0.4,0,0.2,1);min-width:14px;position:relative}
+    .sv-pace-bar:hover{filter:brightness(1.3);box-shadow:0 -4px 12px rgba(252,76,2,0.3)}
+    .sv-pace-label{font-family:'IBM Plex Mono',monospace;font-size:0.5rem;color:var(--text-dim);text-align:center;margin-top:4px}
+
+    /* ── LEGEND ── */
+    .sv-legend{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap}
+    .sv-legend-item{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--text-dim)}
+    .sv-legend-dot{width:10px;height:10px;border-radius:3px}
+
+    /* ── CTA — glowing button ── */
+    .sv-cta{text-align:center;padding:20px 0 60px}
+    .sv-cta a{display:inline-flex;align-items:center;gap:10px;padding:14px 36px;background:var(--strava);color:#fff;border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:0.85rem;font-weight:700;letter-spacing:2px;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s}
+    .sv-cta a:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(252,76,2,0.35)}
+
+    /* ── REVEAL ANIMATION ── */
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* ── TOPOGRAPHIC BACKGROUND ── */
+    body{background-image:url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 200 Q100 180 200 200 T400 200' fill='none' stroke='rgba(252,76,2,0.02)' stroke-width='1'/%3E%3Cpath d='M0 220 Q100 200 200 220 T400 220' fill='none' stroke='rgba(252,76,2,0.015)' stroke-width='1'/%3E%3Cpath d='M0 240 Q100 220 200 240 T400 240' fill='none' stroke='rgba(252,76,2,0.01)' stroke-width='1'/%3E%3Cpath d='M0 160 Q100 140 200 160 T400 160' fill='none' stroke='rgba(252,76,2,0.02)' stroke-width='1'/%3E%3Cpath d='M0 140 Q100 120 200 140 T400 140' fill='none' stroke='rgba(252,76,2,0.015)' stroke-width='1'/%3E%3Cpath d='M0 280 Q150 260 300 280 T600 280' fill='none' stroke='rgba(252,76,2,0.01)' stroke-width='1'/%3E%3C/svg%3E");background-size:400px 400px}
+
+    /* ── SECTION COLOR TINTS ── */
+    .sv-section-hr{background:linear-gradient(180deg,rgba(239,83,80,0.03) 0%,transparent 100%);border-radius:20px;padding-top:32px;margin-bottom:8px}
+    .sv-section-pace{background:linear-gradient(180deg,rgba(38,198,218,0.03) 0%,transparent 100%);border-radius:20px;padding-top:32px;margin-bottom:8px}
+    .sv-section-streak{background:linear-gradient(180deg,rgba(252,76,2,0.03) 0%,transparent 100%);border-radius:20px;padding-top:32px;margin-bottom:8px}
+
+    /* ── LOADING SKELETONS ── */
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    .sv-skeleton{background:linear-gradient(90deg,rgba(255,255,255,0.03) 25%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.03) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
+
+    /* ── FEATURED ACTIVITY ── */
+    .sv-featured{max-width:920px;margin:0 auto 48px;padding:0 20px}
+    .sv-featured-card{background:linear-gradient(135deg,rgba(252,76,2,0.06),rgba(252,76,2,0.02));border:1px solid rgba(252,76,2,0.15);border-radius:18px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;min-height:200px;transition:box-shadow 0.3s}
+    .sv-featured-card:hover{box-shadow:0 12px 48px rgba(252,76,2,0.12)}
+    @media(max-width:600px){.sv-featured-card{grid-template-columns:1fr}}
+    .sv-featured-map{position:relative;display:flex;align-items:center;justify-content:center;height:280px;overflow:hidden;background:rgba(0,0,0,0.3)}
+    .sv-featured-map svg{width:100%;height:100%;position:absolute;inset:0}
+    .sv-featured-map img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;z-index:1}
+    .sv-featured-body{padding:28px 24px;display:flex;flex-direction:column;justify-content:center}
+
+    /* ── POLYLINE IN ACTIVITY CARDS ── */
+    .sv-act-map svg.sv-polyline{position:absolute;inset:0;width:100%;height:100%}
+    .sv-act-map svg.sv-polyline path{fill:none;stroke:var(--strava);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:0.7;filter:drop-shadow(0 0 3px rgba(252,76,2,0.4))}
+
+    /* ── HERO DELTA ARROWS ── */
+    .sv-delta{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;margin-top:4px;letter-spacing:0.5px}
+    .sv-delta-up{color:#66BB6A}
+    .sv-delta-down{color:#EF5350}
+
+    /* ── HR HEARTBEAT PULSE ── */
+    @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.1)}28%{transform:scale(1)}42%{transform:scale(1.05)}56%{transform:scale(1)}}
+    .sv-hr-pulse{display:inline-block;animation:heartbeat 1.5s ease infinite;color:#EF5350;margin-right:6px}
+
+    /* ── STREAK RING ── */
+    .sv-streak-ring{position:relative;width:200px;height:200px;margin:0 auto 24px}
+    .sv-streak-ring svg{width:100%;height:100%}
+    .sv-streak-ring .sv-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .sv-streak-ring .sv-ring-num{font-family:'IBM Plex Mono',monospace;font-size:2.4rem;font-weight:700;color:var(--strava)}
+    .sv-streak-ring .sv-ring-label{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:2px;color:var(--text-dim)}
+
+    /* ── STRAVA DEEP LINK ── */
+    .sv-act-strava{position:absolute;top:10px;right:10px;width:24px;height:24px;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background 0.2s;text-decoration:none}
+    .sv-act-strava:hover{background:var(--strava)}
+    .sv-act-strava svg{width:12px;height:12px;fill:#fff}
+  </style>
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:title" content="FIRST LIGHT — Fitness Ledger">
+  <meta property="og:description" content="Every step. Every heartbeat. Every climb. Since Day 1.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live/strava.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FIRST LIGHT — Fitness Ledger">
+  <meta name="twitter:description" content="Every step. Every heartbeat. Every climb. Powered by Strava.">
+  <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link active">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link active">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+<script>
+(function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
+</script>
+
+<!-- HEADER -->
+<section class="sv-header reveal">
+  <div class="sv-powered">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FC4C02"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
+    POWERED BY STRAVA
+  </div>
+  <h1>THE FITNESS LEDGER</h1>
+  <p>Every step. Every heartbeat. Every climb.<br>GPS-verified since&nbsp;Day&nbsp;1.</p>
+  <div style="margin-top:20px;display:flex;justify-content:center;gap:24px;font-family:'IBM Plex Mono',monospace;font-size:0.7rem">
+    <span style="color:var(--text-dim)">DAY <span style="color:#fff;font-weight:700" data-day>—</span></span>
+    <span style="color:rgba(252,76,2,0.4)">|</span>
+    <span style="color:var(--text-dim)">SATELLITE VERIFIED</span>
+    <span style="color:rgba(252,76,2,0.4)">|</span>
+    <span style="color:var(--text-dim)">REAL-TIME SYNC</span>
+  </div>
+</section>
+
+<!-- HERO STATS -->
+<div class="sv-hero reveal">
+  <div class="sv-hero-card">
+    <div class="sv-hero-val" id="svTotalDist">347</div>
+    <div class="sv-hero-unit">KM</div>
+    <div class="sv-hero-label">Total Distance</div>
+  </div>
+  <div class="sv-hero-card">
+    <div class="sv-hero-val" id="svTotalTime">89</div>
+    <div class="sv-hero-unit">HOURS</div>
+    <div class="sv-hero-label">Moving Time</div>
+  </div>
+  <div class="sv-hero-card">
+    <div class="sv-hero-val" id="svTotalElev">2,140</div>
+    <div class="sv-hero-unit">M</div>
+    <div class="sv-hero-label">Elevation Gained</div>
+  </div>
+  <div class="sv-hero-card">
+    <div class="sv-hero-val" id="svTotalAct">67</div>
+    <div class="sv-hero-unit">RUNS</div>
+    <div class="sv-hero-label">Total Activities</div>
+  </div>
+</div>
+
+<!-- FEATURED LATEST ACTIVITY -->
+<div class="sv-featured reveal" id="svFeaturedWrap">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:4px;color:var(--strava);font-weight:700;margin-bottom:16px;padding-left:16px;position:relative"><span style="position:absolute;left:0;top:1px;bottom:1px;width:3px;background:var(--strava);border-radius:2px"></span>LATEST ACTIVITY</div>
+  <div class="sv-featured-card" id="svFeatured">
+    <div class="sv-featured-map"><div class="sv-skeleton" style="width:100%;height:100%"></div></div>
+    <div class="sv-featured-body"><div class="sv-skeleton" style="width:60%;height:16px;margin-bottom:12px"></div><div class="sv-skeleton" style="width:80%;height:24px;margin-bottom:12px"></div><div class="sv-skeleton" style="width:40%;height:14px"></div></div>
+  </div>
+</div>
+
+<!-- PERSONAL RECORDS -->
+<div class="sv-section reveal">
+  <div class="sv-section-title">Personal Records</div>
+  <div class="sv-pr-grid" id="svPRs">
+    <div class="sv-pr-card">
+      <div class="sv-pr-dist">1 KM</div>
+      <div class="sv-pr-time">4:52</div>
+      <div class="sv-pr-date">Mar 15, 2026</div>
+    </div>
+    <div class="sv-pr-card">
+      <div class="sv-pr-dist">5 KM</div>
+      <div class="sv-pr-time">28:30</div>
+      <div class="sv-pr-date">Apr 10, 2026</div>
+    </div>
+    <div class="sv-pr-card">
+      <div class="sv-pr-dist">10 KM</div>
+      <div class="sv-pr-time">59:12</div>
+      <div class="sv-pr-date">Mar 22, 2026</div>
+    </div>
+    <div class="sv-pr-card">
+      <div class="sv-pr-dist">HALF MARATHON</div>
+      <div class="sv-pr-time">2:08:30</div>
+      <div class="sv-pr-date">—</div>
+    </div>
+    <div class="sv-pr-card">
+      <div class="sv-pr-dist">LONGEST RUN</div>
+      <div class="sv-pr-time">12.4 km</div>
+      <div class="sv-pr-date">Mar 8, 2026</div>
+    </div>
+    <div class="sv-pr-card">
+      <div class="sv-pr-dist">BEST PACE</div>
+      <div class="sv-pr-time">5'18"</div>
+      <div class="sv-pr-date">Apr 13, 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- MONTHLY DISTANCE -->
+<div class="sv-section reveal">
+  <div class="sv-section-title">Monthly Distance</div>
+  <div class="sv-monthly" id="svMonthly">
+    <div class="sv-month-row">
+      <span class="sv-month-label">FEB</span>
+      <div class="sv-month-bar-wrap"><div class="sv-month-bar sv-month-bar-run" style="width:55%"></div></div>
+      <span class="sv-month-val">92.4 km</span>
+    </div>
+    <div class="sv-month-row">
+      <span class="sv-month-label">MAR</span>
+      <div class="sv-month-bar-wrap"><div class="sv-month-bar sv-month-bar-run" style="width:95%"></div></div>
+      <span class="sv-month-val">158.7 km</span>
+    </div>
+    <div class="sv-month-row">
+      <span class="sv-month-label">APR</span>
+      <div class="sv-month-bar-wrap"><div class="sv-month-bar sv-month-bar-run" style="width:60%"></div></div>
+      <span class="sv-month-val">96.2 km</span>
+    </div>
+  </div>
+  <div class="sv-legend">
+    <div class="sv-legend-item"><div class="sv-legend-dot" style="background:var(--strava)"></div> Run</div>
+    <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#00E676"></div> Walk</div>
+    <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#00B0FF"></div> Swim</div>
+    <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#AB47BC"></div> Other</div>
+  </div>
+</div>
+
+<!-- MULTI-SPORT BREAKDOWN -->
+<div class="sv-section reveal">
+  <div class="sv-section-title">Training Breakdown</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px">
+    <div style="background:linear-gradient(145deg,rgba(252,76,2,0.06),rgba(252,76,2,0.02));border:1px solid rgba(252,76,2,0.15);border-radius:14px;padding:24px 16px;text-align:center;transition:transform 0.3s,box-shadow 0.3s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(252,76,2,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div style="font-size:28px;margin-bottom:10px">🏃</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:1.6rem;font-weight:700;color:var(--strava)" id="svRunCount">—</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--strava);letter-spacing:2px;margin-top:4px;font-weight:700">RUNS</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:#fff;margin-top:10px;font-weight:700" id="svRunDist">—</div>
+    </div>
+    <div style="background:linear-gradient(145deg,rgba(0,230,118,0.06),rgba(0,230,118,0.02));border:1px solid rgba(0,230,118,0.15);border-radius:14px;padding:24px 16px;text-align:center;transition:transform 0.3s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:28px;margin-bottom:10px">🚶</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:1.6rem;font-weight:700;color:#00E676" id="svWalkCount">—</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:#00E676;letter-spacing:2px;margin-top:4px;font-weight:700">WALKS</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:#fff;margin-top:10px;font-weight:700" id="svWalkDist">—</div>
+    </div>
+    <div style="background:linear-gradient(145deg,rgba(0,176,255,0.06),rgba(0,176,255,0.02));border:1px solid rgba(0,176,255,0.15);border-radius:14px;padding:24px 16px;text-align:center;transition:transform 0.3s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:28px;margin-bottom:10px">🚴</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:1.6rem;font-weight:700;color:#00B0FF" id="svCycleCount">—</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:#00B0FF;letter-spacing:2px;margin-top:4px;font-weight:700">RIDES</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:#fff;margin-top:10px;font-weight:700" id="svCycleDist">—</div>
+    </div>
+    <div style="background:linear-gradient(145deg,rgba(171,71,188,0.06),rgba(171,71,188,0.02));border:1px solid rgba(171,71,188,0.15);border-radius:14px;padding:24px 16px;text-align:center;transition:transform 0.3s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:28px;margin-bottom:10px">🏋️</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:1.6rem;font-weight:700;color:#AB47BC" id="svGymCount">—</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:#AB47BC;letter-spacing:2px;margin-top:4px;font-weight:700">GYM</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:#fff;margin-top:10px;font-weight:700" id="svGymHrs">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVITY CALENDAR HEATMAP -->
+<div class="sv-section reveal">
+  <div class="sv-section-title">Activity Calendar — 2026</div>
+  <div class="sv-streak" id="svHeatmap"></div>
+  <div class="sv-legend" style="margin-top:16px;justify-content:center">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-dim)">Less</span>
+    <div class="sv-legend-dot" style="background:rgba(252,76,2,0.1)"></div>
+    <div class="sv-legend-dot" style="background:rgba(252,76,2,0.3)"></div>
+    <div class="sv-legend-dot" style="background:rgba(252,76,2,0.6)"></div>
+    <div class="sv-legend-dot" style="background:var(--strava)"></div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-dim)">More</span>
+  </div>
+</div>
+
+<!-- AVERAGE PACE TREND -->
+<div class="sv-section-pace">
+<div class="sv-section reveal">
+  <div class="sv-section-title">Average Pace — Weekly Trend</div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:1.4rem;font-weight:700;color:#fff" id="svAvgPace">6'42"</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--strava)">/km avg</span>
+  </div>
+  <div class="sv-pace-chart" id="svPaceChart"></div>
+  <div style="display:flex;justify-content:space-between;margin-top:4px">
+    <span class="sv-pace-label">W1</span>
+    <span class="sv-pace-label">W2</span>
+    <span class="sv-pace-label">W3</span>
+    <span class="sv-pace-label">W4</span>
+    <span class="sv-pace-label">W5</span>
+    <span class="sv-pace-label">W6</span>
+    <span class="sv-pace-label">W7</span>
+    <span class="sv-pace-label">W8</span>
+    <span class="sv-pace-label">W9</span>
+  </div>
+</div>
+
+</div>
+<!-- HEART RATE ZONES -->
+<div class="sv-section-hr">
+<div class="sv-section reveal">
+  <div class="sv-section-title"><span class="sv-hr-pulse">&#10084;</span>Heart Rate Zone Distribution</div>
+  <div class="sv-hr-zones" id="svHRZones">
+    <div class="sv-hr-zone" style="flex:15;background:#93C5FD">Z1</div>
+    <div class="sv-hr-zone" style="flex:30;background:#6EE7B7">Z2</div>
+    <div class="sv-hr-zone" style="flex:28;background:#FCD34D">Z3</div>
+    <div class="sv-hr-zone" style="flex:20;background:#FC4C02">Z4</div>
+    <div class="sv-hr-zone" style="flex:7;background:#EF4444">Z5</div>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-dim)">
+    <span>Recovery</span>
+    <span>Aerobic</span>
+    <span>Tempo</span>
+    <span>Threshold</span>
+    <span>Max</span>
+  </div>
+  <div style="margin-top:16px;display:flex;gap:24px;flex-wrap:wrap">
+    <div><span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--text-dim)">Avg HR</span><br><span style="font-family:'IBM Plex Mono',monospace;font-size:1.2rem;font-weight:700;color:#fff" id="svAvgHR">148</span> <span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--strava)">bpm</span></div>
+    <div><span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--text-dim)">Max HR</span><br><span style="font-family:'IBM Plex Mono',monospace;font-size:1.2rem;font-weight:700;color:#fff" id="svMaxHR">178</span> <span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--strava)">bpm</span></div>
+    <div><span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--text-dim)">Avg Calories</span><br><span style="font-family:'IBM Plex Mono',monospace;font-size:1.2rem;font-weight:700;color:#fff" id="svAvgCal">420</span> <span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--strava)">/run</span></div>
+  </div>
+</div>
+
+</div>
+<!-- RECENT ACTIVITIES -->
+<div class="sv-section reveal">
+  <div class="sv-section-title">Recent Activities</div>
+  <div class="sv-activities" id="svActivities">
+    <div class="sv-act-card">
+      <div class="sv-act-map"><div class="sv-type-badge">RUN</div>🗺️</div>
+      <div class="sv-act-body">
+        <div class="sv-act-date">DAY 67 · 17 APR 2026</div>
+        <div class="sv-act-name">Morning Run — Iron Covenant</div>
+        <div class="sv-act-stats">
+          <div class="sv-act-stat"><strong>5.39</strong> km</div>
+          <div class="sv-act-stat"><strong>40:00</strong> min</div>
+          <div class="sv-act-stat"><strong>141</strong> bpm</div>
+        </div>
+      </div>
+    </div>
+    <div class="sv-act-card">
+      <div class="sv-act-map"><div class="sv-type-badge">RUN</div>🗺️</div>
+      <div class="sv-act-body">
+        <div class="sv-act-date">DAY 66 · 16 APR 2026</div>
+        <div class="sv-act-name">Morning Run — Iron Covenant</div>
+        <div class="sv-act-stats">
+          <div class="sv-act-stat"><strong>5.04</strong> km</div>
+          <div class="sv-act-stat"><strong>38:00</strong> min</div>
+          <div class="sv-act-stat"><strong>141</strong> bpm</div>
+        </div>
+      </div>
+    </div>
+    <div class="sv-act-card">
+      <div class="sv-act-map"><div class="sv-type-badge">RUN</div>🗺️</div>
+      <div class="sv-act-body">
+        <div class="sv-act-date">DAY 65 · 15 APR 2026</div>
+        <div class="sv-act-name">Morning Run — Iron Covenant</div>
+        <div class="sv-act-stats">
+          <div class="sv-act-stat"><strong>5.24</strong> km</div>
+          <div class="sv-act-stat"><strong>37:00</strong> min</div>
+          <div class="sv-act-stat"><strong>151</strong> bpm</div>
+        </div>
+      </div>
+    </div>
+    <div class="sv-act-card">
+      <div class="sv-act-map"><div class="sv-type-badge">RUN</div>🗺️</div>
+      <div class="sv-act-body">
+        <div class="sv-act-date">DAY 64 · 14 APR 2026</div>
+        <div class="sv-act-name">Morning Run — Iron Covenant</div>
+        <div class="sv-act-stats">
+          <div class="sv-act-stat"><strong>5.02</strong> km</div>
+          <div class="sv-act-stat"><strong>32:00</strong> min</div>
+          <div class="sv-act-stat"><strong>157</strong> bpm</div>
+        </div>
+      </div>
+    </div>
+    <div class="sv-act-card">
+      <div class="sv-act-map"><div class="sv-type-badge">RUN</div>🗺️</div>
+      <div class="sv-act-body">
+        <div class="sv-act-date">DAY 63 · 13 APR 2026</div>
+        <div class="sv-act-name">Morning Run — Iron Covenant</div>
+        <div class="sv-act-stats">
+          <div class="sv-act-stat"><strong>5.09</strong> km</div>
+          <div class="sv-act-stat"><strong>32:00</strong> min</div>
+          <div class="sv-act-stat"><strong>159</strong> bpm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RUN STREAK -->
+<div class="sv-section-streak">
+<div class="sv-section reveal">
+  <div class="sv-section-title" id="svStreakTitle">Run Streak</div>
+  <div class="sv-streak-ring" id="svStreakRing">
+    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="rgba(252,76,2,0.08)" stroke-width="6"/><circle id="svRingArc" cx="100" cy="100" r="88" fill="none" stroke="var(--strava)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 553" transform="rotate(-90 100 100)" style="transition:stroke-dasharray 1.5s ease;filter:drop-shadow(0 0 4px rgba(252,76,2,0.4))"/></svg>
+    <div class="sv-ring-center"><div class="sv-ring-num" id="svRingNum">—</div><div class="sv-ring-label">DAY STREAK</div></div>
+  </div>
+  <p style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--text-dim);margin-bottom:16px;text-align:center">Every day since Feb 10, 2026. No exceptions.</p>
+  <div class="sv-streak" id="svStreak"></div>
+</div>
+</div>
+
+<!-- CTA -->
+<div class="sv-cta">
+  <a href="https://strava.app.link/jxGRExHXo2b" target="_blank">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
+    FOLLOW ON STRAVA
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
+
+<script src="js/config.js"></script>
+<script src="app.js"></script>
+<script>
+(function() {
+  var SUPA = FL.SUPABASE_URL;
+  var KEY = FL.SUPABASE_ANON_KEY;
+
+  // Privacy flag — Mapbox maps ON by default, toggle OFF hides real streets
+  var showRealMaps = true;
+  var _configReady = fetch(SUPA + '/rest/v1/site_config?key=eq.show_route_maps&select=value', {
+    headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (d && d[0]) showRealMaps = (d[0].value !== 'false');
+  }).catch(function() {});
+
+  // Paginated fetch — handles 10+ years of activities
+  async function fetchAllStrava() {
+    var all = [], offset = 0, pageSize = 1000, hasMore = true;
+    while (hasMore) {
+      var resp = await fetch(SUPA + '/rest/v1/strava_activities?select=*&order=start_date_local.desc&limit=' + pageSize + '&offset=' + offset, {
+        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
+      });
+      var page = await resp.json();
+      if (page && Array.isArray(page) && page.length > 0) {
+        all = all.concat(page);
+        offset += pageSize;
+        if (page.length < pageSize) hasMore = false;
+      } else { hasMore = false; }
+    }
+    return all;
+  }
+
+  // ── POLYLINE DECODER — Google Encoded Polyline to SVG path ──
+  function decodePolyline(str) {
+    if (!str) return [];
+    var points = [], lat = 0, lng = 0, i = 0;
+    while (i < str.length) {
+      var b, shift = 0, result = 0;
+      do { b = str.charCodeAt(i++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+      lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+      shift = 0; result = 0;
+      do { b = str.charCodeAt(i++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+      lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+      points.push([lat / 1e5, lng / 1e5]);
+    }
+    return points;
+  }
+
+  var MAPBOX_TOKEN = FL.MAPBOX_TOKEN;
+
+  function polylineToMapbox(polyline, w, h) {
+    try {
+      if (!polyline || polyline.length < 10) return '';
+      var encoded = encodeURIComponent(polyline);
+      var url = 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/path-3+FC4C02-1(' + encoded + ')/auto/' + w + 'x' + h + '@2x?padding=30&access_token=' + MAPBOX_TOKEN;
+      if (url.length > 8000) return polylineToSVG(polyline, w, h, 'var(--strava)');
+      return '<img src="' + url + '" alt="Route" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2" onerror="this.remove()">';
+    } catch(e) { return polylineToSVG(polyline, w, h, 'var(--strava)'); }
+  }
+
+  // Fallback SVG polyline (if Mapbox fails)
+  function polylineToSVG(polyline, w, h, color) {
+    var pts = decodePolyline(polyline);
+    if (pts.length < 2) return '';
+    var minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+    pts.forEach(function(p) { if (p[0]<minLat) minLat=p[0]; if (p[0]>maxLat) maxLat=p[0]; if (p[1]<minLng) minLng=p[1]; if (p[1]>maxLng) maxLng=p[1]; });
+    var pad = 12, rangeX = maxLng-minLng || 0.001, rangeY = maxLat-minLat || 0.001;
+    var path = pts.map(function(p, i) {
+      var x = pad + ((p[1]-minLng)/rangeX) * (w-2*pad);
+      var y = pad + ((maxLat-p[0])/rangeY) * (h-2*pad);
+      return (i===0?'M':'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+    return '<svg class="sv-polyline" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet"><path d="'+path+'" style="stroke:'+(color||'var(--strava)')+';stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0.8;filter:drop-shadow(0 0 3px '+(color||'rgba(252,76,2,0.5)')+')" /></svg>';
+  }
+
+  // ── ANIMATED COUNTER ──
+  function animateCounter(el, target, suffix, duration) {
+    if (!el) return;
+    var start = 0, step = Math.ceil(target / (duration / 16));
+    function tick() { start = Math.min(start + step, target); el.textContent = start.toLocaleString() + (suffix || ''); if (start < target) requestAnimationFrame(tick); }
+    tick();
+  }
+
+  _configReady.then(function(){ return fetchAllStrava(); })
+  .then(function(acts) {
+    if (!acts || !acts.length) { showStravaError('No Strava activities found.'); return; }
+
+    // ── HERO STATS ──
+    var runs = acts.filter(function(a) { return a.type === 'Run'; });
+    var walks = acts.filter(function(a) { return a.type === 'Walk'; });
+    var swims = acts.filter(function(a) { return a.type === 'Swim'; });
+    var rides = acts.filter(function(a) { return a.type === 'Ride'; });
+    var workouts = acts.filter(function(a) { return a.type === 'Workout' || a.type === 'WeightTraining'; });
+    var totalDist = acts.reduce(function(s,a) { return s + parseFloat(a.distance || 0); }, 0) / 1000;
+    var totalTime = acts.reduce(function(s,a) { return s + (a.moving_time || 0); }, 0) / 3600;
+    var totalElev = acts.reduce(function(s,a) { return s + parseFloat(a.total_elevation_gain || 0); }, 0);
+
+    // Animated counters
+    animateCounter(document.getElementById('svTotalDist'), Math.round(totalDist), '', 1200);
+    animateCounter(document.getElementById('svTotalTime'), Math.round(totalTime), '', 1000);
+    animateCounter(document.getElementById('svTotalElev'), Math.round(totalElev), '', 1400);
+    animateCounter(document.getElementById('svTotalAct'), acts.length, '', 800);
+    var actUnit = document.getElementById('svTotalAct'); if (actUnit) actUnit.nextElementSibling.textContent = 'ACTIVITIES';
+
+    // Week-over-week deltas
+    var now = new Date();
+    var thisWeek = acts.filter(function(a) { var d = new Date(a.start_date_local); return (now - d) < 7*86400000; });
+    var lastWeek = acts.filter(function(a) { var d = new Date(a.start_date_local); var diff = now - d; return diff >= 7*86400000 && diff < 14*86400000; });
+    var twKm = thisWeek.reduce(function(s,a) { return s + parseFloat(a.distance||0)/1000; }, 0);
+    var lwKm = lastWeek.reduce(function(s,a) { return s + parseFloat(a.distance||0)/1000; }, 0);
+    if (lwKm > 0) {
+      var pctChange = Math.round(((twKm - lwKm) / lwKm) * 100);
+      var deltaEl = document.getElementById('svTotalDist');
+      if (deltaEl) {
+        var arrow = pctChange >= 0 ? '&#9650;' : '&#9660;';
+        var cls = pctChange >= 0 ? 'sv-delta-up' : 'sv-delta-down';
+        deltaEl.parentElement.insertAdjacentHTML('beforeend', '<div class="sv-delta ' + cls + '">' + arrow + ' ' + Math.abs(pctChange) + '% vs last week</div>');
+      }
+    }
+
+    // ── MULTI-SPORT CARDS ──
+    var runDist = runs.reduce(function(s,a) { return s + parseFloat(a.distance||0); }, 0) / 1000;
+    var runHrs = runs.reduce(function(s,a) { return s + (a.moving_time||0); }, 0) / 3600;
+    document.getElementById('svRunCount').textContent = runs.length;
+    document.getElementById('svRunDist').textContent = Math.round(runDist) + ' km';
+
+    // Walks
+    var walkDist = walks.reduce(function(s,a) { return s + parseFloat(a.distance||0); }, 0) / 1000;
+    var wc = document.getElementById('svWalkCount'); if (wc) wc.textContent = walks.length;
+    var wd = document.getElementById('svWalkDist'); if (wd) wd.textContent = Math.round(walkDist) + ' km';
+
+    // Rides
+    var rideDist = rides.reduce(function(s,a) { return s + parseFloat(a.distance||0); }, 0) / 1000;
+    document.getElementById('svCycleCount').textContent = rides.length;
+    document.getElementById('svCycleDist').textContent = Math.round(rideDist) + ' km';
+
+    var gymTotal = workouts.length;
+    var gymHrs = workouts.reduce(function(s,a) { return s + (a.moving_time||0); }, 0) / 3600;
+    document.getElementById('svGymCount').textContent = gymTotal;
+    document.getElementById('svGymHrs').textContent = Math.round(gymHrs) + ' hrs';
+
+    // ── PERSONAL RECORDS (from runs) ──
+    var prGrid = document.getElementById('svPRs');
+    if (prGrid && runs.length) {
+      var fastest5k = null, longestRun = null, bestPace = 999;
+      runs.forEach(function(r) {
+        var km = parseFloat(r.distance||0) / 1000;
+        var pace = r.moving_time && km > 0 ? r.moving_time / 60 / km : 999;
+        if (km >= 5 && (!fastest5k || r.moving_time < fastest5k.moving_time)) fastest5k = r;
+        if (!longestRun || km > parseFloat(longestRun.distance)/1000) longestRun = r;
+        if (pace < bestPace && km >= 1) bestPace = pace;
+      });
+      function fmtPace(p) { var m=Math.floor(p); var s=Math.round((p-m)*60); return m+"'"+String(s).padStart(2,'0')+'"'; }
+      function fmtTime(sec) { var h=Math.floor(sec/3600); var m=Math.floor((sec%3600)/60); var s=sec%60; return h>0?h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'):m+':'+String(s).padStart(2,'0'); }
+      function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'; }
+
+      var prHtml = '';
+      prHtml += '<div class="sv-pr-card"><div class="sv-pr-dist">TOTAL RUNS</div><div class="sv-pr-time">' + runs.length + '</div><div class="sv-pr-date">' + Math.round(runDist) + ' km lifetime</div></div>';
+      prHtml += '<div class="sv-pr-card"><div class="sv-pr-dist">BEST PACE</div><div class="sv-pr-time">' + fmtPace(bestPace) + '/km</div><div class="sv-pr-date">Fastest recorded</div></div>';
+      if (fastest5k) prHtml += '<div class="sv-pr-card"><div class="sv-pr-dist">5K PR</div><div class="sv-pr-time">' + fmtTime(fastest5k.moving_time) + '</div><div class="sv-pr-date">' + fmtDate(fastest5k.start_date_local) + '</div></div>';
+      if (longestRun) prHtml += '<div class="sv-pr-card"><div class="sv-pr-dist">LONGEST RUN</div><div class="sv-pr-time">' + (parseFloat(longestRun.distance)/1000).toFixed(2) + ' km</div><div class="sv-pr-date">' + fmtDate(longestRun.start_date_local) + '</div></div>';
+      // Avg HR
+      var hrRuns = runs.filter(function(r) { return r.average_heartrate; });
+      if (hrRuns.length) {
+        var avgHR = Math.round(hrRuns.reduce(function(s,r) { return s + parseFloat(r.average_heartrate); }, 0) / hrRuns.length);
+        var maxHR = Math.max.apply(null, hrRuns.map(function(r) { return r.max_heartrate || 0; }));
+        prHtml += '<div class="sv-pr-card"><div class="sv-pr-dist">AVG HEART RATE</div><div class="sv-pr-time">' + avgHR + ' bpm</div><div class="sv-pr-date">Across ' + hrRuns.length + ' runs</div></div>';
+        prHtml += '<div class="sv-pr-card"><div class="sv-pr-dist">MAX HEART RATE</div><div class="sv-pr-time">' + maxHR + ' bpm</div><div class="sv-pr-date">All-time peak</div></div>';
+        document.getElementById('svAvgHR').textContent = avgHR;
+        document.getElementById('svMaxHR').textContent = maxHR;
+      }
+      prGrid.innerHTML = prHtml;
+    }
+
+    // ── MONTHLY DISTANCE ──
+    var monthly = {};
+    acts.forEach(function(a) {
+      var m = a.start_date_local ? a.start_date_local.substring(0,7) : '';
+      if (!m) return;
+      if (!monthly[m]) monthly[m] = { run: 0, walk: 0, swim: 0, other: 0, total: 0 };
+      var km = parseFloat(a.distance||0) / 1000;
+      if (a.type === 'Run') monthly[m].run += km;
+      else if (a.type === 'Walk') monthly[m].walk += km;
+      else if (a.type === 'Swim') monthly[m].swim += km;
+      else monthly[m].other += km;
+      monthly[m].total += km;
+    });
+    var monthlyEl = document.getElementById('svMonthly');
+    if (monthlyEl) {
+      var months = Object.keys(monthly).sort();
+      var maxKm = Math.max.apply(null, months.map(function(m) { return monthly[m].total; }).concat([1]));
+      var mLabels = ['','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      var mHtml = '';
+      months.forEach(function(m) {
+        var d = monthly[m];
+        var pctRun = (d.run / maxKm * 100).toFixed(1);
+        var pctWalk = (d.walk / maxKm * 100).toFixed(1);
+        var pctSwim = (d.swim / maxKm * 100).toFixed(1);
+        var label = mLabels[parseInt(m.split('-')[1])] || m;
+        mHtml += '<div class="sv-month-row">';
+        mHtml += '<span class="sv-month-label">' + label + '</span>';
+        var tooltip = label + ': ' + d.total.toFixed(1) + ' km total';
+        if (d.run > 0) tooltip += ' | Run: ' + d.run.toFixed(1) + ' km';
+        if (d.walk > 0) tooltip += ' | Walk: ' + d.walk.toFixed(1) + ' km';
+        if (d.swim > 0) tooltip += ' | Swim: ' + d.swim.toFixed(1) + ' km';
+        if (d.other > 0) tooltip += ' | Other: ' + d.other.toFixed(1) + ' km';
+        mHtml += '<div class="sv-month-bar-wrap" title="' + tooltip + '" style="cursor:pointer">';
+        mHtml += '<div style="display:flex;height:100%">';
+        if (d.run > 0) mHtml += '<div class="sv-month-bar sv-month-bar-run" style="width:' + pctRun + '%" title="Run: ' + d.run.toFixed(1) + ' km"></div>';
+        if (d.walk > 0) mHtml += '<div class="sv-month-bar sv-month-bar-walk" style="width:' + pctWalk + '%" title="Walk: ' + d.walk.toFixed(1) + ' km"></div>';
+        if (d.swim > 0) mHtml += '<div class="sv-month-bar sv-month-bar-swim" style="width:' + pctSwim + '%" title="Swim: ' + d.swim.toFixed(1) + ' km"></div>';
+        mHtml += '</div></div>';
+        mHtml += '<span class="sv-month-val">' + d.total.toFixed(1) + ' km</span>';
+        mHtml += '</div>';
+      });
+      monthlyEl.innerHTML = mHtml;
+    }
+
+    // ── HEATMAP ──
+    var heatmap = document.getElementById('svHeatmap');
+    if (heatmap) {
+      var dayMap = {};
+      acts.forEach(function(a) {
+        var day = a.start_date_local ? a.start_date_local.substring(0,10) : '';
+        if (!day) return;
+        dayMap[day] = (dayMap[day] || 0) + parseFloat(a.distance||0) / 1000;
+      });
+      var today = new Date();
+      var html = '';
+      for (var i = 150; i >= 0; i--) {
+        var d = new Date(today); d.setDate(d.getDate() - i);
+        var ds = d.toISOString().split('T')[0];
+        var km = dayMap[ds] || 0;
+        var intensity = km === 0 ? 'rgba(255,255,255,0.04)' : km < 3 ? 'rgba(252,76,2,0.15)' : km < 5 ? 'rgba(252,76,2,0.35)' : km < 8 ? 'rgba(252,76,2,0.6)' : 'rgba(252,76,2,0.9)';
+        html += '<div class="sv-streak-day" style="background:' + intensity + '" title="' + ds + (km > 0 ? ' · ' + km.toFixed(1) + ' km' : '') + '"></div>';
+      }
+      heatmap.innerHTML = html;
+    }
+
+    // ── PACE CHART (weekly avg for runs) ──
+    var paceChart = document.getElementById('svPaceChart');
+    if (paceChart && runs.length) {
+      var weekPaces = {};
+      runs.forEach(function(r) {
+        var km = parseFloat(r.distance||0) / 1000;
+        if (km < 1) return;
+        var pace = r.moving_time / 60 / km;
+        var d = new Date(r.start_date_local);
+        var weekStart = new Date(d); weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+        var wk = weekStart.toISOString().split('T')[0];
+        if (!weekPaces[wk]) weekPaces[wk] = { total: 0, count: 0 };
+        weekPaces[wk].total += pace;
+        weekPaces[wk].count++;
+      });
+      var weeks = Object.keys(weekPaces).sort().slice(-10);
+      var paces = weeks.map(function(w) { return weekPaces[w].total / weekPaces[w].count; });
+      var maxPace = Math.max.apply(null, paces.concat([1]));
+      var avgPace = paces.reduce(function(s,p) { return s+p; }, 0) / paces.length;
+      document.getElementById('svAvgPace').textContent = Math.floor(avgPace) + "'" + String(Math.round((avgPace % 1) * 60)).padStart(2,'0') + '"';
+
+      var pHtml = '';
+      paces.forEach(function(p) {
+        var h = Math.round((p / maxPace) * 100);
+        var mins = Math.floor(p);
+        var secs = Math.round((p - mins) * 60);
+        // Color-code: green=fast, cyan=good, orange=avg, red=slow
+        var barColor = p < 6 ? '#66BB6A' : p < 6.5 ? '#26C6DA' : p < 7.5 ? 'var(--strava)' : '#EF5350';
+        pHtml += '<div class="sv-pace-bar" style="height:' + h + '%;background:' + barColor + ';opacity:' + (0.5 + (1 - p/maxPace) * 0.5) + '" title="' + mins + "'" + String(secs).padStart(2,'0') + '&quot;/km"></div>';
+      });
+      // Add target pace line
+      if (avgPace > 0) {
+        var targetH = Math.round((avgPace / maxPace) * 100);
+        pHtml += '<div style="position:absolute;left:0;right:0;bottom:' + targetH + '%;height:1px;border-top:2px dashed rgba(255,255,255,0.15);pointer-events:none"></div>';
+        pHtml += '<div style="position:absolute;right:4px;bottom:calc(' + targetH + '% + 4px);font-family:\'IBM Plex Mono\',monospace;font-size:0.5rem;color:rgba(255,255,255,0.3);pointer-events:none">AVG</div>';
+      }
+      paceChart.style.position = 'relative';
+      paceChart.innerHTML = pHtml;
+    }
+
+    // ── FEATURED ACTIVITY (latest with distance > 0) ──
+    var featWrap = document.getElementById('svFeatured');
+    var featAct = acts.find(function(a) { return parseFloat(a.distance||0) > 0; });
+    if (featWrap && featAct) {
+      var fkm = (parseFloat(featAct.distance||0)/1000).toFixed(2);
+      var fmins = Math.round((featAct.moving_time||0)/60);
+      var fhr = featAct.average_heartrate ? Math.round(featAct.average_heartrate) + ' bpm' : '';
+      var fdate = featAct.start_date_local ? new Date(featAct.start_date_local) : new Date();
+      var fdateStr = fdate.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][fdate.getMonth()]+' '+fdate.getFullYear();
+      var fpoly = featAct.summary_polyline
+        ? (showRealMaps ? polylineToMapbox(featAct.summary_polyline, 400, 200) : polylineToSVG(featAct.summary_polyline, 400, 200, 'var(--strava)'))
+        : '<div style="font-size:48px;opacity:0.3">\uD83D\uDDFA\uFE0F</div>';
+      var fpace = featAct.moving_time && parseFloat(fkm)>0 ? (featAct.moving_time/60/parseFloat(fkm)) : 0;
+      var fpaceStr = fpace ? Math.floor(fpace)+"'"+String(Math.round((fpace%1)*60)).padStart(2,'0')+'"' : '';
+      var fStravaLink = 'https://www.strava.com/activities/' + featAct.id;
+
+      var fHtml = '<div class="sv-featured-map" style="background:rgba(0,0,0,0.4)">' + fpoly + '</div>';
+      fHtml += '<div class="sv-featured-body">';
+      fHtml += '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.6rem;color:var(--strava);letter-spacing:2px;font-weight:700;margin-bottom:8px">' + (featAct.type||'').toUpperCase() + ' · ' + fdateStr + '</div>';
+      fHtml += '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:16px">' + (featAct.name||'Activity') + '</div>';
+      fHtml += '<div style="display:flex;gap:20px;flex-wrap:wrap">';
+      fHtml += '<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:1.6rem;font-weight:700;color:#fff">' + fkm + '</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:1px">KM</div></div>';
+      fHtml += '<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:1.6rem;font-weight:700;color:#fff">' + fmins + '</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:1px">MIN</div></div>';
+      if (fpaceStr) fHtml += '<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:1.6rem;font-weight:700;color:#fff">' + fpaceStr + '</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:1px">PACE</div></div>';
+      if (fhr) fHtml += '<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:1.6rem;font-weight:700;color:#fff">' + fhr.replace(' bpm','') + '</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:1px">BPM</div></div>';
+      fHtml += '</div>';
+      fHtml += '<a href="' + fStravaLink + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;font-family:\'IBM Plex Mono\',monospace;font-size:0.7rem;color:var(--strava);text-decoration:none;letter-spacing:1px">VIEW ON STRAVA →</a>';
+      fHtml += '</div>';
+      featWrap.innerHTML = fHtml;
+    }
+
+    // ── RECENT ACTIVITIES with polyline maps + Strava links ──
+    var actContainer = document.getElementById('svActivities');
+    if (actContainer) {
+      var recent = acts.slice(0, 15);
+      var aHtml = '';
+      recent.forEach(function(a) {
+        var km = (parseFloat(a.distance||0) / 1000).toFixed(2);
+        var mins = Math.round((a.moving_time||0) / 60);
+        var hr = a.average_heartrate ? Math.round(a.average_heartrate) + ' bpm' : '';
+        var typeEmoji = a.type === 'Run' ? '🏃' : a.type === 'Walk' ? '🚶' : a.type === 'Ride' ? '🚴' : a.type === 'Workout' || a.type === 'WeightTraining' ? '🏋️' : '⚡';
+        var typeColor = a.type === 'Run' ? 'var(--strava)' : a.type === 'Walk' ? '#66BB6A' : a.type === 'Ride' ? '#26C6DA' : '#AB47BC';
+        var date = a.start_date_local ? new Date(a.start_date_local) : new Date();
+        var dateStr = date.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][date.getMonth()] + ' ' + date.getFullYear();
+        var stravaLink = 'https://www.strava.com/activities/' + a.id;
+
+        // Map: Mapbox (if privacy toggle ON) or SVG polyline (if OFF)
+        var mapContent = a.summary_polyline
+          ? (showRealMaps ? polylineToMapbox(a.summary_polyline, 270, 100) : polylineToSVG(a.summary_polyline, 270, 100, typeColor))
+          : '<span style="font-size:32px;opacity:0.3">' + typeEmoji + '</span>';
+
+        aHtml += '<div class="sv-act-card">';
+        aHtml += '<div class="sv-act-map" style="background:linear-gradient(135deg,rgba(255,255,255,0.02),transparent)">';
+        aHtml += '<div class="sv-type-badge" style="color:' + typeColor + '">' + (a.type || '').toUpperCase() + '</div>';
+        aHtml += '<a href="' + stravaLink + '" target="_blank" class="sv-act-strava" title="View on Strava"><svg viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg></a>';
+        aHtml += mapContent + '</div>';
+        aHtml += '<div class="sv-act-body">';
+        aHtml += '<div class="sv-act-date">' + dateStr + '</div>';
+        aHtml += '<div class="sv-act-name">' + (a.name || 'Activity') + '</div>';
+        aHtml += '<div class="sv-act-stats">';
+        if (parseFloat(km) > 0) aHtml += '<div class="sv-act-stat"><strong>' + km + '</strong> km</div>';
+        aHtml += '<div class="sv-act-stat"><strong>' + mins + '</strong> min</div>';
+        if (hr) aHtml += '<div class="sv-act-stat"><strong>' + hr + '</strong></div>';
+        aHtml += '</div></div></div>';
+      });
+      actContainer.innerHTML = aHtml;
+    }
+
+    // ── RUN STREAK ──
+    var streakEl = document.getElementById('svStreak');
+    if (streakEl) {
+      var runDates = {};
+      runs.forEach(function(r) { var d = r.start_date_local ? r.start_date_local.substring(0,10) : ''; if (d) runDates[d] = true; });
+      var streakCount = 0;
+      var today = new Date();
+      for (var i = 0; i < 365; i++) {
+        var d = new Date(today); d.setDate(d.getDate() - i);
+        if (runDates[d.toISOString().split('T')[0]]) streakCount++;
+        else break;
+      }
+      var sHtml = '';
+      for (var i = 1; i <= streakCount; i++) {
+        sHtml += '<div class="sv-streak-day" style="background:var(--strava);opacity:' + (0.3 + (i/streakCount)*0.7) + '" title="Day ' + i + '"></div>';
+      }
+      streakEl.innerHTML = sHtml;
+      // Update streak title + ring
+      var streakTitle = document.getElementById('svStreakTitle');
+      if (streakTitle) streakTitle.textContent = streakCount + '-Day Run Streak';
+      var ringNum = document.getElementById('svRingNum');
+      if (ringNum) animateCounter(ringNum, streakCount, '', 1500);
+      // Animate ring arc (553 = circumference of r=88)
+      var ringArc = document.getElementById('svRingArc');
+      if (ringArc) {
+        var pct = Math.min(streakCount / 365, 1);
+        setTimeout(function() { ringArc.style.strokeDasharray = Math.round(pct * 553) + ' 553'; }, 300);
+      }
+    }
+
+    // ── CALORIES ──
+    var calRuns = runs.filter(function(r) { return r.calories; });
+    if (calRuns.length) {
+      var avgCal = Math.round(calRuns.reduce(function(s,r) { return s + parseFloat(r.calories); }, 0) / calRuns.length);
+      var el = document.getElementById('svAvgCal');
+      if (el) el.textContent = avgCal;
+    }
+  })
+  .catch(function(e) { console.error('[Strava]', e); showStravaError('Failed to load Strava data. Please refresh.'); });
+
+  function showStravaError(msg) {
+    var el = document.getElementById('svTotalDist');
+    if (el) el.parentElement.parentElement.insertAdjacentHTML('beforebegin',
+      '<div style="text-align:center;padding:20px;font-family:\'IBM Plex Mono\',monospace;font-size:0.8rem;color:var(--strava,#FC4C02);border:1px solid rgba(252,76,2,0.15);border-radius:8px;margin:0 auto 24px;max-width:600px">' + msg + '</div>');
+  }
+
+  // ── SYNC STATUS — check if today's data is missing ──
+  (function(){
+    try{
+      var ist=(typeof getNowIST==='function')?getNowIST():new Date();
+      var hour=ist.getHours();
+      if(hour>=6){
+        var todayStr=ist.getFullYear()+'-'+String(ist.getMonth()+1).padStart(2,'0')+'-'+String(ist.getDate()).padStart(2,'0');
+        fetch(SUPA+'/rest/v1/strava_activities?select=id&start_date_local=gte.'+todayStr+'T00:00:00&limit=1',{
+          headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}
+        }).then(function(r){return r.json();}).then(function(d){
+          if(!d||!d.length){
+            var hero=document.querySelector('.sv-header');
+            if(hero)hero.insertAdjacentHTML('afterend',
+              '<div style="max-width:700px;margin:0 auto 24px;padding:14px 20px;background:rgba(252,76,2,0.06);border:1px solid rgba(252,76,2,0.2);border-radius:10px;text-align:center;font-family:\'IBM Plex Mono\',monospace;font-size:0.75rem;color:var(--strava,#FC4C02);line-height:1.7">' +
+              '\u23F3 Today\'s Strava data is syncing — your latest activity will appear shortly.<br>' +
+              '<span style="font-size:0.65rem;color:var(--text-dim)">Auto-syncs at 9 AM IST · Force sync from <a href="admin.html" style="color:var(--strava)">Command Center</a> · Check <a href="https://www.instagram.com/firstlightlive" target="_blank" style="color:var(--strava)">Instagram</a> for today\'s post</span></div>');
+          }
+        }).catch(function(){});
+      }
+    }catch(e){}
+  })();
+
+  // Scroll reveal
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+})();
+</script>
+
+</body>
+</html>
+ 

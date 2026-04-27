@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="First Light">
+<meta name="theme-color" content="#0D0C0B">
+<title>FIRST LIGHT</title>
+<script>
+// NUKE all service workers and caches
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(w){w.unregister();});});caches.keys().then(function(k){k.forEach(function(n){caches.delete(n);});});}
+</script>
+<style>
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  @keyframes breathe{0%,100%{box-shadow:0 0 12px rgba(212,168,67,0.15)}50%{box-shadow:0 0 24px rgba(212,168,67,0.35)}}
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --void:#0D0C0B;--gold:#D4A843;--gold-light:#E8C872;
+    --bone:#F0EDE5;--smoke:#8A8681;--ash:#3D3A37;--mint:#2EE89A;--danger:#FF3B5C;
+    --safe-top:env(safe-area-inset-top,0px);
+  }
+  body{background:var(--void);margin:0;padding:0;overflow:hidden;height:100vh;height:100dvh;
+    font-family:'Rajdhani',sans-serif;color:var(--bone)}
+
+  /* Tab bar */
+  .tab-bar{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:rgba(13,12,11,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(61,58,55,.3);
+    padding-top:var(--safe-top);display:flex;justify-content:center;gap:0;
+  }
+  .tab-btn{
+    flex:1;max-width:200px;padding:14px 0 12px;background:transparent;border:none;
+    font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+    letter-spacing:3px;text-transform:uppercase;color:var(--smoke);
+    cursor:pointer;position:relative;transition:color .25s;-webkit-tap-highlight-color:transparent;
+  }
+  .tab-btn.active{color:var(--gold-light)}
+  .tab-btn::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2.5px;
+    background:var(--gold);border-radius:2px 2px 0 0;transform:scaleX(0);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+  .tab-btn.active::after{transform:scaleX(1)}
+  .tab-btn:active{opacity:.7}
+  .tab-icon{display:block;font-size:18px;margin-bottom:2px}
+  .tab-label{display:block;font-size:9px;letter-spacing:2.5px;font-family:'JetBrains Mono',monospace;font-weight:500}
+
+  /* Content */
+  .frame-wrap{position:fixed;top:0;left:0;right:0;bottom:0;padding-top:calc(var(--safe-top) + 58px)}
+  .frame{width:100%;height:100%;border:none;display:none;background:var(--void)}
+  .frame.active{display:block}
+
+  /* Dashboard */
+  .dash{display:none;width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 16px 40px;background:var(--void)}
+  .dash.active{display:block}
+  .dash-inner{max-width:440px;margin:0 auto}
+
+  /* Dashboard cards */
+  .d-hero{text-align:center;padding:24px 0 20px;animation:fadeUp .5s ease-out}
+  .d-hero-brand{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:5px;color:var(--gold);opacity:.6;margin-bottom:12px}
+  .d-hero-day{font-family:'DM Serif Display',serif;font-size:64px;font-weight:700;color:var(--bone);line-height:1}
+  .d-hero-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--smoke);letter-spacing:2px;margin-top:4px}
+  .d-hero-stake{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);margin-top:10px;font-weight:700;letter-spacing:1px}
+
+  .d-card{background:linear-gradient(160deg,rgba(28,26,23,.85),rgba(13,12,11,.95));border:1px solid rgba(61,58,55,.35);
+    border-radius:14px;padding:16px;margin-bottom:12px;backdrop-filter:blur(8px);animation:fadeUp .5s ease-out backwards}
+  .d-card:nth-child(2){animation-delay:.05s}
+  .d-card:nth-child(3){animation-delay:.1s}
+  .d-card:nth-child(4){animation-delay:.15s}
+  .d-card:nth-child(5){animation-delay:.2s}
+  .d-card-title{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--smoke);margin-bottom:10px}
+
+  .d-status-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .d-status{text-align:center;padding:12px 8px;border-radius:10px;border:1px solid rgba(61,58,55,.25);background:rgba(13,12,11,.5)}
+  .d-status.on{border-color:rgba(46,232,154,.25);background:rgba(46,232,154,.04)}
+  .d-status.off{border-color:rgba(255,59,92,.25);background:rgba(255,59,92,.04)}
+  .d-status-emoji{font-size:22px;margin-bottom:4px}
+  .d-status-label{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--smoke)}
+  .d-status-val{font-size:12px;font-weight:700;letter-spacing:1px;margin-top:2px}
+  .d-status.on .d-status-val{color:var(--mint)}
+  .d-status.off .d-status-val{color:var(--danger)}
+
+  .d-countdown{text-align:center;padding:16px;border-radius:12px;background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.15)}
+  .d-countdown-time{font-family:'DM Serif Display',serif;font-size:36px;color:var(--gold);line-height:1}
+  .d-countdown-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--smoke);margin-top:4px}
+
+  .d-streak-dots{display:flex;gap:6px;justify-content:center;margin:12px 0}
+  .d-streak-dot{width:16px;height:16px;border-radius:4px;transition:transform .15s}
+  .d-streak-dot:hover{transform:scale(1.3)}
+
+  .d-post-status{text-align:center;padding:14px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px}
+  .d-post-status.posted{background:rgba(46,232,154,.06);border:1px solid rgba(46,232,154,.15);color:var(--mint)}
+  .d-post-status.pending{background:rgba(255,165,0,.06);border:1px solid rgba(255,165,0,.15);color:#F0A500;animation:pulse 2s infinite}
+
+  .d-action{display:block;width:100%;padding:16px;border:none;border-radius:12px;font-family:'Rajdhani',sans-serif;
+    font-size:16px;font-weight:700;letter-spacing:4px;text-transform:uppercase;cursor:pointer;
+    transition:transform .1s;margin-bottom:8px;text-align:center;text-decoration:none}
+  .d-action:active{transform:scale(.97)}
+  .d-action-carousel{background:linear-gradient(135deg,var(--gold),#B8922E);color:var(--void);animation:breathe 3s ease-in-out infinite}
+  .d-action-reels{background:linear-gradient(135deg,#E1306C,#C13584);color:#fff}
+  .d-action-site{background:transparent;border:1px solid rgba(61,58,55,.3);color:var(--smoke);font-size:12px;letter-spacing:2px;padding:12px}
+
+  /* Loading */
+  .loader{position:fixed;inset:0;z-index:50;background:var(--void);display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:12px;transition:opacity .4s}
+  .loader.hidden{opacity:0;pointer-events:none}
+  .loader-text{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--gold);opacity:.7}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loader-ring{width:28px;height:28px;border:2px solid var(--ash);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loader" id="loader"><div class="loader-ring"></div><div class="loader-text">FIRST LIGHT</div></div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('dashboard')" id="tabDash">
+    <span class="tab-icon">📊</span><span class="tab-label">DASHBOARD</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('carousel')" id="tabGen">
+    <span class="tab-icon">🎨</span><span class="tab-label">CAROUSEL</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('reels')" id="tabReels">
+    <span class="tab-icon">🎬</span><span class="tab-label">REELS</span>
+  </button>
+  <button class="tab-btn" onclick="window.location.href='../index.html'" style="max-width:60px">
+    <span class="tab-icon">↩</span><span class="tab-label">BACK</span>
+  </button>
+</div>
+
+<!-- Dashboard -->
+<div class="frame-wrap">
+  <div class="dash active" id="dashPanel">
+    <div class="dash-inner">
+
+      <!-- Hero — Day + Date + Stake -->
+      <div class="d-hero">
+        <div class="d-hero-brand">◆ FIRST LIGHT · www.firstlight.live</div>
+        <div class="d-hero-day" id="dashDay">—</div>
+        <div class="d-hero-date" id="dashDate">—</div>
+        <div class="d-hero-stake" id="dashStake">—</div>
+      </div>
+
+      <!-- Countdown to 6AM -->
+      <div class="d-card">
+        <div class="d-countdown">
+          <div class="d-countdown-time" id="dashCountdown">--:--:--</div>
+          <div class="d-countdown-label">UNTIL 6:00 AM IST DEADLINE</div>
+        </div>
+      </div>
+
+      <!-- Today's Status -->
+      <div class="d-card">
+        <div class="d-card-title">TODAY'S STATUS</div>
+        <div class="d-status-row">
+          <div class="d-status on" id="dashFood"><div class="d-status-emoji">🍱</div><div class="d-status-label">FOOD</div><div class="d-status-val">✓</div></div>
+          <div class="d-status on" id="dashRun"><div class="d-status-emoji">🏃</div><div class="d-status-label">RUN</div><div class="d-status-val">✓</div></div>
+          <div class="d-status on" id="dashGym"><div class="d-status-emoji">🏋️</div><div class="d-status-label">GYM</div><div class="d-status-val">✓</div></div>
+        </div>
+      </div>
+
+      <!-- 7-Day Streak -->
+      <div class="d-card">
+        <div class="d-card-title">LAST 7 DAYS</div>
+        <div class="d-streak-dots" id="dashStreak"></div>
+        <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--smoke);letter-spacing:1px" id="dashStreakText">—</div>
+      </div>
+
+      <!-- Post Status -->
+      <div class="d-card">
+        <div class="d-card-title">TODAY'S INSTAGRAM POST</div>
+        <div class="d-post-status pending" id="dashPostStatus">📸 NOT POSTED YET — CREATE BELOW</div>
+      </div>
+
+      <!-- Sleep Status (auto-pulled from Supabase) -->
+      <div class="d-card" id="sleepSyncCard">
+        <div class="d-card-title">SLEEP</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:28px">😴</div>
+          <div style="flex:1">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:900;color:var(--cyan,#00D4FF)" id="dashSleepVal">— HRS</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:1px" id="dashSleepStatus">AWAITING APPLE SYNC</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <button class="d-action d-action-carousel" onclick="switchTab('carousel')">🎨 CREATE TODAY'S CAROUSEL</button>
+      <button class="d-action d-action-reels" onclick="switchTab('reels')">🎬 CREATE TODAY'S REEL</button>
+      <a class="d-action d-action-site" href="../accountability.html" target="_blank">⚖️ VIEW ACCOUNTABILITY LEDGER</a>
+      <a class="d-action d-action-site" href="../strava.html" target="_blank">🏃 VIEW STRAVA LEDGER</a>
+      <a class="d-action d-action-site" href="../index.html" target="_blank">◆ OPEN FIRSTLIGHT.LIVE</a>
+
+    </div>
+  </div>
+
+  <!-- Carousel (Generator) -->
+  <iframe class="frame" id="frameGen"></iframe>
+
+  <!-- Reels -->
+  <iframe class="frame" id="frameReels"></iframe>
+</div>
+
+<script src="../js/config.js"></script>
+<script>
+// ── CONFIG ──
+const STREAK_START='2026-02-10';
+const STAKE_SCHEDULE=[[100,15000],[200,20000],[365,25000],[Infinity,30000]];
+const SB_URL=FL.SUPABASE_URL;
+const SB_KEY=FL.SUPABASE_ANON_KEY;
+
+// ── IST TIME ──
+function getNowIST(){const n=new Date();return new Date(n.getTime()+(n.getTimezoneOffset()*60000)+(5.5*3600000));}
+
+// ── DAY NUMBER ──
+function getDayNum(){
+  const s=new Date(STREAK_START+'T00:00:00+05:30');
+  const ist=getNowIST();
+  const t=new Date(ist.getFullYear(),ist.getMonth(),ist.getDate());
+  return Math.max(1,Math.floor((t-s)/86400000)+1);
+}
+
+// ── STAKE ──
+function getStake(d){for(const[max,amt]of STAKE_SCHEDULE)if(d<=max)return amt;return 30000;}
+function getTotalRisk(d){let t=0;for(let i=1;i<=d;i++)t+=getStake(i);return t;}
+function fmtINR(n){const s=n.toString();const l=s.substring(s.length-3);const o=s.substring(0,s.length-3);return(o?o.replace(/\B(?=(\d{2})+(?!\d))/g,',')+',':'')+l;}
+
+// ── SLEEP SYNC ──
+async function loadTodaySleep(){
+  try{
+    var today=getNowIST();var ds=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    var r=await fetch(SB_URL+'/rest/v1/sleep_log?date=eq.'+ds+'&select=*&limit=1',{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    var d=await r.json();
+    if(d&&d.length>0&&d[0].sleep_hours){
+      document.getElementById('dashSleepVal').textContent=parseFloat(d[0].sleep_hours).toFixed(1)+' HRS';
+      document.getElementById('dashSleepStatus').textContent='SYNCED \u2713 '+ds;
+      document.getElementById('dashSleepStatus').style.color='var(--green,#00E676)';
+      document.getElementById('sleepSyncCard').style.borderColor='rgba(0,229,160,0.2)';
+    }
+  }catch(e){}
+}
+
+function syncSleepNow(){
+  var hrs=prompt('How many hours did you sleep?','6.5');
+  if(!hrs)return;
+  hrs=parseFloat(hrs);
+  if(isNaN(hrs)||hrs<0||hrs>24){alert('Enter a valid number (0-24)');return;}
+  var today=getNowIST();var ds=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var wakeTime=String(today.getHours()).padStart(2,'0')+':'+String(today.getMinutes()).padStart(2,'0');
+  var statusEl=document.getElementById('dashSleepStatus');
+  statusEl.textContent='SYNCING...';statusEl.style.color='var(--cyan)';
+  fetch(SB_URL+'/rest/v1/sleep_log?on_conflict=date',{
+    method:'POST',
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+    body:JSON.stringify({date:ds,sleep_hours:hrs,wake_time:wakeTime,source:'dashboard'})
+  }).then(function(r){
+    if(r.ok||r.status===201||r.status===200){
+      document.getElementById('dashSleepVal').textContent=hrs.toFixed(1)+' HRS';
+      statusEl.textContent='SYNCED \u2713 '+ds;statusEl.style.color='var(--green,#00E676)';
+      document.getElementById('sleepSyncCard').style.borderColor='rgba(0,229,160,0.2)';
+    }else{statusEl.textContent='FAILED — try again';statusEl.style.color='var(--red,#FF5252)';}
+  }).catch(function(){statusEl.textContent='NETWORK ERROR';statusEl.style.color='var(--red,#FF5252)';});
+}
+
+// ── INIT DASHBOARD ──
+function initDash(){
+  const day=getDayNum();
+  const ist=getNowIST();
+  const M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const D=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+  document.getElementById('dashDay').textContent=day;
+  document.getElementById('dashDate').textContent=D[ist.getDay()]+' · '+ist.getDate()+' '+M[ist.getMonth()]+' '+ist.getFullYear();
+  document.getElementById('dashStake').textContent='₹'+fmtINR(getTotalRisk(day))+' UNCLAIMED · ₹'+fmtINR(getStake(day))+'/DAY';
+
+  // 7-day streak
+  const log=JSON.parse(localStorage.getItem('fl_log')||'{}');
+  const dots=document.getElementById('dashStreak');
+  let html='',perfect=0;
+  for(let i=6;i>=0;i--){
+    const d=new Date(ist);d.setDate(d.getDate()-i);
+    const dk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const entry=log[dk];
+    const done=entry&&entry.done;
+    if(done)perfect++;
+    const isToday=(i===0);
+    const bg=isToday?'var(--gold)':done?'var(--mint)':'rgba(255,59,92,0.5)';
+    const dayLabel=D[d.getDay()].charAt(0);
+    html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="d-streak-dot" style="background:'+bg+'" title="'+dk+'"></div><div style="font-family:\'JetBrains Mono\',monospace;font-size:6px;color:var(--smoke)">'+dayLabel+'</div></div>';
+  }
+  dots.innerHTML=html;
+  document.getElementById('dashStreakText').textContent=perfect+'/7 DAYS COMPLETED'+(perfect===7?' — PERFECT WEEK':'');
+
+  // Check if posted today
+  checkTodayPost(ist);
+
+  // Countdown
+  updateCountdown();
+  setInterval(updateCountdown,1000);
+}
+
+function updateCountdown(){
+  const ist=getNowIST();
+  const h=ist.getHours(),m=ist.getMinutes(),s=ist.getSeconds();
+  let target=new Date(ist);
+  if(h>=6){target.setDate(target.getDate()+1);}
+  target.setHours(6,0,0,0);
+  const diff=target-ist;
+  if(diff<=0){document.getElementById('dashCountdown').textContent='DEADLINE PASSED';return;}
+  const hh=Math.floor(diff/3600000);
+  const mm=Math.floor((diff%3600000)/60000);
+  const ss=Math.floor((diff%60000)/1000);
+  document.getElementById('dashCountdown').textContent=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+}
+
+async function checkTodayPost(ist){
+  try{
+    const today=ist.getFullYear()+'-'+String(ist.getMonth()+1).padStart(2,'0')+'-'+String(ist.getDate()).padStart(2,'0');
+    const res=await fetch(SB_URL+'/rest/v1/instagram_posts?select=id,timestamp&order=timestamp.desc&limit=1',{
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+    });
+    const posts=await res.json();
+    if(posts&&posts.length>0){
+      const lastDate=posts[0].timestamp.substring(0,10);
+      const el=document.getElementById('dashPostStatus');
+      if(lastDate===today){
+        el.className='d-post-status posted';
+        el.textContent='✅ POSTED TODAY — STREAK ALIVE';
+      }else{
+        el.className='d-post-status pending';
+        el.textContent='📸 NOT POSTED YET — CREATE BELOW';
+      }
+    }
+  }catch(e){console.warn('[Dash] Post check failed:',e);}
+}
+
+// ── TAB SWITCHING ──
+const _v=Date.now();
+const tabs={
+  dashboard:{btn:'tabDash',el:'dashPanel',type:'div'},
+  carousel:{btn:'tabGen',el:'frameGen',type:'iframe',src:'index.html?v='+_v,loaded:false},
+  reels:{btn:'tabReels',el:'frameReels',type:'iframe',src:'index.html?v='+_v+'#reelsSec',loaded:false}
+};
+
+let currentTab='dashboard';
+
+function switchTab(name){
+  if(name===currentTab)return;
+  currentTab=name;
+  localStorage.setItem('fl_app_tab',name);
+
+  // Update buttons
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const t=tabs[name];
+  document.getElementById(t.btn).classList.add('active');
+
+  // Hide all
+  document.getElementById('dashPanel').classList.remove('active');
+  document.querySelectorAll('.frame').forEach(f=>f.classList.remove('active'));
+
+  if(t.type==='div'){
+    document.getElementById(t.el).classList.add('active');
+  }else{
+    const frame=document.getElementById(t.el);
+    if(!t.loaded){frame.src=t.src;t.loaded=true;}
+    frame.classList.add('active');
+  }
+
+  // Reels: unhide sections
+  if(name==='reels'){
+    const _show=()=>{try{const d=document.getElementById('frameReels').contentWindow.document;
+      ['reelsSec','runVidSec','skipStrategyWrap'].forEach(id=>{const e=d.getElementById(id);if(e)e.style.display='';});
+      const s=d.getElementById('runVidSec');if(s)s.scrollIntoView({behavior:'smooth'});
+    }catch(e){}};
+    const f=document.getElementById('frameReels');
+    if(f.contentDocument&&f.contentDocument.getElementById('reelsSec'))_show();
+    else f.onload=_show;
+  }
+}
+
+// ── INIT ──
+initDash();
+
+// Preload carousel after 500ms
+setTimeout(()=>{
+  document.getElementById('frameGen').src=tabs.carousel.src;
+  tabs.carousel.loaded=true;
+},500);
+
+// Hide loader
+document.getElementById('frameGen').addEventListener('load',()=>{
+  setTimeout(()=>{document.getElementById('loader').classList.add('hidden');},300);
+});
+
+// Restore last tab (but default to dashboard)
+const savedTab=localStorage.getItem('fl_app_tab');
+if(savedTab&&savedTab!=='dashboard'&&tabs[savedTab]){
+  setTimeout(()=>switchTab(savedTab),100);
+}else{
+  document.getElementById('loader').classList.add('hidden');
+}
+</script>
+</body>
+</html>
+ 

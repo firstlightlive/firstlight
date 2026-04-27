@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0D0C0B">
+<title>FIRST LIGHT — Platform Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes breathe{0%,100%{opacity:.3}50%{opacity:.6}}
+:root{--void:#0D0C0B;--gold:#D4A843;--gold-light:#E8C872;--bone:#F0EDE5;--smoke:#8A8681;--ash:#3D3A37;--mint:#2EE89A;--danger:#FF3B5C;--purple:#A855F7}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);font-family:'Rajdhani',sans-serif;color:var(--bone);min-height:100vh;padding:env(safe-area-inset-top,20px) 16px 40px;overflow-x:hidden}
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none}
+.ambient::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(212,168,67,.04) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(168,85,247,.03) 0%,transparent 50%);animation:breathe 8s ease-in-out infinite}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto}
+.back{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold);text-decoration:none;padding:12px 0;opacity:.7;transition:opacity .2s}
+.back:hover{opacity:1}
+.header{text-align:center;padding:8px 0 24px}
+.header h1{font-family:'DM Serif Display',serif;font-size:28px;color:var(--bone)}
+.header-sub{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:5px;color:var(--gold);opacity:.7;margin-top:6px}
+.header-line{width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:12px auto}
+.badge-wip{display:inline-block;padding:4px 12px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;background:rgba(255,165,0,.12);border:1px solid rgba(255,165,0,.3);color:#F0A500;margin-top:8px}
+.sec{margin-bottom:20px;animation:fadeUp .5s ease-out backwards}
+.sec:nth-child(odd){animation-delay:.1s}
+.sec:nth-child(even){animation-delay:.15s}
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:500;letter-spacing:4px;color:var(--smoke);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:.5px;background:linear-gradient(90deg,rgba(138,134,129,.2),transparent)}
+.card{background:linear-gradient(160deg,rgba(28,26,23,.85),rgba(13,12,11,.95));border:1px solid rgba(61,58,55,.35);border-radius:14px;padding:16px;backdrop-filter:blur(8px)}
+.card-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--bone);margin-bottom:8px}
+.feature{display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(13,12,11,.4);border-radius:8px;margin-bottom:6px}
+.feature-icon{font-size:20px;min-width:28px;text-align:center;line-height:1.4}
+.feature-text{flex:1}
+.feature-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px}
+.feature-desc{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.5;margin-top:2px}
+.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tech-item{padding:8px;border-radius:8px;border:1px solid rgba(61,58,55,.2)}
+.tech-cat{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;margin-bottom:3px}
+.tech-val{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--bone)}
+.tech-note{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash);margin-top:2px}
+.competitor{padding:8px 10px;border-radius:8px;margin-bottom:5px}
+.comp-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:800;letter-spacing:1px}
+.comp-status{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px}
+.comp-detail{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);margin-top:2px;line-height:1.4}
+.phase{padding:10px;border-radius:8px;margin-bottom:6px}
+.phase-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px}
+.phase-time{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;margin-top:2px}
+.phase-tasks{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6;margin-top:4px}
+.insight{padding:10px;border-radius:8px;text-align:center;margin-top:12px}
+.insight-text{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="app">
+<a class="back" href="app.html">&#8592; BACK TO APP</a>
+
+<div class="header">
+  <h1>First Light Platform</h1>
+  <div class="header-line"></div>
+  <div class="header-sub">GLOBAL FITNESS ACCOUNTABILITY</div>
+  <div class="badge-wip">CONCEPT — BUILD LATER</div>
+</div>
+
+<!-- VISION -->
+<div class="sec">
+  <div class="sec-label">THE VISION</div>
+  <div class="card">
+    <div class="card-title">Pledge. Prove. Pay.</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);line-height:1.7;margin-bottom:12px">
+      A platform where fitness groups form, take financial pledges, track daily activity, and face real consequences for quitting. Groups govern their own penalty pool — charity, events, or helping others. Miss a day? Pay up. Miss too many? You're out. Come back? Double the stake.
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">
+      <div style="padding:8px;background:rgba(212,168,67,.06);border:1px solid rgba(212,168,67,.15);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:900;color:var(--gold)">$12.1B</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">FITNESS APP<br>MARKET 2025</div>
+      </div>
+      <div style="padding:8px;background:rgba(46,232,154,.06);border:1px solid rgba(46,232,154,.15);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:900;color:var(--mint)">$33.6B</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">PROJECTED<br>BY 2033</div>
+      </div>
+      <div style="padding:8px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:900;color:var(--purple)">0</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">COMPETITORS<br>WITH GROUP GOV.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CORE FEATURES -->
+<div class="sec">
+  <div class="sec-label">CORE FEATURES</div>
+  <div class="card">
+    <div class="feature">
+      <div class="feature-icon">&#9876;</div>
+      <div class="feature-text">
+        <div class="feature-name" style="color:var(--gold)">PLEDGE SYSTEM</div>
+        <div class="feature-desc">Users join a group and pledge a financial amount (e.g. ₹15,000/month). Must update daily status — run, gym, steps, proof photo. Verified via Apple Health / Google Fit / Strava API.</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">&#9888;</div>
+      <div class="feature-text">
+        <div class="feature-name" style="color:var(--danger)">PENALTY ENGINE</div>
+        <div class="feature-desc">Miss a day without proof = auto-debit from wallet or autopay. 3 consecutive misses = removal from group. Rejoin fee = 2x original pledge. Penalty goes to group's charity pool — group votes on where it goes.</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">&#9733;</div>
+      <div class="feature-text">
+        <div class="feature-name" style="color:var(--mint)">RANKING & LEADERBOARD</div>
+        <div class="feature-desc">Daily streak tracking, consistency score, group rankings. Badges for milestones (7-day, 30-day, 100-day, 365-day). Rank drops on missed days — public accountability.</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">&#128179;</div>
+      <div class="feature-text">
+        <div class="feature-name" style="color:#F0A500">WALLET + AUTOPAY</div>
+        <div class="feature-desc">Two ways to fund penalties:<br>
+          <span style="color:var(--gold)">OPTION A — WALLET:</span> User adds money upfront (like Paytm wallet). Penalties auto-deduct from balance. Refundable if they leave clean.<br>
+          <span style="color:var(--mint)">OPTION B — AUTOPAY:</span> User sets up UPI autopay / credit card e-mandate via Razorpay. Penalties deducted automatically on miss. RBI-compliant recurring mandate (max ₹15,000/cycle).<br>
+          <span style="color:var(--smoke)">No active wallet + no autopay = cannot join a pledged group.</span></div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">&#9878;</div>
+      <div class="feature-text">
+        <div class="feature-name" style="color:var(--purple)">GROUP GOVERNANCE — CHARITY POOL</div>
+        <div class="feature-desc">All penalty money goes to a group charity pool. Group members vote monthly on where funds go: registered charities, child welfare NGOs, community events, participant meetups. Transparent ledger — every rupee tracked. Group admin proposes, members vote. 51% majority decides. Receipts shared publicly.</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">&#128274;</div>
+      <div class="feature-text">
+        <div class="feature-name" style="color:var(--gold-light)">ORGANIZATION SYSTEM</div>
+        <div class="feature-desc">Create orgs with admins. Multiple groups per org. Custom rules per group (activity type, frequency, penalty amount). Admin dashboard with analytics.</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">&#127760;</div>
+      <div class="feature-text">
+        <div class="feature-name" style="color:var(--bone)">INDIA FIRST → GLOBAL</div>
+        <div class="feature-desc">Launch in India with Razorpay (UPI autopay + wallet). Expand globally with Stripe (40+ countries). 150+ wearable integrations via Terra API. Multi-currency, multi-language. Prove the model in Bangalore, then scale.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPETITORS -->
+<div class="sec">
+  <div class="sec-label">COMPETITIVE LANDSCAPE</div>
+  <div class="card">
+    <div class="competitor" style="background:rgba(46,232,154,.05);border:1px solid rgba(46,232,154,.12)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="comp-name" style="color:var(--mint)">STICKK</span>
+        <span class="comp-status" style="color:var(--mint)">ACTIVE — WEAK</span>
+      </div>
+      <div class="comp-detail">600K users, $42M staked. But only 3 employees, $217K revenue. Individual only — no groups, no governance. Gap: no community layer.</div>
+    </div>
+    <div class="competitor" style="background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.12)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="comp-name" style="color:var(--danger)">PACT / GYMPACT</span>
+        <span class="comp-status" style="color:var(--danger)">DEAD — FTC SHUTDOWN</span>
+      </div>
+      <div class="comp-detail">Failed because GPS tracking was unreliable — users were charged unfairly. Paid $948K in FTC settlements. LESSON: verification must be bulletproof.</div>
+    </div>
+    <div class="competitor" style="background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.12)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="comp-name" style="color:var(--gold)">DIETBET / WAYBETTER</span>
+        <span class="comp-status" style="color:var(--gold)">ACTIVE — NARROW</span>
+      </div>
+      <div class="comp-detail">750K+ players, $62M paid to winners. 10-25% rake. But weight-loss ONLY. No daily fitness tracking, no groups, no governance.</div>
+    </div>
+    <div class="competitor" style="background:rgba(138,134,129,.05);border:1px solid rgba(138,134,129,.12)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="comp-name" style="color:var(--smoke)">BEEMINDER</span>
+        <span class="comp-status" style="color:var(--smoke)">ACTIVE — NICHE</span>
+      </div>
+      <div class="comp-detail">Escalating penalties ($5 to $810). Technical users only. Makes money when users fail. No social/group features.</div>
+    </div>
+
+    <div class="insight" style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15)">
+      <div class="insight-text" style="color:var(--purple)">YOUR DIFFERENTIATOR: GROUP GOVERNANCE OF PENALTY FUNDS<br>NO EXISTING PLATFORM HAS THIS. ZERO.</div>
+    </div>
+  </div>
+</div>
+
+<!-- INDIA LAUNCH STRATEGY -->
+<div class="sec">
+  <div class="sec-label">INDIA-FIRST LAUNCH</div>
+  <div class="card">
+    <div class="card-title">Launch in India. Scale Global.</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6;margin-bottom:12px">India is the fastest-growing fitness market. 820M inactive adults. UPI makes micropayments frictionless. Start here, prove the model, then expand.</div>
+
+    <!-- Payment Flow -->
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:8px">PAYMENT FLOW — HOW MONEY MOVES</div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(46,232,154,.05);border:1px solid rgba(46,232,154,.12);border-radius:8px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:var(--mint);min-width:22px">1</span>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:800;color:var(--bone);letter-spacing:1px">USER JOINS GROUP</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">Must activate wallet (add ₹X) OR setup UPI autopay / credit card e-mandate</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.12);border-radius:8px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:var(--gold);min-width:22px">2</span>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:800;color:var(--bone);letter-spacing:1px">DAILY CHECK-IN BY 6 AM</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">Auto-verified via Apple Health / Strava API. Or manual proof photo + stats upload.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.12);border-radius:8px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:var(--danger);min-width:22px">3</span>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:800;color:var(--bone);letter-spacing:1px">MISS = AUTO-DEBIT</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">Wallet: instant deduct. Autopay: Razorpay charges via UPI e-mandate (RBI compliant, max ₹15K/cycle).</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.12);border-radius:8px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:var(--purple);min-width:22px">4</span>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:800;color:var(--bone);letter-spacing:1px">PENALTY → CHARITY POOL</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">Money enters group charity pool. Monthly vote: charity, child welfare, group event, community project.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(138,134,129,.05);border:1px solid rgba(138,134,129,.12);border-radius:8px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:var(--smoke);min-width:22px">5</span>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:800;color:var(--bone);letter-spacing:1px">3 MISSES = OUT</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">3 consecutive misses = auto-removal. Rejoin fee = 2x original pledge. Rank resets to zero.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- India Payment Stack -->
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px">INDIA PAYMENT STACK</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+      <div style="padding:8px;border:1px solid rgba(46,232,154,.2);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:800;color:var(--mint)">RAZORPAY</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);line-height:1.5;margin-top:2px">UPI autopay (e-mandate)<br>Credit/debit cards<br>Net banking<br>Wallets (Paytm, PhonePe)</div>
+      </div>
+      <div style="padding:8px;border:1px solid rgba(212,168,67,.2);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:800;color:var(--gold)">IN-APP WALLET</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);line-height:1.5;margin-top:2px">Prepaid balance model<br>Add ₹500-15,000<br>Auto-deduct on miss<br>Refundable on clean exit</div>
+      </div>
+    </div>
+
+    <!-- RBI Compliance Note -->
+    <div style="padding:8px 10px;background:rgba(255,165,0,.05);border:1px solid rgba(255,165,0,.15);border-radius:8px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:#F0A500;margin-bottom:3px">RBI COMPLIANCE — CRITICAL</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);line-height:1.5">
+        UPI e-mandate: max ₹15,000 per cycle (RBI rule since 2021). User must authenticate first mandate via UPI PIN. Subsequent charges are auto-debited. Pre-debit notification 24hrs before is mandatory. Razorpay handles all compliance — use their Subscriptions API.
+      </div>
+    </div>
+
+    <!-- Target Cities -->
+    <div style="margin-top:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px">LAUNCH CITIES (PHASE 1)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        <span style="padding:3px 10px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:8px;background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2);color:var(--gold)">BANGALORE</span>
+        <span style="padding:3px 10px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:8px;background:rgba(46,232,154,.08);border:1px solid rgba(46,232,154,.2);color:var(--mint)">MUMBAI</span>
+        <span style="padding:3px 10px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:8px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);color:var(--purple)">DELHI NCR</span>
+        <span style="padding:3px 10px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:8px;background:rgba(255,59,92,.08);border:1px solid rgba(255,59,92,.2);color:var(--danger)">HYDERABAD</span>
+        <span style="padding:3px 10px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:8px;background:rgba(138,134,129,.1);border:1px solid rgba(138,134,129,.2);color:var(--smoke)">PUNE</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash);margin-top:4px">Target: fitness-conscious metro professionals, running clubs, CrossFit communities, corporate wellness groups</div>
+    </div>
+  </div>
+</div>
+
+<!-- TECH STACK -->
+<div class="sec">
+  <div class="sec-label">RECOMMENDED TECH STACK</div>
+  <div class="card">
+    <div class="tech-grid">
+      <div class="tech-item" style="border-color:rgba(255,59,92,.2)">
+        <div class="tech-cat" style="color:var(--danger)">MOBILE APP</div>
+        <div class="tech-val">Flutter</div>
+        <div class="tech-note">iOS + Android from one codebase. Needed for HealthKit access (PWA can't).</div>
+      </div>
+      <div class="tech-item" style="border-color:rgba(46,232,154,.2)">
+        <div class="tech-cat" style="color:var(--mint)">WEB DASHBOARD</div>
+        <div class="tech-val">Next.js</div>
+        <div class="tech-note">Admin panel, org management, analytics. React-based, SEO-friendly.</div>
+      </div>
+      <div class="tech-item" style="border-color:rgba(212,168,67,.2)">
+        <div class="tech-cat" style="color:var(--gold)">BACKEND</div>
+        <div class="tech-val">Node.js + Fastify</div>
+        <div class="tech-note">REST + WebSocket for real-time leaderboards. Python microservices for ML.</div>
+      </div>
+      <div class="tech-item" style="border-color:rgba(168,85,247,.2)">
+        <div class="tech-cat" style="color:var(--purple)">DATABASE</div>
+        <div class="tech-val">PostgreSQL + Redis</div>
+        <div class="tech-note">Postgres for financial ACID compliance. Redis for real-time rankings. TimescaleDB for fitness time-series.</div>
+      </div>
+      <div class="tech-item" style="border-color:rgba(255,165,0,.2)">
+        <div class="tech-cat" style="color:#F0A500">PAYMENTS</div>
+        <div class="tech-val">Stripe + Razorpay</div>
+        <div class="tech-note">Stripe for global (40+ countries). Razorpay for India (UPI, e-mandate for auto-debit).</div>
+      </div>
+      <div class="tech-item" style="border-color:rgba(46,232,154,.2)">
+        <div class="tech-cat" style="color:var(--mint)">FITNESS DATA</div>
+        <div class="tech-val">Terra API</div>
+        <div class="tech-note">Unified access to 150+ wearables: Apple Health, Garmin, Fitbit, Strava, Google Fit.</div>
+      </div>
+      <div class="tech-item" style="border-color:rgba(138,134,129,.2)">
+        <div class="tech-cat" style="color:var(--smoke)">AUTH</div>
+        <div class="tech-val">Supabase Auth</div>
+        <div class="tech-note">OAuth, email/password, magic links. Row-level security for groups.</div>
+      </div>
+      <div class="tech-item" style="border-color:rgba(255,59,92,.2)">
+        <div class="tech-cat" style="color:var(--danger)">HOSTING</div>
+        <div class="tech-val">AWS / Vercel</div>
+        <div class="tech-note">Vercel for web. AWS (ECS/Lambda) for backend. S3 for proof photos.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;padding:8px 10px;background:rgba(255,59,92,.04);border:1px solid rgba(255,59,92,.1);border-radius:8px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--danger);margin-bottom:3px">CRITICAL: NATIVE APP REQUIRED</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.5">PWAs CANNOT access Apple HealthKit or do background fitness tracking. You MUST build a native app (Flutter) for automatic activity verification. This is non-negotiable for the penalty model — Pact died because verification was unreliable.</div>
+    </div>
+  </div>
+</div>
+
+<!-- BUILD PHASES -->
+<div class="sec">
+  <div class="sec-label">BUILD ROADMAP</div>
+  <div class="card">
+    <div class="phase" style="background:rgba(46,232,154,.05);border:1px solid rgba(46,232,154,.12)">
+      <div class="phase-name" style="color:var(--mint)">PHASE 1 — MVP</div>
+      <div class="phase-time" style="color:var(--mint)">MONTH 1-3</div>
+      <div class="phase-tasks">
+        - Web app: user signup, create/join groups, daily check-in form<br>
+        - Manual proof upload (photo + stats)<br>
+        - Basic leaderboard + streak tracking<br>
+        - Payment integration (Razorpay for India)<br>
+        - Test with 1 group of 10-20 friends
+      </div>
+    </div>
+    <div class="phase" style="background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.12)">
+      <div class="phase-name" style="color:var(--gold)">PHASE 2 — AUTOMATION</div>
+      <div class="phase-time" style="color:var(--gold)">MONTH 3-6</div>
+      <div class="phase-tasks">
+        - Flutter app (iOS + Android)<br>
+        - Terra API integration (auto-verify from Apple Watch, Strava, etc.)<br>
+        - Auto-penalty engine (missed day = auto debit)<br>
+        - Group governance: voting on penalty fund usage<br>
+        - Push notifications + reminders
+      </div>
+    </div>
+    <div class="phase" style="background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.12)">
+      <div class="phase-name" style="color:var(--purple)">PHASE 3 — SCALE</div>
+      <div class="phase-time" style="color:var(--purple)">MONTH 6-12</div>
+      <div class="phase-tasks">
+        - Organization system (multiple groups, admin dashboards)<br>
+        - Stripe integration (global payments, multi-currency)<br>
+        - Public leaderboards + embed widgets<br>
+        - Charity/NGO partnerships for penalty fund distribution<br>
+        - Marketing: launch on Product Hunt, Instagram growth from First Light account
+      </div>
+    </div>
+    <div class="phase" style="background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.12)">
+      <div class="phase-name" style="color:var(--danger)">PHASE 4 — GLOBAL</div>
+      <div class="phase-time" style="color:var(--danger)">MONTH 12+</div>
+      <div class="phase-tasks">
+        - Corporate wellness partnerships (B2B)<br>
+        - API for third-party integrations<br>
+        - AI-powered coaching recommendations<br>
+        - Event management system (group-funded events)<br>
+        - Localization: 10+ languages
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVENUE MODEL -->
+<div class="sec">
+  <div class="sec-label">HOW YOU MAKE MONEY</div>
+  <div class="card">
+    <div class="card-title">6 Revenue Streams</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.5;margin-bottom:14px">You never touch the charity pool. Platform revenue comes from fees, subscriptions, and services layered ON TOP of the accountability model.</div>
+
+    <!-- Stream 1: Platform Fee -->
+    <div style="padding:12px;background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.15);border-radius:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:900;color:var(--gold);letter-spacing:1px">1. PLATFORM FEE ON PENALTIES</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--gold)">CORE</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6;margin-bottom:8px">
+        Every penalty collected → 10% goes to platform, 90% goes to group charity pool.<br>
+        User sees: "₹1,000 penalty → ₹900 to charity pool, ₹100 platform fee"
+      </div>
+      <div style="padding:8px;background:rgba(13,12,11,.5);border-radius:6px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;color:var(--gold);margin-bottom:4px">MATH — CONSERVATIVE</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--bone);line-height:1.8">
+          1,000 active users × 30% miss rate × ₹500 avg penalty = ₹1,50,000/mo in penalties<br>
+          Platform keeps 10% = <span style="color:var(--gold);font-weight:700">₹15,000/mo</span><br><br>
+          10,000 users × 30% miss × ₹500 = <span style="color:var(--gold);font-weight:700">₹1,50,000/mo</span><br>
+          1,00,000 users × 25% miss × ₹500 = <span style="color:var(--gold);font-weight:700">₹12,50,000/mo (₹1.5 Cr/yr)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stream 2: Subscription -->
+    <div style="padding:12px;background:rgba(46,232,154,.05);border:1px solid rgba(46,232,154,.15);border-radius:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:900;color:var(--mint);letter-spacing:1px">2. PRO SUBSCRIPTION</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--mint)">RECURRING</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6;margin-bottom:8px">
+        Free tier: join 1 group, basic stats, manual check-in.<br>
+        Pro (₹199/mo): unlimited groups, auto-verify from wearables, advanced analytics, custom badges, priority support.
+      </div>
+      <div style="padding:8px;background:rgba(13,12,11,.5);border-radius:6px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--bone);line-height:1.8">
+          10,000 users × 15% conversion × ₹199/mo = <span style="color:var(--mint);font-weight:700">₹2,98,500/mo</span><br>
+          1,00,000 users × 12% × ₹199 = <span style="color:var(--mint);font-weight:700">₹23,88,000/mo (₹2.8 Cr/yr)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stream 3: Organization Plans -->
+    <div style="padding:12px;background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.15);border-radius:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:900;color:var(--purple);letter-spacing:1px">3. ORGANIZATION PLANS</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--purple)">B2B</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6">
+        Running clubs, CrossFit boxes, corporate HR teams, gym chains, coaching businesses.<br>
+        Starter (₹999/mo): 5 groups, 100 members, admin dashboard<br>
+        Growth (₹4,999/mo): 25 groups, 1,000 members, API access, white-label<br>
+        Enterprise (custom): unlimited, SSO, dedicated support, custom integrations
+      </div>
+      <div style="padding:8px;background:rgba(13,12,11,.5);border-radius:6px;margin-top:8px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--bone);line-height:1.8">
+          100 orgs × ₹2,500 avg = <span style="color:var(--purple);font-weight:700">₹2,50,000/mo</span><br>
+          1,000 orgs × ₹3,000 avg = <span style="color:var(--purple);font-weight:700">₹30,00,000/mo (₹3.6 Cr/yr)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stream 4: Corporate Wellness -->
+    <div style="padding:12px;background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.15);border-radius:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:900;color:var(--danger);letter-spacing:1px">4. CORPORATE WELLNESS</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--danger)">HIGH VALUE</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6">
+        Companies pay ₹200-500/employee/month for wellness programs that reduce insurance costs.<br>
+        Pitch: "Your employees pledge fitness goals. Penalties go to team-chosen charities. You get healthier teams + CSR credits."<br>
+        HealthyWage (competitor) pivoted entirely to B2B — this is where the real money is.
+      </div>
+      <div style="padding:8px;background:rgba(13,12,11,.5);border-radius:6px;margin-top:8px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--bone);line-height:1.8">
+          10 companies × 200 employees × ₹300/emp/mo = <span style="color:var(--danger);font-weight:700">₹6,00,000/mo</span><br>
+          50 companies × 500 emp × ₹300 = <span style="color:var(--danger);font-weight:700">₹75,00,000/mo (₹9 Cr/yr)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stream 5: Events -->
+    <div style="padding:12px;background:rgba(255,165,0,.05);border:1px solid rgba(255,165,0,.15);border-radius:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:900;color:#F0A500;letter-spacing:1px">5. EVENT PLATFORM</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#F0A500">COMMUNITY</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6">
+        Groups organize events funded from charity pool (runs, meetups, charity drives).<br>
+        Platform takes 5% commission on ticketed events. Sponsor matching for larger events.<br>
+        Builds brand, creates viral content, attracts new users through real-world presence.
+      </div>
+    </div>
+
+    <!-- Stream 6: Marketplace -->
+    <div style="padding:12px;background:rgba(138,134,129,.05);border:1px solid rgba(138,134,129,.15);border-radius:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:900;color:var(--smoke);letter-spacing:1px">6. COACH MARKETPLACE</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--smoke)">LONG-TERM</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6">
+        Certified coaches create paid groups with structured programs.<br>
+        Platform takes 15-20% commission. Coaches get clients, users get expert guidance.<br>
+        Think: Udemy for fitness accountability. Coach charges ₹2,000-10,000/month per group.
+      </div>
+    </div>
+
+    <!-- Revenue Projections -->
+    <div style="margin-top:12px;padding:12px;background:linear-gradient(135deg,rgba(212,168,67,.08),rgba(46,232,154,.05));border:1px solid rgba(212,168,67,.2);border-radius:10px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:8px">REVENUE PROJECTIONS — INDIA ONLY</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);margin-bottom:4px">YEAR 1</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:900;color:var(--smoke)">1K users</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">Penalty + Pro</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:900;color:var(--mint)">₹5-8L/yr</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash)">validation phase</div>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);margin-bottom:4px">YEAR 2</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:900;color:var(--smoke)">10K users</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">+ Orgs + Corporate</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:900;color:var(--gold)">₹50L-1Cr/yr</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash)">sustainable</div>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);margin-bottom:4px">YEAR 3</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:900;color:var(--smoke)">1L users</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke)">All 6 streams</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:900;color:var(--danger)">₹8-15Cr/yr</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash)">scale mode</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Insight -->
+    <div style="margin-top:10px;padding:10px;background:rgba(46,232,154,.05);border:1px solid rgba(46,232,154,.12);border-radius:8px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mint);line-height:1.6;text-align:center">
+        THE BEAUTY: YOU MAKE MORE MONEY WHEN PEOPLE FAIL.<br>
+        BUT THE CHARITY MODEL MAKES IT FEEL GOOD — "I FAILED, BUT A CHILD GOT HELPED."<br>
+        THIS IS WHY USERS WON'T HATE THE PENALTY. THEY'LL RESPECT IT.
+      </div>
+    </div>
+
+    <!-- What NOT to do -->
+    <div style="margin-top:10px;padding:10px;background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.12);border-radius:8px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--danger);margin-bottom:3px">NEVER DO THIS</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6">
+        - Never take more than 10% of penalties (users will revolt)<br>
+        - Never make the charity pool opaque (trust = everything)<br>
+        - Never charge unfairly — Pact died for this exact reason<br>
+        - Never keep penalty money if verification fails (refund instantly)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL -->
+<div class="sec">
+  <div class="sec-label">LEGAL NOTES</div>
+  <div class="card">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.7">
+      <span style="color:var(--mint)">GOOD NEWS:</span> Commitment contracts are legal globally (user controls outcome = not gambling).<br><br>
+      <span style="color:var(--danger)">REQUIREMENTS:</span><br>
+      - Transparent terms + easy cancellation (Pact died for unfair billing)<br>
+      - GDPR compliance for EU health data<br>
+      - RBI e-mandate compliance for India recurring payments<br>
+      - AML/KYC for payment processing<br>
+      - Clear refund policy + dispute resolution<br>
+      - 17 of 21 academic studies confirm financial stakes improve fitness outcomes
+    </div>
+  </div>
+</div>
+
+<!-- NOTES -->
+<div class="sec">
+  <div class="sec-label">YOUR NOTES</div>
+  <div class="card">
+    <textarea id="conceptNotes" style="width:100%;min-height:120px;background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.3);border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bone);resize:vertical;outline:none" placeholder="Add your thoughts, ideas, and next steps here..." oninput="localStorage.setItem('fl_concept_notes',this.value)"></textarea>
+  </div>
+</div>
+
+</div>
+
+<script>
+// Auth guard
+(function(){try{var s=JSON.parse(localStorage.getItem('fl_session')||'{}');
+if(!s.user||s.expires<=Date.now()){if(window.top===window.self)window.location.replace('login.html');}}catch(e){if(window.top===window.self)window.location.replace('login.html');}})();
+// Restore notes
+var n=localStorage.getItem('fl_concept_notes');if(n)document.getElementById('conceptNotes').value=n;
+</script>
+</body>
+</html>
+ 

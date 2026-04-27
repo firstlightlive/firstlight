@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0D0C0B">
+<title>FIRST LIGHT — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes breathe{0%,100%{opacity:.3}50%{opacity:.6}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes successPulse{0%{box-shadow:0 0 0 0 rgba(46,232,154,.5)}70%{box-shadow:0 0 0 20px rgba(46,232,154,0)}100%{box-shadow:0 0 0 0 rgba(46,232,154,0)}}
+
+:root{
+  --void:#0D0C0B;--gold:#D4A843;--gold-light:#E8C872;
+  --bone:#F0EDE5;--smoke:#8A8681;--ash:#3D3A37;--mint:#2EE89A;--danger:#FF3B5C;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+  background:var(--void);font-family:'Rajdhani',sans-serif;color:var(--bone);
+  min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+
+/* Ambient background */
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none}
+.ambient::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(ellipse at 30% 20%,rgba(212,168,67,.05) 0%,transparent 50%),
+  radial-gradient(ellipse at 70% 80%,rgba(46,232,154,.03) 0%,transparent 50%);animation:breathe 8s ease-in-out infinite}
+.ambient::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(circle at 50% 40%,rgba(212,168,67,.03) 0%,transparent 60%)}
+
+.login-wrap{
+  position:relative;z-index:1;width:100%;max-width:380px;padding:0 24px;
+  animation:fadeUp .6s ease-out;
+}
+
+/* Brand */
+.brand{text-align:center;margin-bottom:40px}
+.brand-name{font-family:'DM Serif Display',serif;font-size:36px;color:var(--bone);letter-spacing:2px}
+.brand-line{width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:12px auto}
+.brand-tag{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:5px;color:var(--gold);opacity:.7}
+
+/* Card */
+.login-card{
+  background:linear-gradient(160deg,rgba(28,26,23,.9),rgba(13,12,11,.97));
+  border:1px solid rgba(61,58,55,.4);border-radius:18px;padding:28px 24px;
+  backdrop-filter:blur(12px);
+}
+.login-card.shake{animation:shake .4s ease-in-out}
+.login-card.success{animation:successPulse .6s ease-out}
+
+.card-header{
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;
+  color:var(--smoke);text-align:center;margin-bottom:20px;
+}
+
+/* Input groups */
+.input-group{margin-bottom:16px}
+.input-label{
+  font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
+  color:var(--smoke);margin-bottom:6px;display:block;
+}
+.input-field{
+  width:100%;padding:12px 14px;background:rgba(13,12,11,.6);
+  border:1px solid rgba(61,58,55,.4);border-radius:10px;
+  font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;
+  color:var(--bone);letter-spacing:1px;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.input-field::placeholder{color:var(--ash);font-weight:400}
+.input-field:focus{border-color:rgba(212,168,67,.5);box-shadow:0 0 0 3px rgba(212,168,67,.08)}
+.input-field.error{border-color:rgba(255,59,92,.5);box-shadow:0 0 0 3px rgba(255,59,92,.08)}
+
+/* Password toggle */
+.pw-wrap{position:relative}
+.pw-toggle{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--smoke);font-size:16px;cursor:pointer;
+  padding:4px;transition:color .2s;
+}
+.pw-toggle:hover{color:var(--gold)}
+
+/* Button */
+.login-btn{
+  width:100%;padding:14px;border:none;border-radius:10px;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(135deg,var(--gold),#B8922E);color:var(--void);
+  transition:all .15s;margin-top:4px;
+}
+.login-btn:hover{box-shadow:0 4px 20px rgba(212,168,67,.3)}
+.login-btn:active{transform:scale(.97)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.login-btn.reset-btn{
+  background:linear-gradient(135deg,var(--mint),#1CB876);
+}
+
+/* Error message */
+.error-msg{
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;
+  color:var(--danger);text-align:center;margin-top:12px;min-height:16px;
+}
+
+/* Forgot link */
+.forgot-link{
+  display:block;text-align:center;margin-top:14px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;
+  color:var(--smoke);cursor:pointer;transition:color .2s;text-decoration:none;
+}
+.forgot-link:hover{color:var(--gold)}
+
+/* Views */
+.view{display:none}
+.view.active{display:block}
+
+/* Success message */
+.success-msg{
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;
+  color:var(--mint);text-align:center;margin-top:12px;min-height:16px;
+}
+
+/* Footer */
+.login-footer{
+  text-align:center;margin-top:24px;
+  font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;
+  color:var(--ash);
+}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<div class="login-wrap">
+  <div class="brand">
+    <div class="brand-name">FIRST LIGHT</div>
+    <div class="brand-line"></div>
+    <div class="brand-tag">BEFORE 6 DIES</div>
+  </div>
+
+  <!-- LOGIN VIEW -->
+  <div class="view active" id="viewLogin">
+    <div class="login-card" id="loginCard">
+      <div class="card-header">SIGN IN TO CONTINUE</div>
+      <div class="input-group">
+        <label class="input-label">USERNAME</label>
+        <input type="text" class="input-field" id="loginUser" placeholder="Enter username" autocomplete="username" autofocus>
+      </div>
+      <div class="input-group">
+        <label class="input-label">PASSWORD</label>
+        <div class="pw-wrap">
+          <input type="password" class="input-field" id="loginPass" placeholder="Enter password" autocomplete="current-password">
+          <button class="pw-toggle" onclick="togglePw('loginPass',this)" type="button">&#9673;</button>
+        </div>
+      </div>
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">ENTER</button>
+      <div class="error-msg" id="loginError"></div>
+      <a class="forgot-link" onclick="showView('viewReset')">FORGOT PASSWORD?</a>
+    </div>
+  </div>
+
+  <!-- RESET VIEW -->
+  <div class="view" id="viewReset">
+    <div class="login-card" id="resetCard">
+      <div class="card-header">RESET PASSWORD</div>
+      <div class="input-group">
+        <label class="input-label">USERNAME</label>
+        <input type="text" class="input-field" id="resetUser" placeholder="Enter username">
+      </div>
+      <div class="input-group">
+        <label class="input-label">WHAT CITY WERE YOU BORN IN?</label>
+        <input type="text" class="input-field" id="resetAnswer" placeholder="Security answer">
+      </div>
+      <div class="input-group">
+        <label class="input-label">NEW PASSWORD</label>
+        <div class="pw-wrap">
+          <input type="password" class="input-field" id="resetNewPw" placeholder="New password">
+          <button class="pw-toggle" onclick="togglePw('resetNewPw',this)" type="button">&#9673;</button>
+        </div>
+      </div>
+      <button class="login-btn reset-btn" onclick="doReset()">RESET PASSWORD</button>
+      <div class="error-msg" id="resetError"></div>
+      <div class="success-msg" id="resetSuccess"></div>
+      <a class="forgot-link" onclick="showView('viewLogin')">BACK TO LOGIN</a>
+    </div>
+  </div>
+
+  <div class="login-footer">STREAK DOESN'T PAUSE FOR FORGOTTEN PASSWORDS</div>
+</div>
+
+<script>
+// ═══ AUTH SYSTEM — SHA-256 hashed, localStorage override ═══
+
+// Default credentials (SHA-256 hashes)
+const DEFAULT_USERS = {
+  'anupam': {
+    pwHash: '797be128c5f0ffc733dc4a6a2ad77b9ecbcc70a099dc40214e0617726fe6c5c2',
+    secHash: 'd96d30e90af86344a5a9bda56fc230b435a0fde7a1789db64725978b9114e804'
+  }
+};
+
+// SHA-256 hash function
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Get user record (localStorage override or default)
+function getUser(username) {
+  const key = 'fl_auth_' + username.toLowerCase();
+  const override = localStorage.getItem(key);
+  if (override) {
+    try { return JSON.parse(override); } catch(e) {}
+  }
+  return DEFAULT_USERS[username.toLowerCase()] || null;
+}
+
+// Rate limiting — persist in sessionStorage to survive page refresh
+function isLocked() {
+  const until = parseInt(sessionStorage.getItem('fl_lockout') || '0');
+  return Date.now() < until;
+}
+
+function recordAttempt() {
+  let att = parseInt(sessionStorage.getItem('fl_attempts') || '0');
+  att++;
+  sessionStorage.setItem('fl_attempts', String(att));
+  if (att >= 5) {
+    sessionStorage.setItem('fl_lockout', String(Date.now() + 60000));
+    sessionStorage.setItem('fl_attempts', '0');
+    return true;
+  }
+  return false;
+}
+
+// View switching
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  // Clear errors
+  document.querySelectorAll('.error-msg,.success-msg').forEach(e => e.textContent = '');
+  document.querySelectorAll('.input-field').forEach(f => f.classList.remove('error'));
+}
+
+// Password visibility toggle
+function togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') { inp.type = 'text'; btn.innerHTML = '&#9678;'; }
+  else { inp.type = 'password'; btn.innerHTML = '&#9673;'; }
+}
+
+// LOGIN
+async function doLogin() {
+  const errEl = document.getElementById('loginError');
+  const card = document.getElementById('loginCard');
+  errEl.textContent = '';
+
+  if (isLocked()) {
+    errEl.textContent = 'TOO MANY ATTEMPTS. WAIT 60 SECONDS.';
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+    return;
+  }
+
+  const username = document.getElementById('loginUser').value.trim().toLowerCase();
+  const password = document.getElementById('loginPass').value;
+
+  if (!username || !password) {
+    errEl.textContent = 'ENTER BOTH FIELDS.';
+    return;
+  }
+
+  const user = getUser(username);
+  if (!user) {
+    if (recordAttempt()) errEl.textContent = 'TOO MANY ATTEMPTS. LOCKED FOR 60S.';
+    else errEl.textContent = 'INVALID CREDENTIALS.';
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+    return;
+  }
+
+  const hash = await sha256(password);
+  if (hash !== user.pwHash) {
+    if (recordAttempt()) errEl.textContent = 'TOO MANY ATTEMPTS. LOCKED FOR 60S.';
+    else errEl.textContent = 'INVALID CREDENTIALS.';
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+    document.getElementById('loginPass').classList.add('error');
+    return;
+  }
+
+  // Success
+  card.classList.add('success');
+  // Store session (expires in 24h)
+  const session = { user: username, expires: Date.now() + 86400000 };
+  localStorage.setItem('fl_session', JSON.stringify(session));
+  attempts = 0;
+
+  setTimeout(() => { window.location.replace('app.html'); }, 500);
+}
+
+// RESET PASSWORD
+async function doReset() {
+  const errEl = document.getElementById('resetError');
+  const sucEl = document.getElementById('resetSuccess');
+  const card = document.getElementById('resetCard');
+  errEl.textContent = '';
+  sucEl.textContent = '';
+
+  if (isLocked()) {
+    errEl.textContent = 'TOO MANY ATTEMPTS. WAIT 60 SECONDS.';
+    return;
+  }
+
+  const username = document.getElementById('resetUser').value.trim().toLowerCase();
+  const answer = document.getElementById('resetAnswer').value.trim().toLowerCase();
+  const newPw = document.getElementById('resetNewPw').value;
+
+  if (!username || !answer || !newPw) {
+    errEl.textContent = 'FILL ALL FIELDS.';
+    return;
+  }
+
+  if (newPw.length < 4) {
+    errEl.textContent = 'PASSWORD MUST BE AT LEAST 4 CHARACTERS.';
+    return;
+  }
+
+  const user = getUser(username);
+  if (!user) {
+    if (recordAttempt()) errEl.textContent = 'TOO MANY ATTEMPTS. LOCKED FOR 60S.';
+    else errEl.textContent = 'USER NOT FOUND.';
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+    return;
+  }
+
+  const answerHash = await sha256(answer);
+  if (answerHash !== user.secHash) {
+    if (recordAttempt()) errEl.textContent = 'TOO MANY ATTEMPTS. LOCKED FOR 60S.';
+    else errEl.textContent = 'INCORRECT ANSWER.';
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+    return;
+  }
+
+  // Update password in localStorage
+  const newHash = await sha256(newPw);
+  const updated = { pwHash: newHash, secHash: user.secHash };
+  localStorage.setItem('fl_auth_' + username, JSON.stringify(updated));
+  attempts = 0;
+
+  sucEl.textContent = 'PASSWORD UPDATED. REDIRECTING...';
+  card.classList.add('success');
+  setTimeout(() => showView('viewLogin'), 1500);
+}
+
+// Enter key support
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPass').focus(); });
+document.getElementById('resetUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('resetAnswer').focus(); });
+document.getElementById('resetAnswer').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('resetNewPw').focus(); });
+document.getElementById('resetNewPw').addEventListener('keydown', e => { if (e.key === 'Enter') doReset(); });
+
+// Check if already logged in
+(function checkSession() {
+  try {
+    const s = JSON.parse(localStorage.getItem('fl_session') || '{}');
+    if (s.user && s.expires > Date.now()) {
+      window.location.replace('app.html');
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
+ 

@@ -1,0 +1,24 @@
+# Tokens & secrets
+scripts/.strava_*
+scripts/.ig_*
+scripts/.env
+*.secret
+*-service-account-key.json
+gcs-service-account-key.json
+*.key.json
+
+# OS files
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# Temp files
+/tmp/
+*.tmp
+*.log
+
+# Node
+node_modules/
+
+# Local config
+.claude/

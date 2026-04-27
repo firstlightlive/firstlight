@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>FIRST LIGHT — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+  <style>
+    .login-screen{min-height:100vh;min-height:100dvh;min-height:-webkit-fill-available;display:flex;align-items:center;justify-content:center;padding:24px}
+    .login-box{max-width:400px;width:100%;text-align:center}
+    .login-brand{font-family:var(--font-mono);font-size:14px;font-weight:700;letter-spacing:3px;color:var(--cyan);margin-bottom:48px;opacity:0.8}
+    .login-title{font-family:var(--font-mono);font-size:16px;font-weight:700;letter-spacing:2px;color:var(--text);margin-bottom:32px}
+    .login-error{font-family:var(--font-mono);font-size:11px;color:var(--red);margin-bottom:12px;min-height:20px;letter-spacing:0.5px}
+    .login-form .form-group{text-align:left;margin-bottom:16px}
+    .login-form .form-label{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-muted);display:block;margin-bottom:6px}
+    .login-form .form-input{width:100%;padding:14px 16px;background:var(--bg3);border:1px solid var(--surface-border);border-radius:8px;color:var(--text);font-family:var(--font-mono);font-size:14px}
+    .login-form .form-input:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3px rgba(var(--cyan-r),0.12)}
+    .login-forgot{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-dim);margin-top:16px;display:block;cursor:pointer;transition:color 0.2s}
+    .login-forgot:hover{color:var(--cyan)}
+    .login-back{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-top:48px;display:block;transition:color 0.2s}
+    .login-back:hover{color:var(--text-muted)}
+    .forgot-panel{display:none;margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--surface-border);border-radius:12px;text-align:left}
+    .forgot-panel.open{display:block}
+  </style>
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <meta property="og:title" content="FIRST LIGHT — Infinite Streak">
+  <meta property="og:description" content="No end date. No finish line. ₹15,000 on the line every single day. Zero misses.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+
+  <div class="login-screen">
+    <div class="login-box">
+      <div class="login-brand">◆ FIRST LIGHT</div>
+      <div class="login-title">COMMAND CENTER</div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginView">
+        <form class="login-form" id="loginForm">
+          <div class="form-group">
+            <label class="form-label">EMAIL</label>
+            <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">PASSWORD</label>
+            <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+          <div class="login-error" id="loginError"></div>
+          <button type="submit" class="btn btn-primary w-full" id="loginBtn">SIGN IN</button>
+        </form>
+
+        <a class="login-forgot" id="forgotToggle">Forgot password?</a>
+
+        <div class="forgot-panel" id="forgotPanel">
+          <div class="form-group">
+            <label class="form-label">RESET EMAIL</label>
+            <input type="email" class="form-input" id="resetEmail" placeholder="Enter your email">
+          </div>
+          <button class="btn btn-outline w-full" id="sendResetBtn">SEND RESET LINK</button>
+          <div class="login-error" id="resetStatus" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <!-- SET NEW PASSWORD (shown after clicking reset link in email) -->
+      <div id="resetView" style="display:none">
+        <div class="login-title" style="color:var(--gold)">SET NEW PASSWORD</div>
+        <form class="login-form" id="resetForm">
+          <div class="form-group">
+            <label class="form-label">NEW PASSWORD</label>
+            <input type="password" class="form-input" id="newPassword" placeholder="Enter new password (min 8 chars)" required minlength="8" autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label">CONFIRM PASSWORD</label>
+            <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm new password" required minlength="8" autocomplete="new-password">
+          </div>
+          <div class="login-error" id="resetError"></div>
+          <button type="submit" class="btn btn-primary w-full" id="resetBtn">UPDATE PASSWORD</button>
+        </form>
+        <div id="resetSuccess" style="display:none;margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--green);border-radius:12px;text-align:center">
+          <div style="font-family:var(--font-mono);font-size:13px;color:var(--green);letter-spacing:1px;margin-bottom:12px">PASSWORD UPDATED</div>
+          <a href="login.html" class="btn btn-primary w-full" style="display:inline-block;text-decoration:none">SIGN IN WITH NEW PASSWORD</a>
+        </div>
+      </div>
+
+      <a href="index.html" class="login-back">← BACK TO SITE</a>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // ── DETECT RECOVERY TOKEN IN URL ──
+    // Supabase sends: /login#access_token=...&type=recovery
+    // Or newer PKCE flow: /login?code=...&type=recovery (via query params)
+    var _recoveryToken = null;
+
+    (function detectRecovery() {
+      var hash = window.location.hash.substring(1);
+      var params = new URLSearchParams(hash);
+
+      // Check hash fragment (implicit flow)
+      if (params.get('type') === 'recovery' && params.get('access_token')) {
+        _recoveryToken = params.get('access_token');
+      }
+
+      // Check query params (PKCE flow) — exchange code for session
+      var qp = new URLSearchParams(window.location.search);
+      if (qp.get('type') === 'recovery' && qp.get('code')) {
+        // Exchange the code for a session
+        fetch(FL.SUPABASE_URL + '/auth/v1/token?grant_type=pkce', {
+          method: 'POST',
+          headers: { 'apikey': FL.SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ auth_code: qp.get('code'), code_verifier: localStorage.getItem('fl_pkce_verifier') || '' })
+        }).then(function(r) { return r.json(); }).then(function(data) {
+          if (data.access_token) {
+            _recoveryToken = data.access_token;
+            showResetView();
+          }
+        }).catch(function() {});
+      }
+
+      if (_recoveryToken) {
+        showResetView();
+      } else if (isLoggedIn()) {
+        window.location.href = 'admin.html';
+      }
+    })();
+
+    function showResetView() {
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('resetView').style.display = 'block';
+      // Clear the hash so the token isn't visible in the URL bar
+      if (window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+
+    // ── LOGIN FORM ──
+    var _attempts = parseInt(localStorage.getItem('fl_login_attempts') || '0');
+    var _lockUntil = parseInt(localStorage.getItem('fl_login_lock_until') || '0');
+
+    function showError(msg) {
+      document.getElementById('loginError').textContent = msg;
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      showError('');
+
+      if (Date.now() < _lockUntil) {
+        var mins = Math.ceil((_lockUntil - Date.now()) / 60000);
+        showError('Account locked. Try again in ' + mins + ' minute' + (mins > 1 ? 's' : '') + '.');
+        return;
+      }
+
+      var email = document.getElementById('loginEmail').value.trim();
+      var password = document.getElementById('loginPassword').value;
+      var btn = document.getElementById('loginBtn');
+
+      if (email.toLowerCase() !== FL.AUTHORIZED_EMAIL) {
+        showError('Unauthorized email.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'SIGNING IN...';
+
+      var result = await supabaseSignIn(email, password);
+
+      btn.disabled = false;
+      btn.textContent = 'SIGN IN';
+
+      if (result.success) {
+        _attempts = 0;
+        localStorage.setItem('fl_login_attempts', '0');
+        localStorage.removeItem('fl_login_lock_until');
+        window.location.href = 'admin.html';
+      } else {
+        _attempts++;
+        localStorage.setItem('fl_login_attempts', String(_attempts));
+        if (_attempts >= 5) {
+          _lockUntil = Date.now() + 15 * 60 * 1000;
+          localStorage.setItem('fl_login_lock_until', String(_lockUntil));
+          showError('Too many failed attempts. Locked for 15 minutes.');
+        } else {
+          showError(result.error + ' (' + (5 - _attempts) + ' attempts remaining)');
+        }
+      }
+    });
+
+    // ── FORGOT PASSWORD ──
+    document.getElementById('forgotToggle').addEventListener('click', function() {
+      document.getElementById('forgotPanel').classList.toggle('open');
+    });
+
+    document.getElementById('sendResetBtn').addEventListener('click', async function() {
+      var email = document.getElementById('resetEmail').value.trim();
+      var statusEl = document.getElementById('resetStatus');
+      if (!email) { statusEl.textContent = 'Enter your email first.'; statusEl.style.color = 'var(--red)'; return; }
+
+      this.disabled = true;
+      this.textContent = 'SENDING...';
+
+      try {
+        await fetch(FL.SUPABASE_URL + '/auth/v1/recover', {
+          method: 'POST',
+          headers: { 'apikey': FL.SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, redirect_to: 'https://firstlight.live/login' })
+        });
+      } catch (e) {}
+
+      this.disabled = false;
+      this.textContent = 'SEND RESET LINK';
+      statusEl.textContent = 'If that email exists, a reset link has been sent. Check your inbox (and spam folder).';
+      statusEl.style.color = 'var(--green)';
+    });
+
+    // ── SET NEW PASSWORD (after clicking reset link) ──
+    document.getElementById('resetForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var newPw = document.getElementById('newPassword').value;
+      var confirmPw = document.getElementById('confirmPassword').value;
+      var errEl = document.getElementById('resetError');
+      var btn = document.getElementById('resetBtn');
+
+      errEl.textContent = '';
+
+      if (newPw.length < 8) {
+        errEl.textContent = 'Password must be at least 8 characters.';
+        return;
+      }
+      if (newPw !== confirmPw) {
+        errEl.textContent = 'Passwords do not match.';
+        return;
+      }
+      if (!_recoveryToken) {
+        errEl.textContent = 'Recovery token expired. Request a new reset link.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'UPDATING...';
+
+      var result = await supabaseUpdatePassword(_recoveryToken, newPw);
+
+      btn.disabled = false;
+      btn.textContent = 'UPDATE PASSWORD';
+
+      if (result.success) {
+        document.getElementById('resetForm').style.display = 'none';
+        document.getElementById('resetSuccess').style.display = 'block';
+        _recoveryToken = null;
+      } else {
+        errEl.textContent = result.error || 'Failed to update password. The link may have expired — request a new one.';
+      }
+    });
+  </script>
+
+</body>
+</html>
+ 

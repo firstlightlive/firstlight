@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>FIRST LIGHT — Instagram Archive</title>
+  <meta name="description" content="Every day before 6 AM. Every post. Every proof. The complete Instagram archive of First Light.">
+  <meta name="keywords" content="fitness Instagram, daily posting, before 6am, morning run posts, firstlightlive, discipline content">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://firstlight.live/instagram.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .ig-header{text-align:center;padding:120px 0 40px;max-width:800px;margin:0 auto}
+    .ig-header h1{font-family:'IBM Plex Mono',monospace;font-size:clamp(1.8rem,5vw,3rem);font-weight:700;letter-spacing:0.08em;margin-bottom:12px}
+    .ig-header h1 span{background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .ig-header p{font-family:'Inter',sans-serif;color:var(--text-dim,#8a9bb0);font-size:1rem;letter-spacing:0.04em}
+
+    .ig-profile{display:flex;align-items:center;gap:20px;max-width:800px;margin:0 auto 40px;padding:0 20px}
+    .ig-avatar{width:80px;height:80px;border-radius:50%;border:3px solid;border-image:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045) 1;object-fit:cover}
+    .ig-username{font-family:'IBM Plex Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--text,#fff)}
+    .ig-stats{display:flex;gap:20px;margin-top:6px}
+    .ig-stat{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--text-dim)}
+    .ig-stat strong{color:var(--text,#fff);font-size:0.85rem}
+
+    .ig-cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;padding:0 20px 32px;max-width:800px;margin:0 auto}
+    .ig-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:20px 28px;text-align:center;flex:1;min-width:120px}
+    .ig-card .label{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px}
+    .ig-card .value{font-family:'IBM Plex Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--cyan,#00E5FF)}
+
+    .ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:1000px;margin:0 auto;padding:0 20px 20px}
+    @media(max-width:600px){.ig-grid{grid-template-columns:repeat(2,1fr)}}
+
+    .ig-post{position:relative;aspect-ratio:1;overflow:hidden;border-radius:4px;cursor:pointer;background:rgba(255,255,255,0.03)}
+    .ig-post img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s}
+    .ig-post:hover img{transform:scale(1.05)}
+    .ig-post .ig-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;gap:16px;opacity:0;transition:opacity 0.3s}
+    .ig-post:hover .ig-overlay{opacity:1}
+    .ig-post .ig-overlay span{font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:#fff;font-weight:700}
+    .ig-post .ig-day-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.7);padding:3px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--cyan,#00E5FF);font-weight:700;letter-spacing:1px}
+    .ig-post .ig-carousel-badge{position:absolute;top:8px;right:8px;font-size:14px}
+
+    .ig-load-more{text-align:center;padding:24px 20px 60px}
+
+    .ig-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;padding:20px}
+    .ig-lightbox.open{display:flex}
+    .ig-lightbox-close{position:absolute;top:16px;right:20px;font-size:28px;color:#fff;cursor:pointer;z-index:10000;background:none;border:none;font-family:'IBM Plex Mono',monospace}
+    .ig-lightbox img{max-width:90%;max-height:70vh;border-radius:8px;object-fit:contain}
+    .ig-lightbox-caption{max-width:600px;margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.6;max-height:120px;overflow-y:auto;text-align:center}
+    .ig-lightbox-meta{display:flex;gap:20px;margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--text-dim)}
+    .ig-lightbox-nav{display:flex;gap:8px;margin-top:12px}
+    .ig-lightbox-nav button{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:6px 16px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;cursor:pointer}
+    .ig-lightbox-nav button:hover{background:rgba(255,255,255,0.2)}
+
+    .ig-cta{text-align:center;padding:20px;max-width:800px;margin:0 auto}
+    .ig-cta a{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff;border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:0.85rem;font-weight:700;letter-spacing:1px;text-decoration:none;transition:transform 0.2s}
+    .ig-cta a:hover{transform:translateY(-2px)}
+  </style>
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:title" content="FIRST LIGHT — Instagram Archive">
+  <meta property="og:description" content="Every day before 6 AM. Every post. Every proof.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live/instagram.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FIRST LIGHT — Instagram Archive">
+  <meta name="twitter:description" content="Every day before 6 AM. Every post. Every proof.">
+  <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link active">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link active">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+<script>
+(function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
+</script>
+
+<!-- HEADER -->
+<section class="ig-header reveal">
+  <h1><span>INSTAGRAM ARCHIVE</span></h1>
+  <p>Every day before 6 AM. Every post. Every proof. Auto-synced from @firstlightlive.</p>
+</section>
+
+<!-- PROFILE -->
+<div class="ig-profile reveal" id="igProfile"></div>
+
+<!-- STATS -->
+<div class="ig-cards reveal" id="igStats"></div>
+
+<!-- CTA -->
+<div class="ig-cta">
+  <a href="https://www.instagram.com/firstlightlive" target="_blank">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    FOLLOW @FIRSTLIGHTLIVE
+  </a>
+</div>
+
+<!-- GRID -->
+<div class="ig-grid" id="igGrid"></div>
+
+<!-- LOAD MORE -->
+<div class="ig-load-more" id="igLoadMore" style="display:none">
+  <button class="btn btn-outline" onclick="loadMorePosts()">LOAD MORE</button>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--text-dim);margin-top:8px">
+    Older posts available on <a href="https://www.instagram.com/firstlightlive" target="_blank" style="color:var(--cyan)">Instagram →</a>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="ig-lightbox" id="igLightbox">
+  <button class="ig-lightbox-close" onclick="closeLightbox()" aria-label="Close lightbox">×</button>
+  <img id="lbImage" src="" alt="">
+  <div class="ig-lightbox-meta" id="lbMeta"></div>
+  <div class="ig-lightbox-nav" id="lbNav"></div>
+  <div class="ig-lightbox-caption" id="lbCaption"></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  var allPosts = [];
+  var displayCount = 30;
+  var currentLbIndex = 0;
+  var currentLbChildren = [];
+
+  async function loadPosts() {
+    if (!SB.init()) { showIGError('Supabase not available. Data may be loading...'); return; }
+    try {
+      // Paginated fetch — handles 10+ years of posts
+      var allData = [], offset = 0, pageSize = 1000, hasMore = true;
+      while (hasMore) {
+        var page = await sbFetch('instagram_posts', 'GET', null,
+          '?select=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count,children,day_number&order=timestamp.desc&limit=' + pageSize + '&offset=' + offset);
+        if (page && Array.isArray(page) && page.length > 0) {
+          allData = allData.concat(page);
+          offset += pageSize;
+          if (page.length < pageSize) hasMore = false;
+        } else { hasMore = false; }
+      }
+      var posts = allData;
+      if (posts && Array.isArray(posts) && posts.length > 0) {
+        allPosts = posts;
+        renderProfile();
+        renderStats();
+        renderGrid();
+      } else {
+        showIGError('No Instagram posts found.');
+      }
+    } catch(e) { console.error('[IG] Load failed:', e); showIGError('Failed to load Instagram data. Please refresh.'); }
+  }
+
+  function showIGError(msg) {
+    var el = document.getElementById('igGrid');
+    if (el) el.innerHTML = '<div style="text-align:center;padding:40px 20px;font-family:\'IBM Plex Mono\',monospace;font-size:0.8rem;color:var(--red,#FF5252);border:1px solid rgba(255,82,82,0.15);border-radius:8px">' + msg + '</div>';
+  }
+
+  function renderProfile() {
+    document.getElementById('igProfile').innerHTML =
+      '<div>' +
+        '<div class="ig-username">@firstlightlive</div>' +
+        '<div class="ig-stats">' +
+          '<div class="ig-stat"><strong>' + allPosts.length + '</strong> posts</div>' +
+          '<div class="ig-stat"><strong>' + getDayNumber() + '</strong> streak days</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderStats() {
+    var totalLikes = 0, totalComments = 0;
+    allPosts.forEach(function(p) { totalLikes += p.like_count || 0; totalComments += p.comments_count || 0; });
+    document.getElementById('igStats').innerHTML =
+      '<div class="ig-card"><div class="label">Total Posts</div><div class="value">' + allPosts.length + '</div></div>' +
+      '<div class="ig-card"><div class="label">Total Likes</div><div class="value">' + totalLikes + '</div></div>' +
+      '<div class="ig-card"><div class="label">Total Comments</div><div class="value">' + totalComments + '</div></div>' +
+      '<div class="ig-card"><div class="label">Streak Day</div><div class="value">' + getDayNumber() + '</div></div>';
+  }
+
+  function renderGrid() {
+    var grid = document.getElementById('igGrid');
+    var showing = allPosts.slice(0, displayCount);
+    var html = '';
+    showing.forEach(function(p, i) {
+      var imgUrl = p.media_url || p.thumbnail_url || '';
+      var hasCarousel = p.children && p.children.length > 1;
+      html += '<div class="ig-post" onclick="openLightbox(' + i + ')">';
+      html += '<img src="' + imgUrl + '" alt="Day ' + (p.day_number || '') + ' — morning proof post" loading="lazy">';
+      html += '<div class="ig-day-badge">DAY ' + (p.day_number || '?') + '</div>';
+      if (hasCarousel) html += '<div class="ig-carousel-badge">📸 ' + p.children.length + '</div>';
+      html += '<div class="ig-overlay">';
+      html += '<span>❤ ' + (p.like_count || 0) + '</span>';
+      html += '<span>💬 ' + (p.comments_count || 0) + '</span>';
+      html += '</div>';
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+
+    var loadMoreBtn = document.getElementById('igLoadMore');
+    if (allPosts.length > displayCount) {
+      loadMoreBtn.style.display = 'block';
+    } else {
+      loadMoreBtn.style.display = 'none';
+    }
+  }
+
+  window.loadMorePosts = function() {
+    displayCount += 30;
+    renderGrid();
+  };
+
+  window.openLightbox = function(index) {
+    var post = allPosts[index];
+    if (!post) return;
+    currentLbIndex = 0;
+    currentLbChildren = [];
+
+    if (post.children && post.children.length > 0) {
+      currentLbChildren = post.children.map(function(c) { return c.media_url || c.thumbnail_url || ''; });
+    } else {
+      currentLbChildren = [post.media_url || post.thumbnail_url || ''];
+    }
+
+    document.getElementById('lbImage').src = currentLbChildren[0];
+    var date = new Date(post.timestamp);
+    var dateStr = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('lbMeta').innerHTML =
+      '<span>DAY ' + (post.day_number || '?') + '</span>' +
+      '<span>' + dateStr + '</span>' +
+      '<span>❤ ' + (post.like_count || 0) + '</span>' +
+      '<span>💬 ' + (post.comments_count || 0) + '</span>' +
+      '<a href="' + post.permalink + '" target="_blank" style="color:var(--cyan);text-decoration:none">View on Instagram →</a>';
+
+    // Caption (first 300 chars)
+    var caption = (post.caption || '').substring(0, 300);
+    document.getElementById('lbCaption').textContent = caption + (post.caption && post.caption.length > 300 ? '...' : '');
+
+    // Carousel navigation
+    if (currentLbChildren.length > 1) {
+      var navHtml = '';
+      for (var i = 0; i < currentLbChildren.length; i++) {
+        navHtml += '<button onclick="showSlide(' + i + ')" style="' + (i === 0 ? 'border-color:var(--cyan);color:var(--cyan)' : '') + '">' + (i + 1) + '</button>';
+      }
+      document.getElementById('lbNav').innerHTML = navHtml;
+      document.getElementById('lbNav').style.display = 'flex';
+    } else {
+      document.getElementById('lbNav').style.display = 'none';
+    }
+
+    document.getElementById('igLightbox').classList.add('open');
+  };
+
+  window.showSlide = function(i) {
+    currentLbIndex = i;
+    document.getElementById('lbImage').src = currentLbChildren[i];
+    var btns = document.getElementById('lbNav').querySelectorAll('button');
+    btns.forEach(function(b, j) {
+      b.style.borderColor = j === i ? 'var(--cyan)' : '';
+      b.style.color = j === i ? 'var(--cyan)' : '';
+    });
+  };
+
+  window.closeLightbox = function() {
+    document.getElementById('igLightbox').classList.remove('open');
+  };
+
+  // Close on escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight' && currentLbChildren.length > 1) showSlide(Math.min(currentLbIndex + 1, currentLbChildren.length - 1));
+    if (e.key === 'ArrowLeft' && currentLbChildren.length > 1) showSlide(Math.max(currentLbIndex - 1, 0));
+  });
+
+  loadPosts();
+})();
+</script>
+
+</body>
+</html>
+ 

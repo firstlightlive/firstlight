@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin.html
+Disallow: /login.html
+Disallow: /handout.html
+Disallow: /app/
+
+Sitemap: https://firstlight.live/sitemap.xml
+ 

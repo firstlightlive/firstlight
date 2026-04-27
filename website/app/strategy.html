@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FL Strategy">
+<meta name="theme-color" content="#0D0C0B">
+<title>FIRST LIGHT — Strategy</title>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(w){w.unregister();});});caches.keys().then(function(k){k.forEach(function(n){caches.delete(n);});});}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes breathe{0%,100%{opacity:.35}50%{opacity:.7}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px rgba(212,168,67,.2)}50%{box-shadow:0 0 20px rgba(212,168,67,.4)}}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+:root{
+  --void:#0D0C0B;--gold:#D4A843;--gold-light:#E8C872;
+  --bone:#F0EDE5;--smoke:#8A8681;--ash:#3D3A37;--mint:#2EE89A;--danger:#FF3B5C;
+  --safe-top:env(safe-area-inset-top,20px);--safe-bot:env(safe-area-inset-bottom,20px);
+  --amber:#F0A500;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+  background:var(--void);font-family:'Rajdhani',sans-serif;color:var(--bone);
+  min-height:100vh;min-height:100dvh;overflow-x:hidden;
+  padding-top:var(--safe-top);padding-bottom:calc(var(--safe-bot) + 70px);
+}
+
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none}
+.ambient::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(ellipse at 30% 20%,rgba(212,168,67,.04) 0%,transparent 50%),
+  radial-gradient(ellipse at 70% 80%,rgba(212,168,67,.02) 0%,transparent 50%);animation:breathe 8s ease-in-out infinite}
+
+.app{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:0 16px 40px}
+
+/* Back link */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:2px;color:var(--gold);text-decoration:none;padding:16px 0 8px;opacity:.7;transition:opacity .2s}
+.back-link:hover{opacity:1}
+
+/* Header */
+.header{padding:8px 0 16px;text-align:center;animation:fadeUp .5s ease-out}
+.header-eyebrow{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:500;
+  letter-spacing:5px;color:var(--gold);opacity:.7;margin-bottom:6px}
+.header h1{font-family:'DM Serif Display',serif;font-size:28px;color:var(--bone);letter-spacing:1px}
+.header-line{width:30px;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px auto 0}
+
+/* Sections */
+.module{margin-bottom:20px;animation:fadeUp .5s ease-out backwards;scroll-margin-top:20px}
+.module:nth-child(odd){animation-delay:.1s}
+.module:nth-child(even){animation-delay:.15s}
+
+.mod-label{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:500;
+  letter-spacing:4px;color:var(--smoke);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.mod-label::after{content:'';flex:1;height:.5px;background:linear-gradient(90deg,rgba(138,134,129,.2),transparent)}
+
+.card{background:linear-gradient(160deg,rgba(28,26,23,.85),rgba(13,12,11,.95));
+  border:1px solid rgba(61,58,55,.35);border-radius:14px;padding:16px;backdrop-filter:blur(8px)}
+
+.card-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--bone);margin-bottom:10px}
+.card-sub{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--smoke);margin-bottom:8px}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:700;letter-spacing:1.5px}
+.badge-highest{background:rgba(255,59,92,.15);border:1px solid rgba(255,59,92,.4);color:var(--danger)}
+.badge-high{background:rgba(212,168,67,.12);border:1px solid rgba(212,168,67,.35);color:var(--gold)}
+.badge-medium{background:rgba(46,232,154,.1);border:1px solid rgba(46,232,154,.25);color:var(--mint)}
+.badge-low{background:rgba(138,134,129,.1);border:1px solid rgba(138,134,129,.25);color:var(--smoke)}
+
+/* Command Center */
+.cc-date{font-family:'DM Serif Display',serif;font-size:24px;color:var(--gold-light);text-align:center}
+.cc-day-type{text-align:center;margin:8px 0;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;
+  letter-spacing:2px;color:var(--bone)}
+.cc-time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.cc-time-card{background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.25);border-radius:10px;padding:10px;text-align:center}
+.cc-time-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--smoke);margin-bottom:4px}
+.cc-time-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--bone)}
+.cc-countdown{text-align:center;margin:12px 0;padding:12px;background:rgba(212,168,67,.06);
+  border:1px solid rgba(212,168,67,.15);border-radius:10px}
+.cc-countdown-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:3px;color:var(--gold);margin-bottom:4px}
+.cc-countdown-val{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--gold-light);letter-spacing:2px}
+.cc-first15{margin-top:10px;padding:10px;background:rgba(46,232,154,.05);border:1px solid rgba(46,232,154,.15);
+  border-radius:10px;display:flex;align-items:center;gap:10px}
+.cc-first15-text{flex:1;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--mint);font-weight:600}
+.cc-first15-sub{font-size:10px;color:var(--smoke);font-weight:400}
+
+/* Buttons */
+.btn{padding:10px 16px;border:none;border-radius:10px;cursor:pointer;font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all .15s}
+.btn:active{transform:scale(.95)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#B8922E);color:var(--void)}
+.btn-outline{background:transparent;border:1px solid rgba(61,58,55,.4);color:var(--smoke)}
+.btn-outline:active{border-color:var(--gold);color:var(--gold)}
+.btn-mint{background:rgba(46,232,154,.12);border:1px solid rgba(46,232,154,.3);color:var(--mint)}
+.btn-danger{background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.25);color:var(--danger)}
+.btn-sm{padding:7px 12px;font-size:8px}
+.btn-full{width:100%;text-align:center}
+
+/* Hook cards */
+.hook-grid{display:flex;flex-direction:column;gap:6px}
+.hook-card{padding:10px 12px;background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.25);
+  border-radius:10px;cursor:pointer;transition:all .2s;user-select:none}
+.hook-card:active{transform:scale(.98)}
+.hook-card.selected{border-color:var(--gold);background:rgba(212,168,67,.06)}
+.hook-type{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:3px}
+.hook-text{font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--bone);line-height:1.5}
+
+/* SOAR inputs */
+.soar-group{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.soar-item{display:flex;flex-direction:column;gap:3px}
+.soar-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);display:flex;align-items:center;gap:6px}
+.soar-lbl span{color:var(--smoke);font-weight:400;letter-spacing:1px;font-size:7px}
+.soar-input{width:100%;background:rgba(13,12,11,.7);border:1px solid rgba(61,58,55,.25);border-radius:8px;
+  padding:9px 10px;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--bone);outline:none;
+  resize:none;min-height:36px;-webkit-appearance:none;transition:border-color .3s}
+.soar-input:focus{border-color:var(--gold)}
+.soar-input::placeholder{color:var(--ash)}
+
+/* Keywords bar */
+.kw-bar{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.kw-tag{padding:3px 8px;background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2);
+  border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--gold-light)}
+
+/* CTA display */
+.cta-card{margin:10px 0;padding:10px 12px;background:rgba(46,232,154,.04);border:1px solid rgba(46,232,154,.15);
+  border-radius:10px}
+.cta-type{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--mint);margin-bottom:3px}
+.cta-text{font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--bone);line-height:1.5}
+
+/* Generated caption */
+.caption-output{margin-top:12px;background:rgba(13,12,11,.8);border:1px solid rgba(61,58,55,.25);
+  border-radius:10px;padding:14px;display:none}
+.caption-output.show{display:block}
+.caption-text{font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--bone);line-height:1.7;
+  white-space:pre-wrap;word-break:break-word}
+.char-counter{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);margin-top:6px;letter-spacing:1px}
+.preview-line{margin-top:6px;padding:8px;background:rgba(212,168,67,.04);border-radius:6px;
+  font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--smoke);line-height:1.5}
+.preview-line strong{color:var(--bone)}
+
+/* Hashtag section */
+.ht-group{margin:8px 0}
+.ht-cat{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;margin-bottom:4px}
+.ht-cat.niche{color:var(--gold)}
+.ht-cat.location{color:var(--mint)}
+.ht-cat.branded{color:#6C5CE7}
+.ht-tags{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bone);line-height:1.8;margin-bottom:8px}
+/* Shared input style */
+.handle-in{width:100%;background:rgba(13,12,11,.7);border:1px solid rgba(61,58,55,.25);border-radius:8px;
+  padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--bone);
+  outline:none;-webkit-appearance:none;transition:border-color .3s}
+.handle-in:focus{border-color:var(--gold)}
+.handle-in::placeholder{color:var(--ash)}
+
+.ht-avoid{padding:8px 10px;background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.15);
+  border-radius:8px;margin:8px 0}
+.ht-avoid-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--danger);margin-bottom:3px}
+.ht-avoid-tags{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,59,92,.7);text-decoration:line-through}
+
+/* Music card */
+.music-remind{margin-top:10px;padding:10px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);
+  border-radius:10px}
+.music-remind-title{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:rgba(168,85,247,.9);margin-bottom:4px}
+.music-remind-text{font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--smoke);line-height:1.6}
+
+/* Stories checklist */
+.story-list{display:flex;flex-direction:column;gap:6px}
+.story-item{padding:10px 12px;background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.25);
+  border-radius:10px;cursor:pointer;transition:all .2s;user-select:none}
+.story-item:active{transform:scale(.98)}
+.story-item.done{border-color:rgba(46,232,154,.25);background:rgba(46,232,154,.04)}
+.story-item.done .story-check{color:var(--mint)}
+.story-top{display:flex;align-items:center;gap:8px}
+.story-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--ash);display:flex;
+  align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .2s;flex-shrink:0}
+.story-item.done .story-check{border-color:var(--mint);color:var(--mint)}
+.story-num{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--gold);flex-shrink:0}
+.story-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:var(--bone)}
+.story-time{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);margin-left:auto;flex-shrink:0}
+.story-desc{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--smoke);margin-top:4px;padding-left:28px;line-height:1.5}
+.story-sticker{display:inline-block;margin-top:4px;margin-left:28px;padding:2px 8px;
+  background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:12px;
+  font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;color:rgba(168,85,247,.8)}
+.story-progress{margin-top:10px;display:flex;align-items:center;gap:8px}
+.story-prog-bar{flex:1;height:4px;background:var(--ash);border-radius:2px;overflow:hidden}
+.story-prog-fill{height:100%;background:var(--mint);border-radius:2px;transition:width .3s}
+.story-prog-text{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke)}
+
+/* Engagement timer */
+.eng-timer{text-align:center;margin:12px 0}
+.eng-timer-display{font-family:'JetBrains Mono',monospace;font-size:42px;font-weight:700;color:var(--bone);letter-spacing:2px}
+.eng-timer-display.running{animation:timerPulse 1s ease-in-out infinite}
+.eng-phase{margin:8px 0;padding:10px;border-radius:10px}
+.eng-phase-num{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:3px}
+.eng-phase-task{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:var(--bone)}
+.eng-phase-time{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);margin-top:2px}
+.eng-btns{display:flex;gap:8px;justify-content:center;margin:10px 0}
+.eng-targets{margin-top:12px}
+.eng-target{padding:6px 10px;background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.2);
+  border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);margin-bottom:4px}
+.eng-counters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.eng-counter{text-align:center;padding:10px;background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.25);border-radius:10px}
+.eng-counter-val{font-family:'DM Serif Display',serif;font-size:28px;color:var(--bone)}
+.eng-counter-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--smoke);margin-top:2px}
+.eng-counter-btns{display:flex;gap:4px;justify-content:center;margin-top:6px}
+.eng-counter-btn{width:28px;height:28px;border-radius:50%;border:1px solid rgba(61,58,55,.3);
+  background:transparent;color:var(--smoke);font-size:16px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center}
+.eng-counter-btn:active{border-color:var(--gold);color:var(--gold)}
+.growth-calc{margin-top:10px;padding:10px;background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.1);
+  border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);line-height:2;text-align:center}
+.growth-calc strong{color:var(--gold-light)}
+
+/* Metrics */
+.metric-grid{display:flex;flex-direction:column;gap:6px}
+.metric-card{padding:10px 12px;background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.25);
+  border-radius:10px;display:flex;align-items:center;gap:10px}
+.metric-info{flex:1}
+.metric-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--bone)}
+.metric-target{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:1px}
+.metric-input{width:70px;background:rgba(13,12,11,.7);border:1px solid rgba(61,58,55,.25);border-radius:8px;
+  padding:8px;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--bone);
+  text-align:center;outline:none;-webkit-appearance:none}
+.metric-input:focus{border-color:var(--gold)}
+.metric-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.metric-status.green{background:var(--mint);box-shadow:0 0 6px rgba(46,232,154,.4)}
+.metric-status.amber{background:var(--amber);box-shadow:0 0 6px rgba(240,165,0,.4)}
+.metric-status.red{background:var(--danger);box-shadow:0 0 6px rgba(255,59,92,.4)}
+.metric-trend{font-size:14px;flex-shrink:0;width:20px;text-align:center}
+
+/* Bio preview */
+.bio-preview{margin:12px 0;padding:12px;background:rgba(13,12,11,.7);border:1px solid rgba(61,58,55,.25);
+  border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;color:var(--bone);line-height:1.8}
+.bio-line{display:block}
+.bio-line.gold{color:var(--gold-light)}
+.bio-line.mint{color:var(--mint)}
+
+/* Highlights checklist */
+.hl-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.hl-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(13,12,11,.5);
+  border:1px solid rgba(61,58,55,.25);border-radius:10px;cursor:pointer;transition:all .2s}
+.hl-item:active{transform:scale(.98)}
+.hl-item.created{border-color:rgba(46,232,154,.25)}
+.hl-toggle{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--ash);display:flex;
+  align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;flex-shrink:0}
+.hl-item.created .hl-toggle{border-color:var(--mint);color:var(--mint);background:rgba(46,232,154,.1)}
+.hl-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--gold)}
+.hl-desc{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--smoke)}
+
+/* Algorithm card */
+.algo-card{overflow:hidden}
+.algo-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0}
+.algo-header h3{font-family:'DM Serif Display',serif;font-size:16px;color:var(--bone)}
+.algo-toggle{font-size:16px;color:var(--smoke);transition:transform .3s}
+.algo-toggle.open{transform:rotate(180deg)}
+.algo-body{display:none;margin-top:10px}
+.algo-body.open{display:block}
+.algo-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(61,58,55,.1)}
+.algo-item:last-child{border-bottom:none}
+.algo-rank{font-family:'DM Serif Display',serif;font-size:20px;color:var(--gold);flex-shrink:0;width:24px}
+.algo-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--bone)}
+.algo-weight{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:1px}
+.algo-tip{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--smoke);margin-top:2px;line-height:1.4}
+
+/* Sunday review modal */
+.review-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;
+  overflow-y:auto;padding:20px}
+.review-overlay.show{display:flex;align-items:center;justify-content:center}
+.review-panel{width:100%;max-width:400px;background:var(--void);border:1px solid rgba(212,168,67,.2);
+  border-radius:16px;padding:20px;max-height:80vh;overflow-y:auto}
+.review-close{float:right;background:none;border:none;color:var(--smoke);font-size:20px;cursor:pointer}
+
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(13,12,11,.95);
+  backdrop-filter:blur(12px);border-top:1px solid rgba(61,58,55,.25);padding:6px 0;
+  padding-bottom:max(6px,env(safe-area-inset-bottom))}
+.nav-inner{max-width:440px;margin:0 auto;display:flex;justify-content:space-around;padding:0 8px}
+.nav-btn{background:none;border:none;color:var(--smoke);font-size:18px;padding:6px 8px;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .2s}
+.nav-btn.active,.nav-btn:active{color:var(--gold)}
+.nav-lbl{font-family:'JetBrains Mono',monospace;font-size:6px;letter-spacing:1.5px}
+
+/* Utility */
+.mt-8{margin-top:8px}
+.mt-12{margin-top:12px}
+.mb-8{margin-bottom:8px}
+.text-center{text-align:center}
+.flex-between{display:flex;align-items:center;justify-content:space-between}
+.gap-8{gap:8px}
+.hidden{display:none}
+
+/* Divider */
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(61,58,55,.3),transparent);margin:6px 0}
+
+/* Copied toast */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
+  background:rgba(46,232,154,.15);border:1px solid rgba(46,232,154,.4);color:var(--mint);
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;padding:10px 24px;
+  border-radius:10px;z-index:200;opacity:0;transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="app">
+
+<!-- Back Link -->
+<a href="index.html" class="back-link">&#8592; BACK TO GENERATOR</a>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-eyebrow">INSTAGRAM STRATEGY</div>
+  <h1>First Light</h1>
+  <div class="header-line"></div>
+</div>
+
+<!-- MODULE 1: POST COMMAND CENTER -->
+<div class="module" id="mod-command">
+  <div class="mod-label">01 POST COMMAND CENTER</div>
+  <div class="card">
+    <div class="cc-date" id="ccDate"></div>
+    <div class="cc-day-type" id="ccContentType"></div>
+    <div class="flex-between mb-8">
+      <span id="ccPriority" class="badge"></span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);letter-spacing:1px" id="ccDayNum"></span>
+    </div>
+    <div class="cc-time-grid">
+      <div class="cc-time-card">
+        <div class="cc-time-lbl">PRIMARY WINDOW</div>
+        <div class="cc-time-val" id="ccPrimary">--</div>
+      </div>
+      <div class="cc-time-card">
+        <div class="cc-time-lbl">SECONDARY WINDOW</div>
+        <div class="cc-time-val" id="ccSecondary">--</div>
+      </div>
+    </div>
+    <div class="cc-countdown">
+      <div class="cc-countdown-lbl">NEXT POSTING WINDOW IN</div>
+      <div class="cc-countdown-val" id="ccCountdown">--:--:--</div>
+    </div>
+    <div class="cc-first15">
+      <div>
+        <div class="cc-first15-text">First 15-Minute Rule</div>
+        <div class="cc-first15-sub">Reply to every comment within 15 min of posting</div>
+      </div>
+      <button class="btn btn-mint btn-sm" id="first15Btn" onclick="startFirst15()">START</button>
+    </div>
+    <div id="first15Timer" style="display:none;text-align:center;margin-top:8px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--mint)" id="first15Display">15:00</span>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 2: SMART CAPTION ENGINE -->
+<div class="module" id="mod-caption">
+  <div class="mod-label">02 SMART CAPTION ENGINE</div>
+  <div class="card">
+    <!-- Hook Selector -->
+    <div class="card-sub">SELECT HOOK TYPE</div>
+    <div class="hook-grid" id="hookGrid"></div>
+
+    <div class="divider mt-12"></div>
+
+    <!-- SOAR Builder -->
+    <div class="card-sub mt-8">S.O.A.R. MICRO-STORY</div>
+    <div class="soar-group">
+      <div class="soar-item">
+        <div class="soar-lbl">S &mdash; SITUATION <span>Set the scene</span></div>
+        <textarea class="soar-input" id="soarS" placeholder="Day 51. April 1st. Alarm went off at 3:15 AM." rows="2"></textarea>
+      </div>
+      <div class="soar-item">
+        <div class="soar-lbl">O &mdash; OBSTACLE <span>What tried to stop you</span></div>
+        <textarea class="soar-input" id="soarO" placeholder="Only slept 3 hours..." rows="2"></textarea>
+      </div>
+      <div class="soar-item">
+        <div class="soar-lbl">A &mdash; ACTION <span>What you did anyway</span></div>
+        <textarea class="soar-input" id="soarA" placeholder="Laced up anyway..." rows="2"></textarea>
+      </div>
+      <div class="soar-item">
+        <div class="soar-lbl">R &mdash; RESULT <span>The outcome</span></div>
+        <textarea class="soar-input" id="soarR" placeholder="Gym done by 6 AM..." rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SEO Keywords -->
+    <div class="card-sub mt-8">SEO KEYWORDS <span style="color:var(--smoke);font-weight:400"> &mdash; weave naturally</span></div>
+    <div class="kw-bar" id="kwBar"></div>
+    <button class="btn btn-outline btn-sm" onclick="copyKeywords()">COPY KEYWORDS</button>
+
+    <div class="divider mt-12"></div>
+
+    <!-- CTA -->
+    <div class="card-sub mt-8">TODAY'S CTA</div>
+    <div class="cta-card" id="ctaCard">
+      <div class="cta-type" id="ctaType"></div>
+      <div class="cta-text" id="ctaText"></div>
+    </div>
+
+    <div class="divider mt-12"></div>
+
+    <!-- Generate -->
+    <button class="btn btn-gold btn-full mt-8" onclick="generateCaption()">GENERATE FULL CAPTION</button>
+    <div class="caption-output" id="captionOutput">
+      <div class="card-sub">GENERATED CAPTION</div>
+      <div class="caption-text" id="captionText"></div>
+      <div class="char-counter" id="charCounter"></div>
+      <div class="preview-line" id="captionPreview"></div>
+      <button class="btn btn-outline btn-full mt-8" onclick="copyCaption()">COPY CAPTION</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 3: HASHTAG STRATEGY (Tier-Based) -->
+<div class="module" id="mod-hashtag">
+  <div class="mod-label">03 HASHTAG STRATEGY</div>
+  <div class="card">
+
+    <!-- Follower Count + Location -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--smoke);margin-bottom:4px">FOLLOWERS</div>
+        <input type="text" class="handle-in" id="htFollowers" placeholder="e.g. 18, 1.2K, 50K" style="font-size:11px;text-align:center" oninput="onFollowerChange(this.value)">
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--smoke);margin-bottom:4px">LOCATION</div>
+        <input type="text" class="handle-in" id="htLocation" placeholder="e.g. Bangalore" style="font-size:11px;text-align:center" oninput="onLocationChange(this.value)">
+      </div>
+    </div>
+
+    <!-- Current Tier Badge -->
+    <div id="htTierBadge" style="text-align:center;margin-bottom:10px">
+      <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:800;letter-spacing:2px;color:var(--gold)">TIER: NANO (0-1K)</span>
+    </div>
+    <div id="htTierMix" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);letter-spacing:1px;margin-bottom:12px">
+      USING 5 TAGS: 3 NICHE · 1 MEDIUM · 1 BRANDED
+    </div>
+
+    <!-- Today's Hashtags -->
+    <div style="padding:10px;background:rgba(212,168,67,.06);border:1px solid rgba(212,168,67,.12);border-radius:8px;text-align:center;margin-bottom:8px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px">TODAY'S HASHTAGS (ROTATED DAILY)</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bone);line-height:2.2" id="todayHashtags"></div>
+    </div>
+    <button class="btn btn-gold btn-full" onclick="copyHashtags()">COPY HASHTAGS</button>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--mint);letter-spacing:1px;text-align:center;margin-top:4px">PASTE IN CAPTION — MAX 5 HASHTAGS (INSTAGRAM 2026 LIMIT)</div>
+
+    <!-- Tier Roadmap -->
+    <div style="margin-top:14px;padding:10px;background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.25);border-radius:10px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--smoke);margin-bottom:8px">TIER ROADMAP — 18 → 1M</div>
+      <div id="htRoadmap" style="display:flex;flex-direction:column;gap:4px"></div>
+    </div>
+
+    <!-- Avoid -->
+    <div class="ht-avoid mt-12">
+      <div class="ht-avoid-lbl">AVOID THESE (500M+ posts — ZERO DISCOVERY VALUE)</div>
+      <div class="ht-avoid-tags">#fitness #motivation #gym #discipline #workout #fit #health</div>
+    </div>
+
+    <!-- Audio Boost -->
+    <div class="music-remind mt-12">
+      <div class="music-remind-title">AUDIO BOOST</div>
+      <div class="music-remind-text">Add trending or ambient audio to your carousel for Reels algorithm boost. Check Instagram Reels audio library for trending tracks. Even soft ambient audio increases distribution.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 4: STORIES WORKFLOW -->
+<div class="module" id="mod-stories">
+  <div class="mod-label">04 STORIES WORKFLOW</div>
+  <div class="card">
+    <div class="card-sub">DAILY 6-STEP SEQUENCE</div>
+    <div class="story-list" id="storyList"></div>
+    <div class="story-progress mt-12">
+      <div class="story-prog-bar"><div class="story-prog-fill" id="storyProgFill" style="width:0%"></div></div>
+      <div class="story-prog-text" id="storyProgText">0/6</div>
+    </div>
+    <div style="margin-top:8px;padding:6px 10px;background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.12);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(168,85,247,.7);letter-spacing:1px;text-align:center">
+      USE 1+ POLL / QUIZ / QUESTION STICKER DAILY
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 5: COMMUNITY ENGAGEMENT -->
+<div class="module" id="mod-engage">
+  <div class="mod-label">05 COMMUNITY ENGAGEMENT</div>
+  <div class="card">
+    <div class="card-sub">20-MINUTE ENGAGEMENT PROTOCOL</div>
+    <div class="eng-timer">
+      <div class="eng-timer-display" id="engTimerDisplay">20:00</div>
+    </div>
+    <div class="eng-phase" id="engPhaseCard" style="background:rgba(212,168,67,.06);border:1px solid rgba(212,168,67,.12);border-radius:10px">
+      <div class="eng-phase-num" id="engPhaseNum">PHASE 1 OF 3</div>
+      <div class="eng-phase-task" id="engPhaseTask">Reply to ALL comments & DMs on your latest post</div>
+      <div class="eng-phase-time" id="engPhaseTime">5 MINUTES</div>
+    </div>
+    <div class="eng-btns">
+      <button class="btn btn-gold" id="engStartBtn" onclick="toggleEngTimer()">START</button>
+      <button class="btn btn-outline" onclick="resetEngTimer()">RESET</button>
+    </div>
+
+    <div class="divider mt-12"></div>
+
+    <div class="card-sub mt-8">TARGET ACCOUNTS</div>
+    <div class="eng-targets" id="engTargets"></div>
+
+    <div class="divider mt-12"></div>
+
+    <div class="card-sub mt-8">DAILY COUNTERS</div>
+    <div class="eng-counters">
+      <div class="eng-counter">
+        <div class="eng-counter-val" id="engComments">0</div>
+        <div class="eng-counter-lbl">COMMENTS LEFT</div>
+        <div class="eng-counter-btns">
+          <button class="eng-counter-btn" onclick="adjCounter('comments',-1)">&minus;</button>
+          <button class="eng-counter-btn" onclick="adjCounter('comments',1)">+</button>
+        </div>
+      </div>
+      <div class="eng-counter">
+        <div class="eng-counter-val" id="engStories">0</div>
+        <div class="eng-counter-lbl">STORIES REPLIED</div>
+        <div class="eng-counter-btns">
+          <button class="eng-counter-btn" onclick="adjCounter('stories',-1)">&minus;</button>
+          <button class="eng-counter-btn" onclick="adjCounter('stories',1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="growth-calc">
+      <span id="engGrowthCalc"></span>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 6: WEEKLY METRICS -->
+<div class="module" id="mod-metrics">
+  <div class="mod-label">06 WEEKLY METRICS</div>
+  <div class="card">
+    <div class="flex-between mb-8">
+      <div class="card-sub" style="margin:0">WEEK <span id="metricWeekNum">--</span></div>
+      <button class="btn btn-outline btn-sm" onclick="saveMetrics()">SAVE WEEK</button>
+    </div>
+    <div class="metric-grid" id="metricGrid"></div>
+    <button class="btn btn-gold btn-full mt-12" onclick="showSundayReview()">SUNDAY REVIEW</button>
+
+    <div class="divider mt-12"></div>
+
+    <div class="card-sub mt-8">BIO TEMPLATE</div>
+    <div class="bio-preview" id="bioPreview"></div>
+    <button class="btn btn-outline btn-full mt-8" onclick="copyBio()">COPY BIO</button>
+  </div>
+</div>
+
+<!-- MODULE 7: PROFILE OPTIMIZATION -->
+<div class="module" id="mod-profile">
+  <div class="mod-label">07 PROFILE OPTIMIZATION</div>
+  <div class="card">
+    <div class="card-sub">STORY HIGHLIGHTS CHECKLIST</div>
+    <div class="hl-list" id="hlList"></div>
+  </div>
+</div>
+
+<!-- MODULE 8: GROWTH ROADMAP — 18 to 1M -->
+<div class="module" id="mod-growth">
+  <div class="mod-label">08 GROWTH ROADMAP</div>
+  <div class="card">
+    <div class="card-sub">18 → 1,000,000 — YOUR 3-YEAR PATH</div>
+
+    <!-- Current Phase -->
+    <div id="growthPhase" style="text-align:center;margin:10px 0">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:900;letter-spacing:2px;color:var(--gold)" id="gpTitle">PHASE 1: FOUNDATION</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);letter-spacing:1px" id="gpRange">0 — 1,000 FOLLOWERS</div>
+    </div>
+
+    <!-- Phase Priorities -->
+    <div id="gpPriorities" style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px"></div>
+
+    <!-- Milestone Timeline -->
+    <div style="padding:10px;background:rgba(13,12,11,.5);border:1px solid rgba(61,58,55,.25);border-radius:10px;margin-bottom:10px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--smoke);margin-bottom:8px">REALISTIC MILESTONES</div>
+      <div id="gpTimeline" style="display:flex;flex-direction:column;gap:4px"></div>
+    </div>
+
+    <!-- Content Mix for Current Phase -->
+    <div style="padding:10px;background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.12);border-radius:10px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px">CONTENT MIX — THIS PHASE</div>
+      <div id="gpContentMix" style="display:flex;flex-direction:column;gap:4px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 9: CONTENT PILLARS -->
+<div class="module" id="mod-pillars">
+  <div class="mod-label">09 CONTENT PILLARS</div>
+  <div class="card">
+    <div class="card-sub">4-PILLAR FRAMEWORK — NEVER POST OUTSIDE THESE</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+      <div style="padding:10px;background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.15);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:800;color:#FF6B6B;letter-spacing:1px">TRANSFORMATION / PROOF</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke)">25%</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);margin-top:3px">Progress clips, before/after, raw training footage, Apple Watch data</div>
+      </div>
+      <div style="padding:10px;background:rgba(46,232,154,.05);border:1px solid rgba(46,232,154,.15);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:800;color:var(--mint);letter-spacing:1px">EDUCATION / VALUE</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke)">30%</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);margin-top:3px">Workout breakdowns, discipline frameworks, nutrition tips — SAVE magnets</div>
+      </div>
+      <div style="padding:10px;background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.15);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:800;color:var(--gold);letter-spacing:1px">IDENTITY / PHILOSOPHY</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke)">25%</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);margin-top:3px">Discipline quotes, lifestyle POV, "why most quit" takes — SHARE triggers</div>
+      </div>
+      <div style="padding:10px;background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.15);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:800;color:#A855F7;letter-spacing:1px">PERSONAL / BTS</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke)">20%</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);margin-top:3px">Morning routine, meal prep, real talk, vulnerability, travel days</div>
+      </div>
+    </div>
+
+    <!-- Hero / Hub / Hygiene -->
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--smoke);margin-bottom:6px">HERO · HUB · HYGIENE SPLIT</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+      <div style="text-align:center;padding:8px;background:rgba(255,59,92,.06);border:1px solid rgba(255,59,92,.15);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:900;color:#FF6B6B">5%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);letter-spacing:1px">HERO</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash)">Viral plays</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(212,168,67,.06);border:1px solid rgba(212,168,67,.15);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:900;color:var(--gold)">35%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);letter-spacing:1px">HUB</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash)">Series / recurring</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(46,232,154,.06);border:1px solid rgba(46,232,154,.15);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:900;color:var(--mint)">60%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);letter-spacing:1px">HYGIENE</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash)">SEO / search value</div>
+      </div>
+    </div>
+
+    <!-- Format Mix -->
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--smoke);margin-bottom:6px">WEEKLY FORMAT MIX (4-5 POSTS/WEEK)</div>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:60%;height:6px;background:linear-gradient(90deg,#FF6B6B,#FF3B5C);border-radius:3px"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke)">60-70% REELS (discovery)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:25%;height:6px;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke)">20-30% CAROUSELS (saves)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:100%;height:6px;background:linear-gradient(90deg,var(--mint),rgba(46,232,154,.4));border-radius:3px"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke)">DAILY STORIES (retention)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 10: MONETIZATION ROADMAP -->
+<div class="module" id="mod-monetize">
+  <div class="mod-label">10 MONETIZATION ROADMAP</div>
+  <div class="card">
+    <div class="card-sub">REVENUE STREAMS BY PHASE — WHEN TO ACTIVATE EACH</div>
+    <div id="monRoadmap" style="display:flex;flex-direction:column;gap:8px"></div>
+
+    <!-- Reality Check -->
+    <div style="margin-top:12px;padding:10px;background:rgba(255,59,92,.04);border:1px solid rgba(255,59,92,.12);border-radius:8px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--danger);margin-bottom:4px">REALITY CHECK</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);line-height:1.6">
+        Only 4% of creators reach full-time income. But fitness is one of the BEST niches — high brand spend + natural coaching monetization. India's creator economy: $2.5B in 2025, projected $5B by 2027. Only 880 fitness influencers identified in India. 820M Indians remain inactive. The opportunity is massive.
+      </div>
+    </div>
+
+    <!-- Key Insight -->
+    <div style="margin-top:8px;padding:8px 10px;background:rgba(46,232,154,.05);border:1px solid rgba(46,232,154,.12);border-radius:8px;text-align:center">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mint);letter-spacing:1px">
+        YOU DON'T NEED 100K TO EARN FULL-TIME. 10K-30K ENGAGED FOLLOWERS + COACHING + DIGITAL PRODUCTS = ₹2-4L/MONTH IN INDIA.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 11: PSYCHOLOGY TRIGGERS -->
+<div class="module" id="mod-psych">
+  <div class="mod-label">11 PSYCHOLOGY PLAYBOOK</div>
+  <div class="card">
+    <div class="card-sub">WHAT MAKES PEOPLE FOLLOW, SAVE, SHARE, AND BUY</div>
+
+    <!-- Algorithm Hierarchy -->
+    <div style="margin-bottom:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px">ALGORITHM SIGNAL HIERARCHY (2026)</div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(255,59,92,.06);border-radius:6px">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:#FF6B6B;width:20px">1</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--bone)">DM SHARES</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);margin-left:auto">STRONGEST SIGNAL</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(212,168,67,.06);border-radius:6px">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:var(--gold);width:20px">2</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--bone)">SAVES</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);margin-left:auto">3X WEIGHT OF LIKES</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(46,232,154,.06);border-radius:6px">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:var(--mint);width:20px">3</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--bone)">WATCH TIME / DWELL</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);margin-left:auto">CAROUSEL SWIPES COUNT</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(168,85,247,.06);border-radius:6px">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:#A855F7;width:20px">4</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--bone)">COMMENTS (5+ WORDS)</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);margin-left:auto">THREADS > SINGLE</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(138,134,129,.06);border-radius:6px">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:900;color:var(--smoke);width:20px">5</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--bone)">FOLLOWS FROM CONTENT</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);margin-left:auto">EXPLORE TRIGGER</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Psychology -->
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px">WHAT TRIGGERS EACH ACTION</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+      <div style="padding:8px;background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.1);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:800;color:var(--gold);letter-spacing:1px;margin-bottom:3px">GETS SAVED</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);line-height:1.5">Step-by-step guides<br>Workout routines<br>Checklists<br>Frameworks</div>
+      </div>
+      <div style="padding:8px;background:rgba(255,59,92,.04);border:1px solid rgba(255,59,92,.1);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:800;color:#FF6B6B;letter-spacing:1px;margin-bottom:3px">GETS SHARED</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);line-height:1.5">Relatable struggle<br>Transformation proof<br>Hot takes / opinions<br>"Tag someone who..."</div>
+      </div>
+      <div style="padding:8px;background:rgba(46,232,154,.04);border:1px solid rgba(46,232,154,.1);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:800;color:var(--mint);letter-spacing:1px;margin-bottom:3px">GETS COMMENTS</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);line-height:1.5">Polarizing opinions<br>Direct questions<br>Vulnerability / story<br>Milestone posts</div>
+      </div>
+      <div style="padding:8px;background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.1);border-radius:8px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:800;color:#A855F7;letter-spacing:1px;margin-bottom:3px">GETS FOLLOWS</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);line-height:1.5">Series content (Part 1/7)<br>Strong pinned posts<br>Consistent visual grid<br>"Follow for Part 2"</div>
+      </div>
+    </div>
+
+    <!-- Hook Bank -->
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px">REEL HOOK FORMULAS (FIRST 3 SECONDS)</div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px">
+      <div style="padding:6px 8px;background:rgba(13,12,11,.5);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--bone)">
+        <span style="color:var(--gold)">CURIOSITY:</span> "The one thing nobody tells you about..."
+      </div>
+      <div style="padding:6px 8px;background:rgba(13,12,11,.5);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--bone)">
+        <span style="color:#FF6B6B">CONTRARIAN:</span> "Stop doing cardio if you want to..."
+      </div>
+      <div style="padding:6px 8px;background:rgba(13,12,11,.5);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--bone)">
+        <span style="color:var(--mint)">PROOF:</span> "This routine got me X in 30 days"
+      </div>
+      <div style="padding:6px 8px;background:rgba(13,12,11,.5);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--bone)">
+        <span style="color:#A855F7">IDENTITY:</span> "If you're reading this at 5AM..."
+      </div>
+    </div>
+
+    <!-- Dead Strategies Warning -->
+    <div style="padding:10px;background:rgba(255,59,92,.05);border:1px solid rgba(255,59,92,.15);border-radius:8px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--danger);margin-bottom:4px">DEAD IN 2026 — AVOID THESE</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,59,92,.6);line-height:1.6;text-decoration:line-through">Follow/unfollow · Engagement pods · Hashtag stuffing (30 tags) · Reposting viral content · Generic quote graphics · Buying followers</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 12: FLIGHT DAY PROTOCOL -->
+<div class="module" id="mod-flight">
+  <div class="mod-label">12 FLIGHT DAY PROTOCOL</div>
+  <div class="card">
+    <div class="card-sub">STREAK DOESN'T PAUSE FOR FLIGHTS</div>
+
+    <!-- PRE-BOARD -->
+    <div style="margin-bottom:14px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:800;letter-spacing:3px;color:var(--gold);margin-bottom:8px">PRE-BOARD</div>
+      <div id="flightPreChecks" style="display:flex;flex-direction:column;gap:6px">
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.12);border-radius:8px;cursor:pointer;transition:all .15s">
+          <input type="checkbox" onchange="updateFlightProgress()" style="accent-color:var(--gold);width:16px;height:16px">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--bone);letter-spacing:1px">BOARDING PASS → STORY</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:1px;margin-top:2px">"₹15,000 DOESN'T PAUSE FOR FLIGHTS."</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.12);border-radius:8px;cursor:pointer;transition:all .15s">
+          <input type="checkbox" onchange="updateFlightProgress()" style="accent-color:var(--gold);width:16px;height:16px">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--bone);letter-spacing:1px">TAG AIRPORT LOCATION</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:1px;margin-top:2px">BUILDS TRAVEL CURIOSITY + ALGORITHM REACH</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(61,58,55,.4),transparent);margin:4px 0 14px"></div>
+
+    <!-- POST-LAND -->
+    <div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:800;letter-spacing:3px;color:var(--mint);margin-bottom:8px">POST-LAND</div>
+      <div id="flightPostChecks" style="display:flex;flex-direction:column;gap:6px">
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(46,232,154,.04);border:1px solid rgba(46,232,154,.12);border-radius:8px;cursor:pointer;transition:all .15s">
+          <input type="checkbox" onchange="updateFlightProgress()" style="accent-color:var(--mint);width:16px;height:16px">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--bone);letter-spacing:1px">5K RUN / WALK</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:1px;margin-top:2px">AIRPORT AREA OR HOTEL — NO EXCUSES</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(46,232,154,.04);border:1px solid rgba(46,232,154,.12);border-radius:8px;cursor:pointer;transition:all .15s">
+          <input type="checkbox" onchange="updateFlightProgress()" style="accent-color:var(--mint);width:16px;height:16px">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--bone);letter-spacing:1px">SHARE WATCH STATS → STORY + POST</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:1px;margin-top:2px">"LANDED. LACED UP. 5K DONE."</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div style="margin-top:12px">
+      <div class="story-prog-bar"><div class="story-prog-fill" id="flightProgFill" style="width:0%;background:linear-gradient(90deg,var(--gold),var(--mint))"></div></div>
+      <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);margin-top:4px;letter-spacing:2px" id="flightProgText">0 / 4</div>
+    </div>
+  </div>
+</div>
+
+<!-- ALGORITHM SIGNALS -->
+<div class="module" id="mod-algo">
+  <div class="mod-label">ALGORITHM REFERENCE</div>
+  <div class="card algo-card">
+    <div class="algo-header" onclick="toggleAlgo()">
+      <h3>5 Algorithm Signals</h3>
+      <span class="algo-toggle" id="algoToggle">&#9660;</span>
+    </div>
+    <div class="algo-body" id="algoBody"></div>
+  </div>
+</div>
+
+</div><!-- /.app -->
+
+<!-- Sunday Review Overlay -->
+<div class="review-overlay" id="reviewOverlay">
+  <div class="review-panel">
+    <button class="review-close" onclick="closeReview()">&times;</button>
+    <div class="card-title" style="margin-bottom:12px">Sunday Review</div>
+    <div id="reviewContent"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">COPIED</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <div class="nav-inner">
+    <button class="nav-btn" onclick="scrollToMod('mod-command')"><span>&#9201;</span><span class="nav-lbl">COMMAND</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-caption')"><span>&#9998;</span><span class="nav-lbl">CAPTION</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-hashtag')"><span>#</span><span class="nav-lbl">HASHTAG</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-stories')"><span>&#9711;</span><span class="nav-lbl">STORIES</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-engage')"><span>&#9829;</span><span class="nav-lbl">ENGAGE</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-metrics')"><span>&#9632;</span><span class="nav-lbl">METRICS</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-profile')"><span>&#9733;</span><span class="nav-lbl">PROFILE</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-growth')"><span>&#9650;</span><span class="nav-lbl">GROWTH</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-pillars')"><span>&#9638;</span><span class="nav-lbl">PILLARS</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-monetize')"><span>&#8377;</span><span class="nav-lbl">MONEY</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-psych')"><span>&#9881;</span><span class="nav-lbl">PSYCH</span></button>
+    <button class="nav-btn" onclick="scrollToMod('mod-flight')"><span>&#9992;</span><span class="nav-lbl">FLIGHT</span></button>
+  </div>
+</nav>
+
+<script>
+// ===== CONSTANTS =====
+const STREAK_ORIGIN = new Date(2026, 1, 10); // Feb 10, 2026
+const LS_PREFIX = 'fl_strat_';
+
+function ls(key, val) {
+  if (val === undefined) {
+    try { return JSON.parse(localStorage.getItem(LS_PREFIX + key)); } catch(e) { return null; }
+  }
+  localStorage.setItem(LS_PREFIX + key, JSON.stringify(val));
+}
+// Direct localStorage (no prefix) — for keys shared with Generator tab
+function lsShared(key, val) {
+  if (val === undefined) return localStorage.getItem(key) || '';
+  localStorage.setItem(key, val);
+}
+
+function computeStreakDay() {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.max(1, Math.floor((today - STREAK_ORIGIN) / 86400000) + 1);
+}
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function formatIndianCurrency(num) {
+  const s = String(num);
+  if (s.length <= 3) return s;
+  let last3 = s.slice(-3);
+  let rest = s.slice(0, -3);
+  let result = '';
+  while (rest.length > 2) {
+    result = ',' + rest.slice(-2) + result;
+    rest = rest.slice(0, -2);
+  }
+  return rest + result + ',' + last3;
+}
+
+// Escalating stakes: ₹15K (days 1-100), ₹20K (101-200), ₹25K (201-365+)
+function getCurrentStake(day) {
+  if (day <= 100) return 15000;
+  if (day <= 200) return 20000;
+  return 25000;
+}
+
+function getTotalUnclaimed(day) {
+  let total = 0;
+  if (day <= 100) {
+    total = day * 15000;
+  } else if (day <= 200) {
+    total = 100 * 15000 + (day - 100) * 20000;
+  } else {
+    total = 100 * 15000 + 100 * 20000 + (day - 200) * 25000;
+  }
+  return total;
+}
+
+function fillTemplate(text, day) {
+  const stake = formatIndianCurrency(getCurrentStake(day));
+  const unclaimed = formatIndianCurrency(getTotalUnclaimed(day));
+  return text.replace(/\{DAY\}/g, day).replace(/\{STAKE\}/g, stake).replace(/\{UNCLAIMED\}/g, unclaimed);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || 'COPIED';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1200);
+}
+
+function scrollToMod(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== MODULE 1: POST COMMAND CENTER =====
+const SCHEDULE = {
+  0: { type: 'WEEKLY RECAP Carousel', sub: '7-day summary', primary: '7:00-9:00 AM', secondary: '11:00-1:00 PM', priority: 'Medium', priStart: 7, priEnd: 9, secStart: 11, secEnd: 13 },
+  1: { type: 'Daily Carousel', sub: 'Standard 5-slide', primary: '9:00-11:00 AM', secondary: '7:00-8:00 PM', priority: 'HIGH', priStart: 9, priEnd: 11, secStart: 19, secEnd: 20 },
+  2: { type: 'Daily Carousel', sub: 'Standard 5-slide', primary: '10:00-12:00 PM', secondary: '6:30-9:00 PM', priority: 'HIGH', priStart: 10, priEnd: 12, secStart: 18.5, secEnd: 21 },
+  3: { type: 'EDUCATIONAL Carousel', sub: '8-10 slides, high-save content', primary: '9:00-1:00 PM', secondary: '6:30-9:00 PM', priority: 'HIGHEST', priStart: 9, priEnd: 13, secStart: 18.5, secEnd: 21 },
+  4: { type: 'Daily Carousel', sub: 'Standard 5-slide', primary: '10:00-12:00 PM', secondary: '6:30-9:00 PM', priority: 'HIGH', priStart: 10, priEnd: 12, secStart: 18.5, secEnd: 21 },
+  5: { type: 'TEXT POST / Single Image', sub: 'Reflective quote', primary: '11:00-1:00 PM', secondary: '7:00-9:00 PM', priority: 'HIGH', priStart: 11, priEnd: 13, secStart: 19, secEnd: 21 },
+  6: { type: 'Daily Carousel', sub: 'Standard 5-slide', primary: '10:00-12:00 PM', secondary: '5:00-7:00 PM', priority: 'Medium', priStart: 10, priEnd: 12, secStart: 17, secEnd: 19 }
+};
+
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function initCommandCenter() {
+  const now = new Date();
+  const dow = now.getDay();
+  const sched = SCHEDULE[dow];
+  const dayNum = computeStreakDay();
+
+  document.getElementById('ccDate').textContent = DAYS[dow] + ', ' + now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('ccContentType').textContent = sched.type;
+  document.getElementById('ccDayNum').textContent = 'DAY ' + dayNum;
+  document.getElementById('ccPrimary').textContent = sched.primary;
+  document.getElementById('ccSecondary').textContent = sched.secondary;
+
+  const pb = document.getElementById('ccPriority');
+  pb.textContent = sched.priority;
+  pb.className = 'badge badge-' + sched.priority.toLowerCase().replace('highest','highest');
+  if (sched.priority === 'HIGHEST') pb.className = 'badge badge-highest';
+  else if (sched.priority === 'HIGH') pb.className = 'badge badge-high';
+  else if (sched.priority === 'Medium') pb.className = 'badge badge-medium';
+  else pb.className = 'badge badge-low';
+}
+
+function updateCountdown() {
+  const now = new Date();
+  const dow = now.getDay();
+  const sched = SCHEDULE[dow];
+  const h = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+
+  let targetH = null;
+  if (h < sched.priStart) {
+    targetH = sched.priStart;
+  } else if (h < sched.priEnd) {
+    document.getElementById('ccCountdown').textContent = 'POST NOW';
+    document.getElementById('ccCountdown').style.color = 'var(--mint)';
+    return;
+  } else if (h < sched.secStart) {
+    targetH = sched.secStart;
+  } else if (h < sched.secEnd) {
+    document.getElementById('ccCountdown').textContent = 'POST NOW';
+    document.getElementById('ccCountdown').style.color = 'var(--mint)';
+    return;
+  } else {
+    // Next day primary
+    const nextDow = (dow + 1) % 7;
+    const nextSched = SCHEDULE[nextDow];
+    targetH = 24 + nextSched.priStart;
+  }
+
+  document.getElementById('ccCountdown').style.color = '';
+  const diffSec = Math.max(0, (targetH - h) * 3600);
+  const hrs = Math.floor(diffSec / 3600);
+  const mins = Math.floor((diffSec % 3600) / 60);
+  const secs = Math.floor(diffSec % 60);
+  document.getElementById('ccCountdown').textContent =
+    String(hrs).padStart(2, '0') + ':' + String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+}
+
+// First 15-minute timer
+let first15Interval = null;
+let first15Remaining = 900;
+
+function startFirst15() {
+  if (first15Interval) return;
+  first15Remaining = 900;
+  document.getElementById('first15Timer').style.display = 'block';
+  document.getElementById('first15Btn').textContent = 'RUNNING';
+  document.getElementById('first15Btn').disabled = true;
+  first15Interval = setInterval(() => {
+    first15Remaining--;
+    if (first15Remaining <= 0) {
+      clearInterval(first15Interval);
+      first15Interval = null;
+      document.getElementById('first15Display').textContent = 'DONE!';
+      document.getElementById('first15Btn').textContent = 'START';
+      document.getElementById('first15Btn').disabled = false;
+      playBeep();
+      return;
+    }
+    const m = Math.floor(first15Remaining / 60);
+    const s = first15Remaining % 60;
+    document.getElementById('first15Display').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }, 1000);
+}
+
+// ===== MODULE 2: SMART CAPTION ENGINE =====
+const HOOKS = [
+  // Shocking Stat hooks (rotate by day)
+  { type: 'SHOCKING STAT', text: '3.8 hours of sleep. 5K run. Before the sun came up.' },
+  { type: 'SHOCKING STAT', text: 'Day {DAY}. Zero alarms snoozed. Rs. {STAKE} on the line.' },
+  { type: 'SHOCKING STAT', text: '{DAY} days. {DAY} runs. Rs. {UNCLAIMED} unclaimed.' },
+  { type: 'SHOCKING STAT', text: 'Woke up at 3:30 AM. Again. Day {DAY} of not quitting.' },
+  // Bold Claim hooks
+  { type: 'BOLD CLAIM', text: 'Day {DAY}. Zero misses. Rs. {STAKE} stays mine.' },
+  { type: 'BOLD CLAIM', text: 'Rs. {UNCLAIMED} on the table. {DAY} days. Nobody has collected.' },
+  { type: 'BOLD CLAIM', text: 'I will not miss Day {DAY}. The streak is non-negotiable.' },
+  { type: 'BOLD CLAIM', text: '{DAY} consecutive days. The version of me that quits is dead.' },
+  // Vulnerable Confession hooks
+  { type: 'VULNERABLE CONFESSION', text: "I almost didn't get up this morning. Then I remembered the bet." },
+  { type: 'VULNERABLE CONFESSION', text: "My body begged me to stay in bed. Day {DAY} didn't care." },
+  { type: 'VULNERABLE CONFESSION', text: "Not gonna lie — Day {DAY} nearly broke me. Nearly." },
+  { type: 'VULNERABLE CONFESSION', text: "The hardest morning yet. I showed up anyway. Day {DAY}." },
+  // Counter-Intuitive hooks
+  { type: 'COUNTER-INTUITIVE', text: "Discipline isn't about willpower. It's about making quitting expensive." },
+  { type: 'COUNTER-INTUITIVE', text: "I don't wake up motivated. I wake up because Rs. {STAKE} says I have to." },
+  { type: 'COUNTER-INTUITIVE', text: "The secret to consistency? Make failure cost more than effort." },
+  { type: 'COUNTER-INTUITIVE', text: "Motivation is a lie. Accountability with real money is the truth." },
+  // Question hooks
+  { type: 'QUESTION', text: 'What would you do for Rs. {STAKE}? I run 5K every day to keep mine.' },
+  { type: 'QUESTION', text: 'Could you wake up at 3:30 AM for {DAY} days straight?' },
+  { type: 'QUESTION', text: 'Would you bet Rs. {STAKE} against yourself? I did. Day {DAY}.' },
+  { type: 'QUESTION', text: 'What if missing one workout cost you Rs. {STAKE}? Day {DAY} report.' }
+];
+
+const KEYWORDS = ['morning routine', '5K run', 'gym motivation', 'discipline', 'fitness accountability', 'Bangalore runner', 'early morning workout'];
+
+const CTAS = [
+  // Comment drivers (rotate within type)
+  { type: 'COMMENT DRIVER', signal: 'Comments (5+ words)', texts: [
+    "What's the earliest you've ever woken up to train? Drop it below.",
+    "Could you do this for {DAY} days? Honest answer only.",
+    "What would you sacrifice for zero excuses? Tell me below.",
+    "If someone offered you Rs. {STAKE} to skip one day, would you take it?"
+  ]},
+  // Save drivers
+  { type: 'SAVE DRIVER', signal: 'Saves (3x weight of likes)', texts: [
+    "Save this post. Check back tomorrow at 6 AM. If I miss, you collect Rs. {STAKE}.",
+    "Save this. Follow the streak. Be the first to comment if I fail.",
+    "Bookmark this. Day {DAY}. The proof is public.",
+    "Save this routine. Try it for 7 days. I dare you."
+  ]},
+  // Share drivers
+  { type: 'SHARE DRIVER', signal: 'DM Shares (#1 algorithm signal)', texts: [
+    "Send this to someone who keeps hitting snooze. They need this bet.",
+    "Tag someone who needs a wake-up call. Literally.",
+    "Send this to your gym buddy who's been slacking.",
+    "Share this with someone who says they don't have time."
+  ]}
+];
+
+let selectedHook = -1;
+
+function initCaptionEngine() {
+  const dayNum = computeStreakDay();
+  const grid = document.getElementById('hookGrid');
+  grid.innerHTML = '';
+
+  // Show 5 hooks — one per type, rotated by day for variety
+  const hookTypes = ['SHOCKING STAT', 'BOLD CLAIM', 'VULNERABLE CONFESSION', 'COUNTER-INTUITIVE', 'QUESTION'];
+  const displayHooks = [];
+  hookTypes.forEach(type => {
+    const ofType = HOOKS.filter(h => h.type === type);
+    const pick = ofType[dayNum % ofType.length];
+    displayHooks.push(pick);
+  });
+
+  // Auto-select today's recommended hook (rotates daily across all 5 types)
+  const autoSelectIdx = dayNum % 5;
+
+  displayHooks.forEach((h, i) => {
+    const el = document.createElement('div');
+    el.className = 'hook-card' + (i === autoSelectIdx ? ' selected' : '');
+    el.innerHTML = '<div class="hook-type">' + h.type + '</div><div class="hook-text">' + fillTemplate(h.text, dayNum) + '</div>';
+    el.onclick = () => {
+      document.querySelectorAll('.hook-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedHook = i;
+    };
+    grid.appendChild(el);
+  });
+  selectedHook = autoSelectIdx;
+
+  // Keywords
+  const kwBar = document.getElementById('kwBar');
+  kwBar.innerHTML = '';
+  KEYWORDS.forEach(kw => {
+    const tag = document.createElement('span');
+    tag.className = 'kw-tag';
+    tag.textContent = kw;
+    kwBar.appendChild(tag);
+  });
+
+  // CTA — rotate type by day, rotate text within type by week
+  const ctaIdx = dayNum % 3;
+  const cta = CTAS[ctaIdx];
+  const ctaTextIdx = Math.floor(dayNum / 3) % cta.texts.length;
+  document.getElementById('ctaType').textContent = cta.type + ' — ' + cta.signal;
+  document.getElementById('ctaText').textContent = fillTemplate(cta.texts[ctaTextIdx], dayNum);
+
+  // Restore SOAR
+  const saved = ls('soar_' + todayKey());
+  if (saved) {
+    if (saved.s) document.getElementById('soarS').value = saved.s;
+    if (saved.o) document.getElementById('soarO').value = saved.o;
+    if (saved.a) document.getElementById('soarA').value = saved.a;
+    if (saved.r) document.getElementById('soarR').value = saved.r;
+  }
+
+  // Auto-save SOAR
+  ['soarS','soarO','soarA','soarR'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      ls('soar_' + todayKey(), {
+        s: document.getElementById('soarS').value,
+        o: document.getElementById('soarO').value,
+        a: document.getElementById('soarA').value,
+        r: document.getElementById('soarR').value
+      });
+    });
+  });
+}
+
+function copyKeywords() {
+  navigator.clipboard.writeText(KEYWORDS.join(', ')).then(() => showToast('KEYWORDS COPIED'));
+}
+
+function generateCaption() {
+  const dayNum = computeStreakDay();
+  const stake = formatIndianCurrency(getCurrentStake(dayNum));
+  const unclaimed = formatIndianCurrency(getTotalUnclaimed(dayNum));
+  let caption = '';
+
+  // Part 0: Deal Hook (ALWAYS first — strategy requirement)
+  caption += '🚨 MISS 1 DAY = ₹' + stake + ' TO FIRST COMMENT 🚨\n\n';
+
+  // Part 1: The Hook (first 125 chars territory)
+  if (selectedHook >= 0) {
+    const hookTypes = ['SHOCKING STAT', 'BOLD CLAIM', 'VULNERABLE CONFESSION', 'COUNTER-INTUITIVE', 'QUESTION'];
+    const displayHooks = [];
+    hookTypes.forEach(type => {
+      const ofType = HOOKS.filter(h => h.type === type);
+      displayHooks.push(ofType[dayNum % ofType.length]);
+    });
+    caption += fillTemplate(displayHooks[selectedHook].text, dayNum) + '\n\n';
+  }
+
+  // Part 2: S.O.A.R. Micro-Story (80-120 words body)
+  const s = document.getElementById('soarS').value.trim();
+  const o = document.getElementById('soarO').value.trim();
+  const a = document.getElementById('soarA').value.trim();
+  const r = document.getElementById('soarR').value.trim();
+  if (s || o || a || r) {
+    if (s) caption += s + '\n';
+    if (o) caption += o + '\n';
+    if (a) caption += a + '\n';
+    if (r) caption += r + '\n';
+    caption += '\n';
+  }
+
+  // Stakes context
+  caption += '₹' + unclaimed + ' unclaimed. Day ' + dayNum + '. The streak lives.\n\n';
+
+  // Part 3: CTA (specific, rotating)
+  const ctaIdx = dayNum % 3;
+  const cta = CTAS[ctaIdx];
+  const ctaTextIdx = Math.floor(dayNum / 3) % cta.texts.length;
+  caption += fillTemplate(cta.texts[ctaTextIdx], dayNum) + '\n\n';
+
+  // Social handle
+  caption += '📸 @firstlight.daily';
+
+  // NOTE: Hashtags go in FIRST COMMENT (not caption) per strategy
+  // Keywords are woven into the story naturally, not listed
+
+  document.getElementById('captionText').textContent = caption;
+  document.getElementById('captionOutput').classList.add('show');
+
+  // Char counter + first 125 preview
+  const total = caption.length;
+  const first125 = caption.substring(0, 125);
+  document.getElementById('charCounter').textContent = total + ' chars · first 125 shown below (visible before "more" tap)';
+  document.getElementById('captionPreview').innerHTML = '<strong>' + first125 + '</strong>' + (total > 125 ? '... <span style="color:var(--gold)">more</span>' : '');
+}
+
+function copyCaption() {
+  const text = document.getElementById('captionText').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('CAPTION COPIED'));
+}
+
+// ===== MODULE 3: HASHTAGS (5-8 max, rotated daily) =====
+// ═══ TIER-BASED HASHTAG SYSTEM (Instagram 5-tag limit, Dec 2025) ═══
+const HT_POOL = {
+  niche: ['#5amrunner','#morningrunner','#runstreak','#publicaccountability','#dailydiscipline','#morningdiscipline','#noexcusesrunning','#earlymorningrun','#5kchallenge','#fitnessaccountability'],
+  medium: ['#disciplineovermotivation','#runningcommunity','#consistencyiskey','#gymlife','#morningroutine','#earlymorningworkout','#runnersofinstagram'],
+  broad: ['#fitnessmotivation','#fitnessjourney','#runningmotivation','#marathontraining','#healthylifestyle'],
+  branded: ['#firstlightdaily','#ironcovenantchallenge']
+};
+
+const HT_LOCATION_MAP = {
+  'bangalore':['#bangalorerunners','#bengalurufitness','#blrrunners','#bangalorefitness','#whitefieldgym'],
+  'bengaluru':['#bangalorerunners','#bengalurufitness','#blrrunners','#bangalorefitness','#whitefieldgym'],
+  'mumbai':['#mumbairunners','#mumbaifitness','#marinedriverunners','#bombayfitness'],
+  'delhi':['#delhirunners','#delhifitness','#delhiNCRfitness','#delhirunning'],
+  'hyderabad':['#hyderabadrunners','#hyderabadfitness','#hyderabadrunning'],
+  'chennai':['#chennairunners','#chennaifitness','#chennairunning'],
+  'pune':['#punerunners','#punefitness','#punerunning'],
+  'kolkata':['#kolkatarunners','#kolkatafitness'],
+  'london':['#londonrunners','#londonrunning','#londonmarathon'],
+  'dubai':['#dubairunners','#dubaifitness','#dubairunning'],
+  'new york':['#nycrunners','#nycrunning','#centralParkrun'],
+  'tokyo':['#tokyorunners','#tokyorunning','#tokyofitness'],
+  'singapore':['#singaporerunners','#sgrunning','#singaporefitness']
+};
+
+const HT_TIERS = [
+  {min:0,     max:999,    name:'NANO',           tag:'0-1K',      total:5, niche:3, medium:1, broad:0, branded:1, color:'var(--mint)'},
+  {min:1000,  max:4999,   name:'MICRO-STARTER',  tag:'1K-5K',     total:5, niche:2, medium:2, broad:0, branded:1, color:'var(--mint)'},
+  {min:5000,  max:9999,   name:'MICRO',          tag:'5K-10K',    total:5, niche:2, medium:1, broad:1, branded:1, color:'var(--gold)'},
+  {min:10000, max:49999,  name:'MID-TIER',       tag:'10K-50K',   total:5, niche:1, medium:2, broad:1, branded:1, color:'var(--gold)'},
+  {min:50000, max:99999,  name:'MACRO-EMERGING',tag:'50K-100K',  total:5, niche:1, medium:1, broad:2, branded:1, color:'var(--gold-light)'},
+  {min:100000,max:499999, name:'MACRO',          tag:'100K-500K', total:4, niche:0, medium:1, broad:2, branded:1, color:'var(--amber)'},
+  {min:500000,max:Infinity,name:'MEGA',          tag:'500K-1M',   total:3, niche:0, medium:0, broad:1, branded:2, color:'var(--danger)'}
+];
+
+function parseFollowers(str) {
+  if (!str) return 0;
+  str = str.toString().replace(/[,\s👥]/g, '').toLowerCase();
+  const m = str.match(/^([\d.]+)\s*(k|m)?$/);
+  if (!m) return parseInt(str) || 0;
+  let n = parseFloat(m[1]);
+  if (m[2] === 'k') n *= 1000;
+  if (m[2] === 'm') n *= 1000000;
+  return Math.round(n);
+}
+
+function getHashtagTier(count) {
+  for (const t of HT_TIERS) { if (count >= t.min && count <= t.max) return t; }
+  return HT_TIERS[0];
+}
+
+function getLocationTags(city) {
+  if (!city) return [];
+  const key = city.toLowerCase().trim();
+  if (HT_LOCATION_MAP[key]) return HT_LOCATION_MAP[key];
+  // Generate for unknown cities
+  const clean = key.replace(/[^a-z]/g, '');
+  return ['#' + clean + 'runners', '#' + clean + 'fitness'];
+}
+
+function pickHashtags(tier, day, city) {
+  const tags = [];
+  // Branded
+  for (let i = 0; i < tier.branded; i++) tags.push(HT_POOL.branded[i % HT_POOL.branded.length]);
+  // Niche (rotating)
+  let nicheCount = tier.niche;
+  const locTags = getLocationTags(city);
+  // If location available and niche > 0, swap 1 niche for location
+  if (locTags.length > 0 && nicheCount > 0) {
+    nicheCount--;
+    tags.push(locTags[day % locTags.length]);
+  }
+  for (let i = 0; i < nicheCount; i++) {
+    tags.push(HT_POOL.niche[(day * 2 + i) % HT_POOL.niche.length]);
+  }
+  // Medium (rotating with offset)
+  for (let i = 0; i < tier.medium; i++) {
+    tags.push(HT_POOL.medium[(day * 3 + i) % HT_POOL.medium.length]);
+  }
+  // Broad (rotating with offset)
+  for (let i = 0; i < tier.broad; i++) {
+    tags.push(HT_POOL.broad[(day + i) % HT_POOL.broad.length]);
+  }
+  return tags.slice(0, tier.total);
+}
+
+function getTodayHashtags() {
+  const day = computeStreakDay();
+  const fc = parseFollowers(lsShared('fl_followers') || '0');
+  const tier = getHashtagTier(fc);
+  const city = lsShared('fl_ht_location') || lsShared('fl_loc_city') || 'Bangalore';
+  return pickHashtags(tier, day, city);
+}
+
+function renderTierRoadmap(currentTier) {
+  const el = document.getElementById('htRoadmap');
+  if (!el) return;
+  el.innerHTML = '';
+  HT_TIERS.forEach(t => {
+    const active = t.name === currentTier.name;
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;' +
+      (active ? 'background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2)' : '');
+    div.innerHTML =
+      '<span style="font-size:10px;color:' + (active ? 'var(--gold)' : 'var(--ash)') + '">' + (active ? '●' : '○') + '</span>' +
+      '<span style="font-family:JetBrains Mono,monospace;font-size:10px;font-weight:' + (active ? '700' : '400') + ';color:' + (active ? 'var(--gold-light)' : 'var(--smoke)') + ';letter-spacing:1px">' + t.name + ' · ' + t.tag + '</span>' +
+      (active ? '<span style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--mint);margin-left:auto">← YOU</span>' : '');
+    el.appendChild(div);
+  });
+}
+
+function updateHashtagUI() {
+  const fc = parseFollowers(lsShared('fl_followers') || '0');
+  const tier = getHashtagTier(fc);
+  const tags = getTodayHashtags();
+  // Tier badge
+  const badge = document.getElementById('htTierBadge');
+  if (badge) badge.innerHTML = '<span style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:800;letter-spacing:2px;color:' + tier.color + '">TIER: ' + tier.name + ' (' + tier.tag + ')</span>';
+  // Mix description
+  const mix = document.getElementById('htTierMix');
+  if (mix) {
+    const parts = [];
+    if (tier.niche > 0) parts.push(tier.niche + ' NICHE');
+    if (tier.medium > 0) parts.push(tier.medium + ' MEDIUM');
+    if (tier.broad > 0) parts.push(tier.broad + ' BROAD');
+    if (tier.branded > 0) parts.push(tier.branded + ' BRANDED');
+    mix.textContent = 'USING ' + tier.total + ' TAGS: ' + parts.join(' · ');
+  }
+  // Today's tags
+  const el = document.getElementById('todayHashtags');
+  if (el) el.textContent = tags.join('  ');
+  // Roadmap
+  renderTierRoadmap(tier);
+}
+
+function onFollowerChange(val) {
+  lsShared('fl_followers', val);
+  updateHashtagUI();
+  if(typeof initGrowthRoadmap==='function')initGrowthRoadmap();
+  if(typeof initMonetization==='function')initMonetization();
+}
+
+function onLocationChange(val) {
+  lsShared('fl_ht_location', val);
+  // Also sync to fl_loc_city so Generator tab picks it up
+  lsShared('fl_loc_city', val);
+  updateHashtagUI();
+}
+
+function initHashtags() {
+  // Restore saved values from shared localStorage
+  const savedFc = lsShared('fl_followers') || '';
+  const savedLoc = lsShared('fl_ht_location') || lsShared('fl_loc_city') || 'Bangalore';
+  const fcInput = document.getElementById('htFollowers');
+  const locInput = document.getElementById('htLocation');
+  if (fcInput) fcInput.value = savedFc;
+  if (locInput) locInput.value = savedLoc;
+  updateHashtagUI();
+}
+
+function copyHashtags() {
+  const tags = getTodayHashtags().join(' ');
+  navigator.clipboard.writeText(tags).then(() => showToast(getTodayHashtags().length + ' HASHTAGS COPIED — PASTE IN CAPTION'));
+}
+
+// ===== MODULE 4: STORIES WORKFLOW =====
+const STORIES = [
+  { name: 'THE ALARM', time: '3:15-3:30 AM', desc: 'Screenshot of alarm. Raw, dark, real. No editing needed.', sticker: 'Countdown Sticker' },
+  { name: 'THE EMPTY ROAD', time: '5:00 AM', desc: 'Bangalore streets at 5 AM. The emptiness IS the content.', sticker: 'Location Tag + Poll' },
+  { name: 'THE RUN DATA', time: 'Post-run', desc: 'Strava screenshot. This is where raw data belongs.', sticker: 'Quiz: Guess my pace' },
+  { name: 'THE GYM', time: 'Post-gym', desc: 'Quick selfie or video. Use Poll: Could you do this on 3.8h sleep?', sticker: 'Poll Sticker' },
+  { name: 'THE POST SHARE', time: 'After posting', desc: 'Re-share today\'s carousel. Drives traffic to the carousel.', sticker: 'Link / Share Sticker' },
+  { name: 'EVENING REFLECTION', time: 'Evening', desc: 'Optional text story. A thought or lesson from the day.', sticker: 'Question Sticker' }
+];
+
+function initStories() {
+  const list = document.getElementById('storyList');
+  list.innerHTML = '';
+  const saved = ls('stories_' + todayKey()) || {};
+
+  STORIES.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'story-item' + (saved[i] ? ' done' : '');
+    el.innerHTML = `
+      <div class="story-top">
+        <div class="story-check">&#10003;</div>
+        <div class="story-num">${i + 1}</div>
+        <div class="story-name">${s.name}</div>
+        <div class="story-time">${s.time}</div>
+      </div>
+      <div class="story-desc">${s.desc}</div>
+      <div class="story-sticker">${s.sticker}</div>
+    `;
+    el.onclick = () => {
+      const data = ls('stories_' + todayKey()) || {};
+      data[i] = !data[i];
+      ls('stories_' + todayKey(), data);
+      el.classList.toggle('done');
+      updateStoryProgress();
+    };
+    list.appendChild(el);
+  });
+
+  updateStoryProgress();
+}
+
+function updateStoryProgress() {
+  const saved = ls('stories_' + todayKey()) || {};
+  const done = Object.values(saved).filter(Boolean).length;
+  document.getElementById('storyProgFill').style.width = ((done / 6) * 100) + '%';
+  document.getElementById('storyProgText').textContent = done + '/6';
+}
+
+// ===== MODULE 5: COMMUNITY ENGAGEMENT =====
+const ENG_PHASES = [
+  { num: 1, task: 'Reply to ALL comments & DMs on your latest post', time: '5 MINUTES', duration: 300 },
+  { num: 2, task: 'Find 15-20 niche accounts, leave thoughtful 10+ word comments', time: '10 MINUTES', duration: 600 },
+  { num: 3, task: 'React to & reply to 10-15 Stories in your niche', time: '5 MINUTES', duration: 300 }
+];
+
+const ENG_TARGETS = [
+  'Bangalore running groups',
+  'Indian fitness creators (1K-50K followers)',
+  'Early morning routine / 5AM Club',
+  'Running community / #runstreak',
+  'Accountability / bet accounts'
+];
+
+let engTimerInterval = null;
+let engTimerRunning = false;
+let engTotalRemaining = 1200; // 20 min
+let engCurrentPhase = 0;
+
+function initEngagement() {
+  // Targets
+  const tgt = document.getElementById('engTargets');
+  tgt.innerHTML = '';
+  ENG_TARGETS.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'eng-target';
+    el.textContent = t;
+    tgt.appendChild(el);
+  });
+
+  // Counters
+  const saved = ls('eng_' + todayKey()) || { comments: 0, stories: 0 };
+  document.getElementById('engComments').textContent = saved.comments || 0;
+  document.getElementById('engStories').textContent = saved.stories || 0;
+  updateGrowthCalc();
+
+  // Timer display
+  updateEngTimerDisplay();
+  updateEngPhase();
+}
+
+function updateEngTimerDisplay() {
+  const m = Math.floor(engTotalRemaining / 60);
+  const s = engTotalRemaining % 60;
+  document.getElementById('engTimerDisplay').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+function updateEngPhase() {
+  let elapsed = 1200 - engTotalRemaining;
+  let phase = 0;
+  let phaseElapsed = elapsed;
+  if (elapsed >= 300 && elapsed < 900) { phase = 1; phaseElapsed = elapsed - 300; }
+  else if (elapsed >= 900) { phase = 2; phaseElapsed = elapsed - 900; }
+  engCurrentPhase = phase;
+
+  const p = ENG_PHASES[phase];
+  document.getElementById('engPhaseNum').textContent = 'PHASE ' + p.num + ' OF 3';
+  document.getElementById('engPhaseTask').textContent = p.task;
+  document.getElementById('engPhaseTime').textContent = p.time;
+}
+
+function toggleEngTimer() {
+  if (engTimerRunning) {
+    clearInterval(engTimerInterval);
+    engTimerRunning = false;
+    document.getElementById('engStartBtn').textContent = 'RESUME';
+    document.getElementById('engTimerDisplay').classList.remove('running');
+  } else {
+    engTimerRunning = true;
+    document.getElementById('engStartBtn').textContent = 'PAUSE';
+    document.getElementById('engTimerDisplay').classList.add('running');
+    engTimerInterval = setInterval(() => {
+      engTotalRemaining--;
+      if (engTotalRemaining <= 0) {
+        clearInterval(engTimerInterval);
+        engTimerRunning = false;
+        engTotalRemaining = 0;
+        document.getElementById('engStartBtn').textContent = 'DONE';
+        document.getElementById('engStartBtn').disabled = true;
+        document.getElementById('engTimerDisplay').classList.remove('running');
+        playBeep();
+      }
+      updateEngTimerDisplay();
+      updateEngPhase();
+
+      // Beep at phase transitions
+      if (engTotalRemaining === 900 || engTotalRemaining === 300) {
+        playBeep();
+      }
+    }, 1000);
+  }
+}
+
+function resetEngTimer() {
+  clearInterval(engTimerInterval);
+  engTimerRunning = false;
+  engTotalRemaining = 1200;
+  engCurrentPhase = 0;
+  document.getElementById('engStartBtn').textContent = 'START';
+  document.getElementById('engStartBtn').disabled = false;
+  document.getElementById('engTimerDisplay').classList.remove('running');
+  updateEngTimerDisplay();
+  updateEngPhase();
+}
+
+function adjCounter(type, delta) {
+  const saved = ls('eng_' + todayKey()) || { comments: 0, stories: 0 };
+  saved[type] = Math.max(0, (saved[type] || 0) + delta);
+  ls('eng_' + todayKey(), saved);
+  document.getElementById('eng' + type.charAt(0).toUpperCase() + type.slice(1)).textContent = saved[type];
+  updateGrowthCalc();
+}
+
+function updateGrowthCalc() {
+  const saved = ls('eng_' + todayKey()) || { comments: 0, stories: 0 };
+  const comments = saved.comments || 0;
+  const visits = comments * 2.5;
+  const follows = Math.round(visits * 0.1);
+  document.getElementById('engGrowthCalc').innerHTML =
+    '<strong>' + comments + '</strong> comments x 2-3 profile visits = <strong>' + Math.round(visits) + '</strong> visits x 10% follow rate = <strong>' + follows + '</strong> new followers today';
+}
+
+// ===== MODULE 6: WEEKLY METRICS =====
+const METRICS = [
+  { key: 'saves', name: 'Saves per post', target: 5, unit: 'saves' },
+  { key: 'shares', name: 'Shares per post', target: 3, unit: 'shares' },
+  { key: 'profileVisits', name: 'Profile visits / week', target: 100, unit: 'visits' },
+  { key: 'nonFollowerReach', name: 'Non-follower reach %', target: 20, unit: '%' },
+  { key: 'carouselCompletion', name: 'Carousel completion rate', target: 60, unit: '%' },
+  { key: 'followerGrowth', name: 'Follower growth / week', target: 10, unit: 'new' },
+  { key: 'storyEngagement', name: 'Story engagement rate', target: 10, unit: '%' }
+];
+
+function getWeekNum() {
+  const now = new Date();
+  const daysSinceOrigin = Math.floor((now - STREAK_ORIGIN) / 86400000);
+  return Math.max(1, Math.ceil(daysSinceOrigin / 7));
+}
+
+function initMetrics() {
+  const weekNum = getWeekNum();
+  document.getElementById('metricWeekNum').textContent = weekNum;
+
+  const grid = document.getElementById('metricGrid');
+  grid.innerHTML = '';
+
+  const current = ls('metrics_w' + weekNum) || {};
+  const prev = ls('metrics_w' + (weekNum - 1)) || {};
+
+  METRICS.forEach(m => {
+    const val = current[m.key] !== undefined ? current[m.key] : '';
+    const prevVal = prev[m.key] !== undefined ? prev[m.key] : null;
+    const numVal = parseFloat(val) || 0;
+
+    // Status
+    let status = 'red';
+    if (numVal >= m.target) status = 'green';
+    else if (numVal >= m.target * 0.7) status = 'amber';
+
+    // Trend
+    let trend = '';
+    if (prevVal !== null && val !== '') {
+      if (numVal > prevVal) trend = '&#9650;'; // up
+      else if (numVal < prevVal) trend = '&#9660;'; // down
+      else trend = '&#9644;'; // flat
+    }
+    const trendColor = numVal > (prevVal||0) ? 'var(--mint)' : numVal < (prevVal||0) ? 'var(--danger)' : 'var(--smoke)';
+
+    const el = document.createElement('div');
+    el.className = 'metric-card';
+    el.innerHTML = `
+      <div class="metric-info">
+        <div class="metric-name">${m.name}</div>
+        <div class="metric-target">Target: ${m.target}${m.unit === '%' ? '%' : '+'}</div>
+      </div>
+      <input class="metric-input" type="number" inputmode="decimal" value="${val}" data-key="${m.key}" placeholder="--">
+      <div class="metric-status ${val !== '' ? status : ''}" style="${val === '' ? 'opacity:0.2' : ''}"></div>
+      <div class="metric-trend" style="color:${trendColor}">${trend}</div>
+    `;
+    grid.appendChild(el);
+  });
+
+  // Listen for changes
+  grid.querySelectorAll('.metric-input').forEach(input => {
+    input.addEventListener('input', () => {
+      const weekNum = getWeekNum();
+      const data = ls('metrics_w' + weekNum) || {};
+      data[input.dataset.key] = input.value ? parseFloat(input.value) : '';
+      ls('metrics_w' + weekNum, data);
+      // Update status dot
+      const m = METRICS.find(x => x.key === input.dataset.key);
+      const dot = input.parentElement.querySelector('.metric-status');
+      const val = parseFloat(input.value) || 0;
+      dot.style.opacity = input.value ? '1' : '0.2';
+      dot.className = 'metric-status';
+      if (input.value) {
+        if (val >= m.target) dot.classList.add('green');
+        else if (val >= m.target * 0.7) dot.classList.add('amber');
+        else dot.classList.add('red');
+      }
+    });
+  });
+
+  // Bio
+  updateBio();
+}
+
+function saveMetrics() {
+  showToast('WEEK ' + getWeekNum() + ' SAVED');
+}
+
+function updateBio() {
+  const dayNum = computeStreakDay();
+  const stake = getCurrentStake(dayNum);
+  const unclaimed = getTotalUnclaimed(dayNum);
+  const bio = document.getElementById('bioPreview');
+  bio.innerHTML = `
+    <span class="bio-line gold">Miss 1 day = &#8377;${formatIndianCurrency(stake)} to a follower. Cash.</span>
+    <span class="bio-line mint">${dayNum} days. 0 misses. &#8377;${formatIndianCurrency(unclaimed)} unclaimed.</span>
+    <span class="bio-line">Run + Gym + Food Code. Before 6AM. Daily.</span>
+    <span class="bio-line" style="color:var(--smoke)">BLR | Follow to collect if I fail.</span>
+  `;
+  // Show stake escalation warning
+  if (dayNum >= 90 && dayNum < 101) {
+    bio.innerHTML += '<span class="bio-line" style="color:var(--danger);font-size:11px;margin-top:4px">⚠ Stakes increase to ₹20,000 at Day 101 (' + (101 - dayNum) + ' days)</span>';
+  } else if (dayNum >= 190 && dayNum < 201) {
+    bio.innerHTML += '<span class="bio-line" style="color:var(--danger);font-size:11px;margin-top:4px">⚠ Stakes increase to ₹25,000 at Day 201 (' + (201 - dayNum) + ' days)</span>';
+  }
+}
+
+function copyBio() {
+  const dayNum = computeStreakDay();
+  const stake = formatIndianCurrency(getCurrentStake(dayNum));
+  const unclaimed = formatIndianCurrency(getTotalUnclaimed(dayNum));
+  const text = `Miss 1 day = ₹${stake} to a follower. Cash.\n${dayNum} days. 0 misses. ₹${unclaimed} unclaimed.\nRun + Gym + Food Code. Before 6AM. Daily.\nBLR | Follow to collect if I fail.`;
+  navigator.clipboard.writeText(text).then(() => showToast('BIO COPIED'));
+}
+
+function showSundayReview() {
+  const weekNum = getWeekNum();
+  const current = ls('metrics_w' + weekNum) || {};
+  const prev = ls('metrics_w' + (weekNum - 1)) || {};
+
+  let html = '<div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:10px">WEEK ' + weekNum + ' REVIEW</div>';
+
+  let metCount = 0;
+  let totalM = 0;
+
+  METRICS.forEach(m => {
+    const val = current[m.key] !== undefined ? parseFloat(current[m.key]) : null;
+    const prevVal = prev[m.key] !== undefined ? parseFloat(prev[m.key]) : null;
+    totalM++;
+
+    let statusIcon = '&#9679;';
+    let statusColor = 'var(--smoke)';
+    if (val !== null) {
+      if (val >= m.target) { statusColor = 'var(--mint)'; metCount++; statusIcon = '&#10003;'; }
+      else if (val >= m.target * 0.7) { statusColor = 'var(--amber)'; statusIcon = '&#9650;'; }
+      else { statusColor = 'var(--danger)'; statusIcon = '&#10007;'; }
+    }
+
+    let trendText = '';
+    if (prevVal !== null && val !== null) {
+      const diff = val - prevVal;
+      trendText = diff > 0 ? ' (+' + diff + ')' : diff < 0 ? ' (' + diff + ')' : ' (=)';
+    }
+
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(61,58,55,.1)">
+      <span style="color:${statusColor};font-size:12px">${statusIcon}</span>
+      <span style="flex:1;font-family:Rajdhani,sans-serif;font-size:13px">${m.name}</span>
+      <span style="font-family:JetBrains Mono,monospace;font-size:12px;font-weight:700">${val !== null ? val : '--'}</span>
+      <span style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--smoke)">${trendText}</span>
+    </div>`;
+  });
+
+  html += `<div style="margin-top:14px;padding:10px;background:rgba(212,168,67,.06);border-radius:8px;text-align:center">
+    <div style="font-family:DM Serif Display,serif;font-size:24px;color:var(--gold)">${metCount}/${totalM}</div>
+    <div style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--smoke);letter-spacing:2px;margin-top:4px">TARGETS MET</div>
+  </div>`;
+
+  // Recommendations
+  html += '<div style="margin-top:14px;font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px">RECOMMENDATIONS</div>';
+
+  const dayNum = computeStreakDay();
+  const recs = [];
+  if (!current.saves || current.saves < 5) recs.push('Add more "saveable" content: lists, rules, challenges. Wednesday = Educational Carousel day (high-save content)');
+  if (!current.shares || current.shares < 3) recs.push('End carousels with "Send this to someone who..." CTA. DM shares are the #1 algorithm signal.');
+  if (!current.nonFollowerReach || current.nonFollowerReach < 20) recs.push('Add trending audio to carousels for Reels feed boost. Post during peak windows (Wed 9AM-1PM IST is HIGHEST priority).');
+  if (!current.carouselCompletion || current.carouselCompletion < 60) recs.push('Keep carousels to 5-7 slides max. No filler. Slide 2 must also be a hook (Instagram re-shows from Slide 2).');
+  if (!current.followerGrowth || current.followerGrowth < 10) recs.push('Increase daily niche engagement to 20+ thoughtful comments (10+ words each). Each comment = 2-3 profile visits.');
+  if (!current.storyEngagement || current.storyEngagement < 10) recs.push('Use more Poll/Quiz/Question stickers in Stories. Interactive stickers boost entire profile visibility.');
+  if (dayNum > 90 && dayNum <= 100) recs.push('⚠ Stakes increase to ₹20,000 at Day 101! Use this as content: "In ' + (101-dayNum) + ' days, the stakes go up."');
+  if (dayNum > 190 && dayNum <= 200) recs.push('⚠ Stakes increase to ₹25,000 at Day 201! Use this as content: "In ' + (201-dayNum) + ' days, things get harder."');
+  if (recs.length === 0) recs.push('All targets met! Consider increasing targets by 20%. You\'re ready to experiment with Reels content.');
+
+  recs.forEach(r => {
+    html += `<div style="font-family:Rajdhani,sans-serif;font-size:12px;color:var(--bone);padding:4px 0;line-height:1.5">&#8226; ${r}</div>`;
+  });
+
+  document.getElementById('reviewContent').innerHTML = html;
+  document.getElementById('reviewOverlay').classList.add('show');
+}
+
+function closeReview() {
+  document.getElementById('reviewOverlay').classList.remove('show');
+}
+
+// ===== MODULE 7: PROFILE OPTIMIZATION =====
+const HIGHLIGHTS = [
+  { name: 'THE BET', desc: 'Explain the ₹15,000 mechanic' },
+  { name: 'THE RULES', desc: 'Iron Covenant food code' },
+  { name: 'PROOF', desc: 'Best-of collection' },
+  { name: 'START HERE', desc: 'Origin story' }
+];
+
+function initHighlights() {
+  const list = document.getElementById('hlList');
+  list.innerHTML = '';
+  const saved = ls('highlights') || {};
+
+  HIGHLIGHTS.forEach((h, i) => {
+    const el = document.createElement('div');
+    el.className = 'hl-item' + (saved[i] ? ' created' : '');
+    el.innerHTML = `
+      <div class="hl-toggle">&#10003;</div>
+      <div>
+        <div class="hl-name">${h.name}</div>
+        <div class="hl-desc">${h.desc}</div>
+      </div>
+    `;
+    el.onclick = () => {
+      const data = ls('highlights') || {};
+      data[i] = !data[i];
+      ls('highlights', data);
+      el.classList.toggle('created');
+    };
+    list.appendChild(el);
+  });
+}
+
+// ===== MODULE 8: GROWTH ROADMAP =====
+const GROWTH_PHASES = [
+  {min:0,max:999,name:'PHASE 1: FOUNDATION',range:'0 — 1,000',color:'var(--mint)',
+    priorities:['Niche down: "5AM discipline + public stakes" — own it','Post 4-5x/week (60% Reels, 30% carousels)','Optimize name field: "Anupam | 5AM Discipline · ₹15K Stakes"','Daily: like 5, comment 3, follow 1 aligned account','Build first 30-50 strong posts before chasing growth'],
+    mix:[{f:'Reels',p:70,c:'#FF6B6B',why:'Discovery — 55% views from non-followers'},{f:'Carousels',p:20,c:'var(--gold)',why:'Saves — build algorithm trust'},{f:'Stories',p:10,c:'var(--mint)',why:'Daily — polls, questions, behind-the-scenes'}]},
+  {min:1000,max:9999,name:'PHASE 2: BUILD THE MACHINE',range:'1,000 — 10,000',color:'var(--gold)',
+    priorities:['Analyze Insights — double down on what works','Start content series ("Discipline Framework #1, #2...")','DM strategy: welcome new followers, respond to every DM','Begin lightweight collabs with similar-size creators','Launch first low-ticket digital product ($27-47)'],
+    mix:[{f:'Reels',p:60,c:'#FF6B6B',why:'Still primary discovery engine'},{f:'Carousels',p:30,c:'var(--gold)',why:'Educational — save rate target: 5-10%'},{f:'Stories',p:10,c:'var(--mint)',why:'Retention — Story replies build relationship'}]},
+  {min:10000,max:99999,name:'PHASE 3: BREAKOUT',range:'10,000 — 100,000',color:'var(--gold-light)',
+    priorities:['3+ Reels/week with professional editing','Collaborations become your fastest growth lever','70/30 split: original content + trend-riding','Target 50%+ non-follower reach on Reels','Launch coaching program ($200-500/month)','Cross-platform: repurpose to YouTube Shorts + TikTok'],
+    mix:[{f:'Reels',p:50,c:'#FF6B6B',why:'Quality over quantity now'},{f:'Carousels',p:35,c:'var(--gold)',why:'Authority + save magnets'},{f:'Stories',p:15,c:'var(--mint)',why:'3+ per day, interactive stickers'}]},
+  {min:100000,max:499999,name:'PHASE 4: SCALE',range:'100,000 — 500,000',color:'var(--amber)',
+    priorities:['80+ Stories/month (3/day)','Cross-platform distribution (3+ platforms)','Multiple revenue streams active','Build team: editor + VA','Focus on DM shares as primary metric','Create branded hashtag for community'],
+    mix:[{f:'Reels',p:45,c:'#FF6B6B',why:'Cinematic, high-share content'},{f:'Carousels',p:35,c:'var(--gold)',why:'Deep-dive frameworks'},{f:'Stories',p:20,c:'var(--mint)',why:'Community ritual + engagement'}]},
+  {min:500000,max:Infinity,name:'PHASE 5: AUTHORITY',range:'500,000 — 1,000,000',color:'var(--danger)',
+    priorities:['You ARE the brand — launch product lines','Speaking, events, brand ambassadorships','Content team handles execution, you create direction','Community runs itself (UGC, challenges, inside language)','Focus on depth metrics, not vanity metrics'],
+    mix:[{f:'Reels',p:40,c:'#FF6B6B',why:'Maintain discovery'},{f:'Carousels',p:30,c:'var(--gold)',why:'Thought leadership'},{f:'Stories',p:30,c:'var(--mint)',why:'Daily connection'}]}
+];
+
+const MILESTONES = [
+  {target:'1K',months:'1-3 months',note:'Foundation built'},
+  {target:'10K',months:'4-10 months',note:'First brand deals'},
+  {target:'50K',months:'10-18 months',note:'Full-time viable'},
+  {target:'100K',months:'18-28 months',note:'Multiple streams'},
+  {target:'500K',months:'28-36 months',note:'Scale mode'},
+  {target:'1M',months:'30-42 months',note:'Authority status'}
+];
+
+function initGrowthRoadmap(){
+  const fc=parseFollowers(lsShared('fl_followers')||'0');
+  const phase=GROWTH_PHASES.find(p=>fc>=p.min&&fc<=p.max)||GROWTH_PHASES[0];
+  document.getElementById('gpTitle').textContent=phase.name;
+  document.getElementById('gpTitle').style.color=phase.color;
+  document.getElementById('gpRange').textContent=phase.range+' FOLLOWERS';
+  // Priorities
+  const prEl=document.getElementById('gpPriorities');prEl.innerHTML='';
+  phase.priorities.forEach((p,i)=>{
+    prEl.innerHTML+='<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;background:rgba(13,12,11,.4);border-radius:6px"><span style="font-family:Rajdhani,sans-serif;font-size:14px;font-weight:900;color:'+phase.color+';min-width:18px">'+(i+1)+'</span><span style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--bone);line-height:1.5">'+p+'</span></div>';
+  });
+  // Timeline
+  const tlEl=document.getElementById('gpTimeline');tlEl.innerHTML='';
+  MILESTONES.forEach(m=>{
+    const reached=fc>=parseFollowers(m.target);
+    tlEl.innerHTML+='<div style="display:flex;align-items:center;gap:8px;padding:3px 0"><span style="font-size:10px;color:'+(reached?'var(--mint)':'var(--ash)')+'">'+
+      (reached?'&#10003;':'&#9675;')+'</span><span style="font-family:JetBrains Mono,monospace;font-size:9px;font-weight:'+(reached?'700':'400')+';color:'+(reached?'var(--mint)':'var(--smoke)')+'">'+
+      m.target+'</span><span style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--ash);margin-left:auto">'+m.months+'</span></div>';
+  });
+  // Content mix
+  const cmEl=document.getElementById('gpContentMix');cmEl.innerHTML='';
+  phase.mix.forEach(m=>{
+    cmEl.innerHTML+='<div style="display:flex;align-items:center;gap:8px"><div style="width:'+m.p+'%;height:5px;background:'+m.c+';border-radius:3px"></div><span style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--smoke);white-space:nowrap">'+m.p+'% '+m.f+' — '+m.why+'</span></div>';
+  });
+}
+
+// ===== MODULE 10: MONETIZATION ROADMAP =====
+const MON_TIERS = [
+  {range:'0-1K',label:'BUILD',color:'var(--smoke)',streams:['Content portfolio (30-50 posts)','Affiliate links in bio (seed)','UGC for brands (earn with 0 followers)'],earn:'₹0-5K/mo'},
+  {range:'1K-10K',label:'FIRST REVENUE',color:'var(--mint)',streams:['1-on-1 coaching (5 clients × ₹10K)','Low-ticket digital product (₹2-3K)','Nano brand deals (₹10-40K/post)','Affiliate income (₹15-35K/mo)'],earn:'₹15K-1L/mo'},
+  {range:'10K-50K',label:'SIDE → FULL-TIME',color:'var(--gold)',streams:['Group coaching program (₹15-35K)','Paid challenges (100 ppl × ₹3K = ₹3L)','Brand deals (₹35K-2L/post)','Instagram Subscriptions (₹350-1.5K/mo)'],earn:'₹2-6L/mo'},
+  {range:'50K-100K',label:'FULL-TIME',color:'var(--gold-light)',streams:['Coaching waitlist fills itself','Digital product suite','Brand deals (₹2-4L/post)','Build team (editor + VA)'],earn:'₹6-20L/mo'},
+  {range:'100K-1M',label:'SCALE',color:'var(--danger)',streams:['Product lines (supplements, apparel)','Speaking + events','Licensing deals','Multiple streams compounding'],earn:'₹12-80L+/mo'}
+];
+
+function initMonetization(){
+  const fc=parseFollowers(lsShared('fl_followers')||'0');
+  const el=document.getElementById('monRoadmap');el.innerHTML='';
+  MON_TIERS.forEach(t=>{
+    const rangeParts=t.range.split('-');
+    const rangeMin=parseFollowers(rangeParts[0]||'0');
+    const rangeMax=parseFollowers(rangeParts[1]||'0');
+    const isCurrent=fc>=rangeMin&&fc<rangeMax;
+    const isPast=fc>=rangeMax;
+    const borderCol=isPast?'rgba(46,232,154,.2)':isCurrent?'rgba(212,168,67,.2)':'rgba(61,58,55,.15)';
+    let html='<div style="padding:10px;border:1px solid '+borderCol+';border-radius:8px;'+(isPast?'opacity:.5':'')+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html+='<span style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:800;color:'+t.color+';letter-spacing:1px">'+t.range+' — '+t.label+'</span>';
+    html+='<span style="font-family:JetBrains Mono,monospace;font-size:9px;font-weight:700;color:'+t.color+'">'+t.earn+'</span></div>';
+    t.streams.forEach(s=>{
+      html+='<div style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--smoke);padding:2px 0;padding-left:10px">• '+s+'</div>';
+    });
+    html+='</div>';
+    el.innerHTML+=html;
+  });
+}
+
+// ===== MODULE 12: FLIGHT DAY PROTOCOL =====
+function updateFlightProgress(){
+  const all=document.querySelectorAll('#mod-flight input[type=checkbox]');
+  let done=0;all.forEach(cb=>{if(cb.checked)done++;});
+  const pct=Math.round((done/all.length)*100);
+  document.getElementById('flightProgFill').style.width=pct+'%';
+  document.getElementById('flightProgText').textContent=done+' / '+all.length;
+  // Save state
+  const state=[];all.forEach(cb=>state.push(cb.checked));
+  ls('flight_checks',state);
+}
+function initFlightChecks(){
+  const saved=ls('flight_checks');
+  if(!saved)return;
+  const all=document.querySelectorAll('#mod-flight input[type=checkbox]');
+  all.forEach((cb,i)=>{if(saved[i])cb.checked=true;});
+  updateFlightProgress();
+}
+
+// ===== ALGORITHM SIGNALS =====
+const ALGO_SIGNALS = [
+  { rank: 1, name: 'DM Shares', weight: '#1 Strongest Signal', tip: 'Create content people want to send to friends. Bets, challenges, and relatable struggles get shared.' },
+  { rank: 2, name: 'Saves', weight: '3x weight of likes', tip: 'Lists, rules, and educational carousels. "5 Rules of Iron Covenant" = save magnet.' },
+  { rank: 3, name: 'Dwell Time', weight: 'Carousel swipes', tip: 'More slides = more time. Use cliffhangers between slides to keep swiping.' },
+  { rank: 4, name: 'Comments', weight: '5+ words count', tip: 'Ask specific questions. "What time did you wake up?" beats "thoughts?"' },
+  { rank: 5, name: 'Completion Rate', weight: '80%+ = Explore', tip: 'Keep carousels tight. If 80%+ viewers see the last slide, algorithm pushes to Explore.' }
+];
+
+function initAlgo() {
+  const body = document.getElementById('algoBody');
+  body.innerHTML = '';
+  ALGO_SIGNALS.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'algo-item';
+    el.innerHTML = `
+      <div class="algo-rank">${s.rank}</div>
+      <div>
+        <div class="algo-name">${s.name}</div>
+        <div class="algo-weight">${s.weight}</div>
+        <div class="algo-tip">${s.tip}</div>
+      </div>
+    `;
+    body.appendChild(el);
+  });
+}
+
+function toggleAlgo() {
+  document.getElementById('algoBody').classList.toggle('open');
+  document.getElementById('algoToggle').classList.toggle('open');
+}
+
+// ===== WEB AUDIO BEEP =====
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.value = 0.3;
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.stop(ctx.currentTime + 0.5);
+  } catch(e) {}
+}
+
+// ===== INIT =====
+function init() {
+  initCommandCenter();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+  initCaptionEngine();
+  initHashtags();
+  initStories();
+  initEngagement();
+  initMetrics();
+  initHighlights();
+  initFlightChecks();
+  initGrowthRoadmap();
+  initMonetization();
+  initAlgo();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+// Cross-tab sync: when Generator tab changes fl_followers or fl_loc_city, update hashtags here
+window.addEventListener('storage', function(e) {
+  if (e.key === 'fl_followers' || e.key === 'fl_loc_city' || e.key === 'fl_ht_location') {
+    const fcInput = document.getElementById('htFollowers');
+    const locInput = document.getElementById('htLocation');
+    if (fcInput) fcInput.value = lsShared('fl_followers') || '';
+    if (locInput) locInput.value = lsShared('fl_ht_location') || lsShared('fl_loc_city') || 'Bangalore';
+    updateHashtagUI();
+    if(typeof initGrowthRoadmap==='function')initGrowthRoadmap();
+    if(typeof initMonetization==='function')initMonetization();
+  }
+});
+
+// Close review on overlay click
+document.getElementById('reviewOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeReview();
+});
+</script>
+</body>
+</html>
+ 

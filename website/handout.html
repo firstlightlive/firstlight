@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FirstLight — Daily Tracking Sheet</title>
+<style>
+  @page { size: A4; margin: 12mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Courier New', monospace; font-size: 9px; color: #111; background: #fff; line-height: 1.4; }
+  .page { page-break-after: always; padding: 8px; }
+  .page:last-child { page-break-after: avoid; }
+
+  h1 { font-size: 16px; text-align: center; letter-spacing: 4px; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; }
+  h2 { font-size: 11px; letter-spacing: 2px; background: #111; color: #fff; padding: 4px 8px; margin: 8px 0 4px; }
+  h3 { font-size: 9px; letter-spacing: 1px; color: #555; border-bottom: 1px solid #ccc; padding-bottom: 2px; margin: 6px 0 3px; }
+
+  .date-line { text-align: center; font-size: 11px; margin-bottom: 8px; }
+  .date-line span { border-bottom: 1px solid #000; display: inline-block; min-width: 120px; margin-left: 4px; }
+
+  .section { margin-bottom: 6px; }
+  .grid { display: grid; gap: 1px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .item { display: flex; align-items: center; gap: 4px; padding: 2px 4px; border-bottom: 1px dotted #ddd; }
+  .item:last-child { border-bottom: none; }
+  .cb { width: 10px; height: 10px; border: 1.5px solid #333; flex-shrink: 0; }
+  .item-text { flex: 1; font-size: 8px; }
+  .time-slot { color: #888; font-size: 7px; min-width: 40px; }
+
+  .field-row { display: flex; align-items: center; gap: 6px; padding: 3px 4px; border-bottom: 1px dotted #ddd; }
+  .field-label { font-size: 8px; font-weight: bold; min-width: 90px; }
+  .field-input { flex: 1; border-bottom: 1px solid #999; min-height: 12px; }
+  .yn { display: flex; gap: 8px; font-size: 8px; }
+  .yn span { border: 1px solid #333; padding: 1px 6px; }
+
+  .dw-row { display: grid; grid-template-columns: 20px 50px 1fr 50px 20px; gap: 4px; padding: 2px 4px; border-bottom: 1px dotted #ddd; align-items: center; font-size: 8px; }
+  .dw-row .cb { width: 8px; height: 8px; }
+
+  .note { font-size: 7px; color: #888; font-style: italic; padding: 2px 4px; }
+  .footer { text-align: center; font-size: 7px; color: #999; margin-top: 8px; border-top: 1px solid #ddd; padding-top: 4px; }
+
+  .mastery-item { display: flex; align-items: center; gap: 3px; padding: 1px 4px; font-size: 7.5px; border-bottom: 1px dotted #eee; }
+  .mastery-item .cb { width: 8px; height: 8px; border-width: 1px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none; }
+  }
+
+  .download-bar { position: fixed; top: 0; left: 0; right: 0; background: #111; color: #fff; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; z-index: 100; font-family: sans-serif; font-size: 13px; }
+  .download-bar button { background: #00D4FF; color: #000; border: none; padding: 6px 16px; font-weight: 700; cursor: pointer; font-size: 12px; letter-spacing: 1px; }
+  @media print { .download-bar { display: none; } }
+  body { padding-top: 40px; }
+  @media print { body { padding-top: 0; } }
+</style>
+</head>
+<body>
+
+<div class="download-bar no-print">
+  <span>FIRSTLIGHT — DAILY TRACKING SHEET</span>
+  <div>
+    <button onclick="window.print()">⎙ PRINT / SAVE PDF</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ PAGE 1: MORNING + MIDDAY ════════════════════════════════════ -->
+<div class="page">
+  <h1>FIRSTLIGHT — DAILY TRACKING SHEET</h1>
+  <div class="date-line">DATE: <span></span> &nbsp;&nbsp; DAY: <span></span> &nbsp;&nbsp; WAKE TIME: <span></span></div>
+
+  <h2>☀ MORNING RITUALS (3:15 AM — 8:00 AM)</h2>
+
+  <h3>WAKE — ORAL CARE — WALK</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Alarm OFF + feet on floor</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Tongue scraper</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Oil pull (10 min)</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Cold water dive</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Spit oil + brush teeth</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Fenugreek water</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Chyawanprash</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Rooftop walk (10 min)</div></div>
+  </div>
+
+  <h3>BRAHMA MUHURTA</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Marma point massage</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Pranayama</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Japa</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Thai forest meditation</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Earthing</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Brahmacharya mala</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Collagen peptides</div></div>
+  </div>
+
+  <h3>PRE-RUN SUPPLEMENTS</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">L-Carnitine + Creatine</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Ikigai spoken</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Sattu drink</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Box breathing</div></div>
+  </div>
+
+  <h3>RUN + BRIDGE + GYM</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Run (Strava)</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Bridge fuel</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Stability / mobility</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Five Tibetan Rites</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Gym session</div></div>
+  </div>
+
+  <h3>POST GYM — TO OFFICE</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Hot shower</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Moisturiser + sunscreen</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Free writing</div></div>
+  </div>
+
+  <h3>DOPAMINE STACK</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Mucuna Pruriens</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">L-Tyrosine</div></div>
+  </div>
+
+  <h3>AT OFFICE — BREAKFAST</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Ginger lime shot</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Oats + paneer</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Shata Pada</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">ST36 acupressure</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Sunlight exposure</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Vitamins</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">CDP-Choline</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Review time blocks</div></div>
+  </div>
+
+  <div class="note">▸ Instagram post MUST be live before 6:00 AM — photo + carousel + post</div>
+  <div class="note">▸ Morning Rule reading (25 rules cycle) — 60 seconds minimum</div>
+
+  <h2>🌤 MIDDAY RITUALS (12:00 PM — 2:00 PM)</h2>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Posture check</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">20-20-20 eye rule</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Hydration check</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Standing stretch</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Box breathing</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Lunch (before 1:30 PM)</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Shata Pada</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Warm water</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Green tea + L-Theanine</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Handful of almonds</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Afternoon sunlight</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Micro-gratitude</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">End-of-work task review</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Inbox zero + shutdown ritual</div></div>
+  </div>
+
+  <div class="footer">FIRSTLIGHT.LIVE — Log everything before 11:59 PM. No modifications after midnight.</div>
+</div>
+
+<!-- ════════════════════════════════════ PAGE 2: EVENING + DEEP WORK + FORTRESS ════════════════════════════════════ -->
+<div class="page">
+  <h1 style="font-size:12px;border-bottom:1px solid #000;padding-bottom:4px">PAGE 2 — EVENING + DEEP WORK + FORTRESS</h1>
+
+  <h2>🌙 EVENING RITUALS (6:00 PM — 8:30 PM)</h2>
+
+  <h3>EVENING 6 PM</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Sprout mix</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Shata Pada</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Laptop close</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Internet OFF</div></div>
+  </div>
+
+  <h3>NIGHT PREP</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Tomorrow planning</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Fill copper vessel</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Gym bag packed</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Clothes laid out</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Supplements laid out</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Keys ready</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Hot water ready</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Loban lit</div></div>
+  </div>
+
+  <h3>SKIN + OIL RITUALS</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Cold water dive</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Gua Sha</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Coconut oil</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Nasya oil</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Karnapurana</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Mula Bandha</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Abhyanga</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Shilajit</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Olive oil on navel</div></div>
+  </div>
+
+  <h3>WIND DOWN + SLEEP</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Magnesium + Triphala + Glycine</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Warm milk + Ashwagandha</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Black seed oil</div></div>
+  </div>
+
+  <h3>DAY CLOSE + REFLECTION</h3>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text">Night prep confirmed</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Roman Examen</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">3 Wins</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Reverse day replay</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Gratitude</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Trataka</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Ho'oponopono</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Cyclic sighing</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Left side sleeping</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">Mouth tape</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text">LIGHTS OUT (8:30 PM)</div></div>
+  </div>
+
+  <h2>⚡ DEEP WORK BLOCKS (Mon–Sat: 10 slots · Sunday: 5 max)</h2>
+  <div class="dw-row" style="font-weight:bold;border-bottom:1px solid #000;font-size:7px"><div>#</div><div>TIME</div><div>TASK</div><div>CATEGORY</div><div>✓</div></div>
+  <div class="dw-row"><div>01</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>02</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>03</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>04</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>05</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>06</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>07</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>08</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>09</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="dw-row"><div>10</div><div></div><div style="border-bottom:1px solid #ccc"></div><div></div><div class="cb"></div></div>
+  <div class="field-row"><div class="field-label">BIGGEST WIN:</div><div class="field-input"></div></div>
+
+  <h2>🏰 FORTRESS DAILY LOG</h2>
+  <div class="grid grid-2">
+    <div class="field-row"><div class="field-label" style="min-width:140px">Porn watched?</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label" style="min-width:140px">Sexual content?</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label" style="min-width:140px">Masturbated?</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label" style="min-width:140px">Urge level (0-10):</div><div class="field-input" style="max-width:30px"></div></div>
+    <div class="field-row"><div class="field-label" style="min-width:140px">Stayed out till 6PM?</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label" style="min-width:140px">Device-free home?</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label" style="min-width:140px">Phone in car?</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label" style="min-width:140px">Laptop at office?</div><div class="yn"><span>Y</span><span>N</span></div></div>
+  </div>
+  <div class="field-row"><div class="field-label">Trigger journal:</div><div class="field-input"></div></div>
+  <div class="field-row"><div class="field-label">Energy/clarity (0-10):</div><div class="field-input" style="max-width:30px"></div></div>
+
+  <div class="note" style="margin-top:4px">▸ Sunday: Fortress rule is 1:00 PM (not 6 PM)</div>
+  <div class="note">▸ Exception: Friends, family, or parcels at home — 6 PM rule & device rule not applied</div>
+
+  <div class="footer">FIRSTLIGHT.LIVE — Log everything before 11:59 PM. No modifications after midnight.</div>
+</div>
+
+<!-- ════════════════════════════════════ PAGE 3: CHECK-IN + MASTERY ════════════════════════════════════ -->
+<div class="page">
+  <h1 style="font-size:12px;border-bottom:1px solid #000;padding-bottom:4px">PAGE 3 — CHECK-IN + MASTERY + APP ITEMS</h1>
+
+  <h2>✓ TODAY CHECK-IN (Manual Fields)</h2>
+  <div class="note">Auto-pulled: ritual %, gym, deep work, mastery, reading, fortress — verify in app</div>
+  <div class="grid grid-2" style="margin-top:4px">
+    <div class="field-row"><div class="field-label">Food Clean:</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label">Violation:</div><div class="field-input"></div></div>
+    <div class="field-row"><div class="field-label">Wake Time:</div><div class="field-input" style="max-width:50px"></div></div>
+    <div class="field-row"><div class="field-label">Lights Out:</div><div class="field-input" style="max-width:50px"></div></div>
+    <div class="field-row"><div class="field-label">Fortress Out:</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label">Device-Free:</div><div class="yn"><span>Y</span><span>N</span></div></div>
+    <div class="field-row"><div class="field-label">Mood (1-10):</div><div class="field-input" style="max-width:30px"></div></div>
+    <div class="field-row"><div class="field-label">Energy (1-10):</div><div class="field-input" style="max-width:30px"></div></div>
+  </div>
+  <div class="field-row"><div class="field-label">Reflection:</div><div class="field-input"></div></div>
+  <div class="note">▸ SEAL THE DAY before 11:59 PM — no edits after midnight</div>
+
+  <h2>🧠 MASTERY — 25 DAILY ITEMS</h2>
+  <h3>A — People Reading & Social Intelligence</h3>
+  <div class="grid grid-2">
+    <div class="mastery-item"><div class="cb"></div>1. Read 1 person's baseline</div>
+    <div class="mastery-item"><div class="cb"></div>2. Feet First check</div>
+    <div class="mastery-item"><div class="cb"></div>3. Room Read within 60 sec</div>
+    <div class="mastery-item"><div class="cb"></div>4. Make 3 predictions</div>
+    <div class="mastery-item"><div class="cb"></div>5. Spot 3 cognitive biases</div>
+  </div>
+  <h3>B — Communication & Influence</h3>
+  <div class="grid grid-2">
+    <div class="mastery-item"><div class="cb"></div>6. Learn 5 vocabulary words</div>
+    <div class="mastery-item"><div class="cb"></div>7. 3-Second Listening Rule</div>
+    <div class="mastery-item"><div class="cb"></div>8. Give value to 3 people</div>
+    <div class="mastery-item"><div class="cb"></div>9. 1 storytelling framework</div>
+    <div class="mastery-item"><div class="cb"></div>10. Emotional Labeling 3x</div>
+  </div>
+  <h3>C — Mental Performance & Deep Work</h3>
+  <div class="grid grid-2">
+    <div class="mastery-item"><div class="cb"></div>11. Stoic Preparation (5 min)</div>
+    <div class="mastery-item"><div class="cb"></div>12. Emotional Check-in 3x/day</div>
+    <div class="mastery-item"><div class="cb"></div>13. Deep Work sessions done</div>
+    <div class="mastery-item"><div class="cb"></div>14. Apply 1 mental model</div>
+    <div class="mastery-item"><div class="cb"></div>15. 6-Second Rule</div>
+  </div>
+  <h3>D — Brand, Creativity & Career</h3>
+  <div class="grid grid-2">
+    <div class="mastery-item"><div class="cb"></div>16. 15 min craft practice</div>
+    <div class="mastery-item"><div class="cb"></div>17. 1 content piece created</div>
+    <div class="mastery-item"><div class="cb"></div>18. Actions > Words audit</div>
+    <div class="mastery-item"><div class="cb"></div>19. "Am I doing this well?" check</div>
+    <div class="mastery-item"><div class="cb"></div>20. Write your WHY statement</div>
+  </div>
+  <h3>E — Relationships, Wisdom & Inner Game</h3>
+  <div class="grid grid-2">
+    <div class="mastery-item"><div class="cb"></div>21. Make 1 person feel seen</div>
+    <div class="mastery-item"><div class="cb"></div>22. Start 1 hard conversation</div>
+    <div class="mastery-item"><div class="cb"></div>23. Ho'oponopono (5 min)</div>
+    <div class="mastery-item"><div class="cb"></div>24. Invest in 1 relationship</div>
+    <div class="mastery-item"><div class="cb"></div>25. Accept worst case, then act</div>
+  </div>
+
+  <h2>📱 APP ITEMS TO LOG (In Car / Before Bed)</h2>
+  <div class="note" style="font-size:8px;font-style:normal;font-weight:bold;margin-bottom:4px">These are items you MUST update in the FirstLight app. Use this as a checklist:</div>
+  <div class="grid grid-2">
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Morning Rituals</b> — mark all items</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Midday Rituals</b> — mark all items</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Evening Rituals</b> — mark all items</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Deep Work Blocks</b> — fill + check done</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Gym Workout Log</b> — exercises + sets</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Fortress Daily Log</b> — all 10 fields</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Mastery Daily</b> — 25 items</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Morning Rule</b> — read + mark done</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Today Check-in</b> — manual fields</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>SEAL THE DAY</b> — final button</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Journal / Reflection</b> — optional</div></div>
+    <div class="item"><div class="cb"></div><div class="item-text"><b>Instagram Post</b> — before 6 AM</div></div>
+  </div>
+
+  <h2 style="background:#fff;color:#000;border:2px solid #000;text-align:center">⚠ SUNDAY DIFFERENCES</h2>
+  <div class="grid grid-2" style="margin-top:4px">
+    <div class="item"><div class="item-text">• Fortress rule: <b>1:00 PM</b> (not 6 PM)</div></div>
+    <div class="item"><div class="item-text">• Deep Work: <b>5 slots max</b> (not 10)</div></div>
+    <div class="item"><div class="item-text">• Weekend tasks: Abhyanga, Park sit, Friluftsliv, Steam bath, Face mask, Hair oiling, PERMA audit, Grocery prep, Room reset, Rest</div></div>
+  </div>
+  <h3 style="margin-top:6px">SATURDAY TASKS</h3>
+  <div class="grid grid-2">
+    <div class="mastery-item"><div class="cb"></div>Laundry</div>
+    <div class="mastery-item"><div class="cb"></div>Batch cook</div>
+    <div class="mastery-item"><div class="cb"></div>Steam bath</div>
+    <div class="mastery-item"><div class="cb"></div>Hammam scrub</div>
+    <div class="mastery-item"><div class="cb"></div>Hair oiling</div>
+    <div class="mastery-item"><div class="cb"></div>Face mask</div>
+    <div class="mastery-item"><div class="cb"></div>Car clean</div>
+  </div>
+
+  <div class="footer">FIRSTLIGHT.LIVE — ₹15,000/day stakes. No compromise. No shortcuts. No excuses.</div>
+</div>
+
+</body>
+</html>
+ 

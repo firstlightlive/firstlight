@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>About — FIRST LIGHT</title>
+  <meta name="description" content="The person behind the streak. Anupam Kumar — Bangalore, India. 3:15 AM wakeup, 4:30 AM run, gym, ₹15,000 on the line. No end date.">
+  <meta name="keywords" content="Anupam Kumar, data architect, discipline architect, Bangalore runner, morning routine, fitness journey, personal accountability">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://firstlight.live/about.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       ABOUT PAGE — "The Architect's Profile" Cinematic Redesign
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Film grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
+    }
+
+    /* Scan lines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+    }
+
+    /* ── Hero Grid ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 60px;
+      align-items: start;
+      padding: 80px 0 80px;
+    }
+
+    /* Drop cap on first paragraph */
+    .about-text > p:first-child::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.8em;
+      font-weight: 900;
+      float: left;
+      line-height: 0.75;
+      margin-right: 10px;
+      margin-top: 8px;
+      color: var(--cyan);
+      text-shadow: 0 0 30px rgba(0,212,255,0.3);
+    }
+
+    .about-text p {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.9;
+      margin-bottom: 24px;
+    }
+
+    /* ── Cinematic Photo Frame ── */
+    .about-photo {
+      background: var(--surface);
+      border: 2px solid rgba(0,212,255,0.15);
+      border-radius: 12px;
+      aspect-ratio: 3/4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 40px rgba(0,212,255,0.08),
+        0 20px 60px rgba(0,0,0,0.5),
+        inset 0 0 80px rgba(0,0,0,0.3);
+      animation: photoFloat 6s ease-in-out infinite;
+    }
+
+    /* Outer decorative frame */
+    .about-photo::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border: 1px solid rgba(0,212,255,0.08);
+      border-radius: 16px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Inner glow overlay */
+    .about-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        radial-gradient(ellipse at 50% 20%, rgba(0,212,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 90%, rgba(245,166,35,0.05) 0%, transparent 50%),
+        linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+    }
+
+    @keyframes photoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .about-photo-placeholder {
+      position: relative;
+      z-index: 1;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--text-dim);
+      text-align: center;
+    }
+    .about-photo-placeholder .diamond-lg {
+      font-size: 48px;
+      color: var(--cyan);
+      opacity: 0.15;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    /* ── Iron Rules — Glowing Number Badges ── */
+    .iron-rule-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(255,82,82,0.02);
+      border: 1px solid rgba(255,82,82,0.04);
+      transition: all 0.3s ease;
+      animation: ruleSlideIn 0.6s ease both;
+    }
+    .iron-rule-item:hover {
+      background: rgba(255,82,82,0.05);
+      border-color: rgba(255,82,82,0.12);
+      transform: translateX(4px);
+    }
+    .iron-rule-num {
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 14px;
+      color: var(--red);
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(255,82,82,0.08);
+      border: 1px solid rgba(255,82,82,0.2);
+      box-shadow: 0 0 12px rgba(255,82,82,0.15);
+      text-shadow: 0 0 8px rgba(255,82,82,0.4);
+    }
+
+    @keyframes ruleSlideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .iron-rule-item:nth-child(1) { animation-delay: 0.05s; }
+    .iron-rule-item:nth-child(2) { animation-delay: 0.1s; }
+    .iron-rule-item:nth-child(3) { animation-delay: 0.15s; }
+    .iron-rule-item:nth-child(4) { animation-delay: 0.2s; }
+    .iron-rule-item:nth-child(5) { animation-delay: 0.25s; }
+    .iron-rule-item:nth-child(6) { animation-delay: 0.3s; }
+
+    /* ── "I WILL BE UNSTOPPABLE" — Shimmer text ── */
+    .unstoppable-text {
+      font-family: var(--font-mono);
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-align: center;
+      margin-top: 20px;
+      background: linear-gradient(
+        90deg,
+        var(--red) 0%,
+        #FF8A80 20%,
+        var(--gold) 40%,
+        var(--red) 60%,
+        #FF8A80 80%,
+        var(--red) 100%
+      );
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmerText 3s linear infinite;
+    }
+
+    @keyframes shimmerText {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+
+    /* ── Glass Stakes Card ── */
+    .stakes-card {
+      margin-top: 32px;
+      padding: 28px;
+      background: rgba(245,166,35,0.03);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(245,166,35,0.1);
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stakes-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* ── Glass Iron Rules Card ── */
+    .iron-rules-card {
+      margin-top: 20px;
+      padding: 28px;
+      background: rgba(255,82,82,0.02);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,82,82,0.08);
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .iron-rules-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+
+    /* ── Snapshot Glass Cards ── */
+    .snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      padding: 60px 0;
+    }
+    .snapshot-card {
+      background: rgba(255,255,255,0.02);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 28px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .snapshot-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 14px 14px 0 0;
+      transition: opacity 0.4s ease;
+    }
+    .snapshot-card:nth-child(1)::before { background: var(--green); }
+    .snapshot-card:nth-child(2)::before { background: var(--gold); }
+    .snapshot-card:nth-child(3)::before { background: var(--cyan); }
+    .snapshot-card:nth-child(4)::before { background: #E040FB; }
+
+    .snapshot-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0,212,255,0.15);
+      box-shadow:
+        0 12px 40px rgba(0,0,0,0.4),
+        0 0 20px rgba(0,212,255,0.06);
+    }
+    .snapshot-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .snapshot-value {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    /* ── Architecture Section Header ── */
+    .arch-section-header {
+      text-align: center;
+      margin-bottom: 48px;
+      position: relative;
+    }
+    .arch-section-header::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      margin: 16px auto 0;
+      border-radius: 2px;
+    }
+
+    /* ── Hero Stat Bar — Glass morphism ── */
+    .hero-stat-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      max-width: 740px;
+      margin: 0 auto 52px;
+      padding: 0 16px;
+    }
+    .hero-stat-item {
+      text-align: center;
+      padding: 20px 8px;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+    }
+    .hero-stat-item:hover {
+      transform: translateY(-3px);
+    }
+    .hero-stat-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      border-radius: 0 0 2px 2px;
+    }
+    .hero-stat-item:nth-child(1) { background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.1); }
+    .hero-stat-item:nth-child(1)::before { background: var(--cyan); }
+    .hero-stat-item:nth-child(2) { background: rgba(0,230,118,0.04); border: 1px solid rgba(0,230,118,0.1); }
+    .hero-stat-item:nth-child(2)::before { background: var(--green); }
+    .hero-stat-item:nth-child(3) { background: rgba(245,166,35,0.04); border: 1px solid rgba(245,166,35,0.1); }
+    .hero-stat-item:nth-child(3)::before { background: var(--gold); }
+    .hero-stat-item:nth-child(4) { background: rgba(224,64,251,0.04); border: 1px solid rgba(224,64,251,0.1); }
+    .hero-stat-item:nth-child(4)::before { background: #E040FB; }
+
+    /* ── Feature Grid — Glass cards with glow ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.02);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 16px 48px rgba(0,0,0,0.3),
+        0 0 24px rgba(0,212,255,0.06);
+    }
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+    /* Color-coded top accents */
+    .feature-card:nth-child(1)::before,
+    .feature-card:nth-child(5)::before { background: var(--cyan); }
+    .feature-card:nth-child(1):hover { border-color: rgba(0,212,255,0.15); }
+    .feature-card:nth-child(5):hover { border-color: rgba(0,212,255,0.15); }
+
+    .feature-card:nth-child(2)::before,
+    .feature-card:nth-child(8)::before { background: var(--green); }
+    .feature-card:nth-child(2):hover { border-color: rgba(0,230,118,0.15); }
+    .feature-card:nth-child(8):hover { border-color: rgba(0,230,118,0.15); }
+
+    .feature-card:nth-child(3)::before,
+    .feature-card:nth-child(7)::before { background: var(--red); }
+    .feature-card:nth-child(3):hover { border-color: rgba(255,82,82,0.15); }
+    .feature-card:nth-child(7):hover { border-color: rgba(255,82,82,0.15); }
+
+    .feature-card:nth-child(4)::before { background: var(--gold); }
+    .feature-card:nth-child(4):hover { border-color: rgba(245,166,35,0.15); }
+
+    .feature-card:nth-child(6)::before,
+    .feature-card:nth-child(9)::before { background: #E040FB; }
+    .feature-card:nth-child(6):hover { border-color: rgba(224,64,251,0.15); }
+    .feature-card:nth-child(9):hover { border-color: rgba(224,64,251,0.15); }
+
+    /* ── Social Pill Buttons ── */
+    .social-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding-bottom: 80px;
+    }
+    .social-row .btn {
+      border-radius: 40px;
+      padding: 10px 24px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .social-row .btn[data-link="instagram"] {
+      border-color: rgba(225,48,108,0.3);
+      color: #E1306C;
+    }
+    .social-row .btn[data-link="instagram"]:hover {
+      background: linear-gradient(135deg, rgba(131,58,180,0.15), rgba(225,48,108,0.15), rgba(252,175,69,0.15));
+      border-color: rgba(225,48,108,0.5);
+      box-shadow: 0 0 20px rgba(225,48,108,0.2);
+      transform: translateY(-2px);
+    }
+    .social-row .btn[data-link="strava"] {
+      border-color: rgba(252,76,2,0.3);
+      color: #FC4C02;
+    }
+    .social-row .btn[data-link="strava"]:hover {
+      background: rgba(252,76,2,0.1);
+      border-color: rgba(252,76,2,0.5);
+      box-shadow: 0 0 20px rgba(252,76,2,0.2);
+      transform: translateY(-2px);
+    }
+    .social-row .btn[data-link="linkedin"] {
+      border-color: rgba(0,119,181,0.3);
+      color: #0077B5;
+    }
+    .social-row .btn[data-link="linkedin"]:hover {
+      background: rgba(0,119,181,0.1);
+      border-color: rgba(0,119,181,0.5);
+      box-shadow: 0 0 20px rgba(0,119,181,0.2);
+      transform: translateY(-2px);
+    }
+
+    /* ── Page Header Enhancement ── */
+    .page-header h1 {
+      font-family: 'Playfair Display', serif !important;
+      font-weight: 900;
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      letter-spacing: 6px;
+      background: linear-gradient(135deg, var(--text), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Closing Statement Cinematic ── */
+    .closing-section {
+      margin: 60px -24px;
+      padding: 80px 24px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    /* ── Ikigai statement (kept for compatibility) ── */
+    .about-ikigai {
+      text-align: center;
+      padding: 60px 0;
+      border-top: 1px solid rgba(0,212,255,0.06);
+      border-bottom: 1px solid rgba(0,212,255,0.06);
+    }
+    .about-ikigai p {
+      font-family: var(--font-mono);
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2px;
+      line-height: 1.5;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .about-photo {
+        max-width: 320px;
+        margin: 0 auto;
+      }
+      .snapshot-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .hero-stat-bar {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .unstoppable-text {
+        font-size: clamp(0.9rem, 4vw, 1.3rem);
+        letter-spacing: 2px;
+      }
+      .iron-rule-item {
+        padding: 10px 12px;
+        gap: 12px;
+      }
+      .iron-rule-num {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+      }
+      .social-row .btn {
+        padding: 8px 18px;
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 375px) {
+      .about-text > p:first-child::first-letter {
+        font-size: 3em;
+      }
+      .snapshot-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .snapshot-card {
+        padding: 20px 16px;
+      }
+      .snapshot-value {
+        font-size: 16px;
+      }
+    }
+  </style>
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:title" content="About — FIRST LIGHT">
+  <meta property="og:description" content="Data Architect by day. Discipline architect by dawn. The person behind the infinite streak.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live/about.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About — FIRST LIGHT">
+  <meta name="twitter:description" content="Data Architect by day. Discipline architect by dawn. The person behind the infinite streak.">
+  <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Anupam Kumar",
+    "url": "https://firstlight.live/about.html",
+    "jobTitle": "Data Architect",
+    "description": "Data Architect by day. Discipline architect by dawn. Building an infinite fitness streak with ₹15,000 daily accountability.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Bangalore",
+      "addressCountry": "IN"
+    },
+    "sameAs": [
+      "https://www.instagram.com/firstlightlive",
+      "https://www.linkedin.com/in/anupam1001/",
+      "https://strava.app.link/jxGRExHXo2b"
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link active">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link active">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+<script>
+(function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
+</script>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="section-label reveal">FIRST LIGHT</div>
+    <h1 class="reveal">ABOUT</h1>
+    <p class="reveal" style="font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1rem,2.5vw,1.2rem);opacity:0.7">The person behind the streak.</p>
+  </div>
+</div>
+
+<main class="container">
+
+  <!-- Two-column: Text + Photo -->
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>I'm Anupam Kumar. Data Architect by day. Discipline architect by dawn. Every morning at 3:15 AM, while the city sleeps, I'm already on the road — running, training, building the strongest version of myself.</p>
+      <p style="font-family:'Inter',sans-serif;font-size:14px;color:var(--gold);font-style:italic;margin:8px 0 16px;opacity:0.85">"Built by an Engineer who doesn't believe in motivation."</p>
+      <p>I stake ₹<span data-stake-daily>15,000</span> of my own money every single day. Miss once and a stranger collects. No end date. No finish line. This is not a challenge. This is the rest of my life.</p>
+      <p>First Light started on February 10, 2026. Every morning since: 3:15 AM alarm. 5km run before 6 AM. Gym. Strict food code. Every metric tracked — sleep, run distance, pace, heart rate, gym session. Every day documented publicly. The data is open, the stakes are real, and the record is permanent.</p>
+      <p>I'm training for the Standard Chartered Singapore Marathon (December 2026) — targeting sub 4:30. But the marathon is just a milestone. The real race has no finish line.</p>
+      <p style="color:var(--cyan);font-family:var(--font-mono);font-size:13px;letter-spacing:1px;margin-top:32px">Follow the streak. Watch the proof. Or wait for me to fail and claim the money.<br><span data-day></span> days in. Zero misses.</p>
+
+      <!-- HOW THE STAKES WORK -->
+      <div class="stakes-card">
+        <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:2px;color:var(--gold);margin-bottom:16px">HOW THE STAKES WORK — NO FINE PRINT</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.8">
+          <strong style="color:var(--text)">The rule is simple:</strong> I post daily proof on Instagram. If a day is missed — no post by midnight — the first person to claim it gets ₹<span data-stake-daily>15,000</span> via direct UPI transfer within 24 hours. No excuses, no delays, no conditions.<br><br>
+          <strong style="color:var(--text)">Two ways to claim:</strong><br>
+          <span style="color:var(--cyan)">1.</span> Comment on the missed day's Instagram post — first comment wins.<br>
+          <span style="color:var(--cyan)">2.</span> Comment on <a href="index.html#community" style="color:var(--cyan)">firstlight.live</a> — the community section on this website counts too.<br><br>
+          <strong style="color:var(--text)">Why should you believe this?</strong> Because the proof is public. Every day is logged with timestamps — sleep data from my watch, run data from Strava, gym check-in, food code. The entire history is on <a href="proof.html" style="color:var(--cyan)">the proof archive</a>. You can verify any day, any metric.<br><br>
+          <strong style="color:var(--text)">This isn't a marketing stunt.</strong> There's no product to sell, no course, no coaching. This is a personal accountability system with real financial consequences. The money is mine. The risk is mine. Your only role is to watch — or collect.
+        </div>
+      </div>
+
+      <!-- THE IRON RULES — NO EXCEPTIONS -->
+      <div class="iron-rules-card">
+        <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:2px;color:var(--red);margin-bottom:20px">THE IRON RULES — ZERO EXCEPTIONS</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.8">
+          <div class="iron-rule-item"><span class="iron-rule-num">01</span> <span><strong style="color:var(--text)">No rain stops me.</strong> I run in the rain. I've done it. Proof exists.</span></div>
+          <div class="iron-rule-item"><span class="iron-rule-num">02</span> <span><strong style="color:var(--text)">No storm stops me.</strong> Weather is not a variable. The run happens.</span></div>
+          <div class="iron-rule-item"><span class="iron-rule-num">03</span> <span><strong style="color:var(--text)">No city stops me.</strong> Different city, different timezone — same 5 km. Airport, hotel corridor, parking lot. Doesn't matter.</span></div>
+          <div class="iron-rule-item"><span class="iron-rule-num">04</span> <span><strong style="color:var(--text)">No flight stops me.</strong> If my flight departs between 00:30 AM and 6:00 AM — upon landing, I walk 5 km from the airport. GPS verified. No cab until the walk is done. Post may be delayed, but the distance never is.</span></div>
+          <div class="iron-rule-item"><span class="iron-rule-num">05</span> <span><strong style="color:var(--text)">No race excuses the run.</strong> Ultra Marathon, Marathon, Half Marathon, or any registered race starting before 6 AM — the race counts as the run. BIB uploaded to <a href="marathon.html" style="color:var(--cyan)">Races</a> + Instagram before race day. If the race starts after 6 AM — the regular 5 km morning run still happens first.</span></div>
+          <div class="iron-rule-item"><span class="iron-rule-num">06</span> <span><strong style="color:var(--text)">5 km daily. Non-negotiable.</strong> Run or walk. Track or road. Home or airport. Race course or parking lot. The distance gets done. Every. Single. Day.</span></div>
+        </div>
+        <div class="unstoppable-text">I WILL BE UNSTOPPABLE.</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);margin-top:12px;text-align:center;letter-spacing:0.5px"><span data-day></span> days in. These aren't promises — they're facts. Check <a href="proof.html" style="color:var(--cyan)">the proof</a>.</div>
+      </div>
+    </div>
+    <div class="about-photo reveal">
+      <div class="about-photo-placeholder" id="aboutPhoto">
+        <span class="diamond-lg">◆</span>
+        PHOTO
+      </div>
+    </div>
+    <script>
+      // Load about photo from config (ABOUT_PHOTO_URL first, then PROFILE_PHOTO_URL as fallback)
+      (function(){
+        try {
+          var c = JSON.parse(localStorage.getItem('fl_config') || '{}');
+          var url = c.ABOUT_PHOTO_URL || c.PROFILE_PHOTO_URL;
+          if (url) {
+            document.getElementById('aboutPhoto').innerHTML = '<img src="' + url + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:12px" alt="Anupam Kumar">';
+          }
+        } catch(e) {}
+      })();
+    </script>
+  </div>
+
+  <!-- HOW THE SYSTEM WORKS -->
+  <section class="reveal" style="margin:48px 0;padding:60px 0;border-top:1px solid rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.08)">
+    <div class="arch-section-header">
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:4px;color:var(--cyan);margin-bottom:8px">THE ARCHITECTURE</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--text);letter-spacing:2px;margin-bottom:8px">HOW THE SYSTEM WORKS</h2>
+      <p style="font-family:'Inter',sans-serif;color:var(--text-dim);font-size:0.9rem;max-width:500px;margin:0 auto">Not a habit app. Not a spreadsheet. A self-running machine built to be stronger than any weak moment.</p>
+    </div>
+
+    <!-- HERO STAT BAR -->
+    <div class="hero-stat-bar">
+      <div class="hero-stat-item">
+        <div style="font-family:var(--font-mono);font-size:clamp(20px,5vw,28px);font-weight:700;color:var(--cyan)">50+</div>
+        <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim);margin-top:4px">DATA POINTS<br>TRACKED DAILY</div>
+      </div>
+      <div class="hero-stat-item">
+        <div style="font-family:var(--font-mono);font-size:clamp(20px,5vw,28px);font-weight:700;color:var(--green)">130+</div>
+        <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim);margin-top:4px">DAILY<br>CHECKPOINTS</div>
+      </div>
+      <div class="hero-stat-item">
+        <div style="font-family:var(--font-mono);font-size:clamp(20px,5vw,28px);font-weight:700;color:var(--gold)">5</div>
+        <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim);margin-top:4px">CLOUD SYNCS<br>PER DAY</div>
+      </div>
+      <div class="hero-stat-item">
+        <div style="font-family:var(--font-mono);font-size:clamp(20px,5vw,28px);font-weight:700;color:#E040FB">&lt;1s</div>
+        <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim);margin-top:4px">CROSS-DEVICE<br>SYNC</div>
+      </div>
+    </div>
+
+
+    <!-- THE SAFETY NET — Feature Grid -->
+    <div style="max-width:900px;margin:0 auto 40px;padding:0 16px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--text-dim)">─── THE SAFETY NET ───</div>
+      </div>
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">⌚</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">ANY WATCH. ONE SYSTEM.</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">Apple Watch, Garmin, COROS, Polar — doesn't matter. The watch records every run, every heartbeat. GPS verified. No phone needed. Change watches 10 times — nothing breaks.</div>
+        </div>
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">📱</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">ZERO DEVICE DEPENDENCY</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">Phone dies? iPad breaks? Laptop stolen? The streak still syncs. The cloud doesn't sleep. The watch records offline and uploads whenever it finds internet. The system is stronger than any single device.</div>
+        </div>
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">🔒</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">DATA IS IMMUTABLE</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">Once recorded, even I cannot delete or modify it. The database permanently rejects all attempts. Every run, every miss, every metric — sealed forever. <a href="accountability.html" style="color:var(--cyan)">View the accountability ledger →</a></div>
+        </div>
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">⚖️</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">PUBLIC ACCOUNTABILITY</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">Every slip is published automatically. Every penalty requires a verified 20km walk with GPS proof. No backdoor. No override. The internet is the witness. <a href="accountability.html" style="color:var(--cyan)">View the ledger →</a></div>
+        </div>
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">⚡</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">REAL-TIME CROSS-DEVICE SYNC</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">Update on laptop — tablet sees it in under 1 second. WebSocket connection. Not polling. Not refreshing. Instant sync across every device, every time. Works offline too — queues changes, syncs when back online.</div>
+        </div>
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">🔄</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">SELF-HEALING TOKENS</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">Strava tokens expire every 6 hours. Instagram tokens expire every 60 days. The system auto-refreshes them via Google Cloud. No human touches a token. The machine maintains itself.</div>
+        </div>
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">💰</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">₹<span data-stake-daily>15,000</span> EVERY SINGLE DAY</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">Not a one-time bet. Not a monthly thing. <span style="color:var(--red)">Every. Single. Day.</span> Miss once = someone gets paid. The money is real. The UPI transfer happens within 24 hours. No fine print.</div>
+        </div>
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">🌍</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">ANYONE CAN CLAIM</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">This isn't private accountability. Anyone on the internet can check, verify, and claim ₹<span data-stake-daily>15,000</span> if the 6 AM deadline is missed. Comment on any Instagram post, DM, or message on firstlight.live — first claim wins.</div>
+        </div>
+
+        <div class="feature-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:22px">🏗️</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px">BUILT FOR 10 YEARS</span>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7">50+ data points tracked daily. 8 daily cloud syncs. Auto-archival to cold storage. Self-renewing API tokens. Cross-device WebSocket sync. The entire infrastructure costs less than a coffee per month. This system will outlive the devices that built it.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Closing statement -->
+    <div style="text-align:center;margin-top:20px;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-dim);max-width:600px;margin-left:auto;margin-right:auto;line-height:1.8">
+      This website is not a performance. It is an experiment — run in public because public commitment works, and because the man I am building deserves a permanent record, including every failure along the way.
+    </div>
+  </section>
+
+  <!-- THE CLOSING STATEMENT — Cinematic, goosebump-inducing -->
+  <section class="reveal" style="margin:60px -24px;padding:80px 24px;position:relative;overflow:hidden;text-align:center">
+
+    <!-- Background glow effects -->
+    <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(0,212,255,0.06) 0%,transparent 70%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:0;left:30%;width:400px;height:400px;background:radial-gradient(circle,rgba(245,166,35,0.04) 0%,transparent 70%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:0;right:20%;width:300px;height:300px;background:radial-gradient(circle,rgba(0,230,118,0.04) 0%,transparent 70%);pointer-events:none"></div>
+
+    <!-- Top border — gradient line -->
+    <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.3),rgba(245,166,35,0.3),rgba(0,230,118,0.3),transparent)"></div>
+
+    <div style="max-width:720px;margin:0 auto;position:relative;z-index:1">
+
+      <!-- Diamond icon -->
+      <div style="font-size:24px;color:var(--cyan);margin-bottom:24px;opacity:0.6">◆</div>
+
+      <!-- Line 1 — The engineering line (hero sized) -->
+      <div style="font-family:var(--font-mono);font-size:clamp(1.2rem,4vw,1.8rem);font-weight:800;line-height:1.5;letter-spacing:1px;margin-bottom:40px">
+        <span style="color:var(--text)">"The only thing that can break this streak</span><br>
+        <span style="color:var(--text)">is </span><span style="background:linear-gradient(135deg,#FF5252,#FF8A80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">choosing to stay in bed.</span><br>
+        <span style="color:var(--text)">Everything else has been </span><span style="background:linear-gradient(135deg,#00D4FF,#00E5A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">engineered out.</span><span style="color:var(--text)">"</span>
+      </div>
+
+      <!-- Animated separator -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 40px">
+        <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan))"></div>
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--gold)"></div>
+        <div style="width:60px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)"></div>
+      </div>
+
+      <!-- Line 2 — The purpose (each line fades in differently) -->
+      <div style="margin-bottom:40px">
+        <div style="font-family:'Inter',sans-serif;font-size:clamp(0.95rem,2.5vw,1.15rem);color:var(--text-dim);line-height:2;letter-spacing:0.3px;margin-bottom:16px">
+          This website is not a performance.
+        </div>
+        <div style="font-family:'Inter',sans-serif;font-size:clamp(0.95rem,2.5vw,1.15rem);color:var(--text-muted);line-height:2;letter-spacing:0.3px;margin-bottom:16px">
+          It is not content. It is not a brand play.
+        </div>
+        <div style="font-family:'Inter',sans-serif;font-size:clamp(1rem,2.5vw,1.2rem);color:var(--text);line-height:2;letter-spacing:0.3px;margin-bottom:16px">
+          It is an <span style="background:linear-gradient(135deg,#F5A623,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700">experiment</span> — run in public<br>because public commitment works.
+        </div>
+        <div style="font-family:'Inter',sans-serif;font-size:clamp(1rem,2.5vw,1.2rem);color:var(--text);line-height:2;letter-spacing:0.3px">
+          And because the man I am building<br>deserves a <span style="background:linear-gradient(135deg,#00D4FF,#00E5A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700">permanent record</span> —<br>
+          <span style="color:var(--text-muted)">including every failure along the way.</span>
+        </div>
+      </div>
+
+      <!-- Separator with diamond -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 40px">
+        <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))"></div>
+        <div style="color:var(--gold);font-size:10px">◆</div>
+        <div style="width:80px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)"></div>
+      </div>
+
+      <!-- Ikigai — the final punch (biggest text, gradient) -->
+      <div style="margin-bottom:40px">
+        <div style="font-family:var(--font-mono);font-size:clamp(1rem,3vw,1.3rem);font-style:italic;color:var(--text-muted);letter-spacing:1px;margin-bottom:12px">
+          I am not trying to win.
+        </div>
+        <div style="font-family:var(--font-mono);font-size:clamp(1.4rem,4vw,2rem);font-weight:900;letter-spacing:2px">
+          <span style="background:linear-gradient(135deg,#00E676,#00D4FF,#F5A623);-webkit-background-clip:text;-webkit-text-fill-color:transparent">I AM REFUSING TO STOP.</span>
+        </div>
+      </div>
+
+      <!-- Live stats bar -->
+      <div style="display:inline-flex;gap:24px;padding:16px 32px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:40px;flex-wrap:wrap;justify-content:center">
+        <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:2px">
+          <span style="color:var(--cyan);font-weight:700">DAY <span data-day></span></span>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:2px;color:var(--green);font-weight:700">
+          ZERO MISSES
+        </div>
+        <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:2px">
+          <span data-unclaimed style="color:var(--gold);font-weight:700"></span> <span style="color:var(--text-dim)">UNCLAIMED</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom border — gradient line -->
+    <div style="position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,230,118,0.3),rgba(245,166,35,0.3),rgba(0,212,255,0.3),transparent)"></div>
+
+  </section>
+
+  <!-- Current Snapshot -->
+  <div class="snapshot-grid">
+    <div class="snapshot-card reveal">
+      <div class="snapshot-label">STREAK</div>
+      <div class="snapshot-value" style="color:var(--green)"><span data-day></span> DAYS</div>
+    </div>
+    <div class="snapshot-card reveal reveal-delay-1">
+      <div class="snapshot-label">AT STAKE</div>
+      <div class="snapshot-value" style="color:var(--gold)" data-unclaimed>—</div>
+    </div>
+    <div class="snapshot-card reveal reveal-delay-2">
+      <div class="snapshot-label">NEXT RACE</div>
+      <div class="snapshot-value">Singapore Marathon<br><span style="font-size:11px;color:var(--text-muted)">Dec 2026 · Sub 4:30</span></div>
+    </div>
+    <div class="snapshot-card reveal reveal-delay-3">
+      <div class="snapshot-label">BASED IN</div>
+      <div class="snapshot-value">Bangalore, India</div>
+    </div>
+  </div>
+
+  <!-- Social Links -->
+  <div class="social-row reveal">
+    <a href="https://www.instagram.com/firstlightlive" target="_blank" class="btn btn-outline btn-sm" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a>
+    <a href="https://strava.app.link/jxGRExHXo2b" target="_blank" class="btn btn-outline btn-sm" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a>
+    <a href="https://www.linkedin.com/in/anupam1001/" target="_blank" class="btn btn-outline btn-sm" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a>
+  </div>
+
+</main>
+
+<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
+
+<script src="app.js"></script>
+</body>
+</html>
+ 
