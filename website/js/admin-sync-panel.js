@@ -3,8 +3,9 @@
 // ═══════════════════════════════════════════
 
 var _syncInProgress = false;
-var _CF_SYNC_URL = 'https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync';
-var _SYNC_ADMIN_KEY = localStorage.getItem('fl_admin_key') || localStorage.getItem('fl_admin_key');
+var _CF_SYNC_URL = 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync';
+var _SYNC_ADMIN_KEY = localStorage.getItem('fl_admin_key') || '';
+var _SUPA_AUTH = 'Bearer ' + (FL.SUPABASE_ANON_KEY || '');
 
 function renderSyncCenter() {
   _loadSyncHealth();
@@ -61,7 +62,7 @@ async function _triggerSync(action, source) {
   try {
     var resp = await fetch(_CF_SYNC_URL + '?action=' + action, {
       method: 'GET',
-      headers: { 'X-Admin-Key': _SYNC_ADMIN_KEY }
+      headers: { 'X-Admin-Key': _SYNC_ADMIN_KEY, 'Authorization': _SUPA_AUTH }
     });
     var data = await resp.json();
 
@@ -133,7 +134,7 @@ async function _loadSyncHealth() {
   if (!el) return;
 
   try {
-    var resp = await fetch(_CF_SYNC_URL + '?action=health');
+    var resp = await fetch(_CF_SYNC_URL + '?action=health', { headers: { 'Authorization': _SUPA_AUTH } });
     var data = await resp.json();
 
     if (data.health) {

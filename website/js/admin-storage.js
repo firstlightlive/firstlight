@@ -4,7 +4,7 @@
 // Server: scripts/gcs-file-server.sh on port 3001
 // ═══════════════════════════════════════════
 
-var GCS_SERVER = 'https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync';
+var GCS_SERVER = 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync';
 
 // Storage paths
 var STORAGE_PATHS = {

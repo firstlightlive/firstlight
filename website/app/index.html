@@ -6417,7 +6417,7 @@ function fallbackThumb(cv,fname){
 // INSTAGRAM GRAPH API — CAROUSEL + STORY PUBLISHER
 // ═══════════════════════════════════════════════════════
 const _IG_ACCOUNT='17841466893616231';
-const _GCS_UPLOAD='https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync?action=upload';
+const _GCS_UPLOAD='https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=upload';
 
 function _igLog(elId,msg,color){
   const el=document.getElementById(elId);if(!el)return;
@@ -6482,7 +6482,7 @@ async function _uploadCanvasToGCS(canvasId,filename){
 }
 
 // ── IG Graph API — 100% server-side, token NEVER in browser ──
-const _IG_SYNC_URL='https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync';
+const _IG_SYNC_URL='https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync';
 const _ADMIN_KEY=['b8464678b573c885','c449958a9ea760c0','8b01279d01d3a1f9','96fc92b7364f10b7'].join('');
 
 async function _igAPI(endpoint,params){
@@ -6491,7 +6491,7 @@ async function _igAPI(endpoint,params){
     console.log('[IG] Server proxy: '+endpoint);
     const res=await fetch(_IG_SYNC_URL+'?action=ig-proxy',{
       method:'POST',signal:AbortSignal.timeout(30000),
-      headers:{'Content-Type':'application/json','X-Admin-Key':_ADMIN_KEY},
+      headers:{'Content-Type':'application/json','X-Admin-Key':_ADMIN_KEY,'Authorization':'Bearer '+FL.SUPABASE_ANON_KEY},
       body:JSON.stringify({endpoint:endpoint,params:params})
     });
     if(res.ok){

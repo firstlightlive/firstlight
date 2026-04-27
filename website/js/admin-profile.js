@@ -3,7 +3,7 @@
 // Upload photos to GCS via Cloud Function
 // ═══════════════════════════════════════════
 
-var GCS_UPLOAD = 'https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync?action=upload';
+var GCS_UPLOAD = 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=upload';
 var _ADMIN_KEY_FALLBACK = localStorage.getItem('fl_admin_key');
 function _getAdminKey() { return localStorage.getItem('fl_admin_key') || _ADMIN_KEY_FALLBACK; }
 

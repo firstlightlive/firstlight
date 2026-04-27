@@ -229,7 +229,7 @@ async function quickUploadToGCS(files) {
   var folder = document.getElementById('quickUploadFolder').value;
   var progress = document.getElementById('quickUploadProgress');
   var results = document.getElementById('quickUploadResults');
-  var GCS_URL = 'https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync?action=upload';
+  var GCS_URL = 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=upload';
 
   results.innerHTML = '';
   progress.textContent = 'Uploading ' + files.length + ' file(s)...';

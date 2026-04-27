@@ -224,7 +224,7 @@ renderRaceList();
 // GCS PHOTO UPLOAD FOR RACES
 // ══════════════════════════════════════
 
-var GCS_UPLOAD_URL = 'https://asia-south1-project-f050b6ba-60db-4eee-98a.cloudfunctions.net/firstlight-sync?action=upload';
+var GCS_UPLOAD_URL = 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=upload';
 
 // Cloud Function is always available
 async function checkGCSServer() {
