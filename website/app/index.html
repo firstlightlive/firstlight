@@ -1381,7 +1381,7 @@ const savedDL=localStorage.getItem('fl_deadline');
 if(savedDL==='missed'){const dl=document.querySelector('[data-key="deadline"]');if(dl){dl.classList.remove('on');dl.classList.add('off');dl.querySelector('.s-val').textContent='MISSED'}}
 
 // AI Caption toggle + API key persistence
-const _GEMINI_DEFAULT=['AIza','SyDJ0qikjESzplb','VuB6FN_uKxHDF5K6kqWQ'].join('');
+const _GEMINI_DEFAULT=''; // Old default key suspended by Google — user must provide their own
 const _OPENAI_DEFAULT=localStorage.getItem('fl_key_openai')||'';
 // Ensure both keys are always in localStorage
 if(!localStorage.getItem('fl_key_openai'))localStorage.setItem('fl_key_openai',_OPENAI_DEFAULT);
@@ -1407,38 +1407,45 @@ _aiKeyEl.addEventListener('paste',function(){setTimeout(function(){_persistKey()
 // Sync AI keys to Supabase config table for cross-device persistence
 function _syncAiKeys(){
   try{
-    const data={
+    var data={
       aikey:localStorage.getItem('fl_aikey')||'',
       provider:localStorage.getItem('fl_aiprov')||'gemini',
       gemini:localStorage.getItem('fl_key_gemini')||'',
       openai:localStorage.getItem('fl_key_openai')||'',
       claude:localStorage.getItem('fl_key_claude')||''
     };
-    if(typeof sbFetch==='function'){
-      sbFetch('config','POST',{key:'ai_keys',value:JSON.stringify(data)},'?on_conflict=key');
+    var _sbUrl=FL.SUPABASE_URL||'https://edgnudrbysybefbqyijq.supabase.co';
+    var _sbKey=FL.SUPABASE_ANON_KEY;
+    if(_sbKey){
+      fetch(_sbUrl+'/rest/v1/config?on_conflict=key',{
+        method:'POST',
+        headers:{'apikey':_sbKey,'Authorization':'Bearer '+_sbKey,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+        body:JSON.stringify({key:'ai_keys',value:JSON.stringify(data)})
+      }).catch(function(){});
     }
   }catch(e){console.warn('[AI] Key sync failed:',e);}
 }
-// Pull keys from Supabase on load (cross-device)
+// Pull keys from Supabase on load (cross-device, works on any page)
 (function(){try{
-  if(typeof SB!=='undefined'&&SB.init&&SB.init()){
-    fetch(SB.url+'/rest/v1/config?key=eq.ai_keys&select=value',{
-      headers:{'apikey':SB.key,'Authorization':'Bearer '+(SB._getToken?SB._getToken():SB.key)}
-    }).then(r=>r.json()).then(d=>{
-      if(d&&d[0]&&d[0].value){
-        const v=JSON.parse(d[0].value);
-        if(v.aikey){
-          localStorage.setItem('fl_aikey',v.aikey);
-          document.getElementById('aiKey').value=v.aikey;
-        }
-        if(v.provider){localStorage.setItem('fl_aiprov',v.provider);aiProvider=v.provider;}
-        if(v.gemini)localStorage.setItem('fl_key_gemini',v.gemini);
-        if(v.openai)localStorage.setItem('fl_key_openai',v.openai);
-        if(v.claude)localStorage.setItem('fl_key_claude',v.claude);
-        console.log('[AI] All keys loaded from Supabase — gemini:'+(v.gemini?'YES':'NO')+' openai:'+(v.openai?'YES':'NO')+' claude:'+(v.claude?'YES':'NO'));
+  var _sbUrl=FL.SUPABASE_URL||'https://edgnudrbysybefbqyijq.supabase.co';
+  var _sbKey=FL.SUPABASE_ANON_KEY;
+  if(!_sbKey)return;
+  fetch(_sbUrl+'/rest/v1/config?key=eq.ai_keys&select=value',{
+    headers:{'apikey':_sbKey,'Authorization':'Bearer '+_sbKey}
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d&&d[0]&&d[0].value){
+      var v=JSON.parse(d[0].value);
+      if(v.aikey){
+        localStorage.setItem('fl_aikey',v.aikey);
+        var el=document.getElementById('aiKey');if(el&&!el.value)el.value=v.aikey;
       }
-    }).catch(()=>{});
-  }
+      if(v.provider){localStorage.setItem('fl_aiprov',v.provider);}
+      if(v.gemini){localStorage.setItem('fl_key_gemini',v.gemini);var ge=document.getElementById('apiKeyGemini');if(ge&&!ge.value)ge.value=v.gemini;}
+      if(v.openai){localStorage.setItem('fl_key_openai',v.openai);var oe=document.getElementById('apiKeyOpenai');if(oe&&!oe.value)oe.value=v.openai;}
+      if(v.claude){localStorage.setItem('fl_key_claude',v.claude);var ce=document.getElementById('apiKeyClaude');if(ce&&!ce.value)ce.value=v.claude;}
+      console.log('[AI] Keys loaded from Supabase — gemini:'+(v.gemini?'YES':'NO')+' openai:'+(v.openai?'YES':'NO')+' claude:'+(v.claude?'YES':'NO'));
+    }
+  }).catch(function(){});
 }catch(e){}})();
 const savedAiOn=localStorage.getItem('fl_aion');
 if(savedAiOn==='true')document.getElementById('aiToggle').checked=true;
@@ -1454,15 +1461,18 @@ if(savedAiOn==='true')document.getElementById('aiToggle').checked=true;
   // Scan AI key — use main key (could be Gemini, OpenAI, or Claude)
   var scanEl=document.getElementById('aiScanKey');
   if(scanEl&&!scanEl.value)scanEl.value=mainKey||geminiKey;
-  // Persist reel key on change
-  if(reelEl)reelEl.addEventListener('input',function(){localStorage.setItem('fl_key_openai',this.value.trim());});
+  // Persist reel key on change + sync to Supabase
+  if(reelEl)reelEl.addEventListener('input',function(){localStorage.setItem('fl_key_openai',this.value.trim());_syncAiKeys();});
   if(scanEl)scanEl.addEventListener('input',function(){
     var k=this.value.trim();
     if(k.startsWith('sk-ant-'))localStorage.setItem('fl_key_claude',k);
     else if(k.startsWith('sk-'))localStorage.setItem('fl_key_openai',k);
     else if(k.startsWith('AIza'))localStorage.setItem('fl_key_gemini',k);
+    _syncAiKeys();
   });
   console.log('[AI] Keys auto-filled — main:'+(mainKey?'YES':'DEFAULT')+' openai:'+(openaiKey?'YES':'NO')+' gemini:'+(geminiKey?'YES':'NO'));
+  // Sync to Supabase on load if keys exist locally
+  if(mainKey||openaiKey||geminiKey) setTimeout(_syncAiKeys, 2000);
 })();
 
 // AI Provider — gemini (default) or anthropic / openai
@@ -2025,7 +2035,9 @@ function loadImg(input,dropId,key){
 
 // ===== PHOTO AUTO-EXTRACTION (Claude/OpenAI/Gemini Vision) — FAILPROOF =====
 function extractFromPhoto(dataUrl,slot,dropEl){
-  const apiKey=(document.getElementById('aiKey').value||'').trim();
+  var apiKey=(document.getElementById('aiKey').value||'').trim();
+  // Fallback: try localStorage keys if input field is empty
+  if(!apiKey) apiKey=localStorage.getItem('fl_key_gemini')||localStorage.getItem('fl_key_openai')||localStorage.getItem('fl_key_claude')||localStorage.getItem('fl_aikey')||'';
   if(!apiKey){
     const warn=document.createElement('div');
     warn.style.cssText='position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(255,59,92,0.92);color:#FFF;font:700 8px "JetBrains Mono",monospace;padding:3px 9px;border-radius:8px;letter-spacing:1px;white-space:nowrap;pointer-events:none;z-index:9';
@@ -2081,20 +2093,34 @@ function extractFromPhoto(dataUrl,slot,dropEl){
     return p.catch(e=>{clearTimeout(timer);console.warn('[AI] Call failed:',provider,e.message);return '';});
   }
 
-  // ── BULLETPROOF MULTI-KEY RETRY — OpenAI first (most reliable), then Gemini ──
+  // ── BULLETPROOF MULTI-KEY RETRY — OpenAI first, then Gemini, then Claude ──
   const _keys={
-    openai:localStorage.getItem('fl_key_openai')||_OPENAI_DEFAULT,
-    gemini:localStorage.getItem('fl_key_gemini')||_GEMINI_DEFAULT,
+    openai:localStorage.getItem('fl_key_openai')||'',
+    gemini:localStorage.getItem('fl_key_gemini')||'',
     claude:localStorage.getItem('fl_key_claude')||''
   };
-  // Always try OpenAI first (best at image extraction), then Gemini, then Claude
+  // Auto-detect provider from the apiKey input field and fill missing keys
+  if(apiKey){
+    if(apiKey.startsWith('sk-ant-')&&!_keys.claude)_keys.claude=apiKey;
+    else if(apiKey.startsWith('sk-')&&!_keys.openai)_keys.openai=apiKey;
+    else if(apiKey.startsWith('AIza')&&!_keys.gemini)_keys.gemini=apiKey;
+    // If no specific match, try as openai
+    if(!_keys.openai&&!_keys.gemini&&!_keys.claude)_keys.openai=apiKey;
+  }
+  // Build chain: OpenAI first, then Claude, then Gemini
   const _chain=[];
   if(_keys.openai)_chain.push('openai');
-  if(_keys.gemini)_chain.push('gemini');
   if(_keys.claude)_chain.push('claude');
-  // Fallback: use whatever key is in the input field with the selected provider
-  if(!_chain.length)_chain.push(aiProvider||'openai');
-  if(!_keys[_chain[0]])_keys[_chain[0]]=apiKey;
+  if(_keys.gemini)_chain.push('gemini');
+  if(!_chain.length){
+    console.error('[AI] NO API KEYS AVAILABLE. Add key in Settings or API Keys section.');
+    var noKeyBadge=document.createElement('div');
+    noKeyBadge.style.cssText='position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(255,59,92,0.92);color:#FFF;font:700 8px "JetBrains Mono",monospace;padding:3px 9px;border-radius:8px;letter-spacing:1px;white-space:nowrap;pointer-events:none;z-index:9';
+    noKeyBadge.textContent='\u274C NO API KEY — ADD IN SETTINGS';
+    dropEl.style.position='relative';dropEl.appendChild(noKeyBadge);
+    setTimeout(function(){noKeyBadge.remove();},5000);
+    return;
+  }
 
   let attempt=0;
   console.log('[AI] Extraction chain:',_chain.map(p=>p+'('+(_keys[p]||'').substring(0,10)+'...)').join(' → '));
@@ -3290,12 +3316,30 @@ async function logToSheet(){
 }
 
 // ===== GENERATE =====
+function _ensureCaptionPopulated(){
+  var capEl=document.getElementById('capIG');
+  var htEl=document.getElementById('hashtagText');
+  var fcEl=document.getElementById('firstCommentText');
+  // If any of these are still empty after generate, populate with defaults
+  var day=document.getElementById('dayNum').value||'1';
+  var km=(document.getElementById('km')||document.getElementById('tkm')||{value:''}).value;
+  var handle=document.getElementById('handleIG')?document.getElementById('handleIG').value:'@firstlightlive';
+  if(capEl&&!capEl.textContent.trim()){
+    capEl.textContent='Day '+day+'. '+(km?km+' km. ':'')+'Before 6 AM.\n\n\u20B915,000 on the line. Every single day.\nMiss once \u2014 first comment collects.\n\n'+day+'-day streak. Zero misses.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n\uD83D\uDCF8 '+handle;
+  }
+  if(htEl&&!htEl.textContent.trim()){
+    htEl.textContent='#firstlightlive #accountability #noexcuses #streak #running';
+  }
+  if(fcEl&&!fcEl.textContent.trim()){
+    fcEl.textContent='\u26A1 THE DEAL:\nMiss 1 day = \u20B915,000 to first comment.\nNo questions. No delays.\n\n'+day+'-day streak.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+  }
+}
+
 function generate(){
   // Auto-pull Strava if not already loaded
   if(!_stravaCache)pullStravaLive().catch(()=>{});
   try{_generateInner();}catch(e){
     console.error('Generate error:',e);
-    // Show error to user so they know what's wrong
     var logEl=document.getElementById('igPubLog');
     if(logEl){logEl.style.display='block';logEl.innerHTML='<div style="color:#FF5252">Generate error: '+e.message+'</div>';}
   }
@@ -3303,6 +3347,8 @@ function generate(){
     document.getElementById('output').classList.add('show');
     showS(0);
     logToSheet();
+    // ALWAYS populate caption/hashtag/comment — even if generation had errors
+    _ensureCaptionPopulated();
   }
 }
 function _generateInner(){
@@ -3451,21 +3497,23 @@ function _generateInner(){
     // ── COMPUTE ACHIEVEMENT BADGES ───────────────────────────────────
     window._s1Badges=computeBadges(parseInt(day)||1,wxCond,wxTemp,wStartRaw);
 
-    slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,undefined,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime);
-    slide4(day,total,handleIG,handleX,moodLine,food);
-    slide2(day,km,mn,kc,undefined,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats);
+    try{slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,undefined,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime);}catch(e){console.error('Slide1 error:',e);}
+    try{slide4(day,total,handleIG,handleX,moodLine,food);}catch(e){console.error('Slide4 error:',e);}
+    try{slide2(day,km,mn,kc,undefined,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats);}catch(e){console.error('Slide2 error:',e);}
     // ── ROUTE MAP SLIDE ──
-    if(_stravaCache){
-      var _latestRun=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;});
-      if(_latestRun){slideRouteMap(day,km,mn,kc,total,handleIG,handleX,wStart,wEnd,bpmVal);window._hasRouteMap=true;}
-      else{window._hasRouteMap=false;}
-    }
+    try{
+      if(_stravaCache){
+        var _latestRun=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;});
+        if(_latestRun){slideRouteMap(day,km,mn,kc,total,handleIG,handleX,wStart,wEnd,bpmVal);window._hasRouteMap=true;}
+        else{window._hasRouteMap=false;}
+      }
+    }catch(mapErr){console.error('Route map error:',mapErr);window._hasRouteMap=false;}
     // ── CONDITIONAL SLEEP SLIDE ──
     const t4=document.getElementById('tab4');
     const d4=document.getElementById('dot4');
     const s4=document.getElementById('sb4');
     if(_showSleep){
-      slide3Sleep(day,total,handleIG,handleX,sleepHrs,wxStr,km,wStart);
+      try{slide3Sleep(day,total,handleIG,handleX,sleepHrs,wxStr,km,wStart);}catch(e){console.error('Sleep slide error:',e);}
       if(t4)t4.style.display='';if(d4)d4.style.display='';if(s4)s4.style.display='';
     }else{
       if(t4)t4.style.display='none';if(d4)d4.style.display='none';if(s4)s4.style.display='none';
@@ -4097,6 +4145,8 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
 
     // Element 7: SWIPE FOR PROOF → in bordered box — all tiers
     _drawCTA();
+    // Footer branding
+    drawSocialFooter(c,W,H,handleIG,handleX);
   };
 
   if(_trackerImg){
@@ -4395,8 +4445,7 @@ function slide3Sleep(day,total,handleIG,handleX,sleepHrs,wxStr,km,wStart){
       c.strokeStyle=P.acR+'0.28)';c.lineWidth=.5;c.stroke();
       c.fillStyle=P.accent;c.textAlign='left';c.fillText(wxStr,_wpx+10,_sepY+25);
     }
-    // REMOVED: drawSocialFooter (only on Slide 5)
-    // REMOVED: slide counter (only on Slide 5)
+    drawSocialFooter(c,W,H,handleIG,'');
   };
   // ── UNIFIED RENDER — handles all combinations of sleepHrs + i3 photo ──
   const _drawSleep=(img)=>{
@@ -4736,8 +4785,7 @@ function slide4(day,total,handleIG,handleX,moodLine,food){
       c.restore();
     }
     // REMOVED: "BEFORE 6:00 AM" checkmark (clock proves it)
-    // REMOVED: drawSocialFooter (only on Slide 5)
-    // REMOVED: slide counter (only on Slide 5)
+    drawSocialFooter(c,W,H,handleIG,'');
   };
   if(i2){const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{
     // Full-bleed gym selfie (cover) — face stays visible, text on bottom gradient
@@ -6355,8 +6403,8 @@ function genStoryTemplate(idx){
       c.strokeStyle='#E0E0E0';c.lineWidth=1.5;rr(c,mapX2,mapTop,mapW2,mapH2,14);c.stroke();
       var _routeDrawn=false;
       if(_stravaCache&&_stravaCache.length>0){
-        var la=_stravaCache[0];
-        if(la.summary_polyline){
+        var la=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;})||_stravaCache[0];
+        if(la&&la.summary_polyline){
           var rEnc=encodeURIComponent(la.summary_polyline);
           var rUrl='https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/path-4+FC4C02-1('+rEnc+')/auto/'+Math.round(mapW2)+'x'+Math.round(mapH2)+'@2x?padding=50&access_token='+_MAPBOX_TOKEN;
           if(rUrl.length<8000){
@@ -6374,8 +6422,9 @@ function genStoryTemplate(idx){
       }
       if(!_routeDrawn){
         c.fillStyle='#FAFAFA';rr(c,mapX2,mapTop,mapW2,mapH2,14);c.fill();
-        if(_stravaCache&&_stravaCache[0]&&_stravaCache[0].summary_polyline){
-          var pts2=_decodePolyline(_stravaCache[0].summary_polyline);
+        var _fallbackRun=_stravaCache?(_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;})||_stravaCache[0]):null;
+        if(_fallbackRun&&_fallbackRun.summary_polyline){
+          var pts2=_decodePolyline(_fallbackRun.summary_polyline);
           if(pts2.length>=2){
             var mn2Lat=Infinity,mx2Lat=-Infinity,mn2Lng=Infinity,mx2Lng=-Infinity;
             pts2.forEach(function(p){if(p[0]<mn2Lat)mn2Lat=p[0];if(p[0]>mx2Lat)mx2Lat=p[0];if(p[1]<mn2Lng)mn2Lng=p[1];if(p[1]>mx2Lng)mx2Lng=p[1];});

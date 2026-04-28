@@ -298,19 +298,25 @@ function markDailyRuleRead(btn) {
   if (bestEl) bestEl.textContent = 'Best: ' + streakData.longest;
 }
 
-// ── SYNC TO SUPABASE ──
+// ── SYNC TO SUPABASE (direct fetch — no SB.init dependency) ──
 async function syncReadingLog(date, type, ruleNumber) {
-  if (typeof sbFetch !== 'function') return;
   try {
-    var existing = await sbFetch('reading_log', 'GET', null, '?date=eq.' + date + '&type=eq.' + type);
-    if (existing && existing.length > 0) return;
-    await sbFetch('reading_log', 'POST', {
-      date: date,
-      type: type,
-      rule_number: ruleNumber,
-      completed: true,
-      completed_at: new Date().toISOString()
+    var sbUrl = FL.SUPABASE_URL || localStorage.getItem('fl_supabase_url') || '';
+    var sbKey = FL.SUPABASE_ANON_KEY || localStorage.getItem('fl_supabase_key') || '';
+    if (!sbUrl || !sbKey) return;
+    // Check if already exists
+    var checkResp = await fetch(sbUrl + '/rest/v1/reading_log?date=eq.' + date + '&type=eq.' + type + '&select=id', {
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
     });
+    var existing = await checkResp.json();
+    if (existing && existing.length > 0) return;
+    // Insert
+    await fetch(sbUrl + '/rest/v1/reading_log', {
+      method: 'POST',
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ date: date, type: type, rule_number: ruleNumber, completed: true, completed_at: new Date().toISOString() })
+    });
+    console.log('[Reading] Synced to Supabase: ' + date);
   } catch (e) {
     console.warn('[Reading] Sync failed:', e);
   }
@@ -318,7 +324,6 @@ async function syncReadingLog(date, type, ruleNumber) {
 
 // ── BACKFILL: sync any localStorage reading entries to Supabase ──
 function backfillReadingLog() {
-  if (typeof sbFetch !== 'function') return;
   var streakStart = new Date('2026-02-10');
   for (var i = 0; i < localStorage.length; i++) {
     var key = localStorage.key(i);

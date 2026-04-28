@@ -98,24 +98,78 @@ document.getElementById('metricsForm').addEventListener('submit', function(e) {
 })();
 
 function loadApiKeys() {
+  // Load from localStorage first (instant)
   var keys = JSON.parse(localStorage.getItem('fl_api_keys') || '{}');
-  if (keys.openai) { document.getElementById('apiKeyOpenAI').value = keys.openai; document.getElementById('apiStatusOpenAI').className = 'api-key-status valid'; }
-  if (keys.gemini) { document.getElementById('apiKeyGemini').value = keys.gemini; document.getElementById('apiStatusGemini').className = 'api-key-status valid'; }
-  if (keys.anthropic) { document.getElementById('apiKeyAnthropic').value = keys.anthropic; document.getElementById('apiStatusAnthropic').className = 'api-key-status valid'; }
+  // Also check generator app key names
+  if (!keys.openai) keys.openai = localStorage.getItem('fl_key_openai') || '';
+  if (!keys.gemini) keys.gemini = localStorage.getItem('fl_key_gemini') || '';
+  if (!keys.anthropic) keys.anthropic = localStorage.getItem('fl_key_claude') || '';
+
+  _applyApiKeys(keys);
+
+  // Then load from Supabase (cross-device, overrides localStorage)
+  var sbUrl = FL.SUPABASE_URL || '';
+  var sbKey = FL.SUPABASE_ANON_KEY || '';
+  if (sbUrl && sbKey) {
+    fetch(sbUrl + '/rest/v1/config?key=eq.ai_keys&select=value', {
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      if (d && d[0] && d[0].value) {
+        var v = JSON.parse(d[0].value);
+        var supaKeys = {
+          openai: v.openai || keys.openai || '',
+          gemini: v.gemini || keys.gemini || '',
+          anthropic: v.claude || keys.anthropic || ''
+        };
+        _applyApiKeys(supaKeys);
+        // Sync to localStorage
+        localStorage.setItem('fl_api_keys', JSON.stringify(supaKeys));
+        localStorage.setItem('fl_key_openai', supaKeys.openai);
+        localStorage.setItem('fl_key_gemini', supaKeys.gemini);
+        localStorage.setItem('fl_key_claude', supaKeys.anthropic);
+      }
+    }).catch(function() {});
+  }
+}
+
+function _applyApiKeys(keys) {
+  var oEl = document.getElementById('apiKeyOpenAI');
+  var gEl = document.getElementById('apiKeyGemini');
+  var aEl = document.getElementById('apiKeyAnthropic');
+  if (oEl && keys.openai) { oEl.value = keys.openai; document.getElementById('apiStatusOpenAI').className = 'api-key-status valid'; }
+  if (gEl && keys.gemini) { gEl.value = keys.gemini; document.getElementById('apiStatusGemini').className = 'api-key-status valid'; }
+  if (aEl && keys.anthropic) { aEl.value = keys.anthropic; document.getElementById('apiStatusAnthropic').className = 'api-key-status valid'; }
 }
 
 function saveApiKeys() {
   var keys = {
-    openai: document.getElementById('apiKeyOpenAI').value,
-    gemini: document.getElementById('apiKeyGemini').value,
-    anthropic: document.getElementById('apiKeyAnthropic').value
+    openai: document.getElementById('apiKeyOpenAI').value.trim(),
+    gemini: document.getElementById('apiKeyGemini').value.trim(),
+    anthropic: document.getElementById('apiKeyAnthropic').value.trim()
   };
+  // Save to localStorage (both formats — Command Center + Generator app)
   localStorage.setItem('fl_api_keys', JSON.stringify(keys));
+  localStorage.setItem('fl_key_openai', keys.openai);
+  localStorage.setItem('fl_key_gemini', keys.gemini);
+  localStorage.setItem('fl_key_claude', keys.anthropic);
+  localStorage.setItem('fl_aikey', keys.gemini || keys.openai || keys.anthropic);
+
+  // Save to Supabase (cross-device persistence)
+  var sbUrl = FL.SUPABASE_URL || '';
+  var sbKey = FL.SUPABASE_ANON_KEY || '';
+  if (sbUrl && sbKey) {
+    fetch(sbUrl + '/rest/v1/config?on_conflict=key', {
+      method: 'POST',
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ key: 'ai_keys', value: JSON.stringify({ openai: keys.openai, gemini: keys.gemini, claude: keys.anthropic, aikey: keys.gemini || keys.openai || keys.anthropic, provider: 'gemini' }) })
+    }).catch(function() {});
+  }
+
   // Update status dots
   document.getElementById('apiStatusOpenAI').className = 'api-key-status ' + (keys.openai ? 'valid' : 'empty');
   document.getElementById('apiStatusGemini').className = 'api-key-status ' + (keys.gemini ? 'valid' : 'empty');
   document.getElementById('apiStatusAnthropic').className = 'api-key-status ' + (keys.anthropic ? 'valid' : 'empty');
-  flashBtn(document.querySelector('#p-apikeys .btn-primary'), 'SAVED ✓');
+  flashBtn(document.querySelector('#p-apikeys .btn-primary'), 'SAVED TO CLOUD ✓');
 }
 
 loadApiKeys();
