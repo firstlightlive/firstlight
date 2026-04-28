@@ -566,8 +566,8 @@ Deno.serve(async (req) => {
   const action = url.searchParams.get('action') || 'sync'
   const headers = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
 
-  // Auth check
-  const requestKey = req.headers.get('x-admin-key') || ''
+  // Auth check — supports header OR URL param (pg_cron can't send custom headers reliably)
+  const requestKey = req.headers.get('x-admin-key') || url.searchParams.get('admin_key') || ''
   const adminKey = await getSecret('admin_api_key')
   const isAuthed = adminKey && requestKey === adminKey
 
