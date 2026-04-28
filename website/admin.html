@@ -2054,6 +2054,28 @@
           <div id="syncIgLog" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);line-height:1.8;max-height:200px;overflow-y:auto"></div>
         </div>
 
+        <!-- SLEEP SYNC (Apple Watch) -->
+        <div class="panel-section">
+          <div class="panel-section-title">SLEEP (Apple Watch)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+            <div class="card" style="text-align:center;padding:16px">
+              <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:6px">SLEEP</div>
+              <div style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:#70AEFF" id="syncSleepHrs">—</div>
+            </div>
+            <div class="card" style="text-align:center;padding:16px">
+              <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:6px">BEDTIME</div>
+              <div style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:#7C4DFF" id="syncBedtime">—</div>
+            </div>
+            <div class="card" style="text-align:center;padding:16px">
+              <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:6px">STATUS</div>
+              <div style="font-family:var(--font-mono);font-size:14px;font-weight:700" id="syncSleepStatus">—</div>
+            </div>
+          </div>
+          <button class="btn w-full" id="btnSyncSleep" style="min-height:50px;font-size:14px;letter-spacing:2px;background:linear-gradient(135deg,#70AEFF,#1a3a8a);color:#fff;font-weight:700;border:none;border-radius:8px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent">😴 FORCE SLEEP SYNC</button>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);text-align:center;margin-top:8px;letter-spacing:1px">Reads from Health Auto Export → syncs to all tables</div>
+          <div id="syncSleepLog" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);line-height:1.8;max-height:200px;overflow-y:auto"></div>
+        </div>
+
         <!-- FULL SYNC -->
         <div class="panel-section">
           <div class="panel-section-title">FULL SYNC (ALL SOURCES)</div>
