@@ -3599,10 +3599,10 @@ function _generateInner(){
   const _cta=_ctaMap[_dow];
 
   // Part 5: Tier-based hashtags (max 5, Instagram 2026 limit)
-  const _htNiche=['#5amrunner','#morningrunner','#runstreak','#publicaccountability','#dailydiscipline','#morningdiscipline','#noexcusesrunning','#earlymorningrun','#5kchallenge','#fitnessaccountability'];
-  const _htMedium=['#disciplineovermotivation','#runningcommunity','#consistencyiskey','#gymlife','#morningroutine','#earlymorningworkout','#runnersofinstagram'];
+  const _htNiche=['#5amrunner','#morningrunner','#runstreak','#publicaccountability','#dailydiscipline','#morningdiscipline','#noexcusesrunning','#earlymorningrun','#5kchallenge','#fitnessaccountability','#4amclub','#beforedawn','#streakrunner','#nozerodays','#dailyrunner'];
+  const _htMedium=['#disciplineovermotivation','#runningcommunity','#consistencyiskey','#gymlife','#morningroutine','#earlymorningworkout','#runnersofinstagram','#fitnessdiscipline','#runeveryday','#accountability'];
   const _htBroad=['#fitnessmotivation','#fitnessjourney','#runningmotivation','#marathontraining','#healthylifestyle'];
-  const _htBranded=['#firstlightdaily','#ironcovenantchallenge'];
+  const _htBranded=['#firstlightlive','#firstlightdaily','#ironcovenantchallenge'];
   const _htLocMap={'bangalore':['#bangalorerunners','#bengalurufitness','#blrrunners'],'bengaluru':['#bangalorerunners','#bengalurufitness','#blrrunners'],'mumbai':['#mumbairunners','#mumbaifitness'],'delhi':['#delhirunners','#delhifitness'],'hyderabad':['#hyderabadrunners','#hyderabadfitness'],'chennai':['#chennairunners','#chennaifitness'],'pune':['#punerunners','#punefitness']};
   const _htTiers=[
     {max:999,total:5,niche:3,medium:1,broad:0,branded:1},
@@ -3623,9 +3623,9 @@ function _generateInner(){
   // Get location
   const _htCity=(localStorage.getItem('fl_ht_location')||(document.getElementById('locCity')?.value||'')).trim().toLowerCase();
   const _htLocTags=_htLocMap[_htCity]||(_htCity?['#'+_htCity.replace(/[^a-z]/g,'')+'runners']:['#bangalorerunners']);
-  // Build hashtag set
-  const _htPicked=[];
-  for(let i=0;i<_htTier.branded;i++)_htPicked.push(_htBranded[i%_htBranded.length]);
+  // Build hashtag set — #firstlightlive ALWAYS first
+  const _htPicked=['#firstlightlive'];
+  for(let i=1;i<_htTier.branded;i++)_htPicked.push(_htBranded[(i)%_htBranded.length]);
   let _nicheN=_htTier.niche;
   if(_htLocTags.length>0&&_nicheN>0){_nicheN--;_htPicked.push(_htLocTags[_day%_htLocTags.length]);}
   for(let i=0;i<_nicheN;i++)_htPicked.push(_htNiche[(_day*2+i)%_htNiche.length]);
@@ -3634,7 +3634,7 @@ function _generateInner(){
   const _todayHashtags=_htPicked.slice(0,_htTier.total).join(' ');
 
   // Assemble Instagram Caption (hashtags in caption — max 5, Instagram 2026)
-  const _igCaption=_dealHook+'\n\n'+_hook+'\n\n'+_soar+'\n\n'+_stats+'\n\n'+_cta+'\n\n'+_todayHashtags+'\n\n📸 '+_handleIG;
+  const _igCaption=_dealHook+'\n\n'+_hook+'\n\n'+_soar+'\n\n'+_stats+'\n\n'+_cta+'\n\nwww.firstlight.live\n\n'+_todayHashtags+'\n\n📸 '+_handleIG;
   // Twitter/X caption (shorter)
   const _xCaption='Day '+_day+'. '+_hook+'\n\n'+_result+'\n\n𝕏 '+(document.getElementById('handleX')?.value||'@firstlightdly');
 
@@ -6489,9 +6489,9 @@ async function _igAPI(endpoint,params){
   // Token is injected server-side — never sent from browser
   try{
     console.log('[IG] Server proxy: '+endpoint);
-    const res=await fetch(_IG_SYNC_URL+'?action=ig-proxy',{
-      method:'POST',signal:AbortSignal.timeout(30000),
-      headers:{'Content-Type':'application/json','X-Admin-Key':_ADMIN_KEY,'Authorization':'Bearer '+FL.SUPABASE_ANON_KEY},
+    const res=await fetch(_IG_SYNC_URL+'?action=ig-proxy&admin_key='+_ADMIN_KEY,{
+      method:'POST',signal:AbortSignal.timeout(45000),
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+FL.SUPABASE_ANON_KEY},
       body:JSON.stringify({endpoint:endpoint,params:params})
     });
     if(res.ok){
@@ -6591,7 +6591,7 @@ async function igPublishCarousel(){
       var _d2=document.getElementById('dayNum').value||'1';
       var _stk2=formatIndianCurrency(getCurrentStake(parseInt(_d2)||1));
       var _tot2=formatIndianCurrency(getTotalAtRisk(parseInt(_d2)||1));
-      firstComment='\u26A1 THE DEAL:\nMiss 1 day = \u20B9'+_stk2+' to first comment.\nNo questions. No delays.\n\n'+_d2+'-day streak. \u20B9'+_tot2+' unclaimed.\nSet your alarm. Check tomorrow at 6 AM.\n\n#firstlight #accountability #noexcuses #streak #running';
+      firstComment='\u26A1 THE DEAL:\nMiss 1 day = \u20B9'+_stk2+' to first comment.\nNo questions. No delays.\n\n'+_d2+'-day streak. \u20B9'+_tot2+' unclaimed.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
       _igLog(log,'First comment auto-generated','var(--gold)');
     }
 
@@ -6624,17 +6624,26 @@ async function igPublishStory(){
   _igLog(log,'Generating story card...','var(--gold)');
 
   try{
-    // Generate the stories card first
-    downloadStoriesCard();
-    // Wait for canvas to render
-    await new Promise(r=>setTimeout(r,1500));
-
     const day=document.getElementById('dayNum').value||'0';
     const fname='day'+day+'_story_'+Date.now()+'.jpg';
 
-    // Upload to GCS
-    _igLog(log,'Uploading story to GCS...');
-    const url=await _uploadCanvasToGCS('storiesCard',fname);
+    // Use Story Studio canvas (storyTpl) if it has content, otherwise generate default
+    var storyCanvas=document.getElementById('storyTpl');
+    var useStudioStory=storyCanvas&&storyCanvas.width>0&&storyCanvas.getContext('2d').getImageData(0,0,1,1).data[3]>0;
+
+    if(useStudioStory){
+      _igLog(log,'Using Story Studio template...','var(--gold)');
+    }else{
+      _igLog(log,'Generating default stories card...','var(--gold)');
+      downloadStoriesCard();
+      await new Promise(r=>setTimeout(r,1500));
+    }
+
+    var canvasId=useStudioStory?'storyTpl':'storiesCard';
+
+    // Upload story
+    _igLog(log,'Uploading story...');
+    const url=await _uploadCanvasToGCS(canvasId,fname);
     _igLog(log,'\u2713 Uploaded: '+url.substring(0,60)+'...','var(--mint)');
 
     // Create story container
@@ -9975,3 +9984,4 @@ if(document.readyState==='loading'){
 </body>
 </html>
  
+<!-- v1777354608 -->
