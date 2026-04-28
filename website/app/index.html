@@ -1801,7 +1801,7 @@ async function pullStravaLive(){
     box.style.borderStyle='solid';box.style.borderColor='rgba(252,76,2,0.5)';box.style.background='rgba(252,76,2,0.05)';
     // Auto-fill km/min fields from today's latest run
     var today=new Date().toISOString().split('T')[0];
-    var todayRuns=acts.filter(function(a){return a.start_date_local&&a.start_date_local.startsWith(today)&&(a.type==='Run'||a.type==='Walk');});
+    var todayRuns=acts.filter(function(a){return a.start_date_local&&a.start_date_local.startsWith(today)&&a.type==='Run';});
     if(todayRuns.length>0){
       var latest=todayRuns[0];
       var lkm=(parseFloat(latest.distance||0)/1000).toFixed(2);
@@ -1828,8 +1828,8 @@ async function pullStravaLive(){
     }else{
       statusEl.textContent='No run/walk today yet — showing all-time total';statusEl.style.color='var(--ash)';
     }
-    // Latest activity card
-    var latest=acts[0];
+    // Latest activity card — ONLY Run (no workout, no walk, no ride)
+    var latest=acts.find(function(a){return a.type==='Run';});
     if(latest){
       document.getElementById('stravaLatestWrap').style.display='block';
       document.getElementById('stravaLatestName').textContent=latest.name||'Activity';
@@ -2378,7 +2378,7 @@ function drawHeatmapPanels(c,W,H,stravaImg,stravaStats){
   const mapY=RY+44,mapH=Math.floor(RH*0.48);
   var _mapDrawn=false;
   if(_stravaCache&&_stravaCache.length>0){
-    var latestAct=_stravaCache[0];
+    var latestAct=_stravaCache.find(function(a){return a.type==='Run';});
     var poly=latestAct.summary_polyline;
     if(poly){
       var usePoly=poly.length>1500?_simplifyPolyline(poly):poly;
@@ -2730,7 +2730,7 @@ function drawCorners(c,W,H,col){
   c.beginPath();c.moveTo(W-m-s,H-m);c.lineTo(W-m,H-m);c.lineTo(W-m,H-m-s);c.stroke();
 }
 
-function drawBrand(c,colorOverride){c.textAlign='left';c.font='400 24px "DM Serif Display",serif';c.fillStyle=colorOverride||P.accent;c.fillText('FIRST LIGHT',60,81);c.font='500 10px "JetBrains Mono",monospace';c.fillStyle=colorOverride?colorOverride:P.acR+'0.55)';c.fillText('www.firstlight.live',60,98)}
+function drawBrand(c,colorOverride){c.textAlign='left';c.font='400 24px "DM Serif Display",serif';c.fillStyle=colorOverride||P.accent;c.fillText('FIRST LIGHT',60,81);c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=colorOverride||P.accent;c.globalAlpha=0.7;c.fillText('www.firstlight.live',60,98);c.globalAlpha=1;}
 
 // Theme-aware overlay (dark for dark themes, light for Titanium)
 function ovl(a){return P.light?`rgba(245,245,240,${a})`:`rgba(13,12,11,${a})`}
@@ -2804,8 +2804,9 @@ function drawSocialFooter(c,W,H,handleIG,handleX,accentColor){
   drawXIcon(c,W-60-xw-32,H-96,22,isLight);
   c.textAlign='right';c.fillStyle=P.text;c.fillText(handleX,W-60,H-78);
   // QR code — REMOVED (causes white square patch on dark themes)
-  // Subtle "Follow" text
-  c.textAlign='center';c.font='300 9px "JetBrains Mono",monospace';c.fillStyle=colR+'0.3)';c.fillText('FOLLOW THE JOURNEY',W/2,H-48);
+  // Website branding — prominent footer
+  c.textAlign='center';c.font='700 14px "JetBrains Mono",monospace';c.fillStyle=col;c.fillText('www.firstlight.live',W/2,H-44);
+  c.font='300 8px "JetBrains Mono",monospace';c.fillStyle=colR+'0.3)';c.fillText('THE STREAK  \u00B7  THE EVIDENCE  \u00B7  THE SYSTEM',W/2,H-28);
 }
 
 // QR Code — cached image loaded from API
@@ -3292,7 +3293,12 @@ async function logToSheet(){
 function generate(){
   // Auto-pull Strava if not already loaded
   if(!_stravaCache)pullStravaLive().catch(()=>{});
-  try{_generateInner();}catch(e){console.error('Generate error:',e);}
+  try{_generateInner();}catch(e){
+    console.error('Generate error:',e);
+    // Show error to user so they know what's wrong
+    var logEl=document.getElementById('igPubLog');
+    if(logEl){logEl.style.display='block';logEl.innerHTML='<div style="color:#FF5252">Generate error: '+e.message+'</div>';}
+  }
   finally{
     document.getElementById('output').classList.add('show');
     showS(0);
@@ -3448,6 +3454,12 @@ function _generateInner(){
     slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,undefined,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime);
     slide4(day,total,handleIG,handleX,moodLine,food);
     slide2(day,km,mn,kc,undefined,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats);
+    // ── ROUTE MAP SLIDE ──
+    if(_stravaCache){
+      var _latestRun=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;});
+      if(_latestRun){slideRouteMap(day,km,mn,kc,total,handleIG,handleX,wStart,wEnd,bpmVal);window._hasRouteMap=true;}
+      else{window._hasRouteMap=false;}
+    }
     // ── CONDITIONAL SLEEP SLIDE ──
     const t4=document.getElementById('tab4');
     const d4=document.getElementById('dot4');
@@ -3520,6 +3532,7 @@ function _generateInner(){
   // ═══ SMART CAPTION ENGINE ═══
   // Structure: Deal Hook → Hook (5 types) → S.O.A.R. from data → Stakes → CTA → Handle
   // Hashtags: 5 max, in FIRST COMMENT only (not in caption)
+  try{ // protect caption generation — slides must still render even if caption fails
 
   const _day=parseInt(day)||1;
   const _stake=formatIndianCurrency(getCurrentStake(_day));
@@ -3699,7 +3712,7 @@ Return ONLY the caption text.`;
       aiText=aiText.replace(/^["']|["']$/g,'').trim();
       // Strip any AI-generated hashtags, then append our curated 5
       aiText=aiText.replace(/#\w+/g,'').trim();
-      aiText+='\n\n'+_todayHashtags+'\n\n📸 '+_handleIG;
+      aiText+='\n\nwww.firstlight.live\n\n'+_todayHashtags+'\n\n📸 '+_handleIG;
       document.getElementById('capIG').textContent=aiText;
       // capX removed
       document.getElementById('hashtagText').textContent=_todayHashtags;
@@ -3736,7 +3749,7 @@ Return ONLY the caption text.`;
   if(_fcb){
     const _stakeAmt=formatIndianCurrency(getCurrentStake(_day));
     const _totalAmt=formatIndianCurrency(getTotalAtRisk(_day));
-    _fcb.textContent='⚡ THE DEAL:\nMiss 1 day = \u20B9'+_stakeAmt+' to first comment.\nNo questions. No delays. First come, first paid.\n\n'+_day+'-day streak. \u20B9'+_totalAmt+' unclaimed.\nSet your alarm. Check tomorrow at 6 AM.\nIf I\u2019m not here \u2014 claim your \u20B9'+_stakeAmt+'.\n\n'+_todayHashtags;
+    _fcb.textContent='\u26A1 THE DEAL:\nMiss 1 day = \u20B9'+_stakeAmt+' to first comment.\nNo questions. No delays. First come, first paid.\n\n'+_day+'-day streak. \u20B9'+_totalAmt+' unclaimed.\nSet your alarm. Check tomorrow at 6 AM.\nIf I\u2019m not here \u2014 claim your \u20B9'+_stakeAmt+'.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
   }
 
   // Alt Text — accessibility descriptions per slide
@@ -3753,6 +3766,17 @@ Return ONLY the caption text.`;
   }
 
   setTimeout(()=>document.getElementById('output').scrollIntoView({behavior:'smooth'}),80);
+
+  }catch(capErr){
+    console.error('Caption generation error:',capErr);
+    // Fallback — at minimum populate caption with basic info
+    var _fbDay=document.getElementById('dayNum').value||'1';
+    var _fbKm=(document.getElementById('km')||document.getElementById('tkm')||{value:''}).value;
+    var _fbCaption='Day '+_fbDay+'. '+(_fbKm?_fbKm+' km. ':'')+'Before 6 AM.\n\n₹15,000 on the line. Every single day.\nMiss once — first comment collects.\n\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n📸 @firstlightlive';
+    var _fbEl=document.getElementById('capIG');if(_fbEl)_fbEl.textContent=_fbCaption;
+    var _fbHt=document.getElementById('hashtagText');if(_fbHt)_fbHt.textContent='#firstlightlive #accountability #noexcuses #streak #running';
+    var _fbFc=document.getElementById('firstCommentText');if(_fbFc)_fbFc.textContent='⚡ THE DEAL:\nMiss 1 day = ₹15,000 to first comment.\nNo questions. No delays.\n\n'+_fbDay+'-day streak.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+  }
 }
 
 // ===== SLIDE 1: TRACKER =====
@@ -6417,7 +6441,8 @@ function fallbackThumb(cv,fname){
 // INSTAGRAM GRAPH API — CAROUSEL + STORY PUBLISHER
 // ═══════════════════════════════════════════════════════
 const _IG_ACCOUNT='17841466893616231';
-const _GCS_UPLOAD='https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=upload';
+// Legacy name kept for HEIC conversion fallback
+const _GCS_UPLOAD=FL.SUPABASE_URL+'/functions/v1/firstlight-sync?action=upload';
 
 function _igLog(elId,msg,color){
   const el=document.getElementById(elId);if(!el)return;
@@ -6447,11 +6472,13 @@ async function _uploadCanvasToGCS(canvasId,filename){
   // METHOD 1: Supabase Storage FIRST (reliable, publicly accessible, IG-tested)
   try{
     const blob=dataUrlToBlob(dataUrl);
-    const sbUrl='https://edgnudrbysybefbqyijq.supabase.co';
+    console.log('[UPLOAD] Blob size: '+(blob.size/1024).toFixed(0)+'KB, type: '+blob.type);
+    const sbUrl=FL.SUPABASE_URL||'https://edgnudrbysybefbqyijq.supabase.co';
     const sbKey=FL.SUPABASE_ANON_KEY;
+    if(!sbKey)throw new Error('No Supabase key — check config.js');
     const path='instagram/'+filename;
     const res=await fetch(sbUrl+'/storage/v1/object/media/'+path,{
-      method:'POST',signal:AbortSignal.timeout(15000),
+      method:'POST',signal:AbortSignal.timeout(30000),
       headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey,'Content-Type':'image/jpeg','x-upsert':'true'},
       body:blob
     });
@@ -6460,25 +6487,32 @@ async function _uploadCanvasToGCS(canvasId,filename){
       console.log('[UPLOAD] Supabase success:',publicUrl);
       return publicUrl;
     }
-    throw new Error('Supabase upload HTTP '+res.status);
-  }catch(e){console.warn('[UPLOAD] Supabase failed:',e.message,'→ trying GCS');}
+    const errBody=await res.text().catch(function(){return '';});
+    throw new Error('Supabase HTTP '+res.status+': '+errBody.substring(0,200));
+  }catch(e){console.warn('[UPLOAD] Supabase failed:',e.message);}
 
-  // METHOD 2: Fallback to GCS Cloud Function
+  // METHOD 2: Retry Supabase with lower quality (smaller file)
   try{
-    const adminKey=localStorage.getItem('fl_admin_key')||'';
-    const res=await fetch(_GCS_UPLOAD,{
-      method:'POST',signal:AbortSignal.timeout(15000),
-      headers:{'Content-Type':'application/json','X-Admin-Key':adminKey},
-      body:JSON.stringify({data:dataUrl,filename:filename,folder:'photos/instagram'})
+    console.log('[UPLOAD] Retrying with lower quality...');
+    const smallDataUrl=cv.toDataURL('image/jpeg',0.7);
+    const smallBlob=dataUrlToBlob(smallDataUrl);
+    console.log('[UPLOAD] Retry blob size: '+(smallBlob.size/1024).toFixed(0)+'KB');
+    const sbUrl2=FL.SUPABASE_URL||'https://edgnudrbysybefbqyijq.supabase.co';
+    const sbKey2=FL.SUPABASE_ANON_KEY;
+    const path2='instagram/'+filename;
+    const res2=await fetch(sbUrl2+'/storage/v1/object/media/'+path2,{
+      method:'POST',signal:AbortSignal.timeout(45000),
+      headers:{'apikey':sbKey2,'Authorization':'Bearer '+sbKey2,'Content-Type':'image/jpeg','x-upsert':'true'},
+      body:smallBlob
     });
-    if(res.ok){
-      const d=await res.json();
-      if(d.url||d.publicUrl){console.log('[UPLOAD] GCS success:',d.url||d.publicUrl);return d.url||d.publicUrl;}
+    if(res2.ok){
+      const publicUrl2=sbUrl2+'/storage/v1/object/public/media/'+path2;
+      console.log('[UPLOAD] Retry success:',publicUrl2);
+      return publicUrl2;
     }
-    console.warn('[UPLOAD] GCS also failed');
-  }catch(e2){console.warn('[UPLOAD] GCS error:',e2.message);}
+  }catch(e2){console.warn('[UPLOAD] Retry failed:',e2.message);}
 
-  throw new Error('Upload failed on both Supabase and GCS');
+  throw new Error('Upload failed — check internet connection and try again');
 }
 
 // ── IG Graph API — 100% server-side, token NEVER in browser ──
@@ -6795,10 +6829,26 @@ function updateIGCharCount(len){
   el.style.color=warn?'#FF3B5C':caution?'#D4A843':'var(--smoke)';
 }
 function cpTxt(id,btn){
-  const t=document.getElementById(id).textContent;
-  navigator.clipboard.writeText(t).then(()=>{btn.textContent='✅ COPIED!';setTimeout(()=>btn.textContent=btn.dataset.lbl||'📋 COPY',1500)})
-  .catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');
-    document.body.removeChild(ta);btn.textContent='✅ COPIED!';setTimeout(()=>btn.textContent=btn.dataset.lbl||'📋 COPY',1500)});
+  var el=document.getElementById(id);
+  if(!el){if(btn)btn.textContent='❌ NO CONTENT';return;}
+  var t=el.innerText||el.textContent||'';
+  if(!t.trim()){btn.textContent='❌ GENERATE FIRST';setTimeout(function(){btn.textContent=btn.dataset.lbl||'📋 COPY';},2000);return;}
+  // Method 1: Clipboard API
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){
+      btn.textContent='✅ COPIED!';setTimeout(function(){btn.textContent=btn.dataset.lbl||'📋 COPY';},2000);
+    }).catch(function(){_cpFallback(t,btn);});
+  }else{_cpFallback(t,btn);}
+}
+function _cpFallback(t,btn){
+  // Method 2: textarea fallback (works on all mobile browsers)
+  var ta=document.createElement('textarea');
+  ta.value=t;ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');btn.textContent='✅ COPIED!';}
+  catch(e){btn.textContent='❌ FAILED — long press to copy';}
+  document.body.removeChild(ta);
+  setTimeout(function(){btn.textContent=btn.dataset.lbl||'📋 COPY';},2000);
 }
 
 // ===================================================================
