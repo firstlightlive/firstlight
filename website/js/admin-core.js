@@ -47,6 +47,12 @@ function switchPanel(panelId) {
   if (panelId === 'brahma-analytics') { requireBrahmaPin(function(){ buildBrahmaAnalytics(); }); }
   if (panelId === 'brahma-review') { requireBrahmaPin(function(){ renderBrahmaWeekly(); }); }
   if (panelId === 'brahma-monthly') { requireBrahmaPin(function(){ renderBrahmaMonthly(); }); }
+  if (panelId === 'brahma-matrix')  { requireBrahmaPin(function(){ var el=document.getElementById('brahmaMatrixMonth'); if(el&&!el.value) el.value=getEffectiveToday().slice(0,7); renderBrahmaMatrix(); }); }
+  if (panelId === 'fortress-streaks') { requireBrahmaPin(function(){ if(typeof renderFortressStreaks==='function') renderFortressStreaks(); }); }
+  if (panelId === 'fortress-year')    { requireBrahmaPin(function(){ if(typeof renderFortressYear==='function'){ if(!_faYearNavYear) _faYearNavYear=new Date().getFullYear(); renderFortressYear(); } }); }
+  if (panelId === 'fortress-intel')   { requireBrahmaPin(function(){ if(typeof renderFortressIntel==='function') renderFortressIntel(); }); }
+  if (panelId === 'life-score')       { if(typeof renderLifeScore==='function') renderLifeScore(); }
+  if (panelId === 'mastery-heatmap')  { if(typeof renderMasteryRitualHeatmap==='function') renderMasteryRitualHeatmap(); }
   if (panelId === 'checkin') { if (typeof renderCheckin === 'function') renderCheckin(); }
   if (panelId === 'goals') { if (typeof renderGoalsPanel === 'function') renderGoalsPanel(); }
   if (panelId === 'daily-rule') { if (typeof renderDailyRule === 'function') renderDailyRule(); }

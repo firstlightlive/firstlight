@@ -108,137 +108,206 @@ function isBrahmaEditable(date) {
   return !isDateLocked(date);
 }
 
-// ── RENDER DAILY LOG ──
+// ── RENDER DAILY LOG — Fortress V2 ──
 function renderBrahmaDaily() {
   var dateEl = document.getElementById('brahmaDate');
   if (!dateEl.value) dateEl.value = getEffectiveToday();
   var date = dateEl.value;
   var data = getBrahmaDaily(date);
   var container = document.getElementById('brahma-daily-container');
-  var clean = isCleanDay(data);
   var editable = isBrahmaEditable(date);
+
+  var clean = isCleanDay(data);
   var s = document.getElementById('brahma-status');
   if (s) { s.textContent = clean ? 'CLEAN' : 'RELAPSE'; s.style.color = clean ? 'var(--green)' : 'var(--brahma)'; }
-
-  // Compute streak for badge
   var streak = computeBrahmaStreak();
   var badge = document.getElementById('brahma-streak-badge');
   if (badge) badge.textContent = 'STREAK: ' + streak.currentStreak + ' DAYS';
 
+  // ── RULE STATES ──
+  var purityHeld  = !(data.porn === true || data.masturbate === true);
+  var purityLogged = data.porn !== undefined || data.masturbate !== undefined;
+
+  var brahmaHeld  = data.brahma_held !== undefined ? data.brahma_held : !(data.sexual === true);
+  var brahmaLogged = data.brahma_held !== undefined || data.sexual !== undefined;
+
+  var citadelHeld  = !(data.phone_out === false || data.device_free === false || data.laptop_out === false);
+  var citadelLogged = data.device_free !== undefined || data.phone_out !== undefined;
+
+  var isSunday     = new Date(date).getDay() === 0;
+  var perimHeld    = data.stayed_out === true;
+  var perimLogged  = data.stayed_out !== undefined;
+
+  var vigilHeld    = data.woke_3am === true;
+  var vigilLogged  = data.woke_3am !== undefined;
+
+  var chronHeld    = data.journal_written === true;
+  var chronLogged  = data.journal_written !== undefined;
+
+  var templeHeld   = data.food_rules !== false;
+  var templeLogged = data.food_rules !== undefined;
+
+  var RULES = [
+    { key:'purity',    icon:'🔥', name:'PURITY',       sub:'No porn · No masturbation',          col:'255,68,68',   hex:'#FF5252', held: purityLogged  ? purityHeld  : null },
+    { key:'brahma',    icon:'⚡', name:'BRAHMACHARYA', sub:'Mental energy · No sexual media',     col:'255,183,77',  hex:'#FFB74D', held: brahmaLogged  ? brahmaHeld  : null },
+    { key:'citadel',   icon:'📵', name:'CITADEL',      sub:'No phone or device at home',          col:'0,212,255',   hex:'#00D4FF', held: citadelLogged ? citadelHeld : null },
+    { key:'perimeter', icon:'🏠', name:'PERIMETER',    sub: isSunday ? 'Stay out until 1 PM' : 'Stay out until 6 PM', col:'38,198,218', hex:'#26C6DA', held: perimLogged  ? perimHeld  : null },
+    { key:'vigil',     icon:'🌙', name:'VIGIL',        sub:'Woke up at 3:00 AM sharp',            col:'206,147,216', hex:'#CE93D8', held: vigilLogged   ? vigilHeld   : null },
+    { key:'chronicle', icon:'📖', name:'CHRONICLE',    sub:'Daily journal entry written',         col:'0,230,118',   hex:'#00E676', held: chronLogged   ? chronHeld   : null },
+    { key:'temple',    icon:'🌿', name:'TEMPLE',       sub:'All food rules honored',              col:'245,166,35',  hex:'#F5A623', held: templeLogged  ? templeHeld  : null }
+  ];
+
+  var heldCount    = RULES.filter(function(r) { return r.held === true;  }).length;
+  var loggedCount  = RULES.filter(function(r) { return r.held !== null;  }).length;
+  var totalRules   = RULES.length;
   var html = '';
 
-  // ── LOCKED BANNER for past/future dates ──
+  // ── LOCKED BANNER ──
   if (!editable) {
-    var hasData = Object.keys(data).length > 0;
-    html += '<div style="padding:16px;background:rgba(var(--red-r),0.05);border:1px solid rgba(var(--red-r),0.15);border-radius:8px;margin-bottom:16px;text-align:center">';
-    html += '<div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--brahma);letter-spacing:2px">🔒 LEDGER LOCKED — READ ONLY</div>';
-    html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:4px">History cannot be rewritten. This is a permanent record.</div>';
+    html += '<div class="bfv2-locked"><span style="font-size:20px">🔒</span><div>';
+    html += '<div class="bfv2-locked-title">LEDGER LOCKED — READ ONLY</div>';
+    html += '<div class="bfv2-locked-sub">History cannot be rewritten. This is a permanent record.</div>';
+    html += '</div></div>';
+  }
+
+  // ── FORTRESS SCORE CARD ──
+  var scoreCol  = loggedCount === 0 ? 'rgba(255,255,255,0.2)' :
+    heldCount === totalRules ? '#00E676' :
+    heldCount >= totalRules - 2 ? '#F5A623' : '#FF5252';
+  var scoreGlow = loggedCount === 0 ? 'transparent' :
+    heldCount === totalRules ? 'rgba(0,230,118,0.18)' :
+    heldCount >= totalRules - 2 ? 'rgba(245,166,35,0.12)' : 'rgba(255,68,68,0.14)';
+  var scoreLabel = loggedCount === 0 ? 'AWAITING DAILY LOG' :
+    heldCount === totalRules ? 'FORTRESS UNBREACHED' :
+    heldCount + ' / ' + totalRules + ' WALLS HOLDING';
+
+  html += '<div class="bfv2-score" style="box-shadow:0 0 80px ' + scoreGlow + '">';
+  html += '<div class="bfv2-score-eye">' + date + ' · FORTRESS STATUS</div>';
+  html += '<div class="bfv2-score-dots">';
+  RULES.forEach(function(r) {
+    var dBg  = r.held === null ? 'rgba(255,255,255,0.04)' : r.held ? 'rgba(' + r.col + ',0.14)' : 'rgba(255,68,68,0.1)';
+    var dBdr = r.held === null ? 'rgba(255,255,255,0.1)'  : r.held ? r.hex : '#FF5252';
+    var glyph = r.held === null ? '·' : r.held ? '✓' : '✗';
+    var gCol  = r.held === null ? 'rgba(255,255,255,0.2)' : r.held ? r.hex : '#FF5252';
+    html += '<div class="bfv2-sdot" style="background:' + dBg + ';border-color:' + dBdr + '" title="' + r.name + '">';
+    html += '<span style="font-size:15px">' + r.icon + '</span>';
+    html += '<span style="font-family:var(--font-mono);font-size:9px;font-weight:700;color:' + gCol + '">' + glyph + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div class="bfv2-score-main" style="color:' + scoreCol + '">' + scoreLabel + '</div>';
+  if (loggedCount > 0) {
+    var breached = RULES.filter(function(r) { return r.held === false; }).map(function(r) { return r.name; });
+    if (breached.length) html += '<div class="bfv2-score-breach">BREACHED: ' + breached.join(' · ') + '</div>';
+    if (heldCount === totalRules) html += '<div class="bfv2-score-clean">All ' + totalRules + ' fortress walls intact. Elite discipline.</div>';
+  }
+  html += '</div>';
+
+  // ── RULE CARDS GRID ──
+  html += '<div class="bfv2-grid">';
+  RULES.forEach(function(r) {
+    var cBdr  = r.held === null ? 'rgba(255,255,255,0.07)' : r.held ? 'rgba(' + r.col + ',0.22)' : 'rgba(255,68,68,0.22)';
+    var cBg   = r.held === null ? 'rgba(255,255,255,0.01)' : r.held ? 'rgba(' + r.col + ',0.04)' : 'rgba(255,68,68,0.04)';
+    var cGlow = r.held === false ? '0 8px 32px rgba(255,68,68,0.09)' : r.held ? '0 8px 32px rgba(' + r.col + ',0.07)' : 'none';
+    var stTxt = r.held === null ? 'LOG IT' : r.held ? 'HELD' : 'BREACHED';
+    var stCol = r.held === null ? 'rgba(255,255,255,0.22)' : r.held ? r.hex : '#FF5252';
+    html += '<div class="bfv2-card" style="background:' + cBg + ';border-color:' + cBdr + ';box-shadow:' + cGlow + '">';
+    html += '<div class="bfv2-card-top"><span class="bfv2-icon">' + r.icon + '</span>';
+    html += '<div><div class="bfv2-name">' + r.name + '</div><div class="bfv2-sub">' + r.sub + '</div></div></div>';
+    html += '<div class="bfv2-status" style="color:' + stCol + '">' + stTxt + '</div>';
+    if (editable) {
+      var hA = r.held === true  ? 'style="background:rgba(' + r.col + ',0.14);border-color:' + r.hex + ';color:' + r.hex + '"' : '';
+      var bA = r.held === false ? 'style="background:rgba(255,68,68,0.12);border-color:#FF5252;color:#FF5252"' : '';
+      html += '<div class="bfv2-btns">';
+      html += '<button class="bfv2-btn" ' + hA + ' onclick="bfSetRule(\'' + date + '\',\'' + r.key + '\',true)">✓ HELD</button>';
+      html += '<button class="bfv2-btn" ' + bA + ' onclick="bfSetRule(\'' + date + '\',\'' + r.key + '\',false)">✗ BREACH</button>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ── DETAIL SECTIONS ──
+
+  // PURITY — breach specifics (only show when logged)
+  if (purityLogged) {
+    html += '<div class="panel-section" style="border-color:rgba(255,68,68,0.12)">';
+    html += '<div class="bfv2-detail-hdr" style="color:#FF5252">🔥 PURITY — BREACH DETAIL</div>';
+    var dLock = editable ? '' : 'opacity:0.5;pointer-events:none;';
+    html += '<div class="bfv2-detail-row" style="' + dLock + '">';
+    html += '<div class="bfv2-detail-label">WATCHED PORN?</div>';
+    html += '<div class="bf-toggle">';
+    html += '<div class="bf-toggle-btn' + (data.porn === false ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'porn\',false)">NO</div>';
+    html += '<div class="bf-toggle-btn' + (data.porn === true  ? ' active-yes': '') + '" onclick="setBrahmaYN(\'' + date + '\',\'porn\',true)">YES</div>';
+    html += '</div></div>';
+    html += '<div class="bfv2-detail-row" style="margin-top:10px;' + dLock + '">';
+    html += '<div class="bfv2-detail-label">MASTURBATED?</div>';
+    html += '<div class="bf-toggle">';
+    html += '<div class="bf-toggle-btn' + (data.masturbate === false ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'masturbate\',false)">NO</div>';
+    html += '<div class="bf-toggle-btn' + (data.masturbate === true  ? ' active-yes': '') + '" onclick="setBrahmaYN(\'' + date + '\',\'masturbate\',true)">YES</div>';
+    html += '</div></div>';
+    if (data.porn === true && editable) {
+      html += '<div style="margin-top:12px"><div class="bfv2-detail-label">SEVERITY (1–5)</div><div class="bf-severity" style="margin-top:6px">';
+      for (var sv = 1; sv <= 5; sv++) html += '<div class="bf-sev-btn' + (data.porn_severity === sv ? ' active' : '') + '" onclick="setBrahmaSeverity(\'' + date + '\',' + sv + ')">' + sv + '</div>';
+      html += '</div></div>';
+    }
     html += '</div>';
   }
 
-  // Disabled overlay for non-today dates
-  var lockStyle = editable ? '' : 'opacity:0.5;pointer-events:none;';
-
-  // Item 1: Porn
-  html += '<div class="panel-section" style="border-color:rgba(255,68,68,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">1. Did I watch porn today?</div>';
-  html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (data.porn === false ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'porn\',false)">NO</div>';
-  html += '<div class="bf-toggle-btn' + (data.porn === true ? ' active-yes' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'porn\',true)">YES</div>';
-  html += '</div>';
-  if (data.porn === true) {
-html += '<div style="margin-top:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px">SEVERITY (1-5)</div>';
-html += '<div class="bf-severity">';
-for (var sv = 1; sv <= 5; sv++) {
-  html += '<div class="bf-sev-btn' + (data.porn_severity === sv ? ' active' : '') + '" onclick="setBrahmaSeverity(\'' + date + '\',' + sv + ')">' + sv + '</div>';
-}
-html += '</div>';
-  }
+  // BRAHMACHARYA — urge + clarity sliders
+  html += '<div class="panel-section" style="border-color:rgba(255,183,77,0.12)">';
+  html += '<div class="bfv2-detail-hdr" style="color:#FFB74D">⚡ BRAHMACHARYA — ENERGY AUDIT</div>';
+  var disAttr = editable ? '' : ' disabled';
+  html += '<div class="bfv2-slider-row"><div class="bfv2-detail-label">URGE LEVEL TODAY</div>';
+  html += '<div class="bfv2-slider-val" id="bfv2-urge-val">' + (data.urge || 0) + '<span>/10</span></div></div>';
+  html += '<input type="range" min="0" max="10" value="' + (data.urge || 0) + '" style="width:100%;accent-color:#FFB74D;margin-bottom:16px"' + disAttr;
+  html += ' oninput="setBrahmaField(\'' + date + '\',\'urge\',parseInt(this.value));var v=document.getElementById(\'bfv2-urge-val\');if(v)v.childNodes[0].textContent=this.value">';
+  html += '<div class="bfv2-slider-row"><div class="bfv2-detail-label">ENERGY & CLARITY</div>';
+  html += '<div class="bfv2-slider-val bfv2-clarity" id="bfv2-clarity-val">' + (data.clarity || 0) + '<span>/10</span></div></div>';
+  html += '<input type="range" min="0" max="10" value="' + (data.clarity || 0) + '" style="width:100%;accent-color:var(--green)"' + disAttr;
+  html += ' oninput="setBrahmaField(\'' + date + '\',\'clarity\',parseInt(this.value));var v=document.getElementById(\'bfv2-clarity-val\');if(v)v.childNodes[0].textContent=this.value">';
   html += '</div>';
 
-  // Item 2: Sexual content in movies/TV
-  html += '<div class="panel-section" style="border-color:rgba(255,68,68,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">2. Did I watch sexual content in movies/TV?</div>';
-  html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (data.sexual === false ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'sexual\',false)">NO</div>';
-  html += '<div class="bf-toggle-btn' + (data.sexual === true ? ' active-yes' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'sexual\',true)">YES</div>';
-  html += '</div>';
-  if (data.sexual === true) {
-html += '<div style="margin-top:8px"><input type="text" class="form-input" style="font-size:11px;padding:8px 10px;border-color:rgba(255,68,68,0.15)" placeholder="Title of content..." value="' + ((data.sexual_title || '').replace(/"/g, '&quot;')) + '" oninput="setBrahmaField(\'' + date + '\',\'sexual_title\',this.value)"></div>';
-  }
+  // Daily reflection
+  html += '<div class="panel-section" style="border-color:rgba(255,255,255,0.06)">';
+  html += '<div class="bfv2-detail-hdr">📝 DAILY REFLECTION & TRIGGERS</div>';
+  html += '<textarea class="form-input" rows="4" style="font-size:12px;border-color:rgba(255,255,255,0.08);resize:vertical" placeholder="Trigger journal — what challenged you? What will you do differently?"' + (editable ? '' : ' readonly');
+  html += ' oninput="setBrahmaField(\'' + date + '\',\'trigger_text\',this.value)">' + (data.trigger_text || '') + '</textarea>';
   html += '</div>';
 
-  // Item 3: Masturbation
-  html += '<div class="panel-section" style="border-color:rgba(255,68,68,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">3. Did I masturbate?</div>';
-  html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (data.masturbate === false ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'masturbate\',false)">NO</div>';
-  html += '<div class="bf-toggle-btn' + (data.masturbate === true ? ' active-yes' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'masturbate\',true)">YES</div>';
-  html += '</div></div>';
-
-  // Item 4: Urge level
-  html += '<div class="panel-section" style="border-color:rgba(255,68,68,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">4. Urge level experienced today <span style="font-size:24px;color:var(--brahma);margin-left:8px">' + (data.urge || 0) + '</span><span style="font-size:11px;color:var(--text-dim)">/10</span></div>';
-  html += '<input type="range" min="0" max="10" value="' + (data.urge || 0) + '" style="width:100%;accent-color:var(--brahma)" oninput="setBrahmaField(\'' + date + '\',\'urge\',parseInt(this.value));this.previousElementSibling.querySelector(\'span\').textContent=this.value">';
+  // CHRONICLE — journal notes
+  html += '<div class="panel-section" style="border-color:rgba(0,230,118,0.1)">';
+  html += '<div class="bfv2-detail-hdr" style="color:#00E676">📖 CHRONICLE — JOURNAL NOTES</div>';
+  html += '<textarea class="form-input" rows="3" style="font-size:12px;border-color:rgba(0,230,118,0.1);resize:vertical" placeholder="Key insight from today\'s journal entry..."' + (editable ? '' : ' readonly');
+  html += ' oninput="setBrahmaField(\'' + date + '\',\'journal_notes\',this.value)">' + (data.journal_notes || '') + '</textarea>';
   html += '</div>';
 
-  // Item 5: Trigger journal
-  html += '<div class="panel-section" style="border-color:rgba(255,68,68,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">5. Trigger Journal</div>';
-  html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-bottom:8px">What triggered this? What was I feeling? What was the situation?</div>';
-  html += '<textarea class="form-input" rows="4" style="font-size:12px;border-color:rgba(255,68,68,0.15)" placeholder="Be honest with yourself..." oninput="setBrahmaField(\'' + date + '\',\'trigger_text\',this.value)">' + (data.trigger_text || '') + '</textarea>';
+  // TEMPLE — food log
+  html += '<div class="panel-section" style="border-color:rgba(245,166,35,0.1)">';
+  html += '<div class="bfv2-detail-hdr" style="color:#F5A623">🌿 TEMPLE — FOOD LOG</div>';
+  html += '<textarea class="form-input" rows="3" style="font-size:12px;border-color:rgba(245,166,35,0.1);resize:vertical" placeholder="What did you eat? Any food rule broken? Be specific..."' + (editable ? '' : ' readonly');
+  html += ' oninput="setBrahmaField(\'' + date + '\',\'food_notes\',this.value)">' + (data.food_notes || '') + '</textarea>';
   html += '</div>';
-
-  // Item 6: Energy & clarity
-  html += '<div class="panel-section" style="border-color:rgba(255,68,68,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">6. Energy & clarity score <span style="font-size:24px;color:var(--green);margin-left:8px">' + (data.clarity || 0) + '</span><span style="font-size:11px;color:var(--text-dim)">/10</span></div>';
-  html += '<input type="range" min="0" max="10" value="' + (data.clarity || 0) + '" style="width:100%;accent-color:var(--green)" oninput="setBrahmaField(\'' + date + '\',\'clarity\',parseInt(this.value));this.previousElementSibling.querySelector(\'span\').textContent=this.value">';
-  html += '</div>';
-
-  // ── FORTRESS: DEVICE DISCIPLINE (Items 7-10) ──
-  html += '<div style="margin-top:24px;padding-top:16px;border-top:2px solid rgba(0,212,255,0.1)">';
-  html += '<div style="font-family:var(--font-mono);font-size:11px;letter-spacing:3px;color:var(--cyan);margin-bottom:16px;font-weight:700">DEVICE DISCIPLINE</div>';
-  html += '</div>';
-
-  // Item 7: Stayed out until 6 PM
-  html += '<div class="panel-section" style="border-color:rgba(0,212,255,0.1);' + lockStyle + '">';
-  var isSunday = new Date(date).getDay() === 0;
-  var stayOutTime = isSunday ? '1 PM (Sunday)' : '6 PM';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">7. Did I stay out until ' + stayOutTime + '?</div>';
-  html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-bottom:8px">' + (isSunday ? 'Sunday exception: can return after 1 PM for rest and weekly tasks.' : 'No return home before 6 PM. Office, park, anywhere but home.') + '</div>';
-  html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (data.stayed_out === true ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'stayed_out\',true)">YES</div>';
-  html += '<div class="bf-toggle-btn' + (data.stayed_out === false ? ' active-yes' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'stayed_out\',false)">NO</div>';
-  html += '</div></div>';
-
-  // Item 8: Device-free home
-  html += '<div class="panel-section" style="border-color:rgba(0,212,255,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">8. Was the home device-free?</div>';
-  html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-bottom:8px">No phone, laptop, or internet device crossed the home threshold.</div>';
-  html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (data.device_free === true ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'device_free\',true)">YES</div>';
-  html += '<div class="bf-toggle-btn' + (data.device_free === false ? ' active-yes' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'device_free\',false)">NO</div>';
-  html += '</div></div>';
-
-  // Item 9: Phone at home
-  html += '<div class="panel-section" style="border-color:rgba(0,212,255,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">9. Phone stayed in car/outside?</div>';
-  html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (data.phone_out === true ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'phone_out\',true)">YES — IN CAR</div>';
-  html += '<div class="bf-toggle-btn' + (data.phone_out === false ? ' active-yes' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'phone_out\',false)">NO — BROUGHT IN</div>';
-  html += '</div></div>';
-
-  // Item 10: Laptop at home
-  html += '<div class="panel-section" style="border-color:rgba(0,212,255,0.1);' + lockStyle + '">';
-  html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">10. Laptop stayed at office?</div>';
-  html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (data.laptop_out === true ? ' active-no' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'laptop_out\',true)">YES — AT OFFICE</div>';
-  html += '<div class="bf-toggle-btn' + (data.laptop_out === false ? ' active-yes' : '') + '" onclick="setBrahmaYN(\'' + date + '\',\'laptop_out\',false)">NO — BROUGHT HOME</div>';
-  html += '</div></div>';
 
   container.innerHTML = html;
-  // Stop propagation on inputs
   container.querySelectorAll('input, textarea').forEach(function(el) { el.addEventListener('click', function(e) { e.stopPropagation(); }); });
+}
+
+// ── FORTRESS RULE DISPATCH ──
+function bfSetRule(date, ruleKey, held) {
+  if (!isBrahmaEditable(date)) { alert('This day is locked. The ledger cannot be rewritten.'); return; }
+  var data = getBrahmaDaily(date);
+  switch (ruleKey) {
+    case 'purity':    data.porn = held ? false : true; data.masturbate = held ? false : true; break;
+    case 'brahma':    data.brahma_held = held; data.sexual = held ? false : true; break;
+    case 'citadel':   data.device_free = held; data.phone_out = held; data.laptop_out = held; break;
+    case 'perimeter': data.stayed_out = held; break;
+    case 'vigil':     data.woke_3am = held; break;
+    case 'chronicle': data.journal_written = held; break;
+    case 'temple':    data.food_rules = held; break;
+  }
+  saveBrahmaDaily(date, data);
+  renderBrahmaDaily();
 }
 
 function setBrahmaYN(date, field, value) {
@@ -724,6 +793,201 @@ if (Object.keys(dayData).length > 0) {
   localStorage.setItem('fl_brahma_monthly_' + month, JSON.stringify(data));
   renderBrahmaMonthly();
   markSaved();
+}
+
+// ── FORTRESS RULE MATRIX ──
+function brahmaMatrixNav(dir) {
+  var el = document.getElementById('brahmaMatrixMonth');
+  if (!el) return;
+  if (dir === 0) { el.value = getEffectiveToday().slice(0, 7); }
+  else {
+    var parts = el.value.split('-');
+    var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1 + dir, 1);
+    el.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+  renderBrahmaMatrix();
+}
+
+function renderBrahmaMatrix() {
+  var monthEl = document.getElementById('brahmaMatrixMonth');
+  if (!monthEl) return;
+  if (!monthEl.value) monthEl.value = getEffectiveToday().slice(0, 7);
+  var month = monthEl.value;
+  var year = parseInt(month.split('-')[0]);
+  var mon  = parseInt(month.split('-')[1]) - 1;
+  var daysInMonth = new Date(year, mon + 1, 0).getDate();
+  var todayStr = getEffectiveToday();
+
+  var RULES = [
+    { key:'purity',    icon:'🔥', name:'PURITY',    col:'255,68,68',   hex:'#FF5252',
+      getHeld: function(d) { if (d.porn===undefined && d.masturbate===undefined) return null; return !(d.porn===true||d.masturbate===true); } },
+    { key:'brahma',    icon:'⚡', name:'BRAHMACHARYA', col:'255,183,77', hex:'#FFB74D',
+      getHeld: function(d) { if (d.brahma_held!==undefined) return d.brahma_held; if (d.sexual!==undefined) return !(d.sexual===true); return null; } },
+    { key:'citadel',   icon:'📵', name:'CITADEL',   col:'0,212,255',   hex:'#00D4FF',
+      getHeld: function(d) { if (d.device_free===undefined && d.phone_out===undefined) return null; return !(d.phone_out===false||d.device_free===false||d.laptop_out===false); } },
+    { key:'perimeter', icon:'🏠', name:'PERIMETER', col:'38,198,218',  hex:'#26C6DA',
+      getHeld: function(d) { return d.stayed_out!==undefined ? d.stayed_out===true : null; } },
+    { key:'vigil',     icon:'🌙', name:'VIGIL',     col:'206,147,216', hex:'#CE93D8',
+      getHeld: function(d) { return d.woke_3am!==undefined ? d.woke_3am===true : null; } },
+    { key:'chronicle', icon:'📖', name:'CHRONICLE', col:'0,230,118',   hex:'#00E676',
+      getHeld: function(d) { return d.journal_written!==undefined ? d.journal_written===true : null; } },
+    { key:'temple',    icon:'🌿', name:'TEMPLE',    col:'245,166,35',  hex:'#F5A623',
+      getHeld: function(d) { return d.food_rules!==undefined ? d.food_rules!==false : null; } }
+  ];
+
+  // Pre-load all day data
+  var dayDataMap = {};
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = month + '-' + String(d).padStart(2, '0');
+    dayDataMap[ds] = getBrahmaDaily(ds);
+  }
+
+  // Rule stats for summary cards
+  var ruleStats = RULES.map(function(r) {
+    var held = 0, breached = 0, logged = 0;
+    for (var d = 1; d <= daysInMonth; d++) {
+      var ds = month + '-' + String(d).padStart(2, '0');
+      var h = r.getHeld(dayDataMap[ds]);
+      if (h !== null) { logged++; if (h) held++; else breached++; }
+    }
+    return { held: held, breached: breached, logged: logged, pct: logged > 0 ? Math.round(held / logged * 100) : null };
+  });
+
+  // Day scores (held/logged across all rules)
+  var dayScores = {};
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = month + '-' + String(d).padStart(2, '0');
+    var data = dayDataMap[ds];
+    var hc = 0, lc = 0;
+    RULES.forEach(function(r) { var h = r.getHeld(data); if (h !== null) { lc++; if (h) hc++; } });
+    dayScores[ds] = { held: hc, logged: lc };
+  }
+
+  var html = '';
+  var DOW_NAMES = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+  // ── SUMMARY STAT CARDS ──
+  html += '<div class="bfm-summary">';
+  RULES.forEach(function(r, i) {
+    var st = ruleStats[i];
+    var pctCol = st.pct === null ? 'var(--text-dim)' : st.pct >= 90 ? '#00E676' : st.pct >= 70 ? '#F5A623' : '#FF5252';
+    html += '<div class="bfm-stat-card" style="border-color:rgba(' + r.col + ',0.18)">';
+    html += '<div class="bfm-stat-icon">' + r.icon + '</div>';
+    html += '<div class="bfm-stat-name">' + r.name + '</div>';
+    html += '<div class="bfm-stat-pct" style="color:' + pctCol + '">' + (st.pct !== null ? st.pct + '%' : '—') + '</div>';
+    html += '<div class="bfm-stat-sub">' + st.held + '/' + st.logged + ' held</div>';
+    if (st.breached > 0) html += '<div class="bfm-stat-breach">' + st.breached + ' breach' + (st.breached > 1 ? 'es' : '') + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ── MATRIX GRID ──
+  html += '<div class="bfm-wrap"><div class="bfm-table">';
+
+  // Header row — day numbers
+  html += '<div class="bfm-row">';
+  html += '<div class="bfm-row-label"></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = month + '-' + String(d).padStart(2, '0');
+    var dow = new Date(ds).getDay();
+    var isToday = ds === todayStr;
+    var isWknd  = dow === 0 || dow === 6;
+    html += '<div class="bfm-day-hdr' + (isToday ? ' bfm-today-hdr' : '') + (isWknd ? ' bfm-weekend' : '') + '">';
+    html += '<div class="bfm-day-num">' + d + '</div>';
+    html += '<div class="bfm-day-name">' + DOW_NAMES[dow] + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Rule rows
+  RULES.forEach(function(r) {
+    html += '<div class="bfm-row">';
+    html += '<div class="bfm-row-label">' + r.icon + ' <span>' + r.name + '</span></div>';
+    for (var d = 1; d <= daysInMonth; d++) {
+      var ds = month + '-' + String(d).padStart(2, '0');
+      var held = r.getHeld(dayDataMap[ds]);
+      var isToday = ds === todayStr;
+      var bg, glyph, gCol;
+      if (held === null)  { bg = 'rgba(255,255,255,0.03)'; glyph = ''; gCol = 'transparent'; }
+      else if (held)      { bg = 'rgba(' + r.col + ',0.28)'; glyph = '✓'; gCol = r.hex; }
+      else                { bg = 'rgba(255,68,68,0.38)'; glyph = '✗'; gCol = '#FF5252'; }
+      var tt = ds + (held === null ? ' — not logged' : held ? ' — HELD' : ' — BREACHED');
+      html += '<div class="bfm-cell' + (isToday ? ' bfm-today-cell' : '') + '" style="background:' + bg + '" title="' + tt + '">';
+      html += '<span style="color:' + gCol + ';font-size:9px;font-weight:700;line-height:1">' + glyph + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+
+  // Separator
+  html += '<div class="bfm-sep"></div>';
+
+  // Fortress score row
+  html += '<div class="bfm-row bfm-score-row">';
+  html += '<div class="bfm-row-label">⚡ <span>SCORE</span></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = month + '-' + String(d).padStart(2, '0');
+    var sc = dayScores[ds];
+    var isToday = ds === todayStr;
+    var sBg, sTxt, sCol;
+    if (sc.logged === 0) { sBg = 'rgba(255,255,255,0.03)'; sTxt = ''; sCol = 'transparent'; }
+    else {
+      var ratio = sc.held / sc.logged;
+      sBg  = ratio === 1 ? 'rgba(0,230,118,0.25)' : ratio >= 0.7 ? 'rgba(245,166,35,0.25)' : 'rgba(255,68,68,0.25)';
+      sCol = ratio === 1 ? '#00E676' : ratio >= 0.7 ? '#F5A623' : '#FF5252';
+      sTxt = sc.held + '';
+    }
+    var tt2 = ds + ': ' + sc.held + '/' + sc.logged + ' rules held';
+    html += '<div class="bfm-cell bfm-score-cell' + (isToday ? ' bfm-today-cell' : '') + '" style="background:' + sBg + '" title="' + tt2 + '">';
+    html += '<span style="color:' + sCol + ';font-size:9px;font-weight:700;line-height:1">' + sTxt + '</span>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  html += '</div></div>'; // bfm-table, bfm-wrap
+
+  // ── VULNERABILITY MAP — day of week ──
+  var dowBreaches = [0,0,0,0,0,0,0];
+  var dowLogged   = [0,0,0,0,0,0,0];
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = month + '-' + String(d).padStart(2, '0');
+    var data = dayDataMap[ds];
+    var dow  = new Date(ds).getDay();
+    var anyLogged = false;
+    RULES.forEach(function(r) {
+      var h = r.getHeld(data);
+      if (h === false) dowBreaches[dow]++;
+      if (h !== null)  anyLogged = true;
+    });
+    if (anyLogged) dowLogged[dow]++;
+  }
+  var maxBreach = Math.max.apply(null, dowBreaches) || 1;
+  var worstDow  = dowBreaches.indexOf(Math.max.apply(null, dowBreaches));
+
+  html += '<div class="panel-section" style="border-color:rgba(255,68,68,0.1);margin-top:8px">';
+  html += '<div class="bfv2-detail-hdr">⚠ VULNERABILITY — DAY OF WEEK (breach count this month)</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">';
+  var DOW_FULL = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  for (var i = 0; i < 7; i++) {
+    var intensity = dowBreaches[i] / maxBreach;
+    var bg  = dowBreaches[i] === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,68,68,' + (0.08 + intensity * 0.35) + ')';
+    var col = (i === worstDow && dowBreaches[i] > 0) ? '#FF5252' : 'var(--text-muted)';
+    var fw  = (i === worstDow && dowBreaches[i] > 0) ? '700' : '400';
+    html += '<div style="text-align:center;padding:10px 4px;background:' + bg + ';border-radius:8px;border:1px solid rgba(255,255,255,0.04)">';
+    html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:' + col + ';font-weight:' + fw + '">' + DOW_FULL[i] + '</div>';
+    html += '<div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:' + col + ';margin:4px 0">' + dowBreaches[i] + '</div>';
+    if (i === worstDow && dowBreaches[i] > 0) html += '<div style="font-family:var(--font-mono);font-size:7px;color:#FF5252;letter-spacing:1px">DANGER</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  if (dowBreaches[worstDow] > 0) {
+    html += '<div style="font-family:var(--font-mono);font-size:11px;color:rgba(255,68,68,0.7);letter-spacing:1px;margin-top:12px">';
+    html += '⚠ MOST VULNERABLE DAY: ' + DOW_FULL[worstDow] + ' — ' + dowBreaches[worstDow] + ' breach' + (dowBreaches[worstDow] > 1 ? 'es' : '') + ' this month';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  document.getElementById('brahma-matrix-container').innerHTML = html;
 }
 
 // ── Dashboard streak widget ──
