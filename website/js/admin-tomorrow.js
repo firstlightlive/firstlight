@@ -5,6 +5,8 @@
 
 var _tmrDebounce = null;
 var _tmrActiveTab = 'plan';
+var _tmrPlanDate = null;   // null = tomorrow (default)
+var _tmrReviewDate = null; // null = today (default)
 
 // ── DATA HELPERS ──
 
@@ -28,6 +30,37 @@ function getTomorrowDate() {
   var m = String(today.getMonth() + 1).padStart(2, '0');
   var d = String(today.getDate()).padStart(2, '0');
   return y + '-' + m + '-' + d;
+}
+
+function _tmrOffsetDate(base, days) {
+  var d = new Date(base + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  var y = d.getFullYear();
+  var m = String(d.getMonth() + 1).padStart(2, '0');
+  var dd = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + dd;
+}
+
+function navTomorrowPlanDate(delta) {
+  var base = _tmrPlanDate || getTomorrowDate();
+  _tmrPlanDate = _tmrOffsetDate(base, delta);
+  renderTomorrowPlan();
+}
+
+function navTomorrowReviewDate(delta) {
+  var base = _tmrReviewDate || getEffectiveToday();
+  _tmrReviewDate = _tmrOffsetDate(base, delta);
+  renderTomorrowReview();
+}
+
+function resetTomorrowPlanDate() {
+  _tmrPlanDate = null;
+  renderTomorrowPlan();
+}
+
+function resetTomorrowReviewDate() {
+  _tmrReviewDate = null;
+  renderTomorrowReview();
 }
 
 function formatDateLabel(dateStr) {
@@ -59,28 +92,45 @@ function renderTomorrowPlan() {
   var container = document.getElementById('tmrPlanContainer');
   if (!container) return;
 
-  var tmrDate = getTomorrowDate();
+  var defaultDate = getTomorrowDate();
+  var tmrDate = _tmrPlanDate || defaultDate;
   var data = getTomorrowPlan(tmrDate);
   var tasks = data.tasks || [];
+  var isDefaultDate = (tmrDate === defaultDate);
+  var locked = isDateLocked(tmrDate);
 
   var dateLabel = document.getElementById('tmrPlanDate');
   if (dateLabel) dateLabel.textContent = formatDateLabel(tmrDate);
 
   var html = '';
 
+  // Date navigation bar
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
+  html += '<button class="btn-copy" onclick="navTomorrowPlanDate(-1)" style="padding:5px 12px">&#9664;</button>';
+  html += '<div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:' + (isDefaultDate ? 'var(--cyan)' : 'var(--gold)') + ';flex:1;text-align:center">' + formatDateLabel(tmrDate) + (isDefaultDate ? ' <span style="font-size:9px;color:var(--cyan);letter-spacing:1px">[TOMORROW]</span>' : '') + '</div>';
+  html += '<button class="btn-copy" onclick="navTomorrowPlanDate(1)" style="padding:5px 12px">&#9654;</button>';
+  if (!isDefaultDate) html += '<button class="btn-copy" onclick="resetTomorrowPlanDate()" style="font-size:10px;padding:5px 10px;color:var(--cyan)">TOMORROW</button>';
+  html += '</div>';
+
+  if (locked) {
+    html += '<div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-family:var(--font-mono);font-size:11px;color:var(--gold)">&#128274; This date is locked — view only</div>';
+  }
+
   // Task list
   html += '<div id="tmrTaskList">';
-  if (tasks.length === 0) {
-    // Start with one empty task
+  if (tasks.length === 0 && !locked) {
+    // Start with one empty task and persist it immediately
     tasks = [{ text: '', priority: 'P1', estimate: '30m', done: false }];
+    data.tasks = tasks;
+    localStorage.setItem('fl_tomorrow_' + tmrDate, JSON.stringify(data));
   }
   tasks.forEach(function(task, i) {
-    html += buildTaskRow(task, i, false);
+    html += buildTaskRow(task, i, false, locked);
   });
   html += '</div>';
 
-  // Add task button (max 7)
-  if (tasks.length < 7) {
+  // Add task button (max 7, not locked)
+  if (tasks.length < 7 && !locked) {
     html += '<button class="btn-copy" style="margin-top:12px;width:100%" onclick="addTomorrowTask()">+ ADD TASK</button>';
   }
 
@@ -94,23 +144,23 @@ function renderTomorrowPlan() {
   container.innerHTML = html;
 }
 
-function buildTaskRow(task, index, isReview) {
-  var prefix = isReview ? 'rev' : 'tmr';
-  var disabled = isReview ? '' : '';
+function buildTaskRow(task, index, isReview, locked) {
   var priColors = { P0: 'var(--red)', P1: 'var(--gold)', P2: 'var(--text-muted)' };
   var priColor = priColors[task.priority] || 'var(--text-muted)';
+  var readOnly = isReview || locked;
 
   var html = '<div class="panel-section" style="padding:12px 14px;margin-bottom:8px;border-color:' +
     (task.done ? 'rgba(0,230,118,0.15)' : 'rgba(0,212,255,0.06)') + '">';
 
   // Row 1: checkbox + text
   html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
-  html += '<div class="ritual-check' + (task.done ? '' : '') + '" style="' +
+  html += '<div class="ritual-check" style="' +
     (task.done ? 'background:var(--green);border-color:var(--green);color:#0A0C10;font-size:10px' : '') +
-    ';cursor:pointer;flex-shrink:0" onclick="toggleTomorrowTask(' + index + ',' + isReview + ')">' +
+    ';cursor:' + (locked ? 'default' : 'pointer') + ';flex-shrink:0"' +
+    (locked ? '' : ' onclick="toggleTomorrowTask(' + index + ',' + isReview + ')"') + '>' +
     (task.done ? '&#10003;' : '') + '</div>';
 
-  if (isReview) {
+  if (readOnly) {
     html += '<div style="flex:1;font-size:13px;color:var(--text);' +
       (task.done ? 'text-decoration:line-through;opacity:0.5' : '') + '">' +
       (task.text || '<em style="color:var(--text-dim)">Empty task</em>') + '</div>';
@@ -121,8 +171,8 @@ function buildTaskRow(task, index, isReview) {
       'oninput="updateTomorrowTask(' + index + ',\'text\',this.value)">';
   }
 
-  // Remove button (plan mode only)
-  if (!isReview) {
+  // Remove button (plan mode, not locked)
+  if (!readOnly) {
     html += '<span style="cursor:pointer;color:var(--text-dim);font-size:16px;padding:4px" ' +
       'onclick="removeTomorrowTask(' + index + ')">&#215;</span>';
   }
@@ -131,7 +181,7 @@ function buildTaskRow(task, index, isReview) {
   // Row 2: priority + estimate
   html += '<div style="display:flex;align-items:center;gap:12px">';
 
-  if (isReview) {
+  if (readOnly) {
     html += '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:' + priColor +
       ';letter-spacing:1px;padding:2px 8px;border:1px solid ' + priColor + ';border-radius:4px">' + task.priority + '</span>';
     html += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">' + task.estimate + '</span>';
@@ -181,25 +231,28 @@ function formatMinutes(min) {
 // ── TASK MUTATIONS ──
 
 function updateTomorrowTask(index, field, value) {
-  var tmrDate = getTomorrowDate();
+  var tmrDate = _tmrPlanDate || getTomorrowDate();
   var data = getTomorrowPlan(tmrDate);
   var tasks = data.tasks || [];
-  if (!tasks[index]) return;
+  // Auto-extend tasks array if needed (handles initial empty-task state)
+  while (tasks.length <= index) {
+    tasks.push({ text: '', priority: 'P1', estimate: '30m', done: false });
+  }
   tasks[index][field] = value;
   data.tasks = tasks;
 
-  // Debounced save
+  // Quick localStorage update for responsiveness
+  localStorage.setItem('fl_tomorrow_' + tmrDate, JSON.stringify(data));
+
+  // Debounced Supabase save
   clearTimeout(_tmrDebounce);
   _tmrDebounce = setTimeout(function() {
     saveTomorrowPlan(tmrDate, data);
   }, 800);
-
-  // Quick localStorage update for responsiveness
-  localStorage.setItem('fl_tomorrow_' + tmrDate, JSON.stringify(data));
 }
 
 function addTomorrowTask() {
-  var tmrDate = getTomorrowDate();
+  var tmrDate = _tmrPlanDate || getTomorrowDate();
   var data = getTomorrowPlan(tmrDate);
   var tasks = data.tasks || [];
   if (tasks.length >= 7) return;
@@ -210,7 +263,7 @@ function addTomorrowTask() {
 }
 
 function removeTomorrowTask(index) {
-  var tmrDate = getTomorrowDate();
+  var tmrDate = _tmrPlanDate || getTomorrowDate();
   var data = getTomorrowPlan(tmrDate);
   var tasks = data.tasks || [];
   tasks.splice(index, 1);
@@ -220,7 +273,7 @@ function removeTomorrowTask(index) {
 }
 
 function toggleTomorrowTask(index, isReview) {
-  var date = isReview ? getEffectiveToday() : getTomorrowDate();
+  var date = isReview ? (_tmrReviewDate || getEffectiveToday()) : (_tmrPlanDate || getTomorrowDate());
   var data = getTomorrowPlan(date);
   var tasks = data.tasks || [];
   if (!tasks[index]) return;
@@ -244,19 +297,29 @@ function renderTomorrowReview() {
   var container = document.getElementById('tmrReviewContainer');
   if (!container) return;
 
-  var today = getEffectiveToday();
+  var defaultDate = getEffectiveToday();
+  var today = _tmrReviewDate || defaultDate;
   var data = getTomorrowPlan(today);
   var tasks = data.tasks || [];
+  var isDefaultDate = (today === defaultDate);
 
   var dateLabel = document.getElementById('tmrReviewDate');
   if (dateLabel) dateLabel.textContent = formatDateLabel(today);
 
   var html = '';
 
+  // Date navigation bar
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
+  html += '<button class="btn-copy" onclick="navTomorrowReviewDate(-1)" style="padding:5px 12px">&#9664;</button>';
+  html += '<div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:' + (isDefaultDate ? 'var(--gold)' : 'var(--text)') + ';flex:1;text-align:center">' + formatDateLabel(today) + (isDefaultDate ? ' <span style="font-size:9px;color:var(--gold);letter-spacing:1px">[TODAY]</span>' : '') + '</div>';
+  html += '<button class="btn-copy" onclick="navTomorrowReviewDate(1)" style="padding:5px 12px">&#9654;</button>';
+  if (!isDefaultDate) html += '<button class="btn-copy" onclick="resetTomorrowReviewDate()" style="font-size:10px;padding:5px 10px;color:var(--gold)">TODAY</button>';
+  html += '</div>';
+
   if (tasks.length === 0) {
     html += '<div class="panel-section" style="text-align:center;padding:40px 20px">';
     html += '<div style="font-size:32px;margin-bottom:12px;opacity:0.3">&#128203;</div>';
-    html += '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim)">No plan was set for today.</div>';
+    html += '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim)">No plan was set for ' + (isDefaultDate ? 'today' : 'this date') + '.</div>';
     html += '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);margin-top:4px">Plan tomorrow tonight to see tasks here.</div>';
     html += '</div>';
     container.innerHTML = html;
@@ -297,16 +360,15 @@ function renderTomorrowReview() {
 }
 
 function updateTomorrowReviewNotes(value) {
-  var today = getEffectiveToday();
+  var today = _tmrReviewDate || getEffectiveToday();
   var data = getTomorrowPlan(today);
   data.review_notes = value;
 
+  localStorage.setItem('fl_tomorrow_' + today, JSON.stringify(data));
   clearTimeout(_tmrDebounce);
   _tmrDebounce = setTimeout(function() {
     saveTomorrowPlan(today, data);
   }, 800);
-
-  localStorage.setItem('fl_tomorrow_' + today, JSON.stringify(data));
 }
 
 // ── RENDER: 30-DAY ANALYTICS ──

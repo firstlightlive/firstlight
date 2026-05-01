@@ -199,10 +199,13 @@
     /* Journal */
     .journal-entry{background:var(--surface);border:1px solid var(--surface-border);border-radius:12px;padding:24px;margin-bottom:16px}
     .journal-date{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;color:var(--cyan)}
-    .journal-mood{display:flex;gap:4px;margin:12px 0}
-    .journal-mood span{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
-      justify-content:center;font-size:14px;cursor:pointer;border:1px solid var(--surface-border);transition:all 0.15s}
-    .journal-mood span.active{border-color:var(--cyan);background:var(--cyan-dim);transform:scale(1.15)}
+    .journal-mood{display:flex;gap:4px;margin:4px 0}
+    .journal-mood span{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:16px;cursor:pointer;border:1px solid var(--surface-border);transition:all 0.15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    .journal-mood span.active{border-color:var(--cyan);background:var(--cyan-dim);transform:scale(1.2)}
+    /* Review tabs */
+    .jrv-tab.active{color:var(--cyan)!important;border-bottom-color:var(--cyan)!important}
+    .jrv-tab:not(.active):hover{color:var(--text-muted)!important;background:rgba(255,255,255,0.02)}
 
     /* Deep work blocks */
     .dw-block{display:grid;grid-template-columns:40px 100px 1fr 90px 40px 36px;gap:8px;align-items:center;
@@ -702,9 +705,10 @@
       <div class="cc-group" data-group="journal">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 📓 JOURNAL</div>
         <div class="cc-group-items">
+          <div class="cc-item" data-panel="journal-today"><span class="cc-icon">📝</span> Today's Log</div>
           <div class="cc-item" data-panel="reflection"><span class="cc-icon">✏</span> Reflection</div>
-          <div class="cc-item" data-panel="journal-today"><span class="cc-icon">📝</span> Today's Entry</div>
           <div class="cc-item" data-panel="journal-archive"><span class="cc-icon">📚</span> Archive</div>
+          <div class="cc-item" data-panel="journal-review"><span class="cc-icon">📊</span> Review</div>
         </div>
       </div>
 
@@ -2056,34 +2060,82 @@
       </div>
 
       <!-- ════════════════════════════════════════════════
-           PANEL: JOURNAL TODAY
+           PANEL: TODAY'S LOG (Journal V2)
            ════════════════════════════════════════════════ -->
       <div class="cc-panel" id="p-journal-today">
         <div class="cc-panel-header">
-          <div class="cc-panel-title">TODAY'S JOURNAL</div>
-          <div class="cc-panel-desc">Quick journal entry</div>
+          <div class="cc-panel-title">TODAY'S LOG</div>
+          <div class="cc-panel-desc">Capture your day — add notes anytime · cmd+enter to save</div>
         </div>
 
-        <div class="panel-section">
-          <div class="panel-section-title">JOURNAL — <span id="jtDate" style="color:var(--text-muted);font-weight:400"></span></div>
+        <!-- QUICK CAPTURE -->
+        <div class="panel-section" id="jnCaptureForm">
+          <div class="panel-section-title" style="display:flex;justify-content:space-between;align-items:center">
+            QUICK CAPTURE
+            <span id="jnCurrentDate" style="font-weight:400;color:var(--text-muted);font-size:11px"></span>
+          </div>
           <div class="form-group">
-            <label class="form-label">MOOD</label>
-            <div class="journal-mood" id="jtMoodRow">
-              <span data-mood="angry" onclick="selectJtMood(this)">&#128548;</span>
-              <span data-mood="sad" onclick="selectJtMood(this)">&#128532;</span>
-              <span data-mood="neutral" onclick="selectJtMood(this)">&#128528;</span>
-              <span data-mood="okay" onclick="selectJtMood(this)">&#128578;</span>
-              <span data-mood="good" onclick="selectJtMood(this)">&#128522;</span>
-              <span data-mood="great" onclick="selectJtMood(this)">&#128513;</span>
-              <span data-mood="fire" onclick="selectJtMood(this)">&#128293;</span>
+            <label class="form-label">TYPE</label>
+            <select class="form-input" id="jnNoteType" style="font-family:var(--font-mono);font-size:12px;letter-spacing:1px;cursor:pointer">
+              <option value="quick">⚡ QUICK NOTE</option>
+              <option value="morning">🌅 MORNING</option>
+              <option value="evening">🌙 EVENING</option>
+              <option value="idea">💡 IDEA</option>
+              <option value="gratitude">🙏 GRATITUDE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display:flex;justify-content:space-between">
+              WHAT'S ON YOUR MIND
+              <span id="jnCharCount" style="font-weight:400;color:var(--text-dim);font-size:10px">0 chars</span>
+            </label>
+            <textarea class="form-input" id="jnNoteText" rows="5" placeholder="Type anything — a thought, observation, win, lesson... Cmd+Enter to save." oninput="updateJnCharCount()" style="resize:vertical;line-height:1.75;font-size:14px"></textarea>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:16px">
+            <div>
+              <div class="form-label" style="margin-bottom:6px">MOOD <span style="font-weight:400;color:var(--text-dim)">(optional)</span></div>
+              <div class="journal-mood" id="jnNoteMoodRow">
+                <span data-mood="angry" onclick="selectJnMood(this)">&#128548;</span>
+                <span data-mood="sad" onclick="selectJnMood(this)">&#128532;</span>
+                <span data-mood="neutral" onclick="selectJnMood(this)">&#128528;</span>
+                <span data-mood="okay" onclick="selectJnMood(this)">&#128578;</span>
+                <span data-mood="good" onclick="selectJnMood(this)">&#128522;</span>
+                <span data-mood="great" onclick="selectJnMood(this)">&#128513;</span>
+                <span data-mood="fire" onclick="selectJnMood(this)">&#128293;</span>
+              </div>
+            </div>
+            <div style="flex:1;min-width:160px">
+              <label class="form-label">ENERGY <span id="jnNoteEnergyVal" style="color:var(--cyan)">5</span>/10 <span style="font-weight:400;color:var(--text-dim)">(optional)</span></label>
+              <div class="range-wrap"><input type="range" min="1" max="10" value="5" id="jnNoteEnergy" oninput="document.getElementById('jnNoteEnergyVal').textContent=this.value"></div>
             </div>
           </div>
+          <button class="btn btn-primary w-full" id="jnAddBtn" onclick="addJournalNote()" style="min-height:52px;font-size:14px;letter-spacing:2px;touch-action:manipulation;-webkit-tap-highlight-color:transparent">+ ADD NOTE</button>
+        </div>
+
+        <!-- NOTES LIST -->
+        <div class="panel-section">
+          <div class="panel-section-title">TODAY'S NOTES <span id="jnNotesCount" style="color:var(--text-dim);font-weight:400;font-size:11px"></span></div>
+          <div id="jnNotesList"></div>
+        </div>
+
+        <!-- KEY INSIGHT -->
+        <div class="panel-section" style="background:linear-gradient(135deg,rgba(245,166,35,0.06),rgba(252,76,2,0.03));border:1px solid rgba(245,166,35,0.18);border-radius:12px;margin-top:8px">
+          <div class="panel-section-title" style="color:#F5A623">&#128161; KEY INSIGHT — MAIN POINT TO REMEMBER</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.7">What is the ONE thing from today worth remembering next month? Next year? The insight that changes how you think or act.</div>
           <div class="form-group">
-            <label class="form-label">ENERGY <span id="jtEnergyVal" style="color:var(--cyan)">5</span>/10</label>
-            <div class="range-wrap"><input type="range" min="1" max="10" value="5" id="jtEnergy" oninput="document.getElementById('jtEnergyVal').textContent=this.value"></div>
+            <label class="form-label">CATEGORY</label>
+            <select class="form-input" id="jnInsightCat" style="font-family:var(--font-mono);font-size:12px;letter-spacing:1px;cursor:pointer">
+              <option value="learning">&#128218; LEARNING</option>
+              <option value="decision">&#9889; DECISION</option>
+              <option value="milestone">&#127942; MILESTONE</option>
+              <option value="gratitude">&#128591; GRATITUDE</option>
+              <option value="warning">&#9888; WARNING</option>
+            </select>
           </div>
-          <div class="form-group"><label class="form-label">WHAT HAPPENED TODAY</label><textarea class="form-input" id="jtEntry" rows="6" placeholder="Free write..."></textarea></div>
-          <button class="btn btn-primary w-full" onclick="saveJournalToday()">SAVE ENTRY</button>
+          <div class="form-group">
+            <textarea class="form-input" id="jnInsightText" rows="3" placeholder="The main insight, breakthrough, or lesson from today..." style="line-height:1.75;font-size:14px"></textarea>
+          </div>
+          <button class="btn btn-primary w-full" id="jnSaveInsightBtn" onclick="saveJournalInsight()" style="background:linear-gradient(135deg,#F5A623,#FC4C02);border:none;min-height:48px;font-size:13px;letter-spacing:2px;touch-action:manipulation;-webkit-tap-highlight-color:transparent">LOCK IN TODAY'S INSIGHT</button>
         </div>
       </div>
 
@@ -2118,6 +2170,29 @@
           <input type="text" class="form-input" id="journalSearch" placeholder="Search entries..." oninput="renderJournalArchive()">
         </div>
         <div id="journalArchiveList"></div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
+           PANEL: JOURNAL REVIEW
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-journal-review">
+        <div class="cc-panel-header">
+          <div class="cc-panel-title">JOURNAL REVIEW</div>
+          <div class="cc-panel-desc">Weekly · Monthly · Yearly synthesis of your inner world</div>
+        </div>
+
+        <!-- Tab bar -->
+        <div class="panel-section" style="padding-bottom:0">
+          <div style="display:flex;gap:0;border-bottom:2px solid rgba(255,255,255,0.06)">
+            <button class="jrv-tab active" data-mode="week" onclick="switchJournalReview('week')" style="flex:1;padding:12px 8px;background:none;border:none;border-bottom:2px solid var(--cyan);color:var(--cyan);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;margin-bottom:-2px;transition:all 0.15s;-webkit-tap-highlight-color:transparent">WEEK</button>
+            <button class="jrv-tab" data-mode="month" onclick="switchJournalReview('month')" style="flex:1;padding:12px 8px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;margin-bottom:-2px;transition:all 0.15s;-webkit-tap-highlight-color:transparent">MONTH</button>
+            <button class="jrv-tab" data-mode="year" onclick="switchJournalReview('year')" style="flex:1;padding:12px 8px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;margin-bottom:-2px;transition:all 0.15s;-webkit-tap-highlight-color:transparent">YEAR</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div id="jnReviewContent" style="min-height:200px"></div>
+        </div>
       </div>
 
       <!-- ════════════════════════════════════════════════

@@ -38,6 +38,34 @@
   function changePct(curr,prev) { if(!prev) return ''; var p=((curr-prev)/prev*100).toFixed(1); return (p>0?'+':'')+p+'%'; }
   function spo2Val(d)     { return d.spo2 || d.blood_oxygen || d.oxygen_saturation || null; }
 
+  // ── Month-over-Month helpers ───────────────────────────
+  function _getMonthData(allData, monthKey) {
+    return allData.filter(function(d) { return d.date.substring(0,7) === monthKey; });
+  }
+  function _prevMonthKey(mk) {
+    var y = parseInt(mk.split('-')[0]), m = parseInt(mk.split('-')[1]);
+    m--; if (m === 0) { m = 12; y--; }
+    return y + '-' + (m < 10 ? '0' + m : m);
+  }
+  function _momBadge(curr, prev, unit, higher_better, decimals) {
+    if (curr == null || prev == null) return '';
+    var d = curr - prev;
+    var pct = prev !== 0 ? ((d / prev) * 100).toFixed(1) : '—';
+    var good = higher_better ? d > 0 : d < 0;
+    var neutral = Math.abs(d) < 0.01;
+    var col = neutral ? C.text : good ? C.good : C.bad;
+    var arrow = neutral ? '→' : d > 0 ? '↑' : '↓';
+    return '<span style="font:700 10px \'IBM Plex Mono\';color:' + col + ';margin-left:8px">' + arrow + ' ' + (d >= 0 ? '+' : '') + parseFloat(d).toFixed(decimals || 1) + (unit || '') + ' vs last mo</span>';
+  }
+  function _momRow(label, curr, prev, unit, higher_better, decimals) {
+    if (curr == null) return '';
+    var d = decimals || 1;
+    var col = C.textBright;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:' + C.cardBg + ';border:1px solid ' + C.cardBorder + ';border-radius:8px;flex:1">' +
+      '<div><div style="font:700 7px \'IBM Plex Mono\';color:' + C.text + ';letter-spacing:1.5px;margin-bottom:2px">' + label + '</div>' +
+      '<div style="font:700 14px \'IBM Plex Mono\';color:' + col + '">' + parseFloat(curr).toFixed(d) + (unit || '') + _momBadge(curr, prev, unit, higher_better, d) + '</div></div></div>';
+  }
+
   // ── Canvas Helpers ─────────────────────────────────────
   function getCtx(id, w, h) {
     var el = document.getElementById(id);
@@ -384,6 +412,31 @@
       var avgSc=avg(scoreData.map(function(d){return d.sleep_score;}));
       h+='<div style="font:9px \'IBM Plex Mono\';color:'+scoreColor(avgSc)+'">avg: '+fmt(avgSc,0)+' / 100</div>';
       h+='</div>';
+      // Month-over-month for sleep score
+      (function(){
+        var curMk=allData.length?allData[allData.length-1].date.substring(0,7):'';
+        var prevMk=_prevMonthKey(curMk);
+        var curScores=_getMonthData(allData,curMk).filter(function(d){return d.sleep_score;}).map(function(d){return d.sleep_score;});
+        var prevScores=_getMonthData(allData,prevMk).filter(function(d){return d.sleep_score;}).map(function(d){return d.sleep_score;});
+        var cAvg=curScores.length?avg(curScores):null, pAvg=prevScores.length?avg(prevScores):null;
+        if (cAvg!=null) {
+          var diff=pAvg!=null?cAvg-pAvg:null;
+          var col=diff==null?C.text:diff>=0?C.good:C.bad;
+          h+='<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">';
+          h+='<div style="flex:1;min-width:100px;background:'+C.cardBg+';border:1px solid rgba(0,230,118,0.15);border-radius:8px;padding:10px;text-align:center">';
+          h+='<div style="font:700 7px \'IBM Plex Mono\';color:'+C.text+';letter-spacing:1.5px;margin-bottom:3px">THIS MONTH AVG</div>';
+          h+='<div style="font:700 20px \'IBM Plex Mono\';color:'+scoreColor(cAvg)+'">'+fmt(cAvg,0)+'</div>';
+          if (diff!=null) h+='<div style="font:10px \'IBM Plex Mono\';color:'+col+';margin-top:2px">'+(diff>=0?'↑ +':' ↓ ')+fmt(Math.abs(diff),1)+' pts vs last mo</div>';
+          h+='</div>';
+          if (pAvg!=null) {
+            h+='<div style="flex:1;min-width:100px;background:'+C.cardBg+';border:1px solid '+C.cardBorder+';border-radius:8px;padding:10px;text-align:center">';
+            h+='<div style="font:700 7px \'IBM Plex Mono\';color:'+C.text+';letter-spacing:1.5px;margin-bottom:3px">LAST MONTH AVG</div>';
+            h+='<div style="font:700 20px \'IBM Plex Mono\';color:'+scoreColor(pAvg)+'">'+fmt(pAvg,0)+'</div>';
+            h+='</div>';
+          }
+          h+='</div>';
+        }
+      })();
       h+='<canvas id="hs-score-chart" style="width:100%;background:rgba(0,0,0,0.15);border-radius:10px"></canvas></div>';
     }
 
@@ -401,6 +454,42 @@
     // ── Bedtime & Wake Scatter ──
     h+='<div class="panel-section" style="margin-bottom:20px">';
     h+='<div class="panel-section-title">BEDTIME & WAKE PATTERN</div>';
+    // Month-over-month for bedtime and wake
+    (function(){
+      var curMk=allData.length?allData[allData.length-1].date.substring(0,7):'';
+      var prevMk=_prevMonthKey(curMk);
+      var curM=_getMonthData(allData,curMk), prevM=_getMonthData(allData,prevMk);
+      var curBeds=curM.filter(function(d){return d.bedtime;}).map(function(d){var m=timeToMin(d.bedtime);return m<720?m+1440:m;});
+      var prevBeds=prevM.filter(function(d){return d.bedtime;}).map(function(d){var m=timeToMin(d.bedtime);return m<720?m+1440:m;});
+      var curWakes=curM.filter(function(d){return d.wake_time;}).map(function(d){return timeToMin(d.wake_time);});
+      var prevWakes=prevM.filter(function(d){return d.wake_time;}).map(function(d){return timeToMin(d.wake_time);});
+      var cBed=curBeds.length?avg(curBeds):null, pBed=prevBeds.length?avg(prevBeds):null;
+      var cWake=curWakes.length?avg(curWakes):null, pWake=prevWakes.length?avg(prevWakes):null;
+      if (cBed!=null||cWake!=null) {
+        h+='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
+        if (cBed!=null) {
+          var bDiff=cBed!=null&&pBed!=null?cBed-pBed:null;
+          var bCol=bDiff==null?C.text:bDiff<=0?C.good:C.warn; // earlier is better
+          h+='<div style="flex:1;min-width:120px;background:'+C.cardBg+';border:1px solid rgba(124,77,255,0.2);border-radius:8px;padding:10px;text-align:center">';
+          h+='<div style="font:700 7px \'IBM Plex Mono\';color:'+C.bedtime+';letter-spacing:1.5px;margin-bottom:3px">AVG BEDTIME (THIS MO)</div>';
+          h+='<div style="font:700 16px \'IBM Plex Mono\';color:'+C.textBright+'">'+minToTime(cBed%1440)+'</div>';
+          if (pBed!=null){var d2=(cBed-pBed);h+='<div style="font:10px \'IBM Plex Mono\';color:'+bCol+';margin-top:2px">'+(d2<=0?'↑ Earlier':'↓ Later')+' '+(Math.abs(d2)).toFixed(0)+'m vs last mo</div>';}
+          h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-top:2px">last mo: '+(pBed!=null?minToTime(pBed%1440):'—')+'</div>';
+          h+='</div>';
+        }
+        if (cWake!=null) {
+          var wDiff=cWake!=null&&pWake!=null?cWake-pWake:null;
+          var wCol=wDiff==null?C.text:wDiff<=0?C.good:C.warn; // earlier wake = better
+          h+='<div style="flex:1;min-width:120px;background:'+C.cardBg+';border:1px solid rgba(255,213,79,0.2);border-radius:8px;padding:10px;text-align:center">';
+          h+='<div style="font:700 7px \'IBM Plex Mono\';color:'+C.wake+';letter-spacing:1.5px;margin-bottom:3px">AVG WAKE TIME (THIS MO)</div>';
+          h+='<div style="font:700 16px \'IBM Plex Mono\';color:'+C.textBright+'">'+minToTime(cWake)+'</div>';
+          if (pWake!=null){var d3=(cWake-pWake);h+='<div style="font:10px \'IBM Plex Mono\';color:'+wCol+';margin-top:2px">'+(d3<=0?'↑ Earlier':'↓ Later')+' '+(Math.abs(d3)).toFixed(0)+'m vs last mo</div>';}
+          h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-top:2px">last mo: '+(pWake!=null?minToTime(pWake):'—')+'</div>';
+          h+='</div>';
+        }
+        h+='</div>';
+      }
+    })();
     h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-bottom:10px"><span style="color:'+C.bedtime+'">&#9679; BEDTIME</span> &nbsp;&middot;&nbsp; <span style="color:'+C.wake+'">&#9679; WAKE UP</span></div>';
     h+='<canvas id="hs-bw-chart" style="width:100%;background:rgba(0,0,0,0.15);border-radius:10px"></canvas></div>';
 
@@ -551,6 +640,34 @@
     h+='<div class="panel-section" style="margin-bottom:20px">';
     h+='<div class="panel-section-title">VO2 MAX — LONGEVITY INDEX</div>';
     h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-bottom:10px">VO2 Max tracks your overall aerobic fitness. This uses all historical data for a long-term trend view.</div>';
+    // Month-over-month for VO2 Max
+    (function(){
+      var curMk=allData.length?allData[allData.length-1].date.substring(0,7):'';
+      var prevMk=_prevMonthKey(curMk);
+      var curVo2=_getMonthData(allData,curMk).filter(function(d){return d.vo2_max;}).map(function(d){return d.vo2_max;});
+      var prevVo2=_getMonthData(allData,prevMk).filter(function(d){return d.vo2_max;}).map(function(d){return d.vo2_max;});
+      var cAvg=curVo2.length?avg(curVo2):null, pAvg=prevVo2.length?avg(prevVo2):null;
+      if (cAvg!=null) {
+        var diff=pAvg!=null?cAvg-pAvg:null;
+        var col=diff==null?C.text:diff>=0?C.good:C.bad;
+        function vo2Cat(v){return v>=58?'ELITE':v>=50?'GREAT':v>=42?'GOOD':v>=35?'FAIR':'POOR';}
+        h+='<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">';
+        h+='<div style="flex:1;min-width:120px;background:'+C.cardBg+';border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:10px;text-align:center">';
+        h+='<div style="font:700 7px \'IBM Plex Mono\';color:'+C.text+';letter-spacing:1.5px;margin-bottom:3px">THIS MONTH AVG</div>';
+        h+='<div style="font:700 22px \'IBM Plex Mono\';color:'+C.vo2+'">'+fmt(cAvg,1)+'</div>';
+        h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.vo2+';margin-top:2px">'+vo2Cat(cAvg)+'</div>';
+        if (diff!=null) h+='<div style="font:10px \'IBM Plex Mono\';color:'+col+';margin-top:3px">'+(diff>=0?'↑ +':' ↓ ')+fmt(Math.abs(diff),2)+' vs last mo</div>';
+        h+='</div>';
+        if (pAvg!=null) {
+          h+='<div style="flex:1;min-width:120px;background:'+C.cardBg+';border:1px solid '+C.cardBorder+';border-radius:8px;padding:10px;text-align:center">';
+          h+='<div style="font:700 7px \'IBM Plex Mono\';color:'+C.text+';letter-spacing:1.5px;margin-bottom:3px">LAST MONTH AVG</div>';
+          h+='<div style="font:700 22px \'IBM Plex Mono\';color:'+C.vo2+'">'+fmt(pAvg,1)+'</div>';
+          h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.vo2+';margin-top:2px">'+vo2Cat(pAvg)+'</div>';
+          h+='</div>';
+        }
+        h+='</div>';
+      }
+    })();
     h+='<canvas id="hh-vo2" style="width:100%;background:rgba(0,0,0,0.15);border-radius:10px"></canvas>';
     // VO2 longevity benchmarks
     h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:10px">';

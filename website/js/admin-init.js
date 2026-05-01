@@ -179,12 +179,48 @@ renderJournalArchive();
     var count = 0;
     data.forEach(function(j) {
       if (!all[j.date]) {
-        all[j.date] = { aligned: j.aligned, not_aligned: j.not_aligned, wins: j.wins, changes: j.changes, improve: j.improve, mood: j.mood, energy: j.energy, thoughts: j.thoughts };
+        // Prefer the entry JSON column (set by saveJournal); fall back to individual columns
+        var entryObj = null;
+        if (j.entry) { try { entryObj = typeof j.entry === 'string' ? JSON.parse(j.entry) : j.entry; } catch(e) {} }
+        if (!entryObj || typeof entryObj !== 'object') {
+          entryObj = { aligned: j.aligned, notAligned: j.not_aligned || j.notAligned || '', wins: j.wins, changes: j.changes, improve: j.improve, mood: j.mood, energy: j.energy, thoughts: j.thoughts };
+        }
+        all[j.date] = entryObj;
         count++;
       }
     });
     localStorage.setItem('fl_journal', JSON.stringify(all));
     if (count > 0) console.log('[Bootstrap] Journal: ' + count + ' entries restored');
+  });
+
+  // ── 5b. JOURNAL NOTES — last 90 days ──
+  supaGet('journal_notes', '?date=gte.' + ninetyAgo + '&order=ts.desc').then(function(data) {
+    if (!data || !data.length) return;
+    var notesByDate = {};
+    data.forEach(function(n) { if (n.date) { if (!notesByDate[n.date]) notesByDate[n.date] = []; notesByDate[n.date].push(n); } });
+    Object.keys(notesByDate).forEach(function(date) {
+      if (!localStorage.getItem('fl_journal_notes_' + date)) {
+        localStorage.setItem('fl_journal_notes_' + date, JSON.stringify(notesByDate[date]));
+      }
+    });
+    var dates = JSON.parse(localStorage.getItem('fl_journal_note_dates') || '{}');
+    Object.keys(notesByDate).forEach(function(d){ dates[d]=true; });
+    localStorage.setItem('fl_journal_note_dates', JSON.stringify(dates));
+    console.log('[Bootstrap] Journal notes: ' + data.length + ' restored');
+  });
+
+  // ── 5c. JOURNAL INSIGHTS — last 90 days ──
+  supaGet('journal_insights', '?date=gte.' + ninetyAgo + '&order=date.desc').then(function(data) {
+    if (!data || !data.length) return;
+    var dates = JSON.parse(localStorage.getItem('fl_journal_insight_dates') || '{}');
+    data.forEach(function(ins) {
+      if (ins.date && !localStorage.getItem('fl_journal_insight_' + ins.date)) {
+        localStorage.setItem('fl_journal_insight_' + ins.date, JSON.stringify(ins));
+        dates[ins.date] = true;
+      }
+    });
+    localStorage.setItem('fl_journal_insight_dates', JSON.stringify(dates));
+    console.log('[Bootstrap] Journal insights: ' + data.length + ' restored');
   });
 
   // ── 6. CHECKINS — merge last 90 days ──

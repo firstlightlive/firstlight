@@ -611,19 +611,13 @@ function renderFortressIntel() {
 // ══════════════════════════════════════════════════════
 function faMasteryScore(date) {
   var data = faGetMastery(date);
-  if (!data || !data.items) return null;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
   var done = 0, total = 0;
-  data.items.forEach(function(item) {
-    if (item.inputType === 'checkbox') {
+  Object.keys(data).forEach(function(key) {
+    var id = parseInt(key);
+    if (id >= 1 && id <= 25) {
       total++;
-      if (item.value === true || item.value === 'true' || item.value === 1) done++;
-    } else if (item.inputType === 'number' || item.inputType === 'emotional') {
-      total++;
-      var v = parseFloat(item.value);
-      if (!isNaN(v) && v > 0) done++;
-    } else if (item.inputType === 'text' || item.inputType === 'predictions') {
-      total++;
-      if (typeof item.value === 'string' && item.value.trim().length > 0) done++;
+      if (data[key] && data[key].done) done++;
     }
   });
   return total > 0 ? Math.round(100 * done / total) : null;
@@ -746,14 +740,12 @@ function renderMasteryRitualHeatmap() {
   items.forEach(function(item) { itemData[item.id] = {}; });
   dates.forEach(function(d) {
     var data = faGetMastery(d);
-    if (!data || !data.items) return;
-    data.items.forEach(function(entry) {
-      if (!itemData[entry.id]) return;
-      var done = false;
-      if (entry.inputType === 'checkbox') done = entry.value === true || entry.value === 'true' || entry.value === 1;
-      else if (entry.inputType === 'number' || entry.inputType === 'emotional') { var v = parseFloat(entry.value); done = !isNaN(v) && v > 0; }
-      else if (entry.inputType === 'text' || entry.inputType === 'predictions') done = typeof entry.value === 'string' && entry.value.trim().length > 0;
-      itemData[entry.id][d] = done;
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return;
+    Object.keys(data).forEach(function(key) {
+      var id = parseInt(key);
+      if (!itemData[id]) return;
+      var entry = data[key];
+      itemData[id][d] = entry && entry.done === true;
     });
   });
 
@@ -785,7 +777,7 @@ function renderMasteryRitualHeatmap() {
 
     // Domain header
     html += '<div style="display:flex;gap:1px;margin:10px 0 3px;align-items:center">';
-    html += '<div style="width:176px;flex-shrink:0;font-family:var(--font-mono);font-size:8px;letter-spacing:2px;font-weight:700;color:' + dColor + '">' + dk + ' — ' + (domains[dk] || '') + '</div>';
+    html += '<div style="width:176px;flex-shrink:0;font-family:var(--font-mono);font-size:8px;letter-spacing:2px;font-weight:700;color:' + dColor + '">' + dk + ' — ' + (domains[dk] && domains[dk].name ? domains[dk].name : (domains[dk] || '')) + '</div>';
     dates.forEach(function() { html += '<div style="width:16px;flex-shrink:0"></div>'; });
     html += '</div>';
 
@@ -800,7 +792,7 @@ function renderMasteryRitualHeatmap() {
 
       html += '<div style="display:flex;gap:1px;margin-bottom:1px;align-items:center">';
       html += '<div style="width:176px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding-right:6px">';
-      html += '<div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px" title="' + item.label + '">' + item.id + '. ' + item.label + '</div>';
+      html += '<div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px" title="' + item.title + '">' + item.id + '. ' + item.title + '</div>';
       html += '<div style="font-family:var(--font-mono);font-size:8px;font-weight:700;color:' + pctCol + ';flex-shrink:0;margin-left:4px">' + (pct !== null ? pct + '%' : '') + '</div>';
       html += '</div>';
       dates.forEach(function(d) {

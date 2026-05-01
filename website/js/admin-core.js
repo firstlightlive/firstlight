@@ -32,7 +32,7 @@ function switchPanel(panelId) {
   if (panelId === 'mastery-weekly') renderMasteryWeekly();
   if (panelId === 'mastery-ideas') renderMasteryIdeas();
   if (panelId === 'mastery-analytics') buildMasteryAnalytics();
-  if (panelId === 'mastery-monthly') renderMasteryMonthly();
+  if (panelId === 'mastery-monthly') { renderMasteryMonthly(); setTimeout(function(){ if(typeof calculateMonthlyScores==='function') calculateMonthlyScores(); }, 100); }
   if (panelId === 'morning' || panelId === 'midday' || panelId === 'evening') initRitualDateNav(panelId);
   if (panelId === 'deepwork') initDeepWorkDateNav();
   if (panelId === 'deepwork-analytics') buildDWAnalytics();
@@ -40,7 +40,8 @@ function switchPanel(panelId) {
   if (panelId === 'gym-analytics') buildGymAnalytics();
   if (panelId === 'gym-exercises') renderExerciseLibrary('push');
   if (panelId === 'reflection') { initReflectionDateNav(); if (typeof initRichEditorsForPanel === 'function') setTimeout(function() { initRichEditorsForPanel('reflection'); }, 500); }
-  if (panelId === 'journal-today') { if (typeof initRichEditorsForPanel === 'function') setTimeout(function() { initRichEditorsForPanel('journal-today'); }, 500); }
+  if (panelId === 'journal-today') { if (typeof initJournalToday === 'function') initJournalToday(); }
+  if (panelId === 'journal-review') { if (typeof renderJournalReview === 'function') renderJournalReview(); }
   if (panelId === 'ekadashi') switchEkadashiTab(_ekadashiTab || 'month');
   if (panelId === 'profile') loadProfile();
   if (panelId === 'brahma-log') { requireBrahmaPin(function(){ renderBrahmaDaily(); }); }
@@ -173,7 +174,9 @@ function loadReflection(dateStr) {
   var el = function(id) { return document.getElementById(id); };
   if (el('reflDate')) el('reflDate').textContent = dateStr;
   var all = JSON.parse(localStorage.getItem('fl_journal') || '{}');
-  var entry = all[dateStr] || {};
+  var entry = all[dateStr];
+  if (typeof entry === 'string') { try { entry = JSON.parse(entry); } catch(pe) { entry = {}; } }
+  entry = entry || {};
   if (el('jAligned')) el('jAligned').value = entry.aligned || '';
   if (el('jNotAligned')) el('jNotAligned').value = entry.notAligned || '';
   if (el('jWins')) el('jWins').value = entry.wins || '';

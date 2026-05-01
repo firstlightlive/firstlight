@@ -60,7 +60,13 @@ var gymTimerInterval = null;
 
 // ── DATA HELPERS ──
 function getGymWorkout(date) {
-  try { return JSON.parse(localStorage.getItem('fl_gym_workout_' + date) || 'null'); } catch(e) { return null; }
+  try {
+    var w = JSON.parse(localStorage.getItem('fl_gym_workout_' + date) || 'null');
+    if (w && typeof w.exercises === 'string') {
+      try { w.exercises = JSON.parse(w.exercises); } catch(e) { w.exercises = []; }
+    }
+    return w;
+  } catch(e) { return null; }
 }
 
 function getGymPRs() {
@@ -70,7 +76,7 @@ function getGymPRs() {
 // ── DATE NAV ──
 function initGymDateNav() {
   createDateNav('gym-log-date-nav', {
-    days: 7,
+    days: 14,
     onSelect: function(dateStr) {
       gymDate = dateStr;
       loadGymWorkoutForDate(dateStr);
@@ -406,9 +412,10 @@ function buildGymAnalytics() {
     var ds = (d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
     var w = getGymWorkout(ds);
     weekDays.push({ date: ds, dayName: dayNames[d.getDay()], workout: w });
-    if (w && w.split && w.split !== 'rest') {
+    var wExercises = w ? (Array.isArray(w.exercises) ? w.exercises : []) : [];
+    if (w && w.split !== 'rest' && (w.split || wExercises.length > 0)) {
       weekSessions++;
-      (w.exercises || []).forEach(function(ex) {
+      wExercises.forEach(function(ex) {
         (ex.sets || []).forEach(function(s) {
           var vol = (s.weight || 0) * (s.reps || 0);
           weekVolume += vol;
@@ -424,7 +431,8 @@ function buildGymAnalytics() {
     var md = new Date(today); md.setDate(md.getDate() - m);
     var mds = (md.getFullYear()+'-'+String(md.getMonth()+1).padStart(2,'0')+'-'+String(md.getDate()).padStart(2,'0'));
     var mw = getGymWorkout(mds);
-    if (mw && mw.split && mw.split !== 'rest') monthSessions++;
+    var mwEx = mw ? (Array.isArray(mw.exercises) ? mw.exercises : []) : [];
+    if (mw && mw.split !== 'rest' && (mw.split || mwEx.length > 0)) monthSessions++;
   }
 
   // Month PRs
@@ -436,7 +444,8 @@ function buildGymAnalytics() {
     var sd = new Date(today); sd.setDate(sd.getDate() - s);
     var sds = (sd.getFullYear()+'-'+String(sd.getMonth()+1).padStart(2,'0')+'-'+String(sd.getDate()).padStart(2,'0'));
     var sw = getGymWorkout(sds);
-    if (sw && sw.split && sw.split !== 'rest') streak++;
+    var swEx = sw ? (Array.isArray(sw.exercises) ? sw.exercises : []) : [];
+    if (sw && sw.split !== 'rest' && (sw.split || swEx.length > 0)) streak++;
     else if (s > 0) break;
   }
 

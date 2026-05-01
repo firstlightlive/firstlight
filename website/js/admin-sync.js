@@ -23,6 +23,7 @@ var SYNC_TABLES = [
   'proof_archive', 'slips', 'daily_checkin', 'reading_log',
   'races', 'rituals_log', 'deepwork_log', 'mastery_log',
   'gym_workouts', 'brahma_log', 'journal_entries',
+  'journal_notes', 'journal_insights',
   'ekadashi_log', 'weekly_schedule'
 ];
 
@@ -57,11 +58,37 @@ var SYNC_MAP = {
     if (r.date) {
       try {
         var all = JSON.parse(localStorage.getItem('fl_journal') || '{}');
-        all[r.date] = r.entry;
+        var parsed = r.entry;
+        if (typeof parsed === 'string') { try { parsed = JSON.parse(parsed); } catch(pe) {} }
+        all[r.date] = parsed;
         localStorage.setItem('fl_journal', JSON.stringify(all));
       } catch (e) {
         console.warn('[Sync] journal_entries localStorage error:', e.message);
       }
+    }
+  },
+  'journal_notes': function(r) {
+    if (r.date && r.id) {
+      try {
+        var notes = JSON.parse(localStorage.getItem('fl_journal_notes_' + r.date) || '[]');
+        var idx = notes.findIndex(function(n) { return n.id === r.id; });
+        if (idx >= 0) notes[idx] = r; else notes.unshift(r);
+        notes.sort(function(a, b) { return b.ts > a.ts ? 1 : -1; });
+        localStorage.setItem('fl_journal_notes_' + r.date, JSON.stringify(notes));
+        var dates = JSON.parse(localStorage.getItem('fl_journal_note_dates') || '{}');
+        dates[r.date] = true;
+        localStorage.setItem('fl_journal_note_dates', JSON.stringify(dates));
+      } catch(e) { console.warn('[Sync] journal_notes error:', e.message); }
+    }
+  },
+  'journal_insights': function(r) {
+    if (r.date && r.id) {
+      try {
+        localStorage.setItem('fl_journal_insight_' + r.date, JSON.stringify(r));
+        var dates = JSON.parse(localStorage.getItem('fl_journal_insight_dates') || '{}');
+        dates[r.date] = true;
+        localStorage.setItem('fl_journal_insight_dates', JSON.stringify(dates));
+      } catch(e) { console.warn('[Sync] journal_insights error:', e.message); }
     }
   },
   'ekadashi_log': function(r) {
@@ -127,7 +154,9 @@ var TABLE_PANEL_MAP = {
   'mastery_log': ['mastery-daily', 'mastery-weekly', 'mastery-analytics', 'mastery-monthly'],
   'gym_workouts': ['gym-log', 'gym-analytics'],
   'brahma_log': ['brahma-log', 'brahma-analytics', 'brahma-review', 'brahma-monthly'],
-  'journal_entries': ['journal-today'],
+  'journal_entries': ['journal-today', 'reflection', 'journal-archive', 'journal-review'],
+  'journal_notes': ['journal-today', 'journal-archive', 'journal-review'],
+  'journal_insights': ['journal-today', 'journal-archive', 'journal-review'],
   'ekadashi_log': ['ekadashi'],
   'weekly_schedule': ['weekly'],
   'proof_archive': ['arch-log'],
@@ -381,12 +410,40 @@ function pullAllFromSupabase() {
       try {
         var all = JSON.parse(localStorage.getItem('fl_journal') || '{}');
         rows.forEach(function(r) {
-          if (r.date) all[r.date] = r.entry;
+          if (r.date) {
+            var parsed = r.entry;
+            if (typeof parsed === 'string') { try { parsed = JSON.parse(parsed); } catch(pe) {} }
+            all[r.date] = parsed;
+          }
         });
         localStorage.setItem('fl_journal', JSON.stringify(all));
       } catch (e) {
         console.warn('[Sync] pull journal error:', e.message);
       }
+    }},
+    { table: 'journal_notes', query: '?date=eq.' + today, handler: function(rows) {
+      if (!rows.length) return;
+      var date = rows[0].date;
+      var notes = JSON.parse(localStorage.getItem('fl_journal_notes_' + date) || '[]');
+      rows.forEach(function(r) {
+        var idx = notes.findIndex(function(n) { return n.id === r.id; });
+        if (idx >= 0) notes[idx] = r; else notes.unshift(r);
+      });
+      notes.sort(function(a, b) { return b.ts > a.ts ? 1 : -1; });
+      localStorage.setItem('fl_journal_notes_' + date, JSON.stringify(notes));
+      var dates = JSON.parse(localStorage.getItem('fl_journal_note_dates') || '{}');
+      dates[date] = true;
+      localStorage.setItem('fl_journal_note_dates', JSON.stringify(dates));
+    }},
+    { table: 'journal_insights', query: '?date=eq.' + today, handler: function(rows) {
+      rows.forEach(function(r) {
+        if (r.date) {
+          localStorage.setItem('fl_journal_insight_' + r.date, JSON.stringify(r));
+          var dates = JSON.parse(localStorage.getItem('fl_journal_insight_dates') || '{}');
+          dates[r.date] = true;
+          localStorage.setItem('fl_journal_insight_dates', JSON.stringify(dates));
+        }
+      });
     }}
   ];
 

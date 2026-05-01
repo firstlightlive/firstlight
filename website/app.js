@@ -1578,7 +1578,14 @@ async function pullFromSupabase() {
   if (journal) {
     const all = JSON.parse(localStorage.getItem('fl_journal') || '{}');
     journal.forEach(j => {
-      if (!all[j.date]) all[j.date] = { aligned: j.aligned, not_aligned: j.not_aligned, wins: j.wins, changes: j.changes, improve: j.improve, mood: j.mood, energy: j.energy, thoughts: j.thoughts };
+      if (!all[j.date]) {
+        var entryObj = null;
+        if (j.entry) { try { entryObj = typeof j.entry === 'string' ? JSON.parse(j.entry) : j.entry; } catch(e) {} }
+        if (!entryObj || typeof entryObj !== 'object') {
+          entryObj = { aligned: j.aligned, notAligned: j.not_aligned || j.notAligned || '', wins: j.wins, changes: j.changes, improve: j.improve, mood: j.mood, energy: j.energy, thoughts: j.thoughts };
+        }
+        all[j.date] = entryObj;
+      }
     });
     localStorage.setItem('fl_journal', JSON.stringify(all));
     results.journal = journal.length;
