@@ -518,11 +518,14 @@ function renderSlipHistory() {
 
     // Proof section — Strava verified
     if (!isPending && slip.proof_km) {
-      html += '<div style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--green,#2ecc71)">';
+      html += '<div style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--green,#2ecc71);margin-bottom:' + (slip.proof_strava_activity_id ? '10px' : '0') + '">';
       html += '<span style="font-size:16px">✅</span>';
       html += '<span><strong>' + slip.proof_km + ' km</strong> — Strava verified</span>';
       if (slip.proof_strava_url) html += ' <a href="' + slip.proof_strava_url + '" target="_blank" style="color:var(--accent,#fc4c02)">View on Strava →</a>';
       html += '</div>';
+      if (slip.proof_strava_activity_id) {
+        html += '<div id="slip-map-' + slip.proof_strava_activity_id + '" class="smap-wrap"></div>';
+      }
     } else if (isPending) {
       // Show escalation status
       var escStatus = getEscalationStatus(slip);
@@ -543,6 +546,12 @@ function renderSlipHistory() {
   });
 
   c.innerHTML = html;
+  // Render interactive route maps for all cleared slips
+  filtered.forEach(function(slip) {
+    if (slip.penalty_status === 'cleared' && slip.proof_strava_activity_id) {
+      renderSlipMap('slip-map-' + slip.proof_strava_activity_id, slip.proof_strava_activity_id, slip);
+    }
+  });
 }
 
 function filterSlipHistory(val) {
@@ -1007,6 +1016,237 @@ function syncSlipProof(slip, proofKm, stravaUrl, stravaActivityId) {
   }).catch(function(e) {
     console.error('[SLIPS] Proof sync error:', e.message);
   });
+}
+
+// ══════════════════════════════════════════════════════════════
+// PUNISHMENT ROUTE MAP — Interactive Mapbox GL JS
+// READ-ONLY: only reads strava_activities. Zero writes. Zero
+// impact on immutability triggers or slip table.
+// ══════════════════════════════════════════════════════════════
+
+function _smapDecodePolyline(str) {
+  var coords = [], idx = 0, lat = 0, lng = 0;
+  while (idx < str.length) {
+    var b, shift = 0, result = 0;
+    do { b = str.charCodeAt(idx++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+    shift = 0; result = 0;
+    do { b = str.charCodeAt(idx++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+    coords.push([lng / 1e5, lat / 1e5]);
+  }
+  return coords;
+}
+
+function _smapLoadGL() {
+  return new Promise(function(resolve) {
+    if (window.mapboxgl) { resolve(); return; }
+    if (!document.getElementById('mbgl-css')) {
+      var lnk = document.createElement('link');
+      lnk.id = 'mbgl-css'; lnk.rel = 'stylesheet';
+      lnk.href = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css';
+      document.head.appendChild(lnk);
+    }
+    var s = document.createElement('script');
+    s.src = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js';
+    s.onload = resolve;
+    document.head.appendChild(s);
+  });
+}
+
+function _smapFmtTime(secs) {
+  var h = Math.floor(secs / 3600);
+  var m = Math.floor((secs % 3600) / 60);
+  var s = Math.floor(secs % 60);
+  if (h > 0) return h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function _smapFmtPace(secs, distKm, type) {
+  if (!distKm || distKm <= 0) return '—';
+  if (type === 'Ride') return (distKm / (secs / 3600)).toFixed(1) + ' km/h';
+  var mpm = (secs / 60) / distKm;
+  var m = Math.floor(mpm), sc = Math.round((mpm - m) * 60);
+  return m + ':' + (sc < 10 ? '0' : '') + sc + '/km';
+}
+
+function _smapCountUp(el, to, dur, fmt) {
+  if (!el) return;
+  var t0 = null;
+  (function step(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / dur, 1);
+    var e = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(to * e);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = fmt(to);
+  })(performance.now());
+}
+
+function _smapBuildMetrics(act, uid) {
+  var distKm = (act.distance || 0) / 1000;
+  var type = act.type || 'Walk';
+  var typeColor = type === 'Ride' ? '#FC4C02' : type === 'Run' ? '#00E676' : '#00D4FF';
+  var dateStr = act.start_date_local ? act.start_date_local.split('T')[0] : '';
+  var html = '<div class="smap-metrics">';
+  html += '<div class="smap-metric"><span class="smap-mval" id="' + uid + '-dist" style="color:' + typeColor + '">—</span><span class="smap-mlbl">KM</span></div>';
+  html += '<div class="smap-metric"><span class="smap-mval" id="' + uid + '-time">—</span><span class="smap-mlbl">TIME</span></div>';
+  html += '<div class="smap-metric"><span class="smap-mval" id="' + uid + '-pace">—</span><span class="smap-mlbl">' + (type === 'Ride' ? 'SPEED' : 'PACE') + '</span></div>';
+  if (act.total_elevation_gain) html += '<div class="smap-metric"><span class="smap-mval" id="' + uid + '-elev">—</span><span class="smap-mlbl">ELEV ↑</span></div>';
+  if (act.calories) html += '<div class="smap-metric"><span class="smap-mval" id="' + uid + '-cal">—</span><span class="smap-mlbl">KCAL</span></div>';
+  html += '</div>';
+  if (dateStr) {
+    var typeEmoji = type === 'Ride' ? '🚴' : type === 'Run' ? '🏃' : '🚶';
+    html += '<div class="smap-footer">' + typeEmoji + ' ' + (act.name || type) + ' &nbsp;·&nbsp; ' + dateStr + '</div>';
+  }
+  return html;
+}
+
+function _smapStartCountUp(act, uid) {
+  var distKm = (act.distance || 0) / 1000, dur = 1400;
+  _smapCountUp(document.getElementById(uid + '-dist'), distKm, dur, function(v) { return v.toFixed(1); });
+  var timeEl = document.getElementById(uid + '-time');
+  if (timeEl) {
+    var t0 = null, total = act.moving_time || 0;
+    (function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+      timeEl.textContent = _smapFmtTime(Math.floor(total * e));
+      if (p < 1) requestAnimationFrame(step); else timeEl.textContent = _smapFmtTime(total);
+    })(performance.now());
+  }
+  var paceEl = document.getElementById(uid + '-pace');
+  if (paceEl) paceEl.textContent = _smapFmtPace(act.moving_time, distKm, act.type);
+  if (act.total_elevation_gain) _smapCountUp(document.getElementById(uid + '-elev'), act.total_elevation_gain, dur, function(v) { return Math.round(v) + 'm'; });
+  if (act.calories) _smapCountUp(document.getElementById(uid + '-cal'), act.calories, dur, function(v) { return Math.round(v) + ''; });
+}
+
+async function renderSlipMap(containerId, activityId, slip) {
+  var wrap = document.getElementById(containerId);
+  if (!wrap || !activityId) return;
+
+  wrap.innerHTML = '<div class="smap-loading"><div class="smap-spinner"></div>Loading route map...</div>';
+
+  try {
+    if (typeof sbFetch !== 'function') { wrap.innerHTML = ''; return; }
+
+    var acts = await sbFetch('strava_activities', 'GET', null,
+      '?id=eq.' + activityId + '&select=id,name,type,distance,moving_time,total_elevation_gain,calories,summary_polyline,start_date_local,average_speed&limit=1');
+
+    if (!acts || !acts[0]) { wrap.innerHTML = ''; return; }
+    var act = acts[0];
+    if (slip && slip.proof_strava_url) act._stravaUrl = slip.proof_strava_url;
+
+    var type = act.type || 'Walk';
+    var typeColor = type === 'Ride' ? '#FC4C02' : type === 'Run' ? '#00E676' : '#00D4FF';
+    var typeEmoji = type === 'Ride' ? '🚴' : type === 'Run' ? '🏃' : '🚶';
+    var uid = 'sm' + activityId;
+
+    if (!act.summary_polyline) {
+      wrap.innerHTML = '<div class="smap-no-route">📍 No GPS route (indoor or privacy zone activity)</div>' + _smapBuildMetrics(act, uid);
+      setTimeout(function() { _smapStartCountUp(act, uid); }, 200);
+      return;
+    }
+
+    var coords = _smapDecodePolyline(act.summary_polyline);
+    if (!coords || coords.length < 2) { wrap.innerHTML = ''; return; }
+
+    await _smapLoadGL();
+
+    wrap.innerHTML =
+      '<div class="smap-inner">' +
+        '<div id="' + uid + '-canvas" class="smap-canvas"></div>' +
+        '<div id="' + uid + '-stamp" class="smap-stamp">PUNISHMENT<br>SERVED</div>' +
+        '<div class="smap-badge" style="background:' + typeColor + '18;color:' + typeColor + ';border-color:' + typeColor + '44">' + typeEmoji + ' ' + type.toUpperCase() + '</div>' +
+      '</div>' +
+      _smapBuildMetrics(act, uid);
+
+    mapboxgl.accessToken = (window.FL && window.FL.MAPBOX_TOKEN) ? window.FL.MAPBOX_TOKEN : '';
+    // Disable Mapbox telemetry to avoid CSP issues
+    if (mapboxgl.config) mapboxgl.config.EVENTS_URL = null;
+
+    var map = new mapboxgl.Map({
+      container: uid + '-canvas',
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: coords[0],
+      zoom: 13,
+      interactive: true,
+      attributionControl: false
+    });
+
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+    map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+
+    map.on('load', function() {
+      // Fit to route bounds
+      var lngs = coords.map(function(c) { return c[0]; });
+      var lats = coords.map(function(c) { return c[1]; });
+      map.fitBounds(
+        [[Math.min.apply(null, lngs), Math.min.apply(null, lats)],
+         [Math.max.apply(null, lngs), Math.max.apply(null, lats)]],
+        { padding: 50, duration: 0 }
+      );
+
+      // Ghost — full dim path (shows route immediately)
+      map.addSource('ghost-' + uid, { type: 'geojson', data: { type: 'Feature', geometry: { type: 'LineString', coordinates: coords } } });
+      map.addLayer({ id: 'ghost-' + uid, type: 'line', source: 'ghost-' + uid,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': typeColor, 'line-width': 2, 'line-opacity': 0.18 }
+      });
+
+      // Animated route source
+      map.addSource('route-' + uid, { type: 'geojson', data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [coords[0]] } } });
+
+      // Glow layer
+      map.addLayer({ id: 'glow-' + uid, type: 'line', source: 'route-' + uid,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': typeColor, 'line-width': 14, 'line-opacity': 0.1, 'line-blur': 8 }
+      });
+
+      // Main route line
+      map.addLayer({ id: 'route-' + uid, type: 'line', source: 'route-' + uid,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': typeColor, 'line-width': 4, 'line-opacity': 1 }
+      });
+
+      // Start marker (green pulse)
+      var sEl = document.createElement('div'); sEl.className = 'smap-marker smap-marker-start';
+      new mapboxgl.Marker({ element: sEl, anchor: 'center' }).setLngLat(coords[0]).addTo(map);
+
+      // Animate route drawing
+      var t0 = null;
+      var animDur = Math.max(1600, Math.min(3200, coords.length * 5));
+
+      (function animateRoute(ts) {
+        if (!t0) t0 = ts;
+        var p = Math.min((ts - t0) / animDur, 1);
+        var eased = 1 - Math.pow(1 - p, 2.5);
+        var count = Math.max(2, Math.floor(eased * coords.length));
+        map.getSource('route-' + uid).setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: coords.slice(0, count) } });
+
+        if (p < 1) {
+          requestAnimationFrame(animateRoute);
+        } else {
+          // End marker (red pulse)
+          var eEl = document.createElement('div'); eEl.className = 'smap-marker smap-marker-end';
+          new mapboxgl.Marker({ element: eEl, anchor: 'center' }).setLngLat(coords[coords.length - 1]).addTo(map);
+
+          // Stamp reveal
+          var stamp = document.getElementById(uid + '-stamp');
+          if (stamp) { stamp.style.opacity = '1'; stamp.style.transform = 'rotate(-14deg) translate(-50%,-50%) scale(1)'; }
+
+          // Metrics count-up
+          _smapStartCountUp(act, uid);
+        }
+      })(performance.now());
+    });
+
+    map.on('error', function(e) { console.warn('[SlipMap]', e.error); });
+
+  } catch(e) {
+    console.error('[SlipMap]', e);
+    if (wrap) wrap.innerHTML = '';
+  }
 }
 
 function syncArchEntry(entry) {

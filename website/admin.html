@@ -117,6 +117,45 @@
       .lc-header-cell{font-size:8px}
     }
 
+    /* ── PUNISHMENT ROUTE MAP ── */
+    .smap-wrap{margin-top:4px;border-radius:10px;overflow:hidden;background:rgba(0,0,0,0.3)}
+    .smap-loading{display:flex;align-items:center;gap:10px;padding:20px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:1px}
+    .smap-spinner{width:16px;height:16px;border:2px solid rgba(0,212,255,0.15);border-top-color:var(--cyan);border-radius:50%;animation:smap-spin 0.8s linear infinite;flex-shrink:0}
+    @keyframes smap-spin{to{transform:rotate(360deg)}}
+    .smap-no-route{padding:14px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:0.5px}
+    .smap-inner{position:relative;border-radius:10px 10px 0 0;overflow:hidden}
+    .smap-canvas{width:100%;height:280px}
+    .smap-stamp{position:absolute;top:50%;left:50%;transform:rotate(-14deg) translate(-50%,-50%) scale(0.6);
+      font-family:var(--font-mono);font-size:clamp(18px,4vw,28px);font-weight:700;letter-spacing:4px;
+      color:#FF5252;text-align:center;line-height:1.2;text-shadow:0 0 30px rgba(255,82,82,0.6);
+      border:3px solid rgba(255,82,82,0.7);padding:10px 18px;border-radius:6px;
+      background:rgba(10,12,16,0.55);backdrop-filter:blur(2px);
+      opacity:0;transition:all 0.5s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap}
+    .smap-badge{position:absolute;top:12px;left:12px;font-family:var(--font-mono);font-size:10px;
+      font-weight:700;letter-spacing:1.5px;padding:4px 10px;border-radius:20px;border:1px solid;
+      backdrop-filter:blur(4px);pointer-events:none}
+    .smap-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:0;
+      background:rgba(0,0,0,0.5);border-top:1px solid rgba(255,255,255,0.06)}
+    .smap-metric{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:12px 8px;border-right:1px solid rgba(255,255,255,0.04)}
+    .smap-metric:last-child{border-right:none}
+    .smap-mval{font-family:var(--font-mono);font-size:clamp(13px,2.5vw,17px);font-weight:700;color:var(--text);letter-spacing:0.5px;line-height:1}
+    .smap-mlbl{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1.5px;margin-top:4px;text-align:center}
+    .smap-footer{padding:8px 14px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);
+      background:rgba(0,0,0,0.4);border-top:1px solid rgba(255,255,255,0.04);letter-spacing:0.3px}
+    .smap-footer a{color:var(--accent,#FC4C02);text-decoration:none}
+    .smap-footer a:hover{text-decoration:underline}
+    /* Pulsing route markers */
+    .smap-marker{width:14px;height:14px;border-radius:50%;position:relative}
+    .smap-marker::after{content:'';position:absolute;top:-5px;left:-5px;width:24px;height:24px;
+      border-radius:50%;animation:smap-pulse 1.8s ease-out infinite;opacity:0}
+    .smap-marker-start{background:#00E676;box-shadow:0 0 8px rgba(0,230,118,0.6)}
+    .smap-marker-start::after{border:2px solid #00E676}
+    .smap-marker-end{background:#FF5252;box-shadow:0 0 8px rgba(255,82,82,0.6)}
+    .smap-marker-end::after{border:2px solid #FF5252}
+    @keyframes smap-pulse{0%{transform:scale(0.5);opacity:0.8}100%{transform:scale(2.2);opacity:0}}
+    @media(max-width:600px){.smap-canvas{height:220px}.smap-stamp{font-size:16px;padding:8px 12px;letter-spacing:2px}}
+
     /* Panel header */
     .cc-panel-header{margin-bottom:28px}
     .cc-panel-title{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--text);letter-spacing:1px}
