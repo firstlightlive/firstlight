@@ -24,7 +24,7 @@ var SYNC_TABLES = [
   'races', 'rituals_log', 'deepwork_log', 'mastery_log',
   'gym_workouts', 'brahma_log', 'journal_entries',
   'journal_notes', 'journal_insights',
-  'ekadashi_log', 'weekly_schedule'
+  'ekadashi_log', 'weekly_schedule', 'tomorrow_plan'
 ];
 
 // ── Map table → localStorage update logic ──
@@ -36,7 +36,9 @@ var SYNC_MAP = {
   },
   'deepwork_log': function(r) {
     if (r.date) {
-      localStorage.setItem('fl_deepwork_' + r.date, JSON.stringify({ blocks: r.blocks, bigWin: r.big_win }));
+      var blocks = r.blocks;
+      if (typeof blocks === 'string') { try { blocks = JSON.parse(blocks); } catch(e) { blocks = []; } }
+      localStorage.setItem('fl_deepwork_' + r.date, JSON.stringify({ blocks: blocks, bigWin: r.big_win }));
     }
   },
   'mastery_log': function(r) {
@@ -101,6 +103,18 @@ var SYNC_MAP = {
       localStorage.setItem('fl_weekly_' + r.week_key, JSON.stringify(r.data));
     }
   },
+  'tomorrow_plan': function(r) {
+    if (r.date) {
+      var existing = {};
+      try { existing = JSON.parse(localStorage.getItem('fl_tomorrow_' + r.date) || '{}'); } catch(e) {}
+      var tasks = r.tasks;
+      if (typeof tasks === 'string') { try { tasks = JSON.parse(tasks); } catch(e) { tasks = []; } }
+      existing.tasks = tasks || existing.tasks || [];
+      if (r.executed_pct !== undefined) existing.executed_pct = r.executed_pct;
+      if (r.review_notes !== undefined) existing.review_notes = r.review_notes;
+      localStorage.setItem('fl_tomorrow_' + r.date, JSON.stringify(existing));
+    }
+  },
   'proof_archive': function(r) {
     if (r.date) {
       try {
@@ -159,6 +173,7 @@ var TABLE_PANEL_MAP = {
   'journal_insights': ['journal-today', 'journal-archive', 'journal-review'],
   'ekadashi_log': ['ekadashi'],
   'weekly_schedule': ['weekly'],
+  'tomorrow_plan': ['tomorrow'],
   'proof_archive': ['arch-log'],
   'daily_checkin': ['checkin', 'dashboard'],
   'reading_log': ['reading'],
@@ -352,6 +367,8 @@ function pullAllFromSupabase() {
   if (typeof SB !== 'undefined' && !SB.init()) return;
 
   var today = typeof getEffectiveToday === 'function' ? getEffectiveToday() : new Date().toISOString().slice(0, 10);
+  var _tmrD = new Date(today + 'T00:00:00'); _tmrD.setDate(_tmrD.getDate() + 1);
+  var tomorrow = _tmrD.getFullYear() + '-' + String(_tmrD.getMonth()+1).padStart(2,'0') + '-' + String(_tmrD.getDate()).padStart(2,'0');
 
   console.log('[Sync] Pulling fresh data for ' + today);
 
@@ -367,7 +384,9 @@ function pullAllFromSupabase() {
     { table: 'deepwork_log', query: '?date=eq.' + today, handler: function(rows) {
       rows.forEach(function(r) {
         if (r.date) {
-          localStorage.setItem('fl_deepwork_' + r.date, JSON.stringify({ blocks: r.blocks, bigWin: r.big_win }));
+          var blocks = r.blocks;
+          if (typeof blocks === 'string') { try { blocks = JSON.parse(blocks); } catch(e) { blocks = []; } }
+          localStorage.setItem('fl_deepwork_' + r.date, JSON.stringify({ blocks: blocks, bigWin: r.big_win }));
         }
       });
     }},
@@ -442,6 +461,20 @@ function pullAllFromSupabase() {
           var dates = JSON.parse(localStorage.getItem('fl_journal_insight_dates') || '{}');
           dates[r.date] = true;
           localStorage.setItem('fl_journal_insight_dates', JSON.stringify(dates));
+        }
+      });
+    }},
+    { table: 'tomorrow_plan', query: '?date=in.(' + today + ',' + tomorrow + ')', handler: function(rows) {
+      rows.forEach(function(r) {
+        if (r.date) {
+          var existing = {};
+          try { existing = JSON.parse(localStorage.getItem('fl_tomorrow_' + r.date) || '{}'); } catch(e) {}
+          var tasks = r.tasks;
+          if (typeof tasks === 'string') { try { tasks = JSON.parse(tasks); } catch(e) { tasks = []; } }
+          existing.tasks = tasks || existing.tasks || [];
+          if (r.executed_pct !== undefined) existing.executed_pct = r.executed_pct;
+          if (r.review_notes !== undefined) existing.review_notes = r.review_notes;
+          localStorage.setItem('fl_tomorrow_' + r.date, JSON.stringify(existing));
         }
       });
     }}

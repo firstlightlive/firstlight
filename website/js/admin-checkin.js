@@ -15,7 +15,6 @@ function saveCheckin(date, data) {
     syncSave('daily_checkin', Object.assign({ date: date }, data), 'date');
   }
   markSaved();
-  syncCheckin(date, data);
 }
 
 function syncCheckin(date, data) {
