@@ -50,6 +50,51 @@ function _escapeHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// Parse a field value that may be EditorJS JSON or plain text
+// Returns clean plain text ready for display
+function _jnParseField(value) {
+  if (!value) return '';
+  if (typeof value !== 'string') return String(value);
+  var trimmed = value.trim();
+  // Detect EditorJS JSON format
+  if (trimmed.startsWith('{') && trimmed.indexOf('"blocks"') !== -1) {
+    try {
+      var parsed = JSON.parse(trimmed);
+      if (parsed.blocks && Array.isArray(parsed.blocks)) {
+        // Use existing editorDataToText if available, else inline parse
+        if (typeof editorDataToText === 'function') {
+          var txt = editorDataToText(parsed);
+          return txt ? _cleanEditorHtml(txt) : '';
+        }
+        // Inline fallback
+        return _cleanEditorHtml(parsed.blocks.map(function(b) {
+          if (b.type === 'paragraph' || b.type === 'header') return b.data.text || '';
+          if (b.type === 'list') return (b.data.items || []).join('\n');
+          if (b.type === 'checklist') return (b.data.items || []).map(function(i){ return (i.checked?'✓ ':'○ ')+(i.text||''); }).join('\n');
+          if (b.type === 'quote') return '"'+(b.data.text||'')+'"'+(b.data.caption?' — '+b.data.caption:'');
+          if (b.type === 'delimiter') return '───';
+          return b.data ? (b.data.text || '') : '';
+        }).filter(function(l){ return l; }).join('\n'));
+      }
+    } catch(e) {}
+  }
+  return value;
+}
+
+// Strip HTML tags left by EditorJS (bold, italic, color spans, &nbsp; etc.)
+function _cleanEditorHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/<[^>]+>/g, '')           // strip tags
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+}
+
 // ══════════════════════════════════════════════════════
 // TODAY'S LOG — INIT
 // ══════════════════════════════════════════════════════
@@ -398,12 +443,12 @@ function renderJournalDayDetail(date) {
 
   // Reflection fields
   if (entry) {
-    if (entry.aligned)    html += _jnDetailBlock('ALIGNED',    entry.aligned,    '#00E676', true);
-    if (entry.notAligned) html += _jnDetailBlock('NOT ALIGNED',entry.notAligned, '#FF5252', true);
-    if (entry.wins)       html += _jnDetailBlock('WINS',       entry.wins,       '#F5A623', false);
-    if (entry.changes)    html += _jnDetailBlock('CHANGES',    entry.changes,    '#00E676', false);
-    if (entry.improve)    html += _jnDetailBlock('1% IMPROVE', entry.improve,    '#00D4FF', false);
-    if (entry.thoughts)   html += _jnDetailBlock('THOUGHTS',   entry.thoughts,   'var(--text-muted)', false);
+    html += _jnDetailBlock('ALIGNED',     entry.aligned,                              '#00E676', true);
+    html += _jnDetailBlock('NOT ALIGNED', entry.notAligned || entry.not_aligned || '', '#FF5252', true);
+    html += _jnDetailBlock('WINS',        entry.wins    || '', '#F5A623', false);
+    html += _jnDetailBlock('CHANGES',     entry.changes || '', '#00E676', false);
+    html += _jnDetailBlock('1% IMPROVE',  entry.improve || '', '#00D4FF', false);
+    html += _jnDetailBlock('THOUGHTS',    entry.thoughts || '', 'var(--text-muted)', false);
   }
 
   bodyEl.innerHTML = html;
@@ -412,15 +457,17 @@ function renderJournalDayDetail(date) {
 }
 
 function _jnDetailBlock(title, content, color, asBullets) {
+  var text = _jnParseField(content);
+  if (!text) return '';
   var h = '<div style="margin-bottom:16px">';
   h += '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:'+color+';margin-bottom:8px;font-weight:700">'+title+'</div>';
   if (asBullets) {
-    var lines = content.split(/[\n,]+/).map(function(l){return l.trim();}).filter(function(l){return l;});
+    var lines = text.split(/[\n,]+/).map(function(l){return l.trim();}).filter(function(l){return l;});
     h += '<ul style="margin:0;padding-left:18px;color:var(--text);font-size:13px;line-height:1.8">';
     lines.forEach(function(l){ h += '<li>'+_escapeHtml(l)+'</li>'; });
     h += '</ul>';
   } else {
-    h += '<div style="color:var(--text);font-size:13px;line-height:1.8;white-space:pre-wrap">'+_escapeHtml(content)+'</div>';
+    h += '<div style="color:var(--text);font-size:13px;line-height:1.8;white-space:pre-wrap">'+_escapeHtml(text)+'</div>';
   }
   h += '</div>';
   return h;
@@ -466,7 +513,8 @@ function renderJournalArchive() {
     var noteCount    = notes.length;
     var hasReflection = !!(entry && (entry.aligned || entry.thoughts || entry.wins));
     var hasInsight   = !!insight;
-    var preview = (insight ? insight.insight : null) || (entry ? (entry.aligned||entry.thoughts) : null) || (notes.length ? notes[0].content : null) || '';
+    var preview = (insight ? insight.insight : null) || (entry ? _jnParseField(entry.aligned||entry.thoughts||'') : null) || (notes.length ? notes[0].content : null) || '';
+    preview = _jnParseField(preview);
     var insightCatColor = hasInsight ? (JN_CAT_COLORS[insight.category]||'#F5A623') : '#F5A623';
 
     html += '<div onclick="this.querySelector(\'.je-full\').style.display=this.querySelector(\'.je-full\').style.display===\'none\'?\'block\':\'none\'" style="cursor:pointer;background:var(--bg3);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px;margin-bottom:10px;transition:border-color 0.15s" onmouseenter="this.style.borderColor=\'rgba(0,212,255,0.2)\'" onmouseleave="this.style.borderColor=\'rgba(255,255,255,0.06)\'">' +
@@ -506,11 +554,16 @@ function _jnBuildFullEntry(date, entry, notes, insight) {
       '<div style="font-size:12px;color:var(--text-muted);line-height:1.65">'+_escapeHtml(note.content.substring(0,250))+(note.content.length>250?'…':'')+'</div></div>';
   });
   if (entry) {
-    if (entry.aligned)    html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:#00E676;letter-spacing:1px">ALIGNED: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(entry.aligned)+'</span></div>';
-    if (entry.notAligned) html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:#FF5252;letter-spacing:1px">NOT ALIGNED: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(entry.notAligned)+'</span></div>';
-    if (entry.wins)       html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:#F5A623;letter-spacing:1px">WINS: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(entry.wins)+'</span></div>';
-    if (entry.improve)    html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:#00D4FF;letter-spacing:1px">1% IMPROVE: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(entry.improve)+'</span></div>';
-    if (entry.thoughts)   html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px">THOUGHTS: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(entry.thoughts)+'</span></div>';
+    var fAligned    = _jnParseField(entry.aligned    || '');
+    var fNotAligned = _jnParseField(entry.notAligned || entry.not_aligned || '');
+    var fWins       = _jnParseField(entry.wins       || '');
+    var fImprove    = _jnParseField(entry.improve    || '');
+    var fThoughts   = _jnParseField(entry.thoughts   || '');
+    if (fAligned)    html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:#00E676;letter-spacing:1px">ALIGNED: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(fAligned)+'</span></div>';
+    if (fNotAligned) html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:#FF5252;letter-spacing:1px">NOT ALIGNED: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(fNotAligned)+'</span></div>';
+    if (fWins)       html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:#F5A623;letter-spacing:1px">WINS: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(fWins)+'</span></div>';
+    if (fImprove)    html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:#00D4FF;letter-spacing:1px">1% IMPROVE: </span><span style="font-size:12px;color:var(--text-muted)">'+_escapeHtml(fImprove)+'</span></div>';
+    if (fThoughts)   html += '<div style="margin-bottom:7px"><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px">THOUGHTS: </span><span style="font-size:12px;color:var(--text-muted);white-space:pre-wrap">'+_escapeHtml(fThoughts)+'</span></div>';
   }
   return html || '<div style="color:var(--text-dim);font-size:12px;font-family:var(--font-mono)">No content</div>';
 }

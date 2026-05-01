@@ -177,12 +177,13 @@ function loadReflection(dateStr) {
   var entry = all[dateStr];
   if (typeof entry === 'string') { try { entry = JSON.parse(entry); } catch(pe) { entry = {}; } }
   entry = entry || {};
-  if (el('jAligned')) el('jAligned').value = entry.aligned || '';
-  if (el('jNotAligned')) el('jNotAligned').value = entry.notAligned || '';
-  if (el('jWins')) el('jWins').value = entry.wins || '';
-  if (el('jChanges')) el('jChanges').value = entry.changes || '';
-  if (el('jImprove')) el('jImprove').value = entry.improve || '';
-  if (el('jThoughts')) el('jThoughts').value = entry.thoughts || '';
+  var _pf = typeof _jnParseField === 'function' ? _jnParseField : function(v){ return v || ''; };
+  if (el('jAligned'))    el('jAligned').value    = _pf(entry.aligned    || '');
+  if (el('jNotAligned')) el('jNotAligned').value = _pf(entry.notAligned || entry.not_aligned || '');
+  if (el('jWins'))       el('jWins').value       = _pf(entry.wins       || '');
+  if (el('jChanges'))    el('jChanges').value    = _pf(entry.changes    || '');
+  if (el('jImprove'))    el('jImprove').value    = _pf(entry.improve    || '');
+  if (el('jThoughts'))   el('jThoughts').value   = _pf(entry.thoughts   || '');
   document.querySelectorAll('#jMoodRow span').forEach(function(s) {
 s.classList.toggle('active', s.dataset.mood === (entry.mood || ''));
   });
