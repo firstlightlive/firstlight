@@ -2,6 +2,8 @@
 // FIRST LIGHT — RACES
 // ═══════════════════════════════════════════
 
+var _raceMapActiveId = null;
+
 function renderRaceList() {
   var list = document.getElementById('raceList');
   var races = getRaces();
@@ -9,12 +11,14 @@ function renderRaceList() {
   list.innerHTML = races.map(function(r) {
     var color = RACE_COLORS[r.type] || '#C0C0C0';
     var label = RACE_LABELS[r.type] || r.type;
-    return '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:6px">' +
+    var isMapActive = _raceMapActiveId === r.id;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:6px;flex-wrap:wrap">' +
       '<span style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:3px;background:' + color + '22;color:' + color + '">' + label + '</span>' +
-      '<div style="flex:1"><div style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text)">' + r.name + '</div>' +
+      '<div style="flex:1;min-width:0"><div style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text)">' + r.name + '</div>' +
       '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">' + r.date + ' · ' + (r.finishTime || r.status) + '</div></div>' +
+      '<button class="btn-copy" onclick="showRaceMap(\'' + r.id + '\')" style="' + (isMapActive ? 'color:var(--green);border-color:rgba(0,230,118,0.4)' : '') + '">MAP</button>' +
       '<button class="btn-copy" onclick="editRace(\'' + r.id + '\')">EDIT</button>' +
-      '<button class="btn-copy" style="color:var(--red);border-color:rgba(255,68,68,0.2)" onclick="if(confirm(\'Delete this race?\')){deleteRace(\'' + r.id + '\');renderRaceList();}">DEL</button></div>';
+      '<button class="btn-copy" style="color:var(--red);border-color:rgba(255,68,68,0.2)" onclick="if(confirm(\'Delete this race?\')){deleteRace(\'' + r.id + '\');_raceMapActiveId=null;document.getElementById(\'raceMapPanel\').classList.add(\'hidden\');renderRaceList();}">DEL</button></div>';
   }).join('');
 }
 
@@ -219,6 +223,197 @@ renderRaceList();
   var items = document.querySelectorAll('.story-step');
   done.forEach(function(i) { if (items[i]) { items[i].classList.add('checked'); items[i].querySelector('.story-check').textContent = '✓'; }});
 })();
+
+// ══════════════════════════════════════
+// RACE ROUTE MAP — Mapbox GL JS
+// Queries strava_activities by race date
+// Reuses _smap* helpers from admin-slips.js
+// ══════════════════════════════════════
+
+function showRaceMap(id) {
+  var panel = document.getElementById('raceMapPanel');
+  if (!panel) return;
+
+  // Toggle — click same race MAP button again to close
+  if (_raceMapActiveId === id) {
+    _raceMapActiveId = null;
+    panel.classList.add('hidden');
+    panel.innerHTML = '';
+    renderRaceList();
+    return;
+  }
+
+  var race = getRaces().find(function(r) { return r.id === id; });
+  if (!race) return;
+
+  _raceMapActiveId = id;
+  renderRaceList(); // re-render to highlight active MAP button
+
+  panel.classList.remove('hidden');
+  panel.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">' +
+      '<div>' +
+        '<div style="font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:2px;color:var(--green)">' + (race.name || 'RACE').toUpperCase() + '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">STRAVA ROUTE · ' + (race.date || '') + '</div>' +
+      '</div>' +
+      '<button class="btn-copy" onclick="_raceMapActiveId=null;document.getElementById(\'raceMapPanel\').classList.add(\'hidden\');document.getElementById(\'raceMapPanel\').innerHTML=\'\';renderRaceList()" style="padding:4px 10px;font-size:10px">CLOSE ✕</button>' +
+    '</div>' +
+    '<div id="raceMapContainer" class="smap-wrap"></div>';
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  _renderRaceRouteMap('raceMapContainer', race);
+}
+
+async function _renderRaceRouteMap(containerId, race) {
+  var wrap = document.getElementById(containerId);
+  if (!wrap) return;
+
+  if (!race.date) {
+    wrap.innerHTML = '<div class="smap-no-route">No race date set.</div>';
+    return;
+  }
+
+  wrap.innerHTML = '<div class="smap-loading"><div class="smap-spinner"></div>Searching Strava for run on ' + race.date + '...</div>';
+
+  try {
+    if (typeof sbFetch !== 'function') {
+      wrap.innerHTML = '<div class="smap-no-route">Supabase not configured.</div>';
+      return;
+    }
+
+    // Compute next day for date range
+    var d = new Date(race.date + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    var nextDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+
+    var acts = await sbFetch('strava_activities', 'GET', null,
+      '?start_date_local=gte.' + race.date +
+      '&start_date_local=lt.' + nextDate +
+      '&type=in.(Run,Walk,VirtualRun)' +
+      '&select=id,name,type,distance,moving_time,total_elevation_gain,calories,summary_polyline,start_date_local,average_speed' +
+      '&order=distance.desc&limit=1');
+
+    if (!acts || !acts.length) {
+      wrap.innerHTML =
+        '<div class="smap-no-route" style="padding:20px;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);line-height:1.7">' +
+        '📍 No Strava run/walk found on <strong style="color:var(--text)">' + race.date + '</strong>.<br>' +
+        'Make sure the race activity is synced to Strava on the same date as the race.</div>';
+      return;
+    }
+
+    var act = acts[0];
+    var uid = 'rm' + act.id;
+    var typeColor = '#00E676'; // Race = green
+
+    if (!act.summary_polyline) {
+      wrap.innerHTML =
+        '<div class="smap-no-route">📍 No GPS route (indoor or privacy zone). Found: ' + (act.name || act.type) + '</div>' +
+        _smapBuildMetrics(act, uid);
+      setTimeout(function() { _smapStartCountUp(act, uid); }, 200);
+      return;
+    }
+
+    var coords = _smapDecodePolyline(act.summary_polyline);
+    if (!coords || coords.length < 2) {
+      wrap.innerHTML = '<div class="smap-no-route">📍 Could not decode GPS route data.</div>';
+      return;
+    }
+
+    await _smapLoadGL();
+
+    wrap.innerHTML =
+      '<div class="smap-inner">' +
+        '<div id="' + uid + '-canvas" class="smap-canvas"></div>' +
+        '<div id="' + uid + '-stamp" class="smap-stamp" style="color:#00E676;border-color:rgba(0,230,118,0.4);text-shadow:0 0 20px rgba(0,230,118,0.5)">RACE<br>COMPLETE</div>' +
+        '<div class="smap-badge" style="background:rgba(0,230,118,0.1);color:#00E676;border-color:rgba(0,230,118,0.3)">🏁 ' + (RACE_LABELS[race.type] || race.type || 'RACE').toUpperCase() + '</div>' +
+      '</div>' +
+      _smapBuildMetrics(act, uid);
+
+    mapboxgl.accessToken = (window.FL && window.FL.MAPBOX_TOKEN) ? window.FL.MAPBOX_TOKEN : '';
+    if (mapboxgl.config) mapboxgl.config.EVENTS_URL = null;
+
+    var map = new mapboxgl.Map({
+      container: uid + '-canvas',
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: coords[0],
+      zoom: 13,
+      interactive: true,
+      attributionControl: false
+    });
+
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+    map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+
+    map.on('load', function() {
+      var lngs = coords.map(function(c) { return c[0]; });
+      var lats = coords.map(function(c) { return c[1]; });
+      map.fitBounds(
+        [[Math.min.apply(null, lngs), Math.min.apply(null, lats)],
+         [Math.max.apply(null, lngs), Math.max.apply(null, lats)]],
+        { padding: 50, duration: 0 }
+      );
+
+      // Ghost (dim full path)
+      map.addSource('ghost-' + uid, { type: 'geojson', data: { type: 'Feature', geometry: { type: 'LineString', coordinates: coords } } });
+      map.addLayer({ id: 'ghost-' + uid, type: 'line', source: 'ghost-' + uid,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': typeColor, 'line-width': 2, 'line-opacity': 0.18 }
+      });
+
+      // Animated route source
+      map.addSource('route-' + uid, { type: 'geojson', data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [coords[0]] } } });
+
+      // Glow layer
+      map.addLayer({ id: 'glow-' + uid, type: 'line', source: 'route-' + uid,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': typeColor, 'line-width': 14, 'line-opacity': 0.1, 'line-blur': 8 }
+      });
+
+      // Main line
+      map.addLayer({ id: 'route-' + uid, type: 'line', source: 'route-' + uid,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': typeColor, 'line-width': 4, 'line-opacity': 1 }
+      });
+
+      // Start marker
+      var sEl = document.createElement('div'); sEl.className = 'smap-marker smap-marker-start';
+      new mapboxgl.Marker({ element: sEl, anchor: 'center' }).setLngLat(coords[0]).addTo(map);
+
+      // Animated draw
+      var t0 = null;
+      var animDur = Math.max(1800, Math.min(4000, coords.length * 5));
+
+      (function animateRoute(ts) {
+        if (!t0) t0 = ts;
+        var p = Math.min((ts - t0) / animDur, 1);
+        var eased = 1 - Math.pow(1 - p, 2.5);
+        var count = Math.max(2, Math.floor(eased * coords.length));
+        map.getSource('route-' + uid).setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: coords.slice(0, count) } });
+
+        if (p < 1) {
+          requestAnimationFrame(animateRoute);
+        } else {
+          // Finish marker
+          var eEl = document.createElement('div'); eEl.className = 'smap-marker smap-marker-end';
+          new mapboxgl.Marker({ element: eEl, anchor: 'center' }).setLngLat(coords[coords.length - 1]).addTo(map);
+
+          // Stamp reveal
+          var stamp = document.getElementById(uid + '-stamp');
+          if (stamp) { stamp.style.opacity = '1'; stamp.style.transform = 'rotate(-14deg) translate(-50%,-50%) scale(1)'; }
+
+          // Metrics count-up
+          _smapStartCountUp(act, uid);
+        }
+      })(performance.now());
+    });
+
+    map.on('error', function(e) { console.warn('[RaceMap]', e.error); });
+
+  } catch(e) {
+    console.error('[RaceMap]', e);
+    if (wrap) wrap.innerHTML = '<div class="smap-no-route">Error loading map: ' + (e.message || e) + '</div>';
+  }
+}
 
 // ══════════════════════════════════════
 // GCS PHOTO UPLOAD FOR RACES
