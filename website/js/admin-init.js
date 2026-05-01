@@ -853,13 +853,7 @@ function buildActionBands() {
   var checkinState = checkinDone ? 'done' : (istHour >= 20 ? 'pending' : 'na');
   var checkinGlow = (!checkinDone && istHour >= 20) ? 'due' : null;
 
-  // ── Weekly review
-  var wrDone = false;
-  try {
-    var wrObj = JSON.parse(localStorage.getItem('fl_weekly_review') || '{}');
-    var wk = (function(){var d=new Date(istMs);d.setUTCDate(d.getUTCDate()-d.getUTCDay());return d.toISOString().slice(0,10);})();
-    wrDone = !!wrObj[wk];
-  } catch(e) {}
+  // ── Weekly review (read-only panel — no completion state, glow on Sunday)
   var isSunday = istDow === 0;
   var isWeekend = istDow === 0 || istDow >= 5;
   var isMonthEnd = istDay >= 26;
@@ -917,9 +911,9 @@ function buildActionBands() {
   var weeklyBand = band('THIS WEEK',
     isWeekend ? 'REVIEW WINDOW' : dowLabels[istDow], 'cols4',
     card('\ud83d\udd01', 'SUN', 'WEEKLY REVIEW',
-      wrDone ? 'Done this week' : 'Reflection + habits',
-      wrDone ? 'done' : (isSunday ? 'pending' : 'na'),
-      'weekly-review', (isSunday && !wrDone) ? 'due' : null) +
+      'Reflection + habits',
+      isSunday ? 'pending' : 'na',
+      'weekly-review', isSunday ? 'due' : null) +
     card('\ud83d\udccb', 'SUN', 'MASTERY WEEKLY',
       '7-item Sunday audit',
       isSunday ? 'pending' : 'na', 'mastery-weekly', isSunday ? 'due' : null) +
@@ -954,7 +948,7 @@ function buildActionBands() {
       pill('\ud83d\udcaa', 'GYM ANALYTICS', 'gym-analytics') +
       pill('\ud83d\udd25', 'RITUAL ANALYTICS', 'ritual-analytics') +
       pill('\ud83d\udca1', 'IDEAS HUB', 'mastery-ideas') +
-      pill('\ud83c\udfc3', 'STRAVA', 'strava') +
+      pill('\ud83c\udfc3', 'STREAKS', 'unified-streaks') +
       pill('\ud83d\udcf8', 'INSTAGRAM', 'schedule') +
       pill('\ud83d\udc8a', 'HEALTH', 'health-dashboard') +
       pill('\ud83c\udfc5', 'RACES', 'races') +
