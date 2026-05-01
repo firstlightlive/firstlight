@@ -732,4 +732,237 @@ function buildDashboardStats() {
   }
 }
 buildDashboardStats();
- 
+
+// ═══════════════════════════════════════════
+// SMART ACTION BANDS — time-aware dashboard nav
+// ═══════════════════════════════════════════
+function buildActionBands() {
+  var container = document.getElementById('dashActionBands');
+  if (!container) return;
+
+  var today = (typeof getEffectiveToday === 'function') ? getEffectiveToday() : new Date().toISOString().slice(0,10);
+  var now = new Date();
+  var istMs = now.getTime() + (330 - now.getTimezoneOffset()) * 60000;
+  var istDate = new Date(istMs);
+  var istHour = istDate.getUTCHours();
+  var istMin  = istDate.getUTCMinutes();
+  var istDow  = istDate.getUTCDay();
+  var istDay  = istDate.getUTCDate();
+  var daysInMonth = new Date(istDate.getUTCFullYear(), istDate.getUTCMonth() + 1, 0).getDate();
+
+  var tmrDate = (function() {
+    var d = new Date(istMs); d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0,10);
+  })();
+
+  var td = document.getElementById('dacTimeDisplay');
+  if (td) {
+    td.textContent = String(istHour).padStart(2,'0') + ':' + String(istMin).padStart(2,'0') + ' IST';
+  }
+
+  function badge(state) {
+    var labels = { done:'DONE', partial:'PARTIAL', pending:'PENDING', na:'\u2014' };
+    return '<span class="dac-badge ' + state + '">' + (labels[state] || '\u2014') + '</span>';
+  }
+
+  function card(icon, timeHint, title, sub, state, panel, glow) {
+    var cls = 'dac-block' + (glow ? ' glow-' + glow : '');
+    return '<div class="' + cls + '" onclick="switchPanel(\'' + panel + '\')">' +
+      '<div class="dac-block-time">' + timeHint + '</div>' +
+      '<div class="dac-block-title">' + icon + '  ' + title + '</div>' +
+      '<div class="dac-block-sub">' + sub + '</div>' +
+      badge(state) + '</div>';
+  }
+
+  function band(title, timeHint, colsCls, cardsHtml, isActive) {
+    var headerCls = 'dac-band-header' + (isActive ? ' dac-band-active' : '');
+    return '<div class="dac-band">' +
+      '<div class="' + headerCls + '">' +
+        '<div class="dac-band-title">' + title +
+          (timeHint ? '  <span class="dac-time-hint">' + timeHint + '</span>' : '') +
+        '</div>' +
+        '<div class="dac-band-rule"></div>' +
+      '</div>' +
+      '<div class="dac-blocks ' + colsCls + '">' + cardsHtml + '</div>' +
+    '</div>';
+  }
+
+  // ── Morning rituals
+  var morningDone = 0, morningTotal = 0;
+  if (typeof getRitualDefs === 'function') {
+    var mDefs = getRitualDefs('morning');
+    morningTotal = mDefs ? mDefs.length : 0;
+  }
+  try { morningDone = JSON.parse(localStorage.getItem('fl_rituals_morning_' + today) || '[]').length; } catch(e) {}
+  var morningState = morningTotal === 0 ? 'na' : (morningDone >= morningTotal ? 'done' : morningDone > 0 ? 'partial' : 'pending');
+  var morningGlow = (istHour >= 5 && istHour < 9 && morningState !== 'done') ? 'now' : null;
+
+  // ── Deep work
+  var dwDone = 0, dwTotal = 0;
+  try { var dw = JSON.parse(localStorage.getItem('fl_deepwork_' + today) || '[]'); dwTotal = dw.length; dwDone = dw.filter(function(b){return b.done;}).length; } catch(e) {}
+  var dwState = dwTotal === 0 ? 'na' : (dwDone >= dwTotal ? 'done' : dwDone > 0 ? 'partial' : 'pending');
+  var dwGlow = (istHour >= 9 && istHour < 18 && dwState !== 'done') ? 'now' : null;
+
+  // ── Mastery daily
+  var mastPct = 0;
+  if (typeof computeMasteryStats === 'function') {
+    try { var ms = computeMasteryStats(today); mastPct = ms ? (ms.pct || 0) : 0; } catch(e) {}
+  }
+  var mastState = mastPct >= 100 ? 'done' : mastPct > 0 ? 'partial' : 'na';
+
+  // ── Gym log
+  var gymDone = false;
+  if (typeof getGymWorkout === 'function') {
+    try { var gw = getGymWorkout(today); gymDone = !!(gw && (gw.split || (gw.exercises && gw.exercises.length))); } catch(e) {}
+  }
+  var gymState = gymDone ? 'done' : 'na';
+
+  // ── Journal notes
+  var jnCount = 0;
+  try { jnCount = JSON.parse(localStorage.getItem('fl_journal_notes_' + today) || '[]').length; } catch(e) {}
+  var jnState = jnCount > 0 ? 'done' : 'na';
+
+  // ── Brahma log
+  var brahmaDone = !!localStorage.getItem('fl_brahma_daily_' + today);
+  var brahmaState = brahmaDone ? 'done' : 'na';
+
+  // ── Evening rituals
+  var eveDone = 0, eveTotal = 0;
+  if (typeof getRitualDefs === 'function') {
+    var eDefs = getRitualDefs('evening');
+    eveTotal = eDefs ? eDefs.length : 0;
+  }
+  try { eveDone = JSON.parse(localStorage.getItem('fl_rituals_evening_' + today) || '[]').length; } catch(e) {}
+  var eveState = eveTotal === 0 ? 'na' : (eveDone >= eveTotal ? 'done' : eveDone > 0 ? 'partial' : 'pending');
+  var eveGlow = (istHour >= 19 && istHour < 23 && eveState !== 'done') ? 'now' : null;
+
+  // ── Reflection
+  var refDone = false;
+  try { var jAll = JSON.parse(localStorage.getItem('fl_journal') || '{}'); refDone = !!(jAll[today] && (jAll[today].aligned || jAll[today].thoughts)); } catch(e) {}
+  var refState = refDone ? 'done' : (istHour >= 20 ? 'pending' : 'na');
+  var refGlow = (!refDone && istHour >= 20) ? 'due' : null;
+
+  // ── Tomorrow plan
+  var tmrDone = false;
+  try { var tmr = JSON.parse(localStorage.getItem('fl_tomorrow_' + tmrDate) || '{}'); tmrDone = !!(tmr.tasks && tmr.tasks.filter(function(t){return t.text;}).length > 0); } catch(e) {}
+  var tmrState = tmrDone ? 'done' : (istHour >= 21 ? 'pending' : 'na');
+  var tmrGlow = (!tmrDone && istHour >= 21) ? 'due' : null;
+
+  // ── Check-in
+  var checkinDone = !!localStorage.getItem('fl_checkin_' + today);
+  var checkinState = checkinDone ? 'done' : (istHour >= 20 ? 'pending' : 'na');
+  var checkinGlow = (!checkinDone && istHour >= 20) ? 'due' : null;
+
+  // ── Weekly review
+  var wrDone = false;
+  try {
+    var wrObj = JSON.parse(localStorage.getItem('fl_weekly_review') || '{}');
+    var wk = (function(){var d=new Date(istMs);d.setUTCDate(d.getUTCDate()-d.getUTCDay());return d.toISOString().slice(0,10);})();
+    wrDone = !!wrObj[wk];
+  } catch(e) {}
+  var isSunday = istDow === 0;
+  var isWeekend = istDow === 0 || istDow >= 5;
+  var isMonthEnd = istDay >= 26;
+
+  // ── BAND: MORNING
+  var isMorning = istHour >= 5 && istHour < 9;
+  var morningBand = band('MORNING', '5AM \u2013 9AM', 'cols3',
+    card('\u2600\ufe0f', 'RITUAL', 'MORNING RITUALS',
+      morningTotal > 0 ? morningDone + '/' + morningTotal + ' rituals' : 'Daily rituals',
+      morningState, 'morning', morningGlow) +
+    card('\u26a1', 'FOCUS', 'DEEP WORK',
+      dwTotal > 0 ? dwDone + '/' + dwTotal + ' blocks' : 'Focus blocks',
+      dwState, 'deepwork', dwGlow) +
+    card('\ud83d\udccb', 'TRACK', 'MASTERY DAILY',
+      mastPct > 0 ? mastPct + '% \u00b7 25 items' : '25 items \u00b7 5 domains',
+      mastState, 'mastery-daily', null),
+    isMorning
+  );
+
+  // ── BAND: DAY
+  var isDay = istHour >= 9 && istHour < 20;
+  var dayBand = band('DAY', '9AM \u2013 8PM', 'cols3',
+    card('\ud83d\udcaa', 'WORKOUT', 'GYM LOG',
+      gymDone ? 'Logged today' : 'Log your workout',
+      gymState, 'gym-log', null) +
+    card('\ud83d\udcd3', 'CAPTURE', 'JOURNAL',
+      jnCount > 0 ? jnCount + ' note' + (jnCount !== 1 ? 's' : '') + ' today' : 'Capture thoughts',
+      jnState, 'journal-today', null) +
+    card('\ud83e\uddd8', 'PRACTICE', 'BRAHMA LOG',
+      brahmaDone ? 'Logged today' : 'Daily practice',
+      brahmaState, 'brahma-log', null),
+    isDay
+  );
+
+  // ── BAND: EVENING
+  var isEvening = istHour >= 20 || istHour < 3;
+  var eveningBand = band('EVENING', '8PM \u2013 12AM', 'cols4',
+    card('\ud83c\udf19', 'RITUAL', 'EVENING RITUALS',
+      eveTotal > 0 ? eveDone + '/' + eveTotal + ' rituals' : 'Wind-down rituals',
+      eveState, 'evening', eveGlow) +
+    card('\ud83d\udcd6', 'REFLECT', 'REFLECTION',
+      refDone ? 'Completed' : 'End-of-day alignment',
+      refState, 'reflection', refGlow) +
+    card('\ud83d\udcc5', 'PLAN', 'TOMORROW PLAN',
+      tmrDone ? 'Plan ready' : 'Prepare next day',
+      tmrState, 'tomorrow', tmrGlow) +
+    card('\u2713', 'SEAL', 'CHECK-IN',
+      checkinDone ? 'Day sealed' : 'Close the day',
+      checkinState, 'checkin', checkinGlow),
+    isEvening
+  );
+
+  // ── BAND: THIS WEEK
+  var dowLabels = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  var weeklyBand = band('THIS WEEK',
+    isWeekend ? 'REVIEW WINDOW' : dowLabels[istDow], 'cols4',
+    card('\ud83d\udd01', 'SUN', 'WEEKLY REVIEW',
+      wrDone ? 'Done this week' : 'Reflection + habits',
+      wrDone ? 'done' : (isSunday ? 'pending' : 'na'),
+      'weekly-review', (isSunday && !wrDone) ? 'due' : null) +
+    card('\ud83d\udccb', 'SUN', 'MASTERY WEEKLY',
+      '7-item Sunday audit',
+      isSunday ? 'pending' : 'na', 'mastery-weekly', isSunday ? 'due' : null) +
+    card('\ud83d\uddd3\ufe0f', 'MON', 'WEEKLY SCHEDULE',
+      'Plan the week ahead', 'na', 'weekly', null) +
+    card('\ud83d\udcca', 'ANY', 'FORTRESS STREAKS',
+      'Streak analytics', 'na', 'fortress-streaks', null),
+    isWeekend
+  );
+
+  // ── BAND: THIS MONTH
+  var monthlyBand = band('THIS MONTH',
+    'DAY ' + istDay + ' OF ' + daysInMonth, 'cols4',
+    card('\ud83c\udfc6', 'EOM', 'MONTHLY SCORECARD',
+      'Aggregated performance', 'na', 'mastery-monthly', isMonthEnd ? 'due' : null) +
+    card('\ud83d\udd25', 'EOM', 'RITUAL HEATMAP',
+      '25 items \u00d7 30 days', 'na', 'mastery-heatmap', isMonthEnd ? 'due' : null) +
+    card('\ud83d\udcc8', 'EOM', 'BRAHMA MONTHLY',
+      'Monthly matrix', 'na', 'brahma-monthly', isMonthEnd ? 'due' : null) +
+    card('\ud83c\udfaf', 'ANY', 'LIFE SCORE',
+      'Overall rating', 'na', 'life-score', null),
+    isMonthEnd
+  );
+
+  // ── BAND: ANYTIME pills
+  function pill(icon, label, panel) {
+    return '<div class="dac-pill" onclick="switchPanel(\'' + panel + '\')">' + icon + '  ' + label + '</div>';
+  }
+  var anytimeBand = '<div class="dac-band">' +
+    '<div class="dac-band-header"><div class="dac-band-title">ANYTIME</div><div class="dac-band-rule"></div></div>' +
+    '<div class="dac-band-pills">' +
+      pill('\ud83d\udcaa', 'GYM ANALYTICS', 'gym-analytics') +
+      pill('\ud83d\udd25', 'RITUAL ANALYTICS', 'ritual-analytics') +
+      pill('\ud83d\udca1', 'IDEAS HUB', 'mastery-ideas') +
+      pill('\ud83c\udfc3', 'STRAVA', 'strava') +
+      pill('\ud83d\udcf8', 'INSTAGRAM', 'schedule') +
+      pill('\ud83d\udc8a', 'HEALTH', 'health-dashboard') +
+      pill('\ud83c\udfc5', 'RACES', 'races') +
+      pill('\ud83e\udde0', 'BRAHMA ANALYTICS', 'brahma-analytics') +
+      pill('\ud83d\udcc5', 'LIFE CALENDAR', 'life-calendar') +
+      pill('\ud83d\udd17', 'SYNC CENTER', 'sync-center') +
+    '</div></div>';
+
+  container.innerHTML = morningBand + dayBand + eveningBand + weeklyBand + monthlyBand + anytimeBand;
+}
+buildActionBands();

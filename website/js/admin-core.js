@@ -22,6 +22,7 @@ function switchPanel(panelId) {
     if (group && !group.classList.contains('open')) group.classList.add('open');
   }
   // Build dynamic panels
+  if (panelId === 'dashboard') { if (typeof buildDashboardStats === 'function') buildDashboardStats(); if (typeof buildActionBands === 'function') buildActionBands(); }
   if (panelId === 'manage-rituals') loadRitualManager(currentMgrPeriod);
   if (panelId === 'weekly-review') buildWeeklyReview();
   if (panelId === 'monthly') buildCalHeatMap();
