@@ -307,6 +307,43 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
   function toDate(s: string) { return s ? s.substring(0, 10) : '' }
   function toTime(s: string) { return s ? s.substring(11, 16) : '' }
 
+  // ── Sleep accumulator: robust date attribution + max-wins idempotency ──
+  // Two Apple Health export formats:
+  //   A) Summary record: dp.totalSleep or dp.asleep present → max-wins per attributed date
+  //   B) Individual stage records: only dp.qty → accumulate with dedup fingerprint per attributed date
+  // 6 PM cutoff: sleep starting at or after 18:00 is attributed to the NEXT calendar day
+  const sleepMap: Record<string, {
+    summary_hours: number | null; seg_hours: number; seg_keys: Set<string>;
+    deep_min: number | null; rem_min: number | null; core_min: number | null; awake_min: number | null;
+    bedtime: string | null; wake_time: string | null;
+  }> = {}
+
+  function ensureSleepDay(d: string) {
+    if (!sleepMap[d]) sleepMap[d] = {
+      summary_hours: null, seg_hours: 0, seg_keys: new Set(),
+      deep_min: null, rem_min: null, core_min: null, awake_min: null,
+      bedtime: null, wake_time: null
+    }
+    return sleepMap[d]
+  }
+
+  function sleepAttribDate(dp: Record<string, unknown>): string {
+    // Use inBedStart or start for timestamp-aware attribution; fall back to date field
+    const tsStr = String(dp.inBedStart || dp.start || dp.date || dp.dateString || '')
+    const dateOnly = tsStr.substring(0, 10)
+    if (!dateOnly || dateOnly.length !== 10) return ''
+    const hourStr = tsStr.substring(11, 13)
+    const hour = /^\d{2}$/.test(hourStr) ? parseInt(hourStr, 10) : -1
+    // 3 PM cutoff: any sleep starting at or after 15:00 counts as next day's sleep
+    // Covers early bedtimes (5 PM, 6 PM) that span midnight into the morning
+    if (hour >= 15) {
+      const d = new Date(dateOnly + 'T12:00:00Z')
+      d.setUTCDate(d.getUTCDate() + 1)
+      return d.toISOString().substring(0, 10)
+    }
+    return dateOnly
+  }
+
   for (const m of metrics) {
     const name = (String(m.name || '')).toLowerCase().replace(/\s+/g, '_')
     const unit = String(m.units || '')
@@ -320,16 +357,30 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
       const qty = dp.qty != null ? parseFloat(String(dp.qty)) : null
 
       if (name === 'sleep_analysis' || name === 'apple_sleep_in_bed') {
-        if (dp.totalSleep != null) day.sleep_hours = parseFloat(String(dp.totalSleep))
-        else if (dp.asleep != null) day.sleep_hours = parseFloat(String(dp.asleep))
-        else if (qty != null) day.sleep_hours = qty
-        if (dp.deep != null) day.sleep_deep_min = Math.round(parseFloat(String(dp.deep)) * 60)
-        if (dp.rem != null) day.sleep_rem_min = Math.round(parseFloat(String(dp.rem)) * 60)
-        if (dp.core != null) day.sleep_core_min = Math.round(parseFloat(String(dp.core)) * 60)
-        if (dp.inBed != null && dp.totalSleep != null)
-          day.sleep_awake_min = Math.round((parseFloat(String(dp.inBed)) - parseFloat(String(dp.totalSleep))) * 60)
-        if (dp.inBedStart) day.bedtime = toTime(String(dp.inBedStart))
-        if (dp.inBedEnd) day.wake_time = toTime(String(dp.inBedEnd))
+        const aDate = sleepAttribDate(dp)
+        if (aDate) {
+          const sd = ensureSleepDay(aDate)
+          if (dp.totalSleep != null) {
+            const v = parseFloat(String(dp.totalSleep))
+            if (sd.summary_hours === null || v > sd.summary_hours) sd.summary_hours = v
+          } else if (dp.asleep != null) {
+            const v = parseFloat(String(dp.asleep))
+            if (sd.summary_hours === null || v > sd.summary_hours) sd.summary_hours = v
+          } else if (qty != null && qty > 0) {
+            // Individual sleep stage segment — accumulate with dedup fingerprint
+            const key = `${String(dp.start || dp.date || aDate)}-${qty}`
+            if (!sd.seg_keys.has(key)) { sd.seg_keys.add(key); sd.seg_hours += qty }
+          }
+          if (dp.deep != null) { const v=Math.round(parseFloat(String(dp.deep))*60); if(sd.deep_min===null||v>sd.deep_min) sd.deep_min=v }
+          if (dp.rem != null) { const v=Math.round(parseFloat(String(dp.rem))*60); if(sd.rem_min===null||v>sd.rem_min) sd.rem_min=v }
+          if (dp.core != null) { const v=Math.round(parseFloat(String(dp.core))*60); if(sd.core_min===null||v>sd.core_min) sd.core_min=v }
+          if (dp.inBed != null && dp.totalSleep != null) {
+            const v=Math.round((parseFloat(String(dp.inBed))-parseFloat(String(dp.totalSleep)))*60)
+            if(sd.awake_min===null||v<sd.awake_min) sd.awake_min=v
+          }
+          if (dp.inBedStart && !sd.bedtime) sd.bedtime = toTime(String(dp.inBedStart))
+          if (dp.inBedEnd && !sd.wake_time) sd.wake_time = toTime(String(dp.inBedEnd))
+        }
       }
       else if (name === 'heart_rate') {
         if (dp.Avg != null) day.avg_hr = Math.round(parseFloat(String(dp.Avg)))
@@ -381,10 +432,27 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
     })
   }
 
+  // Merge sleepMap into dailyMap — final sleep values with correct date attribution
+  for (const [sDate, sd] of Object.entries(sleepMap)) {
+    // Prefer summary (aggregated) over accumulated segments; both use max-wins if day already has a value
+    const finalHours = sd.summary_hours !== null ? sd.summary_hours : (sd.seg_hours > 0 ? Math.round(sd.seg_hours * 100) / 100 : null)
+    if (finalHours !== null) {
+      const day = ensureDay(sDate)
+      if (day.sleep_hours === undefined || finalHours > Number(day.sleep_hours)) day.sleep_hours = finalHours
+      if (sd.deep_min !== null) day.sleep_deep_min = sd.deep_min
+      if (sd.rem_min !== null) day.sleep_rem_min = sd.rem_min
+      if (sd.core_min !== null) day.sleep_core_min = sd.core_min
+      if (sd.awake_min !== null) day.sleep_awake_min = sd.awake_min
+      if (sd.bedtime) day.bedtime = sd.bedtime
+      if (sd.wake_time) day.wake_time = sd.wake_time
+    }
+  }
+
   function sleepScore(r: Record<string, unknown>) {
     let s = 0
     const h = Number(r.sleep_hours || 0)
-    if (h >= 7 && h <= 9) s += 40; else if (h >= 6) s += 30; else if (h >= 5) s += 20; else if (h > 0) s += 10
+    // 6h = Anupam's optimal target (not 7-8h standard)
+    if (h >= 6 && h <= 8) s += 40; else if (h >= 5) s += 30; else if (h >= 4) s += 20; else if (h > 0) s += 10
     const d = Number(r.sleep_deep_min || 0)
     if (d >= 60 && d <= 120) s += 25; else if (d >= 30) s += 15; else if (d > 0) s += 5
     const rm = Number(r.sleep_rem_min || 0)
@@ -426,18 +494,31 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
 
       row.raw_payload = data.raw
 
+      // Max-wins for sleep across all tables: fetch stored value once, use the higher of new vs stored
+      let finalSleepHours = row.sleep_hours ? Number(row.sleep_hours) : 0
+      if (finalSleepHours > 0) {
+        const { data: existingSleep } = await supaAdmin.from('sleep_log').select('sleep_hours').eq('date', date).maybeSingle()
+        const storedSleep = existingSleep?.sleep_hours ? Number(existingSleep.sleep_hours) : 0
+        if (storedSleep > finalSleepHours) {
+          // Stored value is better — use it in all tables (another export won't degrade data)
+          finalSleepHours = storedSleep
+          row.sleep_hours = storedSleep
+          row.sleep_score = sleepScore({ ...row, sleep_hours: storedSleep })
+        }
+      }
+
       await supaUpsert('health_daily', row, 'date')
 
-      if (row.sleep_hours) {
-        await supaUpsert('sleep_log', { date, sleep_hours: row.sleep_hours, bedtime: row.bedtime || null, wake_time: row.wake_time || null, source: 'health_auto_export' }, 'date')
+      if (finalSleepHours > 0) {
+        await supaUpsert('sleep_log', { date, sleep_hours: finalSleepHours, bedtime: row.bedtime || null, wake_time: row.wake_time || null, source: 'health_auto_export' }, 'date')
 
         const streakStart = new Date('2026-02-10')
         const dn = Math.floor((new Date(date).getTime() - streakStart.getTime()) / 86400000) + 1
-        const proofRow: Record<string, unknown> = { date, sleep_hrs: row.sleep_hours }
+        const proofRow: Record<string, unknown> = { date, sleep_hrs: finalSleepHours }
         if (dn > 0) proofRow.day_number = dn
         await supaUpsert('proof_archive', proofRow, 'date')
 
-        await supaUpsert('daily_logs', { date, sleep_hrs: row.sleep_hours, wake_time: row.wake_time || null }, 'date')
+        await supaUpsert('daily_logs', { date, sleep_hrs: finalSleepHours, wake_time: row.wake_time || null }, 'date')
       }
 
       // Individual metrics

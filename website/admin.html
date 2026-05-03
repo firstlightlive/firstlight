@@ -736,6 +736,7 @@
       <div class="cc-group" data-group="content">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 📸 CONTENT ENGINE</div>
         <div class="cc-group-items">
+          <div class="cc-item" data-panel="generators"><span class="cc-icon">🎨</span> Generators</div>
           <div class="cc-item" data-panel="schedule"><span class="cc-icon">📅</span> Posting Schedule</div>
           <div class="cc-item" data-panel="hashtags"><span class="cc-icon">#</span> Hashtags</div>
           <div class="cc-item" data-panel="stories"><span class="cc-icon">📱</span> Stories</div>
@@ -1255,6 +1256,80 @@
           </div>
           <div class="form-group"><label class="form-label">FREE THOUGHTS</label><textarea class="form-input" id="jThoughts" rows="5" placeholder="Anything on your mind..."></textarea></div>
           <button class="btn btn-primary w-full" onclick="saveJournal()">SAVE REFLECTION</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
+           PANEL: GENERATORS
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-generators">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">CONTENT GENERATORS</div>
+          <div class="cc-panel-sub">Carousel · Reel · Story · Caption AI</div>
+        </div>
+
+        <!-- Launch Cards -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px">
+
+          <!-- Carousel + Story -->
+          <div style="background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:44px;height:44px;background:linear-gradient(135deg,#F5A623,#B8922E);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🎨</div>
+              <div>
+                <div style="font:700 13px var(--font-mono);color:var(--text);letter-spacing:1px">CAROUSEL GENERATOR</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">5-slide daily proof + publish to Instagram</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font:10px var(--font-mono);color:var(--text-dim)">
+              <div>📊 Tracker slide</div><div>💪 Gym proof</div>
+              <div>🏃 Run proof</div><div>😴 Sleep data</div>
+            </div>
+            <a href="/app/app.html" target="_blank" style="display:block;padding:14px;background:linear-gradient(135deg,#F5A623,#B8922E);border:none;border-radius:10px;font:700 12px var(--font-mono);letter-spacing:3px;color:#0A0C10;text-align:center;text-decoration:none;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🎨 OPEN GENERATOR →</a>
+          </div>
+
+          <!-- Reel -->
+          <div style="background:var(--bg2);border:1px solid rgba(225,48,108,0.2);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:44px;height:44px;background:linear-gradient(135deg,#E1306C,#C13584);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🎬</div>
+              <div>
+                <div style="font:700 13px var(--font-mono);color:var(--text);letter-spacing:1px">REEL GENERATOR</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">15–30s video reel · publish to Instagram</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font:10px var(--font-mono);color:var(--text-dim)">
+              <div>⏱ 15s / 20s / 25s / 30s</div><div>🤖 AI hook generator</div>
+              <div>📸 Selfie overlay</div><div>📤 Direct publish</div>
+            </div>
+            <a href="/app/app.html#reelsSec" target="_blank" style="display:block;padding:14px;background:linear-gradient(135deg,#E1306C,#C13584);border:none;border-radius:10px;font:700 12px var(--font-mono);letter-spacing:3px;color:#fff;text-align:center;text-decoration:none;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🎬 OPEN REEL GENERATOR →</a>
+          </div>
+
+          <!-- Story + Caption AI -->
+          <div style="background:var(--bg2);border:1px solid rgba(224,64,251,0.2);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:44px;height:44px;background:linear-gradient(135deg,#E040FB,#833AB4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">✦</div>
+              <div>
+                <div style="font:700 13px var(--font-mono);color:var(--text);letter-spacing:1px">STORY + CAPTION AI</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Story templates · AI captions · publish</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font:10px var(--font-mono);color:var(--text-dim)">
+              <div>🌅 Today's story</div><div>🌃 Noir template</div>
+              <div>⚠ Unclaimed template</div><div>🤖 Gemini AI captions</div>
+            </div>
+            <a href="/app/index.html" target="_blank" style="display:block;padding:14px;background:linear-gradient(135deg,#E040FB,#833AB4);border:none;border-radius:10px;font:700 12px var(--font-mono);letter-spacing:3px;color:#fff;text-align:center;text-decoration:none;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">✦ OPEN STORY GENERATOR →</a>
+          </div>
+
+        </div>
+
+        <!-- Quick Info -->
+        <div style="background:var(--bg2);border:1px solid rgba(0,212,255,0.06);border-radius:10px;padding:16px">
+          <div style="font:700 10px var(--font-mono);color:var(--cyan);letter-spacing:2px;margin-bottom:10px">DAILY WORKFLOW</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:12px;align-items:flex-start"><span style="font:700 10px var(--font-mono);color:var(--cyan);min-width:50px">STEP 1</span><span style="font-size:12px;color:var(--text-muted)">Open Carousel Generator → fill DAY number → upload selfie → generate slides</span></div>
+            <div style="display:flex;gap:12px;align-items:flex-start"><span style="font:700 10px var(--font-mono);color:var(--gold);min-width:50px">STEP 2</span><span style="font-size:12px;color:var(--text-muted)">Generate AI caption → review → PUBLISH CAROUSEL to Instagram (direct)</span></div>
+            <div style="display:flex;gap:12px;align-items:flex-start"><span style="font:700 10px var(--font-mono);color:#E040FB;min-width:50px">STEP 3</span><span style="font-size:12px;color:var(--text-muted)">Create story → PUBLISH STORY → re-share carousel to stories</span></div>
+            <div style="display:flex;gap:12px;align-items:flex-start"><span style="font:700 10px var(--font-mono);color:#E1306C;min-width:50px">STEP 4</span><span style="font-size:12px;color:var(--text-muted)">Optional: generate 25s Reel for extra reach</span></div>
+          </div>
         </div>
       </div>
 

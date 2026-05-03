@@ -11,6 +11,13 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>FIRST LIGHT</title>
 <script>
+// AUTH GUARD — block access without valid Supabase session
+(function(){
+  var s=JSON.parse(localStorage.getItem('fl_supabase_session')||'null');
+  if(!s||!s.access_token||(s.expires_at&&s.expires_at*1000<Date.now())){
+    window.location.replace('../login.html');
+  }
+})();
 // FORCE NUKE all service workers and caches — fixes stale content issues
 if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(w){w.unregister();console.log('[SW] Unregistered:',w.scope);});});caches.keys().then(function(k){k.forEach(function(n){caches.delete(n);console.log('[SW] Cache deleted:',n);});});}
 </script>

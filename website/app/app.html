@@ -9,6 +9,13 @@
 <meta name="theme-color" content="#0D0C0B">
 <title>FIRST LIGHT</title>
 <script>
+// AUTH GUARD — block access without valid Supabase session
+(function(){
+  var s=JSON.parse(localStorage.getItem('fl_supabase_session')||'null');
+  if(!s||!s.access_token||(s.expires_at&&s.expires_at*1000<Date.now())){
+    window.location.replace('../login.html');
+  }
+})();
 // NUKE all service workers and caches
 if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(w){w.unregister();});});caches.keys().then(function(k){k.forEach(function(n){caches.delete(n);});});}
 </script>

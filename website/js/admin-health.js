@@ -351,7 +351,7 @@
     var avgSteps7=avg(last7.filter(function(d){return d.steps;}).map(function(d){return d.steps;}));
     var bedtimes=rangeData.filter(function(d){return d.bedtime;}).map(function(d){var m=timeToMin(d.bedtime);return m<720?m+1440:m;});
     var sleepConsistency=bedtimes.length>=3?Math.max(0,100-Math.round(stddev(bedtimes)*2)):null;
-    var sleepDebt=0; for (var sd=0;sd<last14.length;sd++) { if (last14[sd].sleep_hours) sleepDebt+=(7-last14[sd].sleep_hours); }
+    var sleepDebt=0; for (var sd=0;sd<last14.length;sd++) { if (last14[sd].sleep_hours) sleepDebt+=(6-last14[sd].sleep_hours); }
     function recoveryScore(d) {
       if (!d.hrv_avg&&!d.resting_hr&&!d.sleep_score) return null;
       var s=0,w=0;
@@ -448,7 +448,7 @@
     h+='<div style="font:700 11px \'IBM Plex Mono\';color:'+debtColor+'">'+(stats.sleepDebt>0?'+'+fmt(stats.sleepDebt,1)+'h DEFICIT':fmt(Math.abs(stats.sleepDebt),1)+'h SURPLUS')+'</div>';
     h+='</div>';
     h+='<canvas id="hs-debt-chart" style="width:100%;background:rgba(0,0,0,0.15);border-radius:10px"></canvas>';
-    h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-top:6px">Running sleep debt vs 7h/night target. Above zero line = in deficit.</div>';
+    h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-top:6px">Running sleep debt vs 6h/night target. Above zero line = in deficit.</div>';
     h+='</div>';
 
     // ── Bedtime & Wake Scatter ──
@@ -535,7 +535,7 @@
         var last30=rangeData.slice(-30);
         var running=0, pts=[], dlabels=[];
         for (var i=0;i<last30.length;i++) {
-          if (last30[i].sleep_hours) running+=(7-last30[i].sleep_hours);
+          if (last30[i].sleep_hours) running+=(6-last30[i].sleep_hours);
           pts.push(running); dlabels.push(last30[i].date.substring(8));
         }
         if (pts.length<2) return;
@@ -874,7 +874,7 @@
     var avgHRV30a=avg(allData.slice(-30).filter(function(d){return d.hrv_avg;}).map(function(d){return d.hrv_avg;}));
 
     setTimeout(function(){
-      drawHeatmap('hy-sleep',allData,function(d){if(!d.sleep_hours)return'rgba(255,255,255,0.03)';return d.sleep_hours>=7?'rgba(112,174,255,0.85)':d.sleep_hours>=6?'rgba(112,174,255,0.5)':d.sleep_hours>=5?'rgba(245,166,35,0.6)':'rgba(255,82,82,0.6)';},function(d){return d.sleep_hours?fmt(d.sleep_hours,1)+'h':'—';});
+      drawHeatmap('hy-sleep',allData,function(d){if(!d.sleep_hours)return'rgba(255,255,255,0.03)';return d.sleep_hours>=6?'rgba(112,174,255,0.85)':d.sleep_hours>=5?'rgba(112,174,255,0.5)':d.sleep_hours>=4?'rgba(245,166,35,0.6)':'rgba(255,82,82,0.6)';},function(d){return d.sleep_hours?fmt(d.sleep_hours,1)+'h':'—';});
       drawHeatmap('hy-hrv',allData,function(d){if(!d.hrv_avg)return'rgba(255,255,255,0.03)';var r=avgHRV30a>0?d.hrv_avg/avgHRV30a:1;return r>=1.1?'rgba(0,230,118,0.85)':r>=0.9?'rgba(0,230,118,0.45)':r>=0.8?'rgba(245,166,35,0.6)':'rgba(255,82,82,0.6)';},function(d){return d.hrv_avg?fmt(d.hrv_avg,0)+'ms':'—';});
       drawHeatmap('hy-steps',allData,function(d){if(!d.steps)return'rgba(255,255,255,0.03)';return d.steps>=10000?'rgba(0,212,255,0.85)':d.steps>=7000?'rgba(0,212,255,0.55)':d.steps>=4000?'rgba(0,212,255,0.3)':'rgba(0,212,255,0.12)';},function(d){return d.steps?d.steps.toLocaleString():'—';});
     },80);
