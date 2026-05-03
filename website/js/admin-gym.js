@@ -326,9 +326,15 @@ function saveGymWorkout() {
   };
   localStorage.setItem('fl_gym_workout_' + dateStr, JSON.stringify(data));
   if (typeof syncSave === 'function') {
-    syncSave('gym_workouts', { date: dateStr, split: data.split || '', exercises: JSON.stringify(data.exercises || []), notes: data.notes || '' }, 'date');
+    syncSave('gym_workouts', {
+      date: dateStr,
+      split: data.split || '',
+      duration_minutes: data.duration_minutes || 0,
+      energy_level: data.energy_level || 5,
+      notes: data.notes || '',
+      exercises: data.exercises || []
+    }, 'date');
   }
-  syncGymWorkout(dateStr, data);
   clearInterval(gymTimerInterval); gymTimerInterval = null;
   markSaved();
   flashBtn(document.querySelector('#p-gym-log .btn-primary'), 'SAVED ✓');

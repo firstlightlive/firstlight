@@ -48,7 +48,15 @@ var SYNC_MAP = {
   },
   'gym_workouts': function(r) {
     if (r.date) {
-      localStorage.setItem('fl_gym_workout_' + r.date, JSON.stringify({ split: r.split, exercises: r.exercises, notes: r.notes }));
+      var exercises = r.exercises;
+      if (typeof exercises === 'string') { try { exercises = JSON.parse(exercises); } catch(e) { exercises = []; } }
+      localStorage.setItem('fl_gym_workout_' + r.date, JSON.stringify({
+        split: r.split,
+        duration_minutes: r.duration_minutes || 0,
+        energy_level: r.energy_level || 5,
+        notes: r.notes || '',
+        exercises: exercises || []
+      }));
     }
   },
   'brahma_log': function(r) {
@@ -397,10 +405,18 @@ function pullAllFromSupabase() {
         }
       });
     }},
-    { table: 'gym_workouts', query: '?date=eq.' + today, handler: function(rows) {
+    { table: 'gym_workouts', query: '?date=eq.' + today + '&select=date,split,duration_minutes,energy_level,notes,exercises', handler: function(rows) {
       rows.forEach(function(r) {
         if (r.date) {
-          localStorage.setItem('fl_gym_workout_' + r.date, JSON.stringify({ split: r.split, exercises: r.exercises, notes: r.notes }));
+          var exercises = r.exercises;
+          if (typeof exercises === 'string') { try { exercises = JSON.parse(exercises); } catch(e) { exercises = []; } }
+          localStorage.setItem('fl_gym_workout_' + r.date, JSON.stringify({
+            split: r.split,
+            duration_minutes: r.duration_minutes || 0,
+            energy_level: r.energy_level || 5,
+            notes: r.notes || '',
+            exercises: exercises || []
+          }));
         }
       });
     }},
