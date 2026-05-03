@@ -120,7 +120,7 @@ function renderTomorrowPanel() {
   html += '<div style="display:flex;gap:6px;margin-top:8px;align-items:center">';
   html += '<button class="btn-copy" onclick="_tmrReviewOffset--;renderTomorrowPanel()" style="padding:3px 10px;font-size:10px">&#9664;</button>';
   if (!isExecToday) html += '<button class="btn-copy" onclick="_tmrReviewOffset=0;renderTomorrowPanel()" style="padding:3px 10px;font-size:10px;color:var(--gold)">TODAY</button>';
-  html += '<button class="btn-copy" onclick="_tmrReviewOffset++;renderTomorrowPanel()" style="padding:3px 10px;font-size:10px">&#9654;</button>';
+  if (_tmrReviewOffset < 0) html += '<button class="btn-copy" onclick="_tmrReviewOffset++;renderTomorrowPanel()" style="padding:3px 10px;font-size:10px">&#9654;</button>';
   html += '</div>';
   html += '</div>';
 
@@ -153,10 +153,12 @@ function renderTomorrowPanel() {
     html += '</div>';
   } else {
     var priColors = { P0: 'var(--red)', P1: 'var(--gold)', P2: 'rgba(255,255,255,0.3)' };
+    var priAccents = { P0: '#FF5252', P1: '#F5A623', P2: 'rgba(255,255,255,0.12)' };
     execTasks.forEach(function(task, i) {
       var isDone = task.done;
       var pColor = priColors[task.priority] || 'rgba(255,255,255,0.3)';
-      html += '<div onclick="tmrToggleExec(' + i + ')" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:' + (isDone ? 'rgba(0,230,118,0.04)' : 'rgba(255,255,255,0.02)') + ';border:1px solid ' + (isDone ? 'rgba(0,230,118,0.12)' : 'rgba(255,255,255,0.06)') + ';border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor=\'rgba(0,212,255,0.2)\'" onmouseout="this.style.borderColor=\'' + (isDone ? 'rgba(0,230,118,0.12)' : 'rgba(255,255,255,0.06)') + '\'">';
+      var pAccent = priAccents[task.priority] || 'rgba(255,255,255,0.12)';
+      html += '<div onclick="tmrToggleExec(' + i + ')" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:' + (isDone ? 'rgba(0,230,118,0.04)' : 'rgba(255,255,255,0.02)') + ';border:1px solid ' + (isDone ? 'rgba(0,230,118,0.12)' : 'rgba(255,255,255,0.06)') + ';border-left:3px solid ' + (isDone ? 'rgba(0,230,118,0.3)' : pAccent) + ';border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor=\'rgba(0,212,255,0.2)\'" onmouseout="this.style.borderColor=\'' + (isDone ? 'rgba(0,230,118,0.12)' : 'rgba(255,255,255,0.06)') + '\'">';
       // Checkbox
       html += '<div style="width:18px;height:18px;border:2px solid ' + (isDone ? 'var(--green)' : 'rgba(255,255,255,0.2)') + ';border-radius:4px;background:' + (isDone ? 'var(--green)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s">';
       if (isDone) html += '<span style="color:#0A0C10;font-size:11px;font-weight:700">✓</span>';
@@ -173,9 +175,10 @@ function renderTomorrowPanel() {
   }
 
   // Shift notes
+  var execLocked = typeof isDateLocked === 'function' && isDateLocked(execDate);
   html += '<div style="margin-top:12px">';
-  html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:6px">SHIFT NOTES — WHAT CHANGED FROM THE PLAN?</div>';
-  html += '<textarea class="form-input" rows="2" placeholder="What shifted? Unexpected tasks, blockers, wins?" style="width:100%;font-size:11px;padding:8px 10px;resize:vertical" oninput="tmrSaveReviewNotes(this.value)">' + _tmrEsc(execData.review_notes || '') + '</textarea>';
+  html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:6px">SHIFT NOTES — WHAT CHANGED FROM THE PLAN?' + (execLocked ? ' <span style="color:rgba(255,82,82,0.5)">[LOCKED]</span>' : '') + '</div>';
+  html += '<textarea class="form-input" rows="2" placeholder="What shifted? Unexpected tasks, blockers, wins?" style="width:100%;font-size:11px;padding:8px 10px;resize:vertical' + (execLocked ? ';opacity:0.45;cursor:not-allowed' : '') + '"' + (execLocked ? ' readonly' : ' oninput="tmrSaveReviewNotes(this.value)"') + '>' + _tmrEsc(execData.review_notes || '') + '</textarea>';
   html += '</div>';
 
   html += '</div>'; // end execution section
@@ -193,7 +196,8 @@ function renderTomorrowPanel() {
   // Header row
   html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px">';
   html += '<div>';
-  html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-dim);margin-bottom:4px">PLANNING FOR</div>';
+  var taskCountLabel = planTasks.length > 0 ? planTasks.length + '/7 TASKS' : '';
+  html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-dim);margin-bottom:4px">PLANNING FOR' + (taskCountLabel ? ' <span style="color:var(--cyan);opacity:0.7">' + taskCountLabel + '</span>' : '') + '</div>';
   html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:' + (isPlanTomorrow ? 'var(--cyan)' : 'var(--text)') + '">';
   html += _tmrFmtDate(planDate);
   if (isPlanTomorrow) html += ' <span style="font-size:9px;color:var(--cyan);letter-spacing:1px">[TOMORROW]</span>';
@@ -222,9 +226,11 @@ function renderTomorrowPanel() {
     html += '</div>';
   } else {
     var priC = { P0: 'var(--red)', P1: 'var(--gold)', P2: 'rgba(255,255,255,0.3)' };
+    var priAcc = { P0: '#FF5252', P1: '#F5A623', P2: 'rgba(255,255,255,0.1)' };
     planTasks.forEach(function(task, i) {
       var pColor2 = priC[task.priority] || 'var(--gold)';
-      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;margin-bottom:6px">';
+      var pAcc2 = priAcc[task.priority] || 'rgba(255,255,255,0.1)';
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-left:3px solid ' + pAcc2 + ';border-radius:8px;margin-bottom:6px">';
       // Priority selector
       html += '<select class="form-input" style="width:56px;font-size:10px;padding:3px 4px;color:' + pColor2 + ';flex-shrink:0" onchange="tmrUpdateTask(\'' + planDate + '\',' + i + ',\'priority\',this.value)">';
       ['P0','P1','P2'].forEach(function(p) {
@@ -245,11 +251,18 @@ function renderTomorrowPanel() {
     });
   }
 
-  // Add task + total
+  // Add task + save
   if (planTasks.length < 7) {
     html += '<button class="btn-copy" style="width:100%;margin-top:8px" onclick="tmrAddTask(\'' + planDate + '\')">+ ADD TASK</button>';
   } else {
     html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);text-align:center;margin-top:8px;opacity:0.5">Max 7 tasks — keep it focused</div>';
+  }
+
+  if (planTasks.length > 0) {
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px">';
+    html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);opacity:0.5">Autosaves as you type</div>';
+    html += '<button class="btn btn-primary" style="font-size:11px;padding:8px 20px;letter-spacing:1px" onclick="tmrForceSave(\'' + planDate + '\')">SAVE PLAN ✓</button>';
+    html += '</div>';
   }
 
   html += '</div>'; // end plan section
@@ -337,6 +350,13 @@ function tmrUpdateTask(planDate, index, field, value) {
   // Debounced Supabase write
   clearTimeout(_tmrDebounce);
   _tmrDebounce = setTimeout(function() { saveTomorrowPlan(planDate, data); }, 800);
+}
+
+function tmrForceSave(planDate) {
+  var data = getTomorrowPlan(planDate);
+  saveTomorrowPlan(planDate, data);
+  var btn = document.querySelector('[onclick="tmrForceSave(\'' + planDate + '\')"]');
+  if (btn) { var orig = btn.textContent; btn.textContent = 'SAVED ✓'; btn.style.background = 'var(--green)'; setTimeout(function() { btn.textContent = orig; btn.style.background = ''; }, 1800); }
 }
 
 // ── 30-DAY TREND ──
