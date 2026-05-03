@@ -235,7 +235,7 @@ function removeGymExercise(exIdx) {
 
 function updateGymSet(exIdx, setIdx, field, value) {
   if (!gymWorkoutData.exercises[exIdx] || !gymWorkoutData.exercises[exIdx].sets[setIdx]) return;
-  gymWorkoutData.exercises[exIdx].sets[setIdx][field] = parseFloat(value) || 0;
+  gymWorkoutData.exercises[exIdx].sets[setIdx][field] = value === '' ? '' : (parseFloat(value) || 0);
   // Check PR
   var set = gymWorkoutData.exercises[exIdx].sets[setIdx];
   if (set.weight > 0 && set.reps > 0) {
@@ -321,8 +321,8 @@ function saveGymWorkout() {
     energy_level: parseInt(document.getElementById('gymEnergy').value) || 5,
     notes: document.getElementById('gymNotes').value,
     exercises: gymWorkoutData.exercises.map(function(ex) {
-      return { name: ex.name, muscle: ex.muscle, sets: ex.sets.filter(function(s) { return s.weight || s.reps; }) };
-    }).filter(function(ex) { return ex.sets.length > 0; })
+      return { name: ex.name, muscle: ex.muscle, sets: ex.sets.filter(function(s) { return s.weight !== '' || s.reps !== ''; }) };
+    })
   };
   localStorage.setItem('fl_gym_workout_' + dateStr, JSON.stringify(data));
   if (typeof syncSave === 'function') {
