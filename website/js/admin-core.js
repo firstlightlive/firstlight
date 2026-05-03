@@ -60,7 +60,7 @@ function switchPanel(panelId) {
   if (panelId === 'daily-rule') { if (typeof renderDailyRule === 'function') renderDailyRule(); }
   if (panelId === 'slip-log') { if (typeof renderSlipLog === 'function') renderSlipLog(); }
   if (panelId === 'slip-history') { if (typeof renderSlipHistory === 'function') renderSlipHistory(); }
-  if (panelId === 'tomorrow') { if (typeof switchTomorrowTab === 'function') switchTomorrowTab(_tmrActiveTab || 'plan'); }
+  if (panelId === 'tomorrow') { if (typeof renderTomorrowPanel === 'function') renderTomorrowPanel(); }
   if (panelId === 'arch-log') { if (typeof renderArchLog === 'function') renderArchLog(); }
   if (panelId === 'unified-streaks') { if (typeof renderUnifiedStreaks === 'function') renderUnifiedStreaks(); }
   if (panelId === 'sync-center') { if (typeof renderSyncCenter === 'function') renderSyncCenter(); }

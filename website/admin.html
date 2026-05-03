@@ -2934,40 +2934,7 @@
           <div class="cc-panel-title">TOMORROW PLANNING</div>
           <div class="cc-panel-desc">Plan tomorrow tonight. Review today's execution. Track alignment.</div>
         </div>
-
-        <!-- Sub-tabs -->
-        <div style="display:flex;gap:8px;margin-bottom:20px">
-          <button class="btn-copy active" id="tmrTab-plan" onclick="switchTomorrowTab('plan')">PLAN TOMORROW</button>
-          <button class="btn-copy" id="tmrTab-review" onclick="switchTomorrowTab('review')">REVIEW TODAY</button>
-          <button class="btn-copy" id="tmrTab-analytics" onclick="switchTomorrowTab('analytics')">ANALYTICS</button>
-        </div>
-
-        <!-- Plan Tomorrow -->
-        <div id="tmrSec-plan">
-          <div class="panel-section" style="padding:16px 14px;margin-bottom:16px">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-muted)">PLANNING FOR</div>
-              <div style="font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--cyan)" id="tmrPlanDate"></div>
-            </div>
-          </div>
-          <div id="tmrPlanContainer"></div>
-        </div>
-
-        <!-- Review Today -->
-        <div id="tmrSec-review" style="display:none">
-          <div class="panel-section" style="padding:16px 14px;margin-bottom:16px">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-muted)">REVIEWING</div>
-              <div style="font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--gold)" id="tmrReviewDate"></div>
-            </div>
-          </div>
-          <div id="tmrReviewContainer"></div>
-        </div>
-
-        <!-- Analytics -->
-        <div id="tmrSec-analytics" style="display:none">
-          <div id="tmrAnalyticsContainer"></div>
-        </div>
+        <div id="tmr-main"></div>
       </div>
 
       <!-- ════════════════════════════════════════════════
