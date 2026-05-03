@@ -3,23 +3,172 @@
 // ═══════════════════════════════════════════
 
 var _raceMapActiveId = null;
+var _raceFilter = 'all';
 
+// ── CAREER STATS BOX ──
+function _raceStatBox(value, label, color) {
+  return '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px 6px;text-align:center">' +
+    '<div style="font-family:var(--font-mono);font-size:clamp(13px,2.5vw,18px);font-weight:700;color:' + color + ';line-height:1">' + value + '</div>' +
+    '<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1px;color:var(--text-dim);margin-top:4px">' + label + '</div>' +
+    '</div>';
+}
+
+// ── DATE FORMAT ──
+function _raceFmtDate(dateStr) {
+  if (!dateStr) return '';
+  var p = dateStr.split('-');
+  var d = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + p[0];
+}
+
+// ── RACE CARD ──
+function _buildRaceCard(race) {
+  var color = RACE_COLORS[race.type] || '#C0C0C0';
+  var label = RACE_LABELS[race.type] || (race.type || 'RACE').toUpperCase();
+  var isCompleted = race.status === 'completed';
+  var isUpcoming = race.status === 'upcoming';
+  var isMapActive = _raceMapActiveId === race.id;
+
+  var statusColor = isCompleted ? 'var(--green)' : isUpcoming ? 'var(--cyan)' : race.status === 'dnf' ? 'var(--red)' : 'rgba(255,255,255,0.25)';
+  var statusLabel = isCompleted ? '✓ COMPLETED' : isUpcoming ? '◷ UPCOMING' : race.status === 'dnf' ? '✗ DNF' : race.status === 'dns' ? '— DNS' : (race.status || '').toUpperCase();
+  var borderColor = isCompleted ? 'rgba(0,230,118,0.15)' : isUpcoming ? 'rgba(0,212,255,0.1)' : 'rgba(255,255,255,0.05)';
+  var bgColor = isCompleted ? 'rgba(0,230,118,0.015)' : isUpcoming ? 'rgba(0,212,255,0.015)' : 'transparent';
+
+  // Days until race (upcoming only)
+  var daysLabel = '';
+  if (isUpcoming && race.date) {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var raceDay = new Date(race.date + 'T00:00:00');
+    var diff = Math.round((raceDay - today) / 86400000);
+    daysLabel = diff > 0 ? diff + ' DAYS AWAY' : diff === 0 ? 'RACE DAY 🏁' : Math.abs(diff) + ' DAYS AGO';
+  }
+
+  var html = '<div style="border:1px solid ' + borderColor + ';background:' + bgColor + ';border-left:3px solid ' + (isCompleted ? '#00E676' : isUpcoming ? '#00D4FF' : 'rgba(255,255,255,0.1)') + ';border-radius:10px;padding:16px;margin-bottom:10px">';
+
+  // Top row: type pill + status pill + date (right)
+  html += '<div style="display:flex;align-items:center;gap:7px;margin-bottom:11px;flex-wrap:wrap">';
+  html += '<span style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:3px;background:' + color + '22;color:' + color + '">' + label + '</span>';
+  html += '<span style="font-family:var(--font-mono);font-size:9px;padding:3px 8px;border-radius:3px;border:1px solid ' + statusColor + '55;color:' + statusColor + '">' + statusLabel + '</span>';
+  html += '<span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-left:auto">' + _raceFmtDate(race.date) + '</span>';
+  html += '</div>';
+
+  // Race name + sub
+  html += '<div style="margin-bottom:12px">';
+  html += '<div style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px">' + (race.name || '—') + '</div>';
+  var sub = [race.shortName, race.location, race.country].filter(Boolean).join(' · ');
+  if (sub) html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">' + sub + '</div>';
+  html += '</div>';
+
+  // Key metrics row
+  html += '<div style="display:flex;align-items:flex-end;gap:20px;margin-bottom:14px;flex-wrap:wrap">';
+  if (isCompleted) {
+    if (race.finishTime) {
+      html += '<div><div style="font-family:var(--font-mono);font-size:24px;font-weight:900;color:var(--green);letter-spacing:-1px;line-height:1">' + race.finishTime + '</div><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1px;color:var(--text-dim);margin-top:3px">CHIP TIME</div></div>';
+    }
+    if (race.pace) html += _raceMini(race.pace, 'PACE/KM');
+    if (race.position && race.position.overall) {
+      html += _raceMini(race.position.overall + (race.position.totalOverall ? '/' + race.position.totalOverall : ''), 'OVERALL');
+    }
+    if (race.distance) html += _raceMini(race.distance + 'km', 'DIST');
+    if (race.heartRate && race.heartRate.avg) html += _raceMini(race.heartRate.avg + ' bpm', 'AVG HR');
+  } else if (isUpcoming) {
+    if (daysLabel) html += '<div style="font-family:var(--font-mono);font-size:17px;font-weight:700;color:var(--cyan)">' + daysLabel + '</div>';
+    if (race.targetTime) html += _raceMini(race.targetTime, 'TARGET');
+    if (race.bib) html += _raceMini('#' + race.bib, 'BIB');
+    if (race.distance) html += _raceMini(race.distance + 'km', 'DIST');
+  } else {
+    if (race.distance) html += _raceMini(race.distance + 'km', 'DIST');
+  }
+  html += '</div>';
+
+  // Highlight quote
+  if (race.highlight) {
+    html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);font-style:italic;margin-bottom:12px;padding:8px 10px;background:rgba(255,255,255,0.02);border-left:2px solid rgba(255,255,255,0.1);border-radius:0 4px 4px 0">"' + race.highlight + '"</div>';
+  }
+
+  // Action buttons
+  html += '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">';
+  if (isCompleted) {
+    var mapActive = isMapActive;
+    html += '<button class="btn-copy" onclick="showRaceMap(\'' + race.id + '\')" style="font-size:10px;' + (mapActive ? 'color:var(--green);border-color:rgba(0,230,118,0.35);background:rgba(0,230,118,0.06)' : '') + '">📍 ' + (mapActive ? 'HIDE MAP' : 'VIEW ROUTE') + '</button>';
+  }
+  if (race.stravaUrl) html += '<a href="' + race.stravaUrl + '" target="_blank" class="btn-copy" style="font-size:10px;text-decoration:none;color:#FC4C02;border-color:rgba(252,76,2,0.25)">STRAVA</a>';
+  if (race.officialResultsUrl) html += '<a href="' + race.officialResultsUrl + '" target="_blank" class="btn-copy" style="font-size:10px;text-decoration:none">RESULTS</a>';
+  html += '<div style="margin-left:auto;display:flex;gap:6px">';
+  html += '<button class="btn-copy" onclick="editRace(\'' + race.id + '\')" style="font-size:10px">EDIT</button>';
+  html += '<button class="btn-copy" onclick="_raceDeleteConfirm(\'' + race.id + '\')" style="font-size:10px;color:rgba(255,82,82,0.55);border-color:rgba(255,82,82,0.12)">DEL</button>';
+  html += '</div></div>';
+
+  html += '</div>'; // end card
+  return html;
+}
+
+function _raceMini(value, label) {
+  return '<div><div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text)">' + value + '</div><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1px;color:var(--text-dim);margin-top:2px">' + label + '</div></div>';
+}
+
+function _raceDeleteConfirm(id) {
+  var race = getRaces().find(function(r) { return r.id === id; });
+  if (!race || !confirm('Delete "' + race.name + '"?\nThis cannot be undone.')) return;
+  deleteRace(id);
+  if (_raceMapActiveId === id) {
+    _raceMapActiveId = null;
+    var p = document.getElementById('raceMapPanel');
+    if (p) { p.classList.add('hidden'); p.innerHTML = ''; }
+  }
+  renderRaceList();
+}
+
+// ── MAIN LIST RENDER ──
 function renderRaceList() {
   var list = document.getElementById('raceList');
   var races = getRaces();
-  if(!races.length) { list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-family:var(--font-mono);font-size:12px">No races added yet.</div>'; return; }
-  list.innerHTML = races.map(function(r) {
-    var color = RACE_COLORS[r.type] || '#C0C0C0';
-    var label = RACE_LABELS[r.type] || r.type;
-    var isMapActive = _raceMapActiveId === r.id;
-    return '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:6px;flex-wrap:wrap">' +
-      '<span style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:3px;background:' + color + '22;color:' + color + '">' + label + '</span>' +
-      '<div style="flex:1;min-width:0"><div style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text)">' + r.name + '</div>' +
-      '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">' + r.date + ' · ' + (r.finishTime || r.status) + '</div></div>' +
-      '<button class="btn-copy" onclick="showRaceMap(\'' + r.id + '\')" style="' + (isMapActive ? 'color:var(--green);border-color:rgba(0,230,118,0.4)' : '') + '">MAP</button>' +
-      '<button class="btn-copy" onclick="editRace(\'' + r.id + '\')">EDIT</button>' +
-      '<button class="btn-copy" style="color:var(--red);border-color:rgba(255,68,68,0.2)" onclick="if(confirm(\'Delete this race?\')){deleteRace(\'' + r.id + '\');_raceMapActiveId=null;document.getElementById(\'raceMapPanel\').classList.add(\'hidden\');renderRaceList();}">DEL</button></div>';
-  }).join('');
+
+  // Career stats
+  var stats = typeof computeCareerStats === 'function' ? computeCareerStats(races) : {};
+  var completedRaces = races.filter(function(r) { return r.status === 'completed'; });
+  var upcomingRaces  = races.filter(function(r) { return r.status === 'upcoming'; });
+
+  var statsHtml = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px">';
+  statsHtml += _raceStatBox(completedRaces.length, 'RACES', 'var(--green)');
+  statsHtml += _raceStatBox((stats.totalKm || 0) + 'km', 'TOTAL KM', 'var(--gold)');
+  statsHtml += _raceStatBox((typeof formatRaceTime === 'function' ? formatRaceTime(stats.bestMarathon) : null) || '—', 'MARATHON PB', '#FF6B35');
+  statsHtml += _raceStatBox((typeof formatRaceTime === 'function' ? formatRaceTime(stats.bestHalf) : null) || '—', 'HALF PB', 'var(--cyan)');
+  statsHtml += '</div>';
+
+  // Filter pills
+  var filterHtml = '<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">';
+  var fDefs = [
+    { key: 'all',       label: 'ALL (' + races.length + ')' },
+    { key: 'upcoming',  label: '◷ UPCOMING (' + upcomingRaces.length + ')' },
+    { key: 'completed', label: '✓ DONE (' + completedRaces.length + ')' }
+  ];
+  fDefs.forEach(function(f) {
+    var active = _raceFilter === f.key;
+    filterHtml += '<button onclick="_raceFilter=\'' + f.key + '\';renderRaceList()" style="font-family:var(--font-mono);font-size:9px;letter-spacing:1px;padding:5px 12px;border-radius:4px;border:1px solid ' + (active ? 'var(--cyan)' : 'rgba(255,255,255,0.1)') + ';background:' + (active ? 'rgba(0,212,255,0.07)' : 'transparent') + ';color:' + (active ? 'var(--cyan)' : 'var(--text-muted)') + ';cursor:pointer;transition:all 0.15s">' + f.label + '</button>';
+  });
+  filterHtml += '</div>';
+
+  // Filtered cards
+  var filtered = races.filter(function(r) {
+    if (_raceFilter === 'upcoming') return r.status === 'upcoming';
+    if (_raceFilter === 'completed') return r.status === 'completed';
+    return true;
+  });
+
+  var cardsHtml = '';
+  if (!filtered.length) {
+    cardsHtml = '<div style="text-align:center;padding:40px 16px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.07);border-radius:10px">';
+    cardsHtml += '<div style="font-size:32px;margin-bottom:12px;opacity:0.2">🏅</div>';
+    cardsHtml += '<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim)">No races in this category.</div>';
+    cardsHtml += '</div>';
+  } else {
+    filtered.forEach(function(r) { cardsHtml += _buildRaceCard(r); });
+  }
+
+  list.innerHTML = statsHtml + filterHtml + cardsHtml;
 }
 
 function showRaceForm(raceId) {
@@ -207,6 +356,31 @@ document.getElementById('raceForm').addEventListener('submit', function(e) {
 document.getElementById('raceType').addEventListener('change', function() {
   var dists = { '5k': 5, '10k': 10, 'half': 21.1, 'marathon': 42.195, 'ultra50k': 50, 'ultra100k': 100 };
   if(dists[this.value]) document.getElementById('raceDist').value = dists[this.value];
+});
+
+// One-race-per-day enforcement: warn inline when date conflicts
+document.getElementById('raceDate').addEventListener('change', function() {
+  var date = this.value;
+  var editId = document.getElementById('raceEditId').value;
+  var existing = getRaces().find(function(r) { return r.date === date && r.id !== editId; });
+  var warn = document.getElementById('raceDateWarn');
+  if (!warn) {
+    warn = document.createElement('div');
+    warn.id = 'raceDateWarn';
+    warn.style.cssText = 'font-family:var(--font-mono);font-size:10px;margin-top:6px;padding:8px 10px;border-radius:6px';
+    this.parentElement.appendChild(warn);
+  }
+  if (existing) {
+    warn.style.background = 'rgba(245,166,35,0.08)';
+    warn.style.border = '1px solid rgba(245,166,35,0.25)';
+    warn.style.color = 'var(--gold)';
+    warn.innerHTML = '⚠ A race already exists on this date: <strong>' + existing.name + '</strong><br><span style="opacity:0.7">Saving will UPDATE that entry (one race per day rule).</span>';
+  } else {
+    warn.innerHTML = '';
+    warn.style.cssText = 'font-family:var(--font-mono);font-size:10px;margin-top:6px;padding:0';
+    warn.style.border = 'none';
+    warn.style.background = 'transparent';
+  }
 });
 
 renderRaceList();

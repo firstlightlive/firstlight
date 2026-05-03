@@ -912,8 +912,6 @@ function saveRace(race) {
   if (typeof syncSave === 'function') {
     syncSave('races', race, 'id');
   }
-  // Supabase sync
-  syncRace(race);
 }
 
 function deleteRace(id) {
