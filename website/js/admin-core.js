@@ -35,7 +35,7 @@ function switchPanel(panelId) {
   if (panelId === 'mastery-analytics') buildMasteryAnalytics();
   if (panelId === 'mastery-monthly') { renderMasteryMonthly(); setTimeout(function(){ if(typeof calculateMonthlyScores==='function') calculateMonthlyScores(); }, 100); }
   if (panelId === 'morning' || panelId === 'midday' || panelId === 'evening') initRitualDateNav(panelId);
-  if (panelId === 'deepwork') initDeepWorkDateNav();
+  if (panelId === 'deepwork') { initDeepWorkDateNav(); if (typeof loadDeepWorkForDate === 'function') loadDeepWorkForDate(deepworkDate || (typeof getEffectiveToday === 'function' ? getEffectiveToday() : new Date().toISOString().slice(0,10))); }
   if (panelId === 'deepwork-analytics') buildDWAnalytics();
   if (panelId === 'gym-log') { initGymDateNav(); renderGymLog(); }
   if (panelId === 'gym-analytics') buildGymAnalytics();

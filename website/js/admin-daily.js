@@ -94,7 +94,6 @@ function saveDeepWork() {
   if (typeof syncSave === 'function') {
     syncSave('deepwork_log', { date: dateStr, blocks: JSON.stringify(dwData.blocks), big_win: dwData.bigWin || '' }, 'date');
   }
-  syncDeepWork(dateStr, dwData);
   markSaved();
   flashBtn(document.querySelector('#p-deepwork .btn-primary'), 'SAVED ✓');
 }

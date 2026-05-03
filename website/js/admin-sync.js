@@ -39,6 +39,11 @@ var SYNC_MAP = {
       var blocks = r.blocks;
       if (typeof blocks === 'string') { try { blocks = JSON.parse(blocks); } catch(e) { blocks = []; } }
       localStorage.setItem('fl_deepwork_' + r.date, JSON.stringify({ blocks: blocks, bigWin: r.big_win }));
+      // Re-render if deepwork panel is active
+      var ap = document.querySelector('.cc-panel.active');
+      if (ap && ap.id === 'p-deepwork' && typeof loadDeepWorkForDate === 'function') {
+        loadDeepWorkForDate(r.date);
+      }
     }
   },
   'mastery_log': function(r) {
@@ -397,6 +402,13 @@ function pullAllFromSupabase() {
           localStorage.setItem('fl_deepwork_' + r.date, JSON.stringify({ blocks: blocks, bigWin: r.big_win }));
         }
       });
+      // Re-render deepwork UI immediately if the panel is currently active
+      if (rows.length > 0) {
+        var ap = document.querySelector('.cc-panel.active');
+        if (ap && ap.id === 'p-deepwork' && typeof loadDeepWorkForDate === 'function') {
+          loadDeepWorkForDate(rows[0].date);
+        }
+      }
     }},
     { table: 'mastery_log', query: '?date=eq.' + today, handler: function(rows) {
       rows.forEach(function(r) {
