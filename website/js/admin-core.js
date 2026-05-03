@@ -43,7 +43,7 @@ function switchPanel(panelId) {
   if (panelId === 'reflection') { initReflectionDateNav(); if (typeof initRichEditorsForPanel === 'function') setTimeout(function() { initRichEditorsForPanel('reflection'); }, 500); }
   if (panelId === 'journal-today') { if (typeof initJournalToday === 'function') initJournalToday(); }
   if (panelId === 'journal-review') { if (typeof renderJournalReview === 'function') renderJournalReview(); }
-  if (panelId === 'ekadashi') switchEkadashiTab(_ekadashiTab || 'month');
+  if (panelId === 'ekadashi') switchEkadashiTab(_ekadashiTab || 'calendar');
   if (panelId === 'profile') loadProfile();
   if (panelId === 'brahma-log') { requireBrahmaPin(function(){ renderBrahmaDaily(); }); }
   if (panelId === 'brahma-analytics') { requireBrahmaPin(function(){ buildBrahmaAnalytics(); }); }

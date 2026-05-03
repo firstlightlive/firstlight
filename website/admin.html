@@ -1598,14 +1598,15 @@
         </div>
 
         <!-- Tab buttons -->
-        <div style="display:flex;gap:8px;margin-bottom:20px">
-          <button class="btn-copy active" id="ekTabMonth" onclick="switchEkadashiTab('month')">MONTHLY</button>
-          <button class="btn-copy" id="ekTabYear" onclick="switchEkadashiTab('year')">YEARLY</button>
-          <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="enableEkadashiNotifications()">NOTIFICATIONS</button>
+        <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="btn-copy active" id="ekTab-calendar" onclick="switchEkadashiTab('calendar')">CALENDAR</button>
+          <button class="btn-copy" id="ekTab-journey" onclick="switchEkadashiTab('journey')">MY JOURNEY</button>
+          <button class="btn-copy" id="ekTab-alltime" onclick="switchEkadashiTab('alltime')">ALL TIME</button>
+          <button class="btn btn-outline btn-sm" style="margin-left:auto;font-size:10px" onclick="enableEkadashiNotifications()">🔔</button>
         </div>
 
-        <!-- Monthly view -->
-        <div id="ekMonthView">
+        <!-- TAB 1: CALENDAR -->
+        <div id="ekView-calendar">
           <div id="ekMonthSummary"></div>
           <div class="panel-section">
             <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
@@ -1622,8 +1623,11 @@
           </div>
         </div>
 
-        <!-- Yearly view -->
-        <div id="ekYearView" style="display:none"></div>
+        <!-- TAB 2: MY JOURNEY -->
+        <div id="ekView-journey" style="display:none"></div>
+
+        <!-- TAB 3: ALL TIME -->
+        <div id="ekView-alltime" style="display:none"></div>
 
         <!-- Log modal -->
         <div id="ekLogModal" style="display:none;margin-top:16px"></div>
