@@ -10,14 +10,14 @@ var MONTHLY_GRIDS = {
     'Chyawanprash+Collagen',
     'Run—Iron Covenant',
     'Stability+Gym',
-    'Barefoot sunlight 5min',
+    'Sunlight 5min (earthing Sun only)',
     'Ikigai spoken aloud',
     'All supplements taken',
     'Deep work blocks done'
   ],
   evening: [
     'Ginger+lime before meal',
-    'No food after 6 PM',
+    'No food after 7 PM',
     'Loban+Dive reflex',
     'Gua Sha+Coconut oil',
     'Nasya+Mula Bandha+Abhyanga',
@@ -25,7 +25,7 @@ var MONTHLY_GRIDS = {
     'Milk+Ashwagandha 8:00',
     'Examen+Wins+Replay',
     'Gratitude+Trataka+Tape',
-    'Lights out 8:00 PM'
+    'Lights out 8:30 PM'
   ],
   weekly: [
     'Wed—Hair+Abhyanga',
@@ -37,9 +37,9 @@ var MONTHLY_GRIDS = {
     'Ekadasi fast (2x/month)'
   ],
   supplements: [
-    'Collagen+lemon (3:58)',
-    'Creatine+L-Carnitine (4:00)',
-    'D3+K2+Omega-3+CDP',
+    'Collagen+lemon (4:27)',
+    'Creatine+L-Carnitine (4:28)',
+    'D3+K2+Omega-3 (daily)',
     'Mucuna/Tyrosine (NEVER both)',
     'PM—Shilajit (7:00)',
     'PM—Mg+Triphala+Glycine',

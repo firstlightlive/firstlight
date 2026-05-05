@@ -1140,6 +1140,7 @@
           <button class="btn btn-outline btn-sm" id="mgrWeekly" onclick="loadRitualManager('weekly')">WEEKLY</button>
           <button class="btn btn-outline btn-sm" id="mgrMonthly" onclick="loadRitualManager('monthly')">MONTHLY</button>
           <button class="btn btn-outline btn-sm" onclick="addNewRitual()">+ ADD RITUAL</button>
+          <button class="btn btn-outline btn-sm" id="ritualResetBtn" style="color:var(--gold);border-color:rgba(245,166,35,0.3)">RESET TO DEFAULTS</button>
         </div>
 
         <div id="ritualManagerList"></div>
@@ -1438,7 +1439,7 @@
         <div class="panel-section">
           <div class="panel-section-title">DAILY 6-STEP STORIES WORKFLOW</div>
           <div id="storiesChecklist">
-            <div class="story-step" onclick="toggleStory(this)"><div class="story-check"></div><div><div class="story-title">01 — THE ALARM · 3:15 AM</div><div class="story-desc">Screenshot of alarm. Raw, dark, real.</div><div class="story-sticker">Sticker: Countdown</div></div></div>
+            <div class="story-step" onclick="toggleStory(this)"><div class="story-check"></div><div><div class="story-title">01 — THE ALARM · 4:00 AM</div><div class="story-desc">Screenshot of alarm. Raw, dark, real.</div><div class="story-sticker">Sticker: Countdown</div></div></div>
             <div class="story-step" onclick="toggleStory(this)"><div class="story-check"></div><div><div class="story-title">02 — THE EMPTY ROAD · 5:00 AM</div><div class="story-desc">Bangalore streets at 5 AM. The emptiness IS the content.</div><div class="story-sticker">Sticker: Location + Poll</div></div></div>
             <div class="story-step" onclick="toggleStory(this)"><div class="story-check"></div><div><div class="story-title">03 — THE RUN DATA · Post-run</div><div class="story-desc">Strava screenshot. Raw data.</div><div class="story-sticker">Sticker: Quiz — "Guess my pace"</div></div></div>
             <div class="story-step" onclick="toggleStory(this)"><div class="story-check"></div><div><div class="story-title">04 — THE GYM · Post-gym</div><div class="story-desc">Quick selfie or video. Clock visible.</div><div class="story-sticker">Sticker: Poll — "Could you do this?"</div></div></div>
@@ -1812,7 +1813,7 @@
           <div class="bio-preview" id="bioPreview">
             <div class="bio-line-gold">Miss 1 day = ₹15,000 to a follower. Cash.</div>
             <div class="bio-line-mint"><span data-day></span> days. 0 misses. <span data-unclaimed></span> unclaimed.</div>
-            <div>3:15 AM. Run. Gym. Food Code. Daily proof.</div>
+            <div>4:00 AM. Run. Gym. Food Code. Daily proof.</div>
             <div class="bio-line-smoke">BLR → Singapore Marathon Dec '26 | firstlight.live</div>
           </div>
           <button class="btn-copy mt-2" onclick="copyBio()">COPY BIO</button>
@@ -2000,19 +2001,19 @@
         </div>
 
         <div id="declContainer">
-          <div class="decl-block"><div class="decl-num">ONE</div><div class="decl-sub">THE ALARM</div><div class="decl-text">When the alarm sounds at 3:15 AM, I do not negotiate. I do not snooze. I do not think. I rise. This is not about willpower. This is identity. I am the man who rises before the world wakes.</div></div>
+          <div class="decl-block"><div class="decl-num">ONE</div><div class="decl-sub">THE ALARM</div><div class="decl-text">When the alarm sounds at 4:00 AM, I do not negotiate. I do not snooze. I do not think. I rise. This is not about willpower. This is identity. I am the man who rises before the world wakes.</div></div>
           <div class="decl-block"><div class="decl-num">TWO</div><div class="decl-sub">THE SACRED HOUR</div><div class="decl-text">Brahma Muhurta is not optional. Pranayama, japa, meditation — these are not practices. They are the infrastructure of my mind. Without them, I am reactive. With them, I am sovereign.</div></div>
           <div class="decl-block"><div class="decl-num">THREE</div><div class="decl-sub">THE RUN</div><div class="decl-text">I run not because I want to. I run because I said I would. The Iron Covenant is public. The stakes are real. Every kilometre is proof that my word means something.</div></div>
           <div class="decl-block"><div class="decl-num">FOUR</div><div class="decl-sub">THE GYM</div><div class="decl-text">After the run, the gym. Not because I have energy left, but because discipline is doing what is required regardless of how I feel. The body follows the mind's command.</div></div>
           <div class="decl-block"><div class="decl-num">FIVE</div><div class="decl-sub">THE FOOD CODE</div><div class="decl-text">No sugar. No junk. No exceptions. Food is fuel, not entertainment. Every meal is an act of respect toward the body that carries me through this mission.</div></div>
           <div class="decl-block"><div class="decl-num">SIX</div><div class="decl-sub">THE DEEP WORK</div><div class="decl-text">Time blocks are sacred. When I sit to work, I work. No phone. No distraction. No half-measures. Depth over breadth. Quality over quantity. Focus is a weapon.</div></div>
-          <div class="decl-block"><div class="decl-num">SEVEN</div><div class="decl-sub">THE EVENING PROTOCOL</div><div class="decl-text">By 6 PM, the day ends. No screens, no stimulation. The evening is for oil rituals, reflection, and preparation. Sleep is earned through discipline, not exhaustion.</div></div>
+          <div class="decl-block"><div class="decl-num">SEVEN</div><div class="decl-sub">THE EVENING PROTOCOL</div><div class="decl-text">By 7 PM, the work ends. No screens, no stimulation. The evening is for oil rituals, reflection, and preparation. Lights out at 8:30 PM. Sleep is earned through discipline, not exhaustion.</div></div>
           <div class="decl-block"><div class="decl-num">EIGHT</div><div class="decl-sub">THE STAKES</div><div class="decl-text">Rs.15,000 on the line every single day. Not as punishment, but as proof. If I fail, I pay. Cash. To a stranger on the internet. This is not a game. This is my word, monetized.</div></div>
           <div class="decl-block"><div class="decl-num">NINE</div><div class="decl-sub">THE INFINITE GAME</div><div class="decl-text">There is no end date. There is no finish line. There is no "enough." First Light is not a challenge. It is a way of living. I do not stop. I do not retire. I do not negotiate. I am First Light.</div></div>
         </div>
 
         <div class="decl-reminder" id="declReminder">
-          I rise at 3:15 AM. No snooze. No negotiation.<br>
+          I rise at 4:00 AM. No snooze. No negotiation.<br>
           I scrape my tongue. I pull oil. I wash my face with cold water.<br>
           I sit in silence. Pranayama. Japa. Meditation.<br>
           I drink collagen with lemon. I take my supplements.<br>
@@ -2023,7 +2024,7 @@
           I eat only what serves me. No sugar. No junk.<br>
           I work in deep focus blocks. No distractions.<br>
           I engage my community. I show up for others.<br>
-          I close my laptop by 6 PM.<br>
+          I close my laptop by 7 PM.<br>
           I prepare everything for tomorrow.<br>
           I light the loban. I do the oil rituals.<br>
           I apply nasya. I practice mula bandha.<br>
@@ -2032,7 +2033,7 @@
           I replay my day backwards. I express gratitude.<br>
           I gaze at the candle. I pray ho'oponopono.<br>
           I do cyclic sighing. I tape my mouth.<br>
-          I sleep on my left side. Lights out by 8 PM.<br>
+          I sleep on my left side. Lights out by 8:30 PM.<br>
           Rs.15,000 is on the line. Every. Single. Day.<br>
           I do not negotiate. I do not compromise.<br>
           I am First Light.<br>

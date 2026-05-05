@@ -152,7 +152,7 @@ function renderBrahmaDaily() {
     { key:'brahma',    icon:'⚡', name:'BRAHMACHARYA', sub:'Mental energy · No sexual media',     col:'255,183,77',  hex:'#FFB74D', held: brahmaLogged  ? brahmaHeld  : null },
     { key:'citadel',   icon:'📵', name:'CITADEL',      sub:'No phone or device at home',          col:'0,212,255',   hex:'#00D4FF', held: citadelLogged ? citadelHeld : null },
     { key:'perimeter', icon:'🏠', name:'PERIMETER',    sub: isSunday ? 'Stay out until 1 PM' : 'Stay out until 6 PM', col:'38,198,218', hex:'#26C6DA', held: perimLogged  ? perimHeld  : null },
-    { key:'vigil',     icon:'🌙', name:'VIGIL',        sub:'Woke up at 3:00 AM sharp',            col:'206,147,216', hex:'#CE93D8', held: vigilLogged   ? vigilHeld   : null },
+    { key:'vigil',     icon:'🌙', name:'VIGIL',        sub:'Woke up at 4:00 AM sharp',            col:'206,147,216', hex:'#CE93D8', held: vigilLogged   ? vigilHeld   : null },
     { key:'chronicle', icon:'📖', name:'CHRONICLE',    sub:'Daily journal entry written',         col:'0,230,118',   hex:'#00E676', held: chronLogged   ? chronHeld   : null },
     { key:'temple',    icon:'🌿', name:'TEMPLE',       sub:'All food rules honored',              col:'245,166,35',  hex:'#F5A623', held: templeLogged  ? templeHeld  : null }
   ];

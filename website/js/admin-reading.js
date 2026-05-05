@@ -24,7 +24,7 @@ var DAILY_RULES = [
     title: 'DO THE RIGHT THING EVEN WHEN NO ONE IS WATCHING',
     origin: 'Greece',
     body: '<b>Do this:</b><br>When no one is looking — be the same person you are in public.<br>Keep your promises when enforcement is zero.<br>Do the hard thing when the easy thing has no consequence.<br><br>Integrity is not a performance. It is who you are when the lights are off. Your character is defined in the moments no one sees.',
-    remember: 'Your Bramacharya covenant, your 3:15 AM wake, Iron Covenant — this is exactly this rule.'
+    remember: 'Your Bramacharya covenant, your 4:00 AM wake, Iron Covenant — this is exactly this rule.'
   },
   {
     n: 4,
@@ -122,7 +122,7 @@ var DAILY_RULES = [
     title: 'USE THE ACHE OF YOUR UNLIVED POTENTIAL AS FUEL',
     origin: 'Portugal / Saudade',
     body: '<b>Do this:</b><br>Feel the gap between who you are and who you could be.<br>Do not numb it. Do not distract from it. Use it.<br><br>The Portuguese call this saudade — a longing for something you have not yet become. That ache is not pain. It is signal. It is your future self calling you forward. Let it pull you out of bed. Let it push you through the workout. Let it fuel the work.',
-    remember: 'Your 3:15 AM wake is the sound of that ache turning into action. Every morning you wake before dawn — you are already closing the gap.'
+    remember: 'Your 4:00 AM wake is the sound of that ache turning into action. Every morning you wake before dawn — you are already closing the gap.'
   },
   {
     n: 18,

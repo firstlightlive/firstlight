@@ -165,10 +165,10 @@ function renderCheckin() {
   html += '<input type="text" class="form-input" style="font-size:11px;padding:8px 10px" placeholder="What was the violation?" id="ci-food-violation" value="' + ((existing.food_violation || '').replace(/"/g, '&quot;')) + '" oninput="setCheckinField(\'food_violation\',this.value)"' + disAttr + '>';
   html += '</div></div>';
 
-  // Wake time (default 03:15)
+  // Wake time (default 04:00)
   html += '<div>';
   html += '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px">WAKE TIME</div>';
-  html += '<input type="time" class="form-input" style="font-size:12px;padding:8px 10px" id="ci-wake" value="' + (existing.wake_time || '03:15') + '" oninput="setCheckinField(\'wake_time\',this.value)"' + disAttr + '>';
+  html += '<input type="time" class="form-input" style="font-size:12px;padding:8px 10px" id="ci-wake" value="' + (existing.wake_time || '04:00') + '" oninput="setCheckinField(\'wake_time\',this.value)"' + disAttr + '>';
   html += '</div>';
 
   // Lights out (default 20:30)
