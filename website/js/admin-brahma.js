@@ -144,17 +144,13 @@ function renderBrahmaDaily() {
   var chronHeld    = data.journal_written === true;
   var chronLogged  = data.journal_written !== undefined;
 
-  var templeHeld   = data.food_rules !== false;
-  var templeLogged = data.food_rules !== undefined;
-
   var RULES = [
     { key:'purity',    icon:'🔥', name:'PURITY',       sub:'No porn · No masturbation',          col:'255,68,68',   hex:'#FF5252', held: purityLogged  ? purityHeld  : null },
     { key:'brahma',    icon:'⚡', name:'BRAHMACHARYA', sub:'Mental energy · No sexual media',     col:'255,183,77',  hex:'#FFB74D', held: brahmaLogged  ? brahmaHeld  : null },
     { key:'citadel',   icon:'📵', name:'CITADEL',      sub:'No phone or device at home',          col:'0,212,255',   hex:'#00D4FF', held: citadelLogged ? citadelHeld : null },
     { key:'perimeter', icon:'🏠', name:'PERIMETER',    sub: isSunday ? 'Stay out until 1 PM' : 'Stay out until 6 PM', col:'38,198,218', hex:'#26C6DA', held: perimLogged  ? perimHeld  : null },
     { key:'vigil',     icon:'🌙', name:'VIGIL',        sub:'Woke up at 4:00 AM sharp',            col:'206,147,216', hex:'#CE93D8', held: vigilLogged   ? vigilHeld   : null },
-    { key:'chronicle', icon:'📖', name:'CHRONICLE',    sub:'Daily journal entry written',         col:'0,230,118',   hex:'#00E676', held: chronLogged   ? chronHeld   : null },
-    { key:'temple',    icon:'🌿', name:'TEMPLE',       sub:'All food rules honored',              col:'245,166,35',  hex:'#F5A623', held: templeLogged  ? templeHeld  : null }
+    { key:'chronicle', icon:'📖', name:'CHRONICLE',    sub:'Daily journal entry written',         col:'0,230,118',   hex:'#00E676', held: chronLogged   ? chronHeld   : null }
   ];
 
   var heldCount    = RULES.filter(function(r) { return r.held === true;  }).length;
@@ -282,12 +278,6 @@ function renderBrahmaDaily() {
   html += ' oninput="setBrahmaField(\'' + date + '\',\'journal_notes\',this.value)">' + (data.journal_notes || '') + '</textarea>';
   html += '</div>';
 
-  // TEMPLE — food log
-  html += '<div class="panel-section" style="border-color:rgba(245,166,35,0.1)">';
-  html += '<div class="bfv2-detail-hdr" style="color:#F5A623">🌿 TEMPLE — FOOD LOG</div>';
-  html += '<textarea class="form-input" rows="3" style="font-size:12px;border-color:rgba(245,166,35,0.1);resize:vertical" placeholder="What did you eat? Any food rule broken? Be specific..."' + (editable ? '' : ' readonly');
-  html += ' oninput="setBrahmaField(\'' + date + '\',\'food_notes\',this.value)">' + (data.food_notes || '') + '</textarea>';
-  html += '</div>';
 
   container.innerHTML = html;
   container.querySelectorAll('input, textarea').forEach(function(el) { el.addEventListener('click', function(e) { e.stopPropagation(); }); });
@@ -304,7 +294,6 @@ function bfSetRule(date, ruleKey, held) {
     case 'perimeter': data.stayed_out = held; break;
     case 'vigil':     data.woke_3am = held; break;
     case 'chronicle': data.journal_written = held; break;
-    case 'temple':    data.food_rules = held; break;
   }
   saveBrahmaDaily(date, data);
   renderBrahmaDaily();
@@ -830,9 +819,7 @@ function renderBrahmaMatrix() {
     { key:'vigil',     icon:'🌙', name:'VIGIL',     col:'206,147,216', hex:'#CE93D8',
       getHeld: function(d) { return d.woke_3am!==undefined ? d.woke_3am===true : null; } },
     { key:'chronicle', icon:'📖', name:'CHRONICLE', col:'0,230,118',   hex:'#00E676',
-      getHeld: function(d) { return d.journal_written!==undefined ? d.journal_written===true : null; } },
-    { key:'temple',    icon:'🌿', name:'TEMPLE',    col:'245,166,35',  hex:'#F5A623',
-      getHeld: function(d) { return d.food_rules!==undefined ? d.food_rules!==false : null; } }
+      getHeld: function(d) { return d.journal_written!==undefined ? d.journal_written===true : null; } }
   ];
 
   // Pre-load all day data

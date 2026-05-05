@@ -18,9 +18,7 @@ var FA_RULES = [
   { key:'vigil',     icon:'🌙', name:'VIGIL',     hex:'#CE93D8', col:'#CE93D8',
     getHeld: function(d){ return d && d.woke_3am; } },
   { key:'chronicle', icon:'📖', name:'CHRONICLE', hex:'#00E676', col:'#00E676',
-    getHeld: function(d){ return d && d.journal_written; } },
-  { key:'temple',    icon:'🌿', name:'TEMPLE',    hex:'#80CBC4', col:'#80CBC4',
-    getHeld: function(d){ return d && d.food_rules; } }
+    getHeld: function(d){ return d && d.journal_written; } }
 ];
 
 // ── Data Helpers ───────────────────────────────────────
