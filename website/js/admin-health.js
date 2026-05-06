@@ -1091,6 +1091,23 @@
   // ══════════════════════════════════════════════════════
   // TAB: RECOVERY (Whoop-Style)
   // ══════════════════════════════════════════════════════
+  // Biological age estimate — VO2 Max (ACSM norms) + HRV (Kubios curve) + RHR + sleep modifier
+  function _bioAge(vo2, hrv, rhr, sleepScore) {
+    var ages = [], weights = [];
+    // VO2 fitness age: ACSM male reference — at VO2=44→age 35, at VO2=39→age 40, at VO2=33→age 47
+    if (vo2 != null) { ages.push(Math.round(80 - vo2 * 1.05)); weights.push(0.45); }
+    // HRV autonomic age: Kubios male median decline — at HRV=60→age 30, HRV=50→age 40, HRV=40→age 50
+    if (hrv != null) { ages.push(Math.round(30 + (60 - hrv) * 1.0)); weights.push(0.35); }
+    // Cardiac fitness age: RHR norms — at RHR=55→age 32, RHR=65→age 42, RHR=75→age 52
+    if (rhr != null) { ages.push(Math.round((rhr - 55) + 32)); weights.push(0.20); }
+    if (!ages.length) return null;
+    var sw = weights.reduce(function(a,b){return a+b;}, 0);
+    var ba = ages.reduce(function(s,a,i){return s+a*weights[i];}, 0) / sw;
+    // Sleep modifier: poor sleep adds biological years
+    if (sleepScore != null) { if (sleepScore < 50) ba += 2; else if (sleepScore < 65) ba += 1; }
+    return Math.round(ba);
+  }
+
   function _recoveryComps(d, avgHRV30, avgRHR30) {
     var hrvC = null, sleepC = null, rhrC = null;
     if (d.hrv_avg && avgHRV30 > 0)
@@ -1261,10 +1278,104 @@
     h += '</div></div></div>';
 
     // ── 6: 30-Day Recovery Heatmap ─────────────────────────
-    h += '<div class="panel-section">';
+    h += '<div class="panel-section" style="margin-bottom:20px">';
     h += '<div class="panel-section-title">30-DAY RECOVERY HEATMAP</div>';
     h += '<div id="hrec-heatmap" style="margin-top:8px"></div>';
     h += '</div>';
+
+    // ── 7: Biological Age Estimate ─────────────────────────
+    var monthlyBA = (function() {
+      var months = {};
+      allData.forEach(function(d) {
+        var mk = d.date.substring(0,7);
+        if (!months[mk]) months[mk] = {vo2:[],hrv:[],rhr:[],sleep:[]};
+        if (d.vo2_max)    months[mk].vo2.push(d.vo2_max);
+        if (d.hrv_avg)    months[mk].hrv.push(d.hrv_avg);
+        if (d.resting_hr) months[mk].rhr.push(d.resting_hr);
+        if (d.sleep_score) months[mk].sleep.push(d.sleep_score);
+      });
+      return Object.keys(months).sort().map(function(mk) {
+        var m = months[mk];
+        var v=m.vo2.length?avg(m.vo2):null, hv=m.hrv.length?avg(m.hrv):null;
+        var r=m.rhr.length?avg(m.rhr):null, s=m.sleep.length?avg(m.sleep):null;
+        return { month:mk, bioAge:_bioAge(v,hv,r,s), vo2:v, hrv:hv, rhr:r };
+      }).filter(function(m){return m.bioAge != null;});
+    })();
+
+    var latestBA   = monthlyBA.length ? monthlyBA[monthlyBA.length-1] : null;
+    var prevMonthBA= monthlyBA.length >= 2 ? monthlyBA[monthlyBA.length-2] : null;
+    var firstBA    = monthlyBA.length ? monthlyBA[0] : null;
+
+    if (latestBA) {
+      var curBA    = latestBA.bioAge;
+      var delta    = prevMonthBA ? latestBA.bioAge - prevMonthBA.bioAge : null;
+      var totalGain= firstBA ? firstBA.bioAge - latestBA.bioAge : null;
+      var baColor  = curBA <= 38 ? C.good : curBA <= 44 ? C.warn : C.bad;
+      var deltaCol = delta == null ? C.text : delta < 0 ? C.good : delta > 0 ? C.bad : C.warn;
+      var deltaStr = delta == null ? '' : delta < 0 ? '↓ '+Math.abs(delta)+' yrs younger this month' : delta > 0 ? '↑ '+delta+' yrs older this month' : '→ Same as last month';
+
+      h += '<div class="panel-section">';
+      h += '<div style="font:700 10px \'IBM Plex Mono\';letter-spacing:3px;color:'+C.hrv+';margin-bottom:16px">BIOLOGICAL AGE ESTIMATE</div>';
+
+      h += '<div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:16px">';
+
+      // Big number
+      h += '<div style="text-align:center;flex-shrink:0">';
+      h += '<div style="font:700 72px \'IBM Plex Mono\';color:'+baColor+';line-height:1;filter:drop-shadow(0 0 20px '+baColor+')">' + curBA + '</div>';
+      h += '<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';letter-spacing:3px;margin-top:4px">YEARS</div>';
+      if (deltaStr) h += '<div style="font:700 10px \'IBM Plex Mono\';color:'+deltaCol+';margin-top:8px">'+deltaStr+'</div>';
+      h += '</div>';
+
+      // Right side: gain callout + component breakdown
+      h += '<div style="flex:1;min-width:200px">';
+      if (totalGain > 0) {
+        h += '<div style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.18);border-radius:10px;padding:12px;margin-bottom:14px;text-align:center">';
+        h += '<div style="font:700 14px \'IBM Plex Mono\';color:'+C.good+'">'+totalGain+' YEARS YOUNGER</div>';
+        h += '<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-top:4px">Since '+firstBA.month+' &rarr; '+latestBA.month+' &nbsp;·&nbsp; Bio age: '+firstBA.bioAge+' &rarr; '+curBA+'</div>';
+        h += '</div>';
+      }
+      h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+      if (latestBA.vo2 != null) {
+        var va = Math.round(80 - latestBA.vo2 * 1.05);
+        h += '<div style="background:'+C.cardBg+';border:1px solid rgba(245,166,35,0.15);border-radius:8px;padding:10px;text-align:center">';
+        h += '<div style="font:700 7px \'IBM Plex Mono\';color:'+C.vo2+';letter-spacing:1px;margin-bottom:4px">VO2 FITNESS</div>';
+        h += '<div style="font:700 22px \'IBM Plex Mono\';color:'+C.textBright+'">'+va+'</div>';
+        h += '<div style="font:7px \'IBM Plex Mono\';color:'+C.text+';margin-top:2px">45% weight</div>';
+        h += '</div>';
+      }
+      if (latestBA.hrv != null) {
+        var ha = Math.round(30 + (60 - latestBA.hrv) * 1.0);
+        h += '<div style="background:'+C.cardBg+';border:1px solid rgba(0,230,118,0.15);border-radius:8px;padding:10px;text-align:center">';
+        h += '<div style="font:700 7px \'IBM Plex Mono\';color:'+C.hrv+';letter-spacing:1px;margin-bottom:4px">HRV AUTONOMIC</div>';
+        h += '<div style="font:700 22px \'IBM Plex Mono\';color:'+C.textBright+'">'+ha+'</div>';
+        h += '<div style="font:7px \'IBM Plex Mono\';color:'+C.text+';margin-top:2px">35% weight</div>';
+        h += '</div>';
+      }
+      if (latestBA.rhr != null) {
+        var ra = Math.round((latestBA.rhr - 55) + 32);
+        h += '<div style="background:'+C.cardBg+';border:1px solid rgba(255,82,82,0.15);border-radius:8px;padding:10px;text-align:center">';
+        h += '<div style="font:700 7px \'IBM Plex Mono\';color:'+C.hr+';letter-spacing:1px;margin-bottom:4px">CARDIAC FITNESS</div>';
+        h += '<div style="font:700 22px \'IBM Plex Mono\';color:'+C.textBright+'">'+ra+'</div>';
+        h += '<div style="font:7px \'IBM Plex Mono\';color:'+C.text+';margin-top:2px">20% weight</div>';
+        h += '</div>';
+      }
+      h += '</div>';
+      h += '</div>';
+      h += '</div>'; // close flex
+
+      // MoM trend chart
+      h += '<div style="font:700 9px \'IBM Plex Mono\';color:'+C.text+';letter-spacing:2px;margin-bottom:8px">BIOLOGICAL AGE TREND — MONTH OVER MONTH</div>';
+      h += '<canvas id="hrec-bioage" style="width:100%;background:rgba(0,0,0,0.15);border-radius:10px"></canvas>';
+
+      // Methodology footnote
+      h += '<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-top:12px;line-height:1.7;padding:10px 12px;background:rgba(0,212,255,0.03);border:1px solid rgba(0,212,255,0.07);border-radius:8px">';
+      h += '<span style="color:'+C.cyan+'">METHODOLOGY</span> &nbsp;·&nbsp; ';
+      h += 'VO2 Max fitness age (ACSM male norms, 45%) + HRV autonomic age (Kubios decline curve, 35%) + Cardiac fitness age via RHR (20%) + sleep quality modifier. ';
+      h += 'Same approach as Whoop Health Age. Lower = biologically younger. Goal: under 38.';
+      h += '</div>';
+
+      h += '</div>'; // close panel-section
+    }
 
     container.innerHTML = h;
 
@@ -1313,6 +1424,21 @@
         html += '</div>';
         el.innerHTML = html;
       })();
+
+      // Bio age MoM trend line
+      if (monthlyBA.length >= 2) {
+        (function() {
+          var pts  = monthlyBA.map(function(m){ return m.bioAge; });
+          var lbls = monthlyBA.map(function(m){ return m.month.substring(2).replace('-','/'); });
+          var minV = Math.min.apply(null,pts) - 3;
+          var maxV = Math.max.apply(null,pts) + 3;
+          var ctx  = getCtx('hrec-bioage', cw, 160); if (!ctx) return;
+          drawSegmentLine(ctx, pts, function(v){ return v<=38?C.good:v<=44?C.warn:C.bad; }, cw, 160, minV, maxV, {
+            gridLines:true, yAxis:true, decimals:0, labels:lbls,
+            thresholds:[{value:38, label:'Target <38', color:'rgba(0,230,118,0.35)'}]
+          });
+        })();
+      }
     }, 80);
   }
 
