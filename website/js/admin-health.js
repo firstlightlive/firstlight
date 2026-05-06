@@ -1674,18 +1674,18 @@
     var rangeData=_getRangeData();
 
     var TABS=[
-      {k:'sleep',    icon:'💤', label:'SLEEP'},
-      {k:'heart',    icon:'❤',  label:'HEART'},
-      {k:'activity', icon:'⚡', label:'ACTIVITY'},
-      {k:'year',     icon:'📅', label:'YEAR'},
-      {k:'insights',  icon:'🧠', label:'INSIGHTS'},
-      {k:'recovery',  icon:'🔋', label:'RECOVERY'},
-      {k:'bioage',    icon:'🧬', label:'BIO AGE'}
+      {k:'sleep',    icon:'💤', label:'SLEEP',    sub:'Duration · Debt · Stages'},
+      {k:'heart',    icon:'❤',  label:'HEART',    sub:'HRV · Resting HR · VO2'},
+      {k:'activity', icon:'⚡', label:'ACTIVITY', sub:'Steps · Calories · Exercise'},
+      {k:'year',     icon:'📅', label:'YEAR VIEW', sub:'Full History · Heatmaps'},
+      {k:'insights', icon:'🧠', label:'INSIGHTS', sub:'Correlations · Patterns'},
+      {k:'recovery', icon:'🔋', label:'RECOVERY', sub:'Daily Score · Readiness'},
+      {k:'bioage',   icon:'🧬', label:'BIO AGE',  sub:'Biological Age · Trend'}
     ];
 
     var html='<div class="ht-bar">';
     TABS.forEach(function(t){
-      html+='<button class="ht-tab'+(t.k===_activeTab?' active':'')+'" data-tab="'+t.k+'" onclick="switchHealthTab(\''+t.k+'\')"><span class="ht-tab-icon">'+t.icon+'</span><span class="ht-tab-label">'+t.label+'</span></button>';
+      html+='<button class="ht-tab'+(t.k===_activeTab?' active':'')+'" data-tab="'+t.k+'" onclick="switchHealthTab(\''+t.k+'\')"><span class="ht-tab-icon">'+t.icon+'</span><span class="ht-tab-label">'+t.label+'</span><span class="ht-tab-sub">'+t.sub+'</span></button>';
     });
     html+='</div><div id="ht-content" style="padding-top:4px"></div>';
     container.innerHTML=html;

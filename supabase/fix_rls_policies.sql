@@ -19,12 +19,12 @@ BEGIN
     FROM pg_policies
     WHERE schemaname = 'public'
       AND tablename IN (
-        'rituals_log','daily_rituals','journal_entries','daily_checkin',
+        'rituals_log','daily_rituals','journal_entries','journal_notes','journal_insights','daily_checkin',
         'mastery_log','mastery_daily','mastery_weekly','mastery_ideas','mastery_monthly_scores',
-        'brahma_log','brahma_daily','brahma_weekly',
+        'brahma_log','brahma_daily','brahma_weekly','brahma_monthly',
         'races','gym_workouts','gym_prs','deepwork_log','reading_log',
-        'ekadashi_log','weekly_schedule','slips','config','daily_logs',
-        'stories_completions','engagement_counters','architecture_log','voice_entries',
+        'ekadashi_log','weekly_schedule','tomorrow_plan','slips','config','daily_logs',
+        'sleep_log','stories_completions','engagement_counters','architecture_log','voice_entries',
         'proof_archive','instagram_posts','strava_activities','comments','comment_reactions'
       )
   LOOP
@@ -40,12 +40,12 @@ DO $$
 DECLARE
   tbl TEXT;
   tables TEXT[] := ARRAY[
-    'rituals_log','daily_rituals','journal_entries','daily_checkin',
+    'rituals_log','daily_rituals','journal_entries','journal_notes','journal_insights','daily_checkin',
     'mastery_log','mastery_daily','mastery_weekly','mastery_ideas','mastery_monthly_scores',
-    'brahma_log','brahma_daily','brahma_weekly',
+    'brahma_log','brahma_daily','brahma_weekly','brahma_monthly',
     'races','gym_workouts','gym_prs','deepwork_log','reading_log',
-    'ekadashi_log','weekly_schedule','slips','config','daily_logs',
-    'stories_completions','engagement_counters','architecture_log','voice_entries',
+    'ekadashi_log','weekly_schedule','tomorrow_plan','slips','config','daily_logs',
+    'sleep_log','stories_completions','engagement_counters','architecture_log','voice_entries',
     'proof_archive','instagram_posts','strava_activities','comments','comment_reactions'
   ];
 BEGIN
