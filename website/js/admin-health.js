@@ -1089,6 +1089,234 @@
   }
 
   // ══════════════════════════════════════════════════════
+  // TAB: RECOVERY (Whoop-Style)
+  // ══════════════════════════════════════════════════════
+  function _recoveryComps(d, avgHRV30, avgRHR30) {
+    var hrvC = null, sleepC = null, rhrC = null;
+    if (d.hrv_avg && avgHRV30 > 0)
+      hrvC = Math.min(100, Math.max(0, Math.round((d.hrv_avg / avgHRV30) * 50)));
+    if (d.sleep_score)
+      sleepC = Math.min(100, Math.max(0, d.sleep_score));
+    if (d.resting_hr && avgRHR30 > 0)
+      rhrC = Math.min(100, Math.max(0, Math.round((avgRHR30 / d.resting_hr) * 50)));
+    var s = 0, w = 0;
+    if (sleepC != null) { s += sleepC * 0.35; w += 0.35; }
+    if (hrvC  != null) { s += hrvC  * 0.40; w += 0.40; }
+    if (rhrC  != null) { s += rhrC  * 0.25; w += 0.25; }
+    return { total: w > 0 ? Math.round(s / w) : null, hrv: hrvC, sleep: sleepC, rhr: rhrC };
+  }
+
+  function _recStatus(score) {
+    if (score == null) return { label: 'NO DATA', color: C.text };
+    if (score >= 80) return { label: 'PEAK',        color: C.good };
+    if (score >= 67) return { label: 'OPTIMAL',     color: C.good };
+    if (score >= 50) return { label: 'MODERATE',    color: C.warn };
+    if (score >= 33) return { label: 'LOW',          color: '#FF9800' };
+    return               { label: 'COMPROMISED',  color: C.bad };
+  }
+
+  function _renderRecovery(container, rangeData, allData, stats) {
+    var today     = stats.today;
+    var avgHRV30  = stats.avgHRV30;
+    var avgRHR30  = stats.avgRHR30;
+    var comps     = _recoveryComps(today, avgHRV30, avgRHR30);
+    var score     = comps.total;
+    var status    = _recStatus(score);
+    var h = '';
+
+    // ── 1: Hero Recovery Ring ──────────────────────────────
+    h += '<div class="panel-section" style="margin-bottom:20px">';
+    h += '<div class="panel-section-title">TODAY\'S RECOVERY — ' + (today.date || '—') + '</div>';
+    h += '<div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">';
+
+    if (score != null) {
+      var rc = status.color;
+      h += '<div style="flex-shrink:0;text-align:center">';
+      h += '<svg width="140" height="140" viewBox="0 0 140 140">';
+      h += '<circle cx="70" cy="70" r="55" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>';
+      h += '<circle cx="70" cy="70" r="55" fill="none" stroke="' + rc + '" stroke-width="10" ';
+      h += 'stroke-dasharray="' + Math.round(score * 3.456) + ' 346" transform="rotate(-90 70 70)" stroke-linecap="round" ';
+      h += 'style="filter:drop-shadow(0 0 10px ' + rc + ')"/>';
+      h += '<text x="70" y="63" text-anchor="middle" fill="' + rc + '" font-size="34" font-weight="700" font-family="IBM Plex Mono">' + score + '</text>';
+      h += '<text x="70" y="78" text-anchor="middle" fill="' + C.text + '" font-size="8" font-family="IBM Plex Mono" letter-spacing="1">/ 100</text>';
+      h += '<text x="70" y="96" text-anchor="middle" fill="' + rc + '" font-size="11" font-weight="700" font-family="IBM Plex Mono" letter-spacing="2">' + status.label + '</text>';
+      h += '</svg>';
+      var tips = { 'PEAK':'Primed. Go all out today.', 'OPTIMAL':'Great shape. Train hard.', 'MODERATE':'Moderate training only.', 'LOW':'Light activity. Prioritize rest.', 'COMPROMISED':'Rest day. No hard training.' };
+      h += '<div style="font:9px \'IBM Plex Mono\';color:' + C.text + ';max-width:140px;text-align:center;margin-top:4px;line-height:1.5">' + (tips[status.label] || '') + '</div>';
+      h += '</div>';
+    }
+
+    // Sub-component bars
+    h += '<div style="flex:1;min-width:200px">';
+    h += '<div style="font:700 9px \'IBM Plex Mono\';color:' + C.text + ';letter-spacing:2px;margin-bottom:14px">SCORE BREAKDOWN</div>';
+    [
+      { label:'HRV',        val:comps.hrv,   color:C.hrv,   weight:'40%', sub:fmt(today.hrv_avg,0)+'ms · 30d avg '+fmt(avgHRV30,0)+'ms' },
+      { label:'SLEEP',      val:comps.sleep, color:C.sleep, weight:'35%', sub:'Sleep score '+fmt(today.sleep_score,0)+'/100' },
+      { label:'RESTING HR', val:comps.rhr,   color:C.hr,    weight:'25%', sub:fmt(today.resting_hr,0)+' bpm · 30d avg '+fmt(avgRHR30,0) }
+    ].forEach(function(cr) {
+      var pct = cr.val != null ? cr.val : 0;
+      var bc  = pct >= 67 ? C.good : pct >= 40 ? C.warn : C.bad;
+      h += '<div style="margin-bottom:14px">';
+      h += '<div style="display:flex;justify-content:space-between;margin-bottom:5px">';
+      h += '<span style="font:700 9px \'IBM Plex Mono\';color:' + cr.color + '">' + cr.label + ' <span style="color:' + C.text + ';font-weight:400">(' + cr.weight + ')</span></span>';
+      h += '<span style="font:700 11px \'IBM Plex Mono\';color:' + bc + '">' + (cr.val != null ? cr.val + '%' : '—') + '</span>';
+      h += '</div>';
+      h += '<div style="height:7px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden">';
+      h += '<div style="height:100%;width:' + pct + '%;background:' + bc + ';border-radius:4px;box-shadow:0 0 6px ' + bc + '"></div>';
+      h += '</div>';
+      h += '<div style="font:8px \'IBM Plex Mono\';color:' + C.text + ';margin-top:3px">' + cr.sub + '</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+    h += '</div></div>';
+
+    // ── 2: Vitals Row ──────────────────────────────────────
+    var spo2Now = spo2Val(today);
+    var rrNow   = today.respiratory_rate || null;
+    h += '<div class="panel-section" style="margin-bottom:20px">';
+    h += '<div class="panel-section-title">VITALS</div>';
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px">';
+    [
+      { l:'HRV',        v:fmt(today.hrv_avg,0)+' ms',     sub:'vs avg: '+fmt(avgHRV30,0)+'ms', c:C.hrv,      ok:today.hrv_avg >= avgHRV30 },
+      { l:'RESTING HR', v:fmt(today.resting_hr,0)+' bpm', sub:'vs avg: '+fmt(avgRHR30,0),      c:C.hr,       ok:today.resting_hr > 0 && today.resting_hr <= avgRHR30 },
+      { l:'SLEEP SCORE',v:fmt(today.sleep_score,0),       sub:'/100',                          c:scoreColor(today.sleep_score||0), ok:today.sleep_score >= 70 },
+      { l:'SPO2',       v:spo2Now ? fmt(spo2Now,1)+'%' : '—', sub:'Blood oxygen',              c:C.spo2,     ok:spo2Now >= 96 },
+      { l:'RESP RATE',  v:rrNow ? fmt(rrNow,1)+'/min' : '—',  sub:'Normal 12-20',              c:C.exercise, ok:rrNow && rrNow <= 16 }
+    ].forEach(function(vc) {
+      var border = vc.ok ? 'rgba(0,230,118,0.15)' : C.cardBorder;
+      h += '<div style="background:' + C.cardBg + ';border:1px solid ' + border + ';border-radius:10px;padding:12px;text-align:center">';
+      h += '<div style="font:700 7px \'IBM Plex Mono\';color:' + vc.c + ';letter-spacing:2px;margin-bottom:5px">' + vc.l + '</div>';
+      h += '<div style="font:700 17px \'IBM Plex Mono\';color:' + C.textBright + '">' + vc.v + '</div>';
+      h += '<div style="font:8px \'IBM Plex Mono\';color:' + C.text + ';margin-top:2px">' + vc.sub + '</div>';
+      h += '</div>';
+    });
+    h += '</div></div>';
+
+    // ── 3: 7-Day Recovery Trend ────────────────────────────
+    h += '<div class="panel-section" style="margin-bottom:20px">';
+    h += '<div class="panel-section-title">7-DAY RECOVERY TREND</div>';
+    h += '<canvas id="hrec-trend" style="width:100%;background:rgba(0,0,0,0.15);border-radius:10px"></canvas>';
+    h += '</div>';
+
+    // ── 4: Strain / Training Load ──────────────────────────
+    var cals        = today.active_calories || 0;
+    var exMin       = today.exercise_minutes || 0;
+    var strainScore = Math.min(21, Math.round(cals / 55));
+    var strainLabel = strainScore >= 16 ? 'ALL OUT' : strainScore >= 12 ? 'STRENUOUS' : strainScore >= 9 ? 'MODERATE' : strainScore >= 5 ? 'LIGHT' : 'MINIMAL';
+    var strainColor = strainScore >= 16 ? C.bad : strainScore >= 12 ? C.warn : strainScore >= 5 ? C.good : C.text;
+    h += '<div class="panel-section" style="margin-bottom:20px">';
+    h += '<div class="panel-section-title">TODAY\'S STRAIN</div>';
+    h += '<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">';
+    h += '<div style="flex-shrink:0;text-align:center">';
+    h += '<svg width="110" height="110" viewBox="0 0 110 110">';
+    h += '<circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="9"/>';
+    h += '<circle cx="55" cy="55" r="44" fill="none" stroke="' + strainColor + '" stroke-width="9" ';
+    h += 'stroke-dasharray="' + Math.round(strainScore / 21 * 277) + ' 277" transform="rotate(-90 55 55)" stroke-linecap="round" ';
+    h += 'style="filter:drop-shadow(0 0 6px ' + strainColor + ')"/>';
+    h += '<text x="55" y="50" text-anchor="middle" fill="' + strainColor + '" font-size="26" font-weight="700" font-family="IBM Plex Mono">' + strainScore + '</text>';
+    h += '<text x="55" y="63" text-anchor="middle" fill="' + C.text + '" font-size="8" font-family="IBM Plex Mono">/ 21</text>';
+    h += '</svg>';
+    h += '<div style="font:700 10px \'IBM Plex Mono\';color:' + strainColor + ';margin-top:2px">' + strainLabel + '</div>';
+    h += '</div>';
+    h += '<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+    [
+      { l:'ACTIVE CAL',  v:cals ? cals.toLocaleString()+' kcal' : '—', c:C.cal },
+      { l:'EXERCISE',    v:exMin ? exMin+' min' : '—',                  c:C.exercise },
+      { l:'STEPS',       v:today.steps ? today.steps.toLocaleString() : '—', c:C.steps },
+      { l:'VO2 MAX',     v:fmt(today.vo2_max,1),                        c:C.vo2 }
+    ].forEach(function(sc) {
+      h += '<div style="background:' + C.cardBg + ';border:1px solid ' + C.cardBorder + ';border-radius:8px;padding:10px;text-align:center">';
+      h += '<div style="font:700 7px \'IBM Plex Mono\';color:' + sc.c + ';letter-spacing:1.5px;margin-bottom:3px">' + sc.l + '</div>';
+      h += '<div style="font:700 14px \'IBM Plex Mono\';color:' + C.textBright + '">' + sc.v + '</div>';
+      h += '</div>';
+    });
+    h += '</div></div></div>';
+
+    // ── 5: HRV Age Reference Norms ─────────────────────────
+    var ageNorms = [
+      {age:'20-25',med:70},{age:'25-30',med:65},{age:'30-35',med:60},
+      {age:'35-40',med:55},{age:'40-45',med:50},{age:'45-50',med:46},
+      {age:'50-55',med:42},{age:'55-60',med:38}
+    ];
+    var maxNorm = 80, yourHRV = avgHRV30 || 0;
+    var yourCol = yourHRV >= 60 ? C.good : yourHRV >= 45 ? C.warn : C.bad;
+    h += '<div class="panel-section" style="margin-bottom:20px">';
+    h += '<div class="panel-section-title">HRV — AGE REFERENCE NORMS</div>';
+    h += '<div style="font:9px \'IBM Plex Mono\';color:' + C.text + ';margin-bottom:12px">Your 30-day avg HRV vs typical values by age group (male, Kubios reference data).</div>';
+    h += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><div style="display:flex;gap:6px;align-items:flex-end;height:130px;min-width:380px;padding:0 4px">';
+    ageNorms.forEach(function(n) {
+      var bh = Math.round((n.med / maxNorm) * 90);
+      h += '<div style="flex:1;text-align:center">';
+      h += '<div style="font:8px \'IBM Plex Mono\';color:' + C.text + ';margin-bottom:2px">' + n.med + '</div>';
+      h += '<div style="height:' + bh + 'px;background:rgba(0,212,255,0.25);border-radius:3px 3px 0 0;margin-bottom:2px"></div>';
+      h += '<div style="font:7px \'IBM Plex Mono\';color:' + C.text + '">' + n.age + '</div>';
+      h += '</div>';
+    });
+    var yourBh = Math.round((yourHRV / maxNorm) * 90);
+    h += '<div style="flex:1;text-align:center">';
+    h += '<div style="font:700 8px \'IBM Plex Mono\';color:' + yourCol + ';margin-bottom:2px">' + fmt(yourHRV,0) + '</div>';
+    h += '<div style="height:' + yourBh + 'px;background:' + yourCol + ';border-radius:3px 3px 0 0;margin-bottom:2px;box-shadow:0 0 8px ' + yourCol + '"></div>';
+    h += '<div style="font:700 7px \'IBM Plex Mono\';color:' + yourCol + '">YOU</div>';
+    h += '</div>';
+    h += '</div></div></div>';
+
+    // ── 6: 30-Day Recovery Heatmap ─────────────────────────
+    h += '<div class="panel-section">';
+    h += '<div class="panel-section-title">30-DAY RECOVERY HEATMAP</div>';
+    h += '<div id="hrec-heatmap" style="margin-top:8px"></div>';
+    h += '</div>';
+
+    container.innerHTML = h;
+
+    // ── Canvas + Dynamic renders ───────────────────────────
+    setTimeout(function() {
+      var cw = (container.offsetWidth || 600) - 2;
+
+      // 7-day trend bars
+      (function() {
+        var last7   = rangeData.slice(-7);
+        var vals    = last7.map(function(d) { return _recoveryComps(d, avgHRV30, avgRHR30).total || 0; });
+        var lbls    = last7.map(function(d) { return d.date.substring(8); });
+        var ctx     = getCtx('hrec-trend', cw, 140); if (!ctx) return;
+        drawGradientBars(ctx, vals, C.good, cw, 140, 100, {
+          labels:   lbls,
+          colorFn:  function(v) { return v >= 67 ? C.good : v >= 40 ? C.warn : C.bad; },
+          targets:  [
+            { value:67, label:'Optimal', color:'rgba(0,230,118,0.3)' },
+            { value:40, label:'Low',     color:'rgba(245,166,35,0.25)' }
+          ]
+        });
+      })();
+
+      // 30-day recovery heatmap grid
+      (function() {
+        var el = document.getElementById('hrec-heatmap'); if (!el) return;
+        var sorted30 = allData.slice().sort(function(a,b){return a.date<b.date?-1:1;}).slice(-30);
+        if (!sorted30.length) { el.innerHTML='<div style="color:'+C.text+';text-align:center;padding:20px">No data</div>'; return; }
+        var html = '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+        sorted30.forEach(function(d) {
+          var sc  = _recoveryComps(d, avgHRV30, avgRHR30).total;
+          var bg  = sc == null ? 'rgba(255,255,255,0.04)' : sc >= 67 ? 'rgba(0,230,118,0.75)' : sc >= 40 ? 'rgba(245,166,35,0.75)' : 'rgba(255,82,82,0.75)';
+          var dd  = d.date.substring(8);
+          var mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(d.date.substring(5,7))-1];
+          html += '<div title="' + dd + ' ' + mon + ': ' + (sc != null ? sc+'/100' : 'No data') + '" ';
+          html += 'style="width:30px;height:44px;background:' + bg + ';border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center">';
+          html += '<div style="font:700 9px \'IBM Plex Mono\';color:#fff">' + (sc != null ? sc : '—') + '</div>';
+          html += '<div style="font:7px \'IBM Plex Mono\';color:rgba(255,255,255,0.55)">' + dd + '</div>';
+          html += '</div>';
+        });
+        html += '</div>';
+        html += '<div style="display:flex;gap:14px;margin-top:10px;font:9px \'IBM Plex Mono\';color:' + C.text + '">';
+        html += '<span><span style="display:inline-block;width:10px;height:10px;background:rgba(0,230,118,0.75);border-radius:2px;vertical-align:middle;margin-right:4px"></span>67+ OPTIMAL</span>';
+        html += '<span><span style="display:inline-block;width:10px;height:10px;background:rgba(245,166,35,0.75);border-radius:2px;vertical-align:middle;margin-right:4px"></span>40-66 MODERATE</span>';
+        html += '<span><span style="display:inline-block;width:10px;height:10px;background:rgba(255,82,82,0.75);border-radius:2px;vertical-align:middle;margin-right:4px"></span>&lt;40 LOW</span>';
+        html += '</div>';
+        el.innerHTML = html;
+      })();
+    }, 80);
+  }
+
+  // ══════════════════════════════════════════════════════
   // MAIN RENDER — builds tab bar + dispatches
   // ══════════════════════════════════════════════════════
   function _getRangeData() {
@@ -1107,8 +1335,9 @@
       case 'heart':    _renderHeart(contentEl, rangeData, allData, stats); break;
       case 'activity': _renderActivity(contentEl, rangeData, stats); break;
       case 'year':     _renderYear(contentEl, allData); break;
-      case 'insights': _renderInsights(contentEl, rangeData, allData, stats); break;
-      default:         _renderSleep(contentEl, rangeData, allData, stats);
+      case 'insights':  _renderInsights(contentEl, rangeData, allData, stats); break;
+      case 'recovery':  _renderRecovery(contentEl, rangeData, allData, stats); break;
+      default:          _renderSleep(contentEl, rangeData, allData, stats);
     }
   }
 
@@ -1127,7 +1356,8 @@
       {k:'heart',    icon:'❤',  label:'HEART'},
       {k:'activity', icon:'⚡', label:'ACTIVITY'},
       {k:'year',     icon:'📅', label:'YEAR'},
-      {k:'insights', icon:'🧠', label:'INSIGHTS'}
+      {k:'insights',  icon:'🧠', label:'INSIGHTS'},
+      {k:'recovery',  icon:'🔋', label:'RECOVERY'}
     ];
 
     var html='<div class="ht-bar">';
