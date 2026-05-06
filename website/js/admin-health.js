@@ -36,7 +36,7 @@
   function scoreColor(s)  { return s>=70?C.good:s>=40?C.warn:C.bad; }
   function trendIcon(curr,prev) { if(!prev||!curr) return ''; return curr>prev?'<span style="color:'+C.good+'">&#9650;</span>':curr<prev?'<span style="color:'+C.bad+'">&#9660;</span>':'<span style="color:'+C.warn+'">&#9472;</span>'; }
   function changePct(curr,prev) { if(!prev) return ''; var p=((curr-prev)/prev*100).toFixed(1); return (p>0?'+':'')+p+'%'; }
-  function spo2Val(d)     { return d.spo2 || d.blood_oxygen || d.oxygen_saturation || null; }
+  function spo2Val(d)     { return d.spo2 || d.blood_oxygen || d.oxygen_saturation || d.blood_oxygen_pct || null; }
 
   // ── Month-over-Month helpers ───────────────────────────
   function _getMonthData(allData, monthKey) {

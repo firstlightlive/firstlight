@@ -388,8 +388,10 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
         if (dp.Min != null) day.min_hr = Math.round(parseFloat(String(dp.Min)))
       }
       else if (name === 'resting_heart_rate') { if (qty != null) day.resting_hr = Math.round(qty) }
-      else if (name === 'heart_rate_variability') { if (qty != null) day.hrv_avg = qty }
-      else if (name === 'heart_rate_variability_sdnn') { if (qty != null) day.hrv_sdnn = qty }
+      else if (name === 'heart_rate_variability' || name === 'heart_rate_variability_sdnn' ||
+               name === 'heartratevariabilitysdnn' || name === 'hrv_sdnn' || name === 'hrv') {
+        if (qty != null) { day.hrv_avg = qty; day.hrv_sdnn = qty }
+      }
       else if (name === 'vo2_max' || name === 'vo2max') { if (qty != null) day.vo2_max = qty }
       else if (name === 'active_energy_burned') { if (qty != null) day.active_calories = Math.round(qty) }
       else if (name === 'active_energy') {
