@@ -294,7 +294,7 @@ function buildWeeklyReview() {
   for (var r = 1; r <= 10; r++) {
     var isActive = r <= currentRating;
     var rColor = r <= 3 ? '#FF5252' : r <= 6 ? '#F5A623' : r <= 8 ? '#00D4FF' : '#00E676';
-    html += '<button id="wr_rat_' + r + '" onclick="_wrSetRating(' + r + ')" style="width:40px;height:40px;border-radius:8px;border:1px solid ' + (isActive ? rColor : 'rgba(255,255,255,0.08)') + ';background:' + (isActive ? rColor + '22' : 'transparent') + ';font-family:var(--font-mono);font-size:12px;font-weight:700;color:' + (isActive ? rColor : 'var(--text-dim)') + ';cursor:' + (qReadonly ? 'not-allowed' : 'pointer') + ';-webkit-tap-highlight-color:transparent;touch-action:manipulation' + (qReadonly ? ';opacity:0.5;pointer-events:none' : '') + '">' + r + '</button>';
+    html += '<button id="wr_rat_' + r + '" data-active="' + (isActive ? '1' : '0') + '" onclick="_wrSetRating(' + r + ')" style="width:40px;height:40px;border-radius:8px;border:1px solid ' + (isActive ? rColor : 'rgba(255,255,255,0.08)') + ';background:' + (isActive ? rColor + '22' : 'transparent') + ';font-family:var(--font-mono);font-size:12px;font-weight:700;color:' + (isActive ? rColor : 'var(--text-dim)') + ';cursor:' + (qReadonly ? 'not-allowed' : 'pointer') + ';-webkit-tap-highlight-color:transparent;touch-action:manipulation' + (qReadonly ? ';opacity:0.5;pointer-events:none' : '') + '">' + r + '</button>';
   }
   html += '</div>';
   if (currentRating > 0) {
@@ -429,7 +429,7 @@ function _wrCollectData() {
   var rating = 0;
   for (var r = 10; r >= 1; r--) {
     var btn = document.getElementById('wr_rat_' + r);
-    if (btn && btn.style.background && btn.style.background !== 'transparent') { rating = r; break; }
+    if (btn && btn.getAttribute('data-active') === '1') { rating = r; break; }
   }
   return { wins: wins, failures: failures, nonNeg: nonNeg, rating: rating };
 }
@@ -467,6 +467,7 @@ function _wrSetRating(r) {
     if (!btn) continue;
     var active = i <= r;
     var col = rColors[i];
+    btn.setAttribute('data-active', active ? '1' : '0');
     btn.style.background = active ? col + '22' : 'transparent';
     btn.style.border = '1px solid ' + (active ? col : 'rgba(255,255,255,0.08)');
     btn.style.color = active ? col : 'var(--text-dim)';
