@@ -786,6 +786,24 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
           </div>
         </div>
       </div>
+      <!-- Optional: Upload Strava map screenshot -->
+      <div style="margin-top:14px;border-top:1px solid rgba(252,76,2,0.12);padding-top:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:2px">MAP IMAGE <span style="color:#FC4C02;font-size:6px;background:rgba(252,76,2,0.12);padding:1px 6px;border-radius:3px;margin-left:4px;letter-spacing:0">OPTIONAL</span></div>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0">
+            <input type="checkbox" id="useStravaMapImg" style="accent-color:#FC4C02;width:16px;height:16px" onchange="onStravaMapImgToggle()">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--smoke);letter-spacing:1px;white-space:nowrap">USE THIS IMAGE ✓</span>
+          </label>
+        </div>
+        <div class="p-drop" id="dM" onclick="document.getElementById('fM').click()" style="height:90px;border-color:rgba(252,76,2,0.25)">
+          <div class="p-icon">🗺️</div>
+          <div class="p-text">STRAVA MAP SCREENSHOT<br><span style="font-size:7px;opacity:0.55">Upload instead of slow API pull</span></div>
+          <input type="file" id="fM" accept="image/jpeg,image/png,.jpg,.jpeg,.png" onchange="loadStravaMapImg(this)">
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash);margin-top:6px;text-align:center;letter-spacing:0.5px">
+          Upload screenshot → check ✓ → Route Map slide uses your image · no API wait
+        </div>
+      </div>
       <div id="stravaStatus" style="display:none;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ash);text-align:center;margin-top:8px"></div>
     </div>
   </div>
@@ -1867,6 +1885,37 @@ async function pullStravaLive(){
   }catch(e){
     console.error('[STRAVA]',e);
     lblEl.textContent='FETCH FAILED';statusEl.textContent=e.message;statusEl.style.color='#FF5252';
+  }
+}
+
+// ── Strava map image upload (optional — skips slow API pull) ──
+function loadStravaMapImg(input){
+  loadImg(input,'dM','iM');
+  // Auto-check "use this image"
+  var cb=document.getElementById('useStravaMapImg');
+  if(cb)cb.checked=true;
+  // Preview in stravaLatestMap
+  var file=input.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    var mapC=document.getElementById('stravaLatestMap');
+    if(mapC)mapC.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover">';
+    var wrap=document.getElementById('stravaLatestWrap');
+    if(wrap)wrap.style.display='block';
+  };
+  r.readAsDataURL(file);
+}
+
+function onStravaMapImgToggle(){
+  // If unchecked, restore the Strava-pulled map preview if available
+  var cb=document.getElementById('useStravaMapImg');
+  if(!cb||cb.checked)return;
+  var mapC=document.getElementById('stravaLatestMap');
+  if(!mapC)return;
+  // Re-render Strava polyline if cached
+  if(_stravaCache){
+    var run=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;});
+    if(run)_renderPolylineCanvas(mapC,run.summary_polyline,mapC.offsetWidth||340,200);
   }
 }
 
@@ -3509,11 +3558,19 @@ function _generateInner(){
     try{slide2(day,km,mn,kc,undefined,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats);}catch(e){console.error('Slide2 error:',e);}
     // ── ROUTE MAP SLIDE ──
     try{
-      if(_stravaCache){
+      var _useUploadedMap=(document.getElementById('useStravaMapImg')&&document.getElementById('useStravaMapImg').checked&&iM);
+      var _routeMapGenerated=false;
+      if(_useUploadedMap){
+        // Uploaded image takes priority — no Strava pull needed
+        slideRouteMap(day,km,mn,kc,total,handleIG,handleX,wStart,wEnd,bpmVal);
+        window._hasRouteMap=true;_routeMapGenerated=true;
+      }else if(_stravaCache){
         var _latestRun=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;});
-        if(_latestRun){slideRouteMap(day,km,mn,kc,total,handleIG,handleX,wStart,wEnd,bpmVal);window._hasRouteMap=true;}
+        if(_latestRun){slideRouteMap(day,km,mn,kc,total,handleIG,handleX,wStart,wEnd,bpmVal);window._hasRouteMap=true;_routeMapGenerated=true;}
         else{window._hasRouteMap=false;}
       }
+      // Show/hide tab7 based on whether route map was generated
+      ['tab7','dot7','sb7'].forEach(function(xid){var xe=document.getElementById(xid);if(xe)xe.style.display=_routeMapGenerated?'':'none';});
     }catch(mapErr){console.error('Route map error:',mapErr);window._hasRouteMap=false;}
     // ── CONDITIONAL SLEEP SLIDE ──
     const t4=document.getElementById('tab4');
