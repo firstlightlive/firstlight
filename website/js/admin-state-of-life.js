@@ -340,11 +340,21 @@
         var dims = [
           {
             label: 'BODY', icon: '💪', color: '#00D4FF', score: P.score, prev: pP.score,
-            lines: [
-              '😴 Sleep ' + (P.sleepAvg ? P.sleepAvg + 'h avg' : 'no data'),
-              '🏃 ' + P.runs + ' run' + (P.runs !== 1 ? 's' : '') + ' this week',
-              '🏋 ' + P.gyms + ' gym session' + (P.gyms !== 1 ? 's' : '')
-            ]
+            lines: (function() {
+              var ls = [
+                '😴 Sleep ' + (P.sleepAvg ? P.sleepAvg + 'h avg' : 'no data'),
+                '🏃 ' + P.runs + ' run' + (P.runs !== 1 ? 's' : '') + ' this week',
+                '🏋 ' + P.gyms + ' gym session' + (P.gyms !== 1 ? 's' : '')
+              ];
+              try {
+                var wLog = JSON.parse(localStorage.getItem('fl_weight_log') || '[]');
+                if (wLog.length) {
+                  var latest = wLog.sort(function(a,b){return a.date<b.date?1:-1;})[0];
+                  ls.push('⚖ ' + latest.kg + 'kg on ' + latest.date.slice(5));
+                }
+              } catch(e) {}
+              return ls;
+            })()
           },
           {
             label: 'MIND', icon: '🧠', color: '#F5A623', score: M.score, prev: pM.score,

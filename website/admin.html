@@ -656,6 +656,7 @@
           <div class="cc-item" data-panel="midday"><span class="cc-icon">🌤</span> Midday Rituals</div>
           <div class="cc-item" data-panel="evening"><span class="cc-icon">🌙</span> Evening Rituals</div>
           <div class="cc-item" data-panel="deepwork"><span class="cc-icon">⚡</span> Deep Work</div>
+          <div class="cc-item" data-panel="body-weight"><span class="cc-icon">⚖</span> Body Weight</div>
           <div class="cc-item" data-panel="gym-log"><span class="cc-icon">🏋</span> Log Workout</div>
           <div class="cc-item" data-panel="races"><span class="cc-icon">🏃</span> Races</div>
           <div class="cc-item" data-panel="ekadashi"><span class="cc-icon">🙏</span> Ekadashi</div>
@@ -2741,6 +2742,17 @@
       <!-- ════════════════════════════════════════════════
            PANEL: GYM — EXERCISE LIBRARY
            ════════════════════════════════════════════════ -->
+      <!-- ════════════════════════════════════════════════
+           PANEL: BODY WEIGHT TRACKER
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-body-weight">
+        <div class="cc-panel-header">
+          <div class="cc-panel-title">BODY WEIGHT</div>
+          <div class="cc-panel-desc">Weekly weigh-in · trend graph · BMI · goal progress</div>
+        </div>
+        <div id="body-weight-content"></div>
+      </div>
+
       <div class="cc-panel" id="p-gym-exercises">
         <div class="cc-panel-header">
           <div class="cc-panel-title">EXERCISE LIBRARY</div>
@@ -3215,6 +3227,7 @@
   <script src="js/admin-life-calendar.js"></script>
   <script src="js/admin-state-of-life.js"></script>
   <script src="js/admin-weekly-review.js"></script>
+  <script src="js/admin-body-weight.js"></script>
   <script src="js/admin-init.js"></script>
 
   <!-- Sidebar mobile interaction — must load LAST after all modules -->

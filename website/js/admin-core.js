@@ -54,6 +54,7 @@ function switchPanel(panelId) {
   if (panelId === 'fortress-year')    { requireBrahmaPin(function(){ if(typeof renderFortressYear==='function'){ if(!_faYearNavYear) _faYearNavYear=new Date().getFullYear(); renderFortressYear(); } }); }
   if (panelId === 'fortress-intel')   { requireBrahmaPin(function(){ if(typeof renderFortressIntel==='function') renderFortressIntel(); }); }
   if (panelId === 'life-score')       { if(typeof renderStateOfLife==='function') renderStateOfLife(); else if(typeof renderLifeScore==='function') renderLifeScore(); }
+  if (panelId === 'body-weight')      { if(typeof renderBodyWeight==='function') renderBodyWeight(); }
   if (panelId === 'mastery-heatmap')  { if(typeof renderMasteryRitualHeatmap==='function') renderMasteryRitualHeatmap(); }
   if (panelId === 'checkin') { if (typeof renderCheckin === 'function') renderCheckin(); }
   if (panelId === 'goals') { if (typeof renderGoalsPanel === 'function') renderGoalsPanel(); }
