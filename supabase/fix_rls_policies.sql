@@ -25,7 +25,8 @@ BEGIN
         'races','gym_workouts','gym_prs','deepwork_log','reading_log',
         'ekadashi_log','weekly_schedule','tomorrow_plan','slips','config','daily_logs',
         'sleep_log','stories_completions','engagement_counters','architecture_log','voice_entries',
-        'proof_archive','instagram_posts','strava_activities','comments','comment_reactions'
+        'proof_archive','instagram_posts','strava_activities','comments','comment_reactions',
+        'body_weight'
       )
   LOOP
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I.%I', r.policyname, r.schemaname, r.tablename);
@@ -46,7 +47,8 @@ DECLARE
     'races','gym_workouts','gym_prs','deepwork_log','reading_log',
     'ekadashi_log','weekly_schedule','tomorrow_plan','slips','config','daily_logs',
     'sleep_log','stories_completions','engagement_counters','architecture_log','voice_entries',
-    'proof_archive','instagram_posts','strava_activities','comments','comment_reactions'
+    'proof_archive','instagram_posts','strava_activities','comments','comment_reactions',
+    'body_weight'
   ];
 BEGIN
   FOREACH tbl IN ARRAY tables LOOP
