@@ -29,8 +29,9 @@ function saveTomorrowPlan(date, data) {
 }
 
 function getTomorrowDate() {
-  var t = new Date();
-  t.setDate(t.getDate() + 1);
+  // Use IST (same as getEffectiveToday) to avoid timezone mismatch
+  var ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+  var t = new Date(ist.getFullYear(), ist.getMonth(), ist.getDate() + 1);
   return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
 }
 
@@ -68,11 +69,32 @@ function _tmrFmtMin(min) {
   return h + 'h' + (m ? ' ' + m + 'm' : '');
 }
 
+// ── FORCE-SYNC localStorage → Supabase for today + tomorrow ──
+// Runs once on panel open. Protects against RLS failures, device switches.
+function _tmrSyncLocalToSupabase() {
+  var today = typeof getEffectiveToday === 'function' ? getEffectiveToday() : new Date().toISOString().slice(0, 10);
+  var tomorrow = getTomorrowDate();
+  [today, tomorrow].forEach(function(date) {
+    var data = getTomorrowPlan(date);
+    var tasks = data.tasks || [];
+    if (typeof tasks === 'string') { try { tasks = JSON.parse(tasks); } catch(e) { tasks = []; } }
+    if (tasks.length > 0 && typeof syncSave === 'function') {
+      var payload = { date: date };
+      payload.tasks = JSON.stringify(tasks);
+      payload.executed_pct = data.executed_pct || 0;
+      payload.review_notes = data.review_notes || '';
+      syncSave('tomorrow_plan', payload, 'date');
+    }
+  });
+}
+
 // ── MAIN RENDER ──
 
 function renderTomorrowPanel() {
   var container = document.getElementById('tmr-main');
   if (!container) return;
+
+  _tmrSyncLocalToSupabase(); // Push any locally-stored plans to Supabase
 
   var today = typeof getEffectiveToday === 'function' ? getEffectiveToday() : new Date().toISOString().slice(0, 10);
   var tomorrow = getTomorrowDate();
