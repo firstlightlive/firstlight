@@ -128,13 +128,15 @@
 
     var ekScore = 75; // default = no data, give benefit of doubt
     try {
-      var logs = JSON.parse(localStorage.getItem('fl_ekadashi_log') || '[]');
-      if (logs.length >= 2) {
-        var last2 = logs.slice(-2);
-        var ok = last2.filter(function (e) { return e.fasted || e.clean || e.completed; }).length;
+      // fl_ekadashi_log is an OBJECT keyed by date: { 'YYYY-MM-DD': { status, name, paksha, note } }
+      var logObj = JSON.parse(localStorage.getItem('fl_ekadashi_log') || '{}');
+      var ekDates = Object.keys(logObj).sort(); // ascending
+      if (ekDates.length >= 2) {
+        var last2 = ekDates.slice(-2);
+        var ok = last2.filter(function (d) { return logObj[d] && logObj[d].status === 'observed'; }).length;
         ekScore = ok === 2 ? 100 : ok === 1 ? 50 : 0;
-      } else if (logs.length === 1) {
-        ekScore = (logs[0].fasted || logs[0].clean || logs[0].completed) ? 100 : 0;
+      } else if (ekDates.length === 1) {
+        ekScore = (logObj[ekDates[0]] && logObj[ekDates[0]].status === 'observed') ? 100 : 0;
       }
     } catch (e) {}
 
@@ -146,7 +148,8 @@
 
   // ── SCORE: SOCIAL ────────────────────────────────────
   // Mastery social domains A+E (70%) · Instagram posts (30%)
-  function _social(days7) {
+  // igPostCount is pre-fetched from Supabase by renderStateOfLife
+  function _social(days7, igPostCount) {
     var socialItems = (typeof MASTERY_ITEMS !== 'undefined')
       ? MASTERY_ITEMS.filter(function (i) { return i.domain === 'A' || i.domain === 'E'; })
       : [];
@@ -168,16 +171,7 @@
     var mastSocialAvg = _avg(socialPcts);
     var mastSocialScore = mastSocialAvg !== null ? _clamp(mastSocialAvg) : 50;
 
-    // IG posts this week
-    var igPosts = 0;
-    try {
-      var weekStart = days7[0];
-      var ig = JSON.parse(localStorage.getItem('fl_ig_posts') || '[]');
-      igPosts = ig.filter(function (p) {
-        var ts = p.timestamp || p.date || '';
-        return ts && ts.slice(0, 10) >= weekStart;
-      }).length;
-    } catch (e) {}
+    var igPosts = igPostCount || 0;
     var igScore = igPosts >= 5 ? 100 : igPosts === 4 ? 85 : igPosts === 3 ? 70 : igPosts === 2 ? 50 : igPosts === 1 ? 25 : 0;
 
     return {
@@ -316,19 +310,30 @@
 
     el.innerHTML = '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);padding:30px;text-align:center">Computing life scores...</div>';
 
-    setTimeout(function () {
+    setTimeout(async function () {
       try {
         var today = (typeof getNowIST === 'function') ? getNowIST() : new Date();
         var days7 = _getLast7(today);
         var prevDays7 = _getLast7(new Date(today.getTime() - 7 * 86400000));
 
+        // Fetch IG posts from Supabase for this week (not in localStorage)
+        var igPostCount = 0;
+        try {
+          if (typeof sbFetch === 'function') {
+            var weekStart = days7[0];
+            var igData = await sbFetch('instagram_posts', 'GET', null,
+              '?select=id,timestamp&timestamp=gte.' + weekStart + 'T00:00:00Z&limit=50');
+            igPostCount = (igData && Array.isArray(igData)) ? igData.length : 0;
+          }
+        } catch (e) {}
+
         var P = _physical(days7), M = _mental(days7), Sp = _spiritual(days7),
-          So = _social(days7), F = _financial();
+          So = _social(days7, igPostCount), F = _financial();
 
         var overall = Math.round((P.score + M.score + Sp.score + So.score + F.score) / 5);
 
         var pP = _physical(prevDays7), pM = _mental(prevDays7), pSp = _spiritual(prevDays7),
-          pSo = _social(prevDays7), pF = F; // financial is month-based
+          pSo = _social(prevDays7, 0), pF = F; // financial is month-based; prev IG not fetched
         var prevOverall = Math.round((pP.score + pM.score + pSp.score + pSo.score + pF.score) / 5);
 
         var overallDelta = overall - prevOverall;
