@@ -177,16 +177,7 @@ function renderCheckin() {
   html += '<input type="time" class="form-input" style="font-size:12px;padding:8px 10px" id="ci-lights" value="' + (existing.lights_out || '20:30') + '" oninput="setCheckinField(\'lights_out\',this.value)"' + disAttr + '>';
   html += '</div>';
 
-  // Fortress stayed out toggle — Sunday rule: 1 PM, other days: 6 PM
   var isSunday = new Date().getDay() === 0;
-  var fortressLabel = isSunday ? 'STAYED OUT UNTIL 1 PM (Sunday)' : 'STAYED OUT UNTIL 6 PM';
-  var fortress = existing.fortress_stayed_out !== false;
-  html += '<div>';
-  html += '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px">' + fortressLabel + '</div>';
-  html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (fortress ? ' active-no' : '') + '" onclick="setCheckinToggle(\'fortress_stayed_out\',true)"' + disAttr + '>YES</div>';
-  html += '<div class="bf-toggle-btn' + (!fortress ? ' active-yes' : '') + '" onclick="setCheckinToggle(\'fortress_stayed_out\',false)"' + disAttr + '>NO</div>';
-  html += '</div></div>';
 
   // ── FORTRESS: NO SMARTPHONE IN OFFICE ──
   var noPhone = existing.no_phone_office !== false;
@@ -391,7 +382,6 @@ function sealTheDay() {
     food_violation:       manual.food_violation || '',
     wake_time:            manual.wake_time || '',
     lights_out:           manual.lights_out || '',
-    fortress_stayed_out:  manual.fortress_stayed_out !== false,
     device_free:          manual.device_free !== false,
     mood:                 manual.mood || 5,
     energy:               manual.energy || 5,
