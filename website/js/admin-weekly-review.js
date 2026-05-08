@@ -29,9 +29,7 @@ function _wrGetData(key) {
 function _wrSaveData(key, data) {
   data.savedAt = new Date().toISOString();
   localStorage.setItem('fl_wr_' + key, JSON.stringify(data));
-  if (typeof syncSave === 'function') {
-    syncSave('weekly_schedule', { week_key: 'review_' + key, data: JSON.stringify(data) }, 'week_key');
-  }
+  // Reviews stored in localStorage only — weekly_schedule table uses date-keyed rows for schedule blocks
 }
 
 // ── COMPUTE WEEK SNAPSHOT ─────────────────────────────────────
