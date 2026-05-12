@@ -2464,7 +2464,17 @@ function drawHeatmapPanels(c,W,H,stravaImg,stravaStats){
   // Map area
   const mapY=RY+44,mapH=Math.floor(RH*0.48);
   var _mapDrawn=false;
-  if(_stravaCache&&_stravaCache.length>0){
+  if(iM){
+    var _runMapImg=new Image();
+    _runMapImg.onload=function(){
+      c.save();rr(c,RX+4,mapY,RW-8,mapH,10);c.clip();
+      c.drawImage(_runMapImg,RX+4,mapY,RW-8,mapH);
+      c.strokeStyle='rgba(252,76,2,0.25)';c.lineWidth=1;rr(c,RX+4,mapY,RW-8,mapH,10);c.stroke();
+      c.restore();
+    };
+    _runMapImg.src=iM;
+    _mapDrawn=true;
+  }else if(_stravaCache&&_stravaCache.length>0){
     var latestAct=_stravaCache.find(function(a){return a.type==='Run';});
     var poly=latestAct.summary_polyline;
     if(poly){
