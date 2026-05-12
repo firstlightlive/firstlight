@@ -56,7 +56,7 @@ function switchPanel(panelId) {
   if (panelId === 'life-score')       { if(typeof renderStateOfLife==='function') renderStateOfLife(); else if(typeof renderLifeScore==='function') renderLifeScore(); }
   if (panelId === 'body-weight')      { if(typeof renderBodyWeight==='function') renderBodyWeight(); }
   if (panelId === 'mastery-heatmap')  { if(typeof renderMasteryRitualHeatmap==='function') renderMasteryRitualHeatmap(); }
-  if (panelId === 'checkin') { if (typeof renderCheckin === 'function') renderCheckin(); }
+  if (panelId === 'checkin') { if (typeof renderCheckin === 'function') renderCheckin(); if (typeof renderFinanceCheckinWidget === 'function') renderFinanceCheckinWidget(); }
   if (panelId === 'goals') { if (typeof renderGoalsPanel === 'function') renderGoalsPanel(); }
   if (panelId === 'daily-rule') { if (typeof renderDailyRule === 'function') renderDailyRule(); }
   if (panelId === 'slip-log') { if (typeof renderSlipLog === 'function') renderSlipLog(); }
@@ -68,6 +68,11 @@ function switchPanel(panelId) {
   if (panelId === 'journal-archive') { if (typeof renderJournalCalendar === 'function') renderJournalCalendar(); }
   if (panelId === 'life-calendar') { if (typeof renderLifeCalendar === 'function') renderLifeCalendar(); }
   if (panelId === 'health-dashboard') { if (typeof loadHealthData === 'function') loadHealthData(); }
+  if (panelId === 'finance') { if (typeof renderFinancePanel === 'function') renderFinancePanel('overview'); }
+  if (panelId === 'finance-add') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('add'); } }
+  if (panelId === 'finance-timeline') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('timeline'); } }
+  if (panelId === 'finance-invest') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('invest'); } }
+  if (panelId === 'finance-budgets') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('settings'); } }
 }
 
 // Legacy support — map old switchTab calls to switchPanel

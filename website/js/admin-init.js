@@ -730,6 +730,8 @@ function buildDashboardStats() {
       gymStatus.textContent = (lastSplit ? 'Last: ' + lastSplit.toUpperCase() + ' · ' : '') + prs + ' PRs total';
     }
   }
+  // Finance dashboard widget
+  if (typeof renderFinanceDashboardWidget === 'function') renderFinanceDashboardWidget();
 }
 buildDashboardStats();
 

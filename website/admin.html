@@ -736,6 +736,17 @@
       </div>
 
       <!-- CONTENT ENGINE -->
+      <div class="cc-group" data-group="finance">
+        <div class="cc-group-header"><span class="cc-arrow">▶</span> 💰 FINANCIAL FORTRESS</div>
+        <div class="cc-group-items">
+          <div class="cc-item" data-panel="finance"><span class="cc-icon">◈</span> Overview</div>
+          <div class="cc-item" data-panel="finance-add"><span class="cc-icon">+</span> Add Expense</div>
+          <div class="cc-item" data-panel="finance-timeline"><span class="cc-icon">≡</span> Timeline</div>
+          <div class="cc-item" data-panel="finance-invest"><span class="cc-icon">▲</span> Investments</div>
+          <div class="cc-item" data-panel="finance-budgets"><span class="cc-icon">⚙</span> Budgets</div>
+        </div>
+      </div>
+
       <div class="cc-group" data-group="content">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 📸 CONTENT ENGINE</div>
         <div class="cc-group-items">
@@ -1012,6 +1023,9 @@
           </div>
         </div>
 
+        <!-- ── FINANCIAL FORTRESS WIDGET ── -->
+        <div id="finance-dashboard-widget"></div>
+
       </div>
 
       <!-- ════════════════════════════════════════════════
@@ -1034,6 +1048,7 @@
           <div class="cc-panel-desc">One form. Every signal. Seal the day.</div>
         </div>
         <div id="checkin-container"></div>
+        <div id="finance-checkin-widget"></div>
       </div>
 
       <!-- ════════════════════════════════════════════════
@@ -3099,6 +3114,23 @@
       </div>
 
       <!-- ════════════════════════════════════════════════
+           PANEL: FINANCIAL FORTRESS
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-finance">
+        <div class="cc-panel-header">
+          <div class="cc-panel-title">FINANCIAL FORTRESS</div>
+          <div class="cc-panel-desc">Expenses · Income · Investments · Budget tracking</div>
+        </div>
+        <div id="finance-container"></div>
+      </div>
+
+      <!-- Finance sub-panel aliases (all route to renderFinancePanel with tab) -->
+      <div class="cc-panel" id="p-finance-add"></div>
+      <div class="cc-panel" id="p-finance-timeline"></div>
+      <div class="cc-panel" id="p-finance-invest"></div>
+      <div class="cc-panel" id="p-finance-budgets"></div>
+
+      <!-- ════════════════════════════════════════════════
            PANEL: LOGOUT
            ════════════════════════════════════════════════ -->
       <div class="cc-panel" id="p-logout">
@@ -3228,6 +3260,7 @@
   <script src="js/admin-state-of-life.js"></script>
   <script src="js/admin-weekly-review.js"></script>
   <script src="js/admin-body-weight.js"></script>
+  <script src="js/admin-finance.js"></script>
   <script src="js/admin-init.js"></script>
 
   <!-- Sidebar mobile interaction — must load LAST after all modules -->
