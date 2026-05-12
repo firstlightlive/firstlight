@@ -1902,6 +1902,11 @@ function loadStravaMapImg(input){
     if(mapC)mapC.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover">';
     var wrap=document.getElementById('stravaLatestWrap');
     if(wrap)wrap.style.display='block';
+    // If carousel already generated, re-generate to include route map slide (c7)
+    var out=document.getElementById('output');
+    if(out&&out.classList.contains('show')){
+      setTimeout(function(){try{generate();}catch(ex){console.warn('Map re-gen:',ex);}},600);
+    }
   };
   r.readAsDataURL(file);
 }
@@ -6466,7 +6471,17 @@ function genStoryTemplate(idx){
       // Light grey border frame
       c.strokeStyle='#E0E0E0';c.lineWidth=1.5;rr(c,mapX2,mapTop,mapW2,mapH2,14);c.stroke();
       var _routeDrawn=false;
-      if(_stravaCache&&_stravaCache.length>0){
+      if(iM){
+        var _upRouteImg=new Image();
+        _upRouteImg.onload=function(){
+          c.save();rr(c,mapX2,mapTop,mapW2,mapH2,14);c.clip();
+          c.drawImage(_upRouteImg,mapX2,mapTop,mapW2,mapH2);
+          c.restore();
+          c.strokeStyle='#FC4C02';c.lineWidth=2;rr(c,mapX2,mapTop,mapW2,mapH2,14);c.stroke();
+        };
+        _upRouteImg.src=iM;
+        _routeDrawn=true;
+      }else if(_stravaCache&&_stravaCache.length>0){
         var la=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;})||_stravaCache[0];
         if(la&&la.summary_polyline){
           var rEnc=encodeURIComponent(la.summary_polyline);
@@ -6814,10 +6829,11 @@ async function igPublishStory(){
 }
 
 function _getSlideCanvases(){
-  // c1=Summary, c2=Gym, c3=Run, c4=Sleep, c5=Milestone
+  // c1=Summary, c2=Gym, c3=Run, c4=Sleep, c5=Milestone, c7=Route Map
   if(mode==='lastlight') return ['c1','c2'];
   const day=document.getElementById('dayNum').value;
   const ids=['c1','c2','c3'];
+  if(window._hasRouteMap) ids.push('c7');
   if(mode==='normal') ids.push('c4');
   if(isMilestone(day)) ids.push('c5');
   return ids;
