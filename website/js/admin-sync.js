@@ -120,11 +120,22 @@ var SYNC_MAP = {
     if (r.date) {
       var existing = {};
       try { existing = JSON.parse(localStorage.getItem('fl_tomorrow_' + r.date) || '{}'); } catch(e) {}
-      var tasks = r.tasks;
-      if (typeof tasks === 'string') { try { tasks = JSON.parse(tasks); } catch(e) { tasks = []; } }
-      existing.tasks = tasks || existing.tasks || [];
+      var remoteTasks = r.tasks || [];
+      if (typeof remoteTasks === 'string') { try { remoteTasks = JSON.parse(remoteTasks); } catch(e) { remoteTasks = []; } }
+      var localTasks = existing.tasks || [];
+      if (typeof localTasks === 'string') { try { localTasks = JSON.parse(localTasks); } catch(e) { localTasks = []; } }
+      // Merge: remote is base; local done-state wins so checkmarks survive a background pull
+      if (remoteTasks.length > 0) {
+        existing.tasks = remoteTasks.map(function(rt, i) {
+          var lt = localTasks[i];
+          return Object.assign({}, rt, lt ? { done: lt.done || rt.done } : {});
+        });
+      } else {
+        existing.tasks = localTasks;
+      }
       if (r.executed_pct !== undefined) existing.executed_pct = r.executed_pct;
-      if (r.review_notes !== undefined) existing.review_notes = r.review_notes;
+      // Prefer local review notes (user may have typed something not yet synced)
+      if (!existing.review_notes && r.review_notes) existing.review_notes = r.review_notes;
       localStorage.setItem('fl_tomorrow_' + r.date, JSON.stringify(existing));
     }
   },
@@ -494,16 +505,24 @@ function pullAllFromSupabase() {
     }},
     { table: 'tomorrow_plan', query: '?date=in.(' + today + ',' + tomorrow + ')', handler: function(rows) {
       rows.forEach(function(r) {
-        if (r.date) {
-          var existing = {};
-          try { existing = JSON.parse(localStorage.getItem('fl_tomorrow_' + r.date) || '{}'); } catch(e) {}
-          var tasks = r.tasks;
-          if (typeof tasks === 'string') { try { tasks = JSON.parse(tasks); } catch(e) { tasks = []; } }
-          existing.tasks = tasks || existing.tasks || [];
-          if (r.executed_pct !== undefined) existing.executed_pct = r.executed_pct;
-          if (r.review_notes !== undefined) existing.review_notes = r.review_notes;
-          localStorage.setItem('fl_tomorrow_' + r.date, JSON.stringify(existing));
+        if (!r.date) return;
+        var existing = {};
+        try { existing = JSON.parse(localStorage.getItem('fl_tomorrow_' + r.date) || '{}'); } catch(e) {}
+        var remoteTasks = r.tasks || [];
+        if (typeof remoteTasks === 'string') { try { remoteTasks = JSON.parse(remoteTasks); } catch(e) { remoteTasks = []; } }
+        var localTasks = existing.tasks || [];
+        if (typeof localTasks === 'string') { try { localTasks = JSON.parse(localTasks); } catch(e) { localTasks = []; } }
+        if (remoteTasks.length > 0) {
+          existing.tasks = remoteTasks.map(function(rt, i) {
+            var lt = localTasks[i];
+            return Object.assign({}, rt, lt ? { done: lt.done || rt.done } : {});
+          });
+        } else {
+          existing.tasks = localTasks;
         }
+        if (r.executed_pct !== undefined) existing.executed_pct = r.executed_pct;
+        if (!existing.review_notes && r.review_notes) existing.review_notes = r.review_notes;
+        localStorage.setItem('fl_tomorrow_' + r.date, JSON.stringify(existing));
       });
     }}
   ];

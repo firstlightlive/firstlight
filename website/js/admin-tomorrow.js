@@ -19,19 +19,24 @@ function saveTomorrowPlan(date, data) {
   if (typeof isDateLocked === 'function' && isDateLocked(date)) { showLockWarning(); return; }
   localStorage.setItem('fl_tomorrow_' + date, JSON.stringify(data));
   if (typeof syncSave === 'function') {
-    var payload = { date: date };
-    payload.tasks = JSON.stringify(data.tasks || []);
-    payload.executed_pct = data.executed_pct || 0;
-    payload.review_notes = data.review_notes || '';
+    var tasks = data.tasks || [];
+    if (typeof tasks === 'string') { try { tasks = JSON.parse(tasks); } catch(e) { tasks = []; } }
+    var payload = {
+      date: date,
+      tasks: tasks,                         // send actual array — column is JSONB, not text
+      executed_pct: data.executed_pct || 0,
+      review_notes: data.review_notes || ''
+    };
     syncSave('tomorrow_plan', payload, 'date');
   }
   if (typeof markSaved === 'function') markSaved();
 }
 
 function getTomorrowDate() {
-  // Use IST (same as getEffectiveToday) to avoid timezone mismatch
-  var ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
-  var t = new Date(ist.getFullYear(), ist.getMonth(), ist.getDate() + 1);
+  // Always base off getEffectiveToday — ensures plan date aligns with execution date
+  var today = (typeof getEffectiveToday === 'function') ? getEffectiveToday() : new Date().toISOString().slice(0, 10);
+  var parts = today.split('-');
+  var t = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]) + 1);
   return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
 }
 
@@ -70,8 +75,11 @@ function _tmrFmtMin(min) {
 }
 
 // ── FORCE-SYNC localStorage → Supabase for today + tomorrow ──
-// Runs once on panel open. Protects against RLS failures, device switches.
+// Only runs once when panel is first opened (not on every nav).
+var _tmrSyncDone = false;
 function _tmrSyncLocalToSupabase() {
+  if (_tmrSyncDone) return;
+  _tmrSyncDone = true;
   var today = typeof getEffectiveToday === 'function' ? getEffectiveToday() : new Date().toISOString().slice(0, 10);
   var tomorrow = getTomorrowDate();
   [today, tomorrow].forEach(function(date) {
@@ -79,13 +87,62 @@ function _tmrSyncLocalToSupabase() {
     var tasks = data.tasks || [];
     if (typeof tasks === 'string') { try { tasks = JSON.parse(tasks); } catch(e) { tasks = []; } }
     if (tasks.length > 0 && typeof syncSave === 'function') {
-      var payload = { date: date };
-      payload.tasks = JSON.stringify(tasks);
-      payload.executed_pct = data.executed_pct || 0;
-      payload.review_notes = data.review_notes || '';
-      syncSave('tomorrow_plan', payload, 'date');
+      syncSave('tomorrow_plan', { date: date, tasks: tasks, executed_pct: data.executed_pct || 0, review_notes: data.review_notes || '' }, 'date');
     }
   });
+}
+
+// ── FETCH FROM SUPABASE → restore data on fresh device / cleared cache ──
+var _tmrFetchDone = false;
+async function _tmrFetchFromSupabase() {
+  if (_tmrFetchDone) return;
+  _tmrFetchDone = true;
+  try {
+    var sbUrl = (typeof FL !== 'undefined' && FL.SUPABASE_URL) || localStorage.getItem('fl_supabase_url') || '';
+    var sbKey = (typeof FL !== 'undefined' && FL.SUPABASE_ANON_KEY) || localStorage.getItem('fl_supabase_key') || '';
+    if (!sbUrl || !sbKey) return;
+    var today = typeof getEffectiveToday === 'function' ? getEffectiveToday() : new Date().toISOString().slice(0, 10);
+    var tomorrow = getTomorrowDate();
+    // Fetch today, tomorrow, and past 7 days (for execution section backscroll)
+    var yesterday = _tmrDateOffset(today, -1);
+    var dates = [yesterday, today, tomorrow];
+    var query = '?date=in.(' + dates.join(',') + ')&select=date,tasks,executed_pct,review_notes';
+    var resp = await fetch(sbUrl + '/rest/v1/tomorrow_plan' + query, {
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+    });
+    if (!resp.ok) return;
+    var rows = await resp.json();
+    if (!Array.isArray(rows) || rows.length === 0) return;
+    var changed = false;
+    rows.forEach(function(r) {
+      if (!r.date) return;
+      var remoteTasks = r.tasks || [];
+      if (typeof remoteTasks === 'string') { try { remoteTasks = JSON.parse(remoteTasks); } catch(e) { remoteTasks = []; } }
+      if (remoteTasks.length === 0) return; // nothing to restore
+      var existing = getTomorrowPlan(r.date);
+      var localTasks = existing.tasks || [];
+      if (typeof localTasks === 'string') { try { localTasks = JSON.parse(localTasks); } catch(e) { localTasks = []; } }
+      // Merge: remote is base, local done-state wins (local checkmarks survive a pull)
+      var merged = remoteTasks.map(function(rt, i) {
+        var lt = localTasks[i];
+        return Object.assign({}, rt, lt ? { done: lt.done || rt.done } : {});
+      });
+      var mergedData = Object.assign({}, existing, {
+        tasks: merged,
+        executed_pct: r.executed_pct !== undefined ? r.executed_pct : (existing.executed_pct || 0),
+        review_notes: (existing.review_notes || r.review_notes || '')
+      });
+      var before = localStorage.getItem('fl_tomorrow_' + r.date);
+      var after = JSON.stringify(mergedData);
+      if (before !== after) {
+        localStorage.setItem('fl_tomorrow_' + r.date, after);
+        changed = true;
+      }
+    });
+    if (changed) renderTomorrowPanel();
+  } catch(e) {
+    console.warn('[Tomorrow] Supabase fetch failed:', e);
+  }
 }
 
 // ── MAIN RENDER ──
@@ -94,7 +151,8 @@ function renderTomorrowPanel() {
   var container = document.getElementById('tmr-main');
   if (!container) return;
 
-  _tmrSyncLocalToSupabase(); // Push any locally-stored plans to Supabase
+  _tmrSyncLocalToSupabase();  // Push local → Supabase (once per session)
+  _tmrFetchFromSupabase();    // Pull Supabase → local (once per session, re-renders if data found)
 
   var today = typeof getEffectiveToday === 'function' ? getEffectiveToday() : new Date().toISOString().slice(0, 10);
   var tomorrow = getTomorrowDate();
