@@ -210,7 +210,7 @@ function deleteFinIncome(id, date) {
   try { incomes = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
   localStorage.setItem(key, JSON.stringify(incomes.filter(function(i) { return i.id !== id; })));
   if (typeof sbFetch === 'function') sbFetch('income_log', 'DELETE', null, '?id=eq.' + id);
-  renderFinancePanel('timeline');
+  renderFinancePanel('manage');
 }
 
 // ── COMPUTATIONS ──

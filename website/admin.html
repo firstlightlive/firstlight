@@ -2857,16 +2857,16 @@
            ════════════════════════════════════════════════ -->
       <div class="cc-panel bf-panel" id="p-brahma-log">
         <div class="cc-panel-header">
-          <div class="cc-panel-title" style="color:var(--brahma)">FORTRESS DAILY LOG</div>
+          <div class="cc-panel-title" id="brahma-panel-title" style="color:var(--green)">FORTRESS DAILY LOG</div>
           <div class="cc-panel-desc">Track. Reflect. Rebuild. <span id="brahma-status" style="color:var(--green)">CLEAN</span></div>
         </div>
         <div class="panel-section">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-            <input type="date" class="form-input" id="brahmaDate" style="max-width:180px;border-color:rgba(255,68,68,0.15)" onchange="renderBrahmaDaily()">
+            <input type="date" class="form-input" id="brahmaDate" style="max-width:180px;border-color:rgba(0,230,118,0.2)" onchange="renderBrahmaDaily()">
             <button class="btn-copy" onclick="brahmaDateNav(-1)">◀ PREV</button>
             <button class="btn-copy" onclick="brahmaDateNav(0)">TODAY</button>
             <button class="btn-copy" onclick="brahmaDateNav(1)">NEXT ▶</button>
-            <span style="margin-left:auto;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--brahma)" id="brahma-streak-badge">STREAK: 0</span>
+            <span style="margin-left:auto;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green)" id="brahma-streak-badge">STREAK: 0</span>
           </div>
         </div>
         <div id="brahma-daily-container"></div>

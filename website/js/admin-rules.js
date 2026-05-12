@@ -26,9 +26,10 @@ function getRules25State() {
 function saveRules25State(state) {
   var today = getEffectiveToday();
   localStorage.setItem('fl_rules25_' + today, JSON.stringify(state));
-  // Sync to Supabase via mastery_log (prefixed date avoids conflict with mastery data)
-  if (typeof syncSave === 'function') {
-    syncSave('mastery_log', { date: 'rules25_' + today, items: JSON.stringify(state) }, 'date');
+  // Bridge to the reading streak: any rule read = daily rule read for streak purposes
+  var anyRead = Object.keys(state).some(function(k) { return state[k]; });
+  if (anyRead) {
+    localStorage.setItem('fl_daily_rule_read_' + today, '1');
   }
 }
 
@@ -66,37 +67,63 @@ async function loadRules25FromSupabase() {
   }
 }
 
+// ── ONE-TIME BACKFILL: set fl_daily_rule_read_* for all past days where rules were read ──
+function _rules25Backfill() {
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (!k || !k.startsWith('fl_rules25_')) continue;
+    var date = k.replace('fl_rules25_', '');
+    if (date.length !== 10) continue;
+    if (localStorage.getItem('fl_daily_rule_read_' + date)) continue; // already set
+    try {
+      var st = JSON.parse(localStorage.getItem(k) || '{}');
+      if (Object.keys(st).some(function(r) { return st[r]; })) {
+        localStorage.setItem('fl_daily_rule_read_' + date, '1');
+      }
+    } catch(e) {}
+  }
+}
+
 // ── COMPUTE 25-RULES TRACKING STATS ──
 function compute25RulesStats() {
   var today = new Date();
   var todayStr = (today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0'));
-  var stats = { todayRead: 0, thisWeek: 0, weekDays: 0, thisMonth: 0, monthDays: 0, thisYear: 0, yearDays: 0, lifetimeCycles: 0 };
+  var stats = { todayRead: 0, currentStreak: 0, longestStreak: 0, thisWeek: 0, thisMonth: 0, monthDays: 0, thisYear: 0, yearDays: 0, lifetimeCycles: 0 };
 
   // Today
   var todayState = getRules25State();
   stats.todayRead = Object.keys(todayState).filter(function(k) { return todayState[k]; }).length;
 
   // Count complete days (all 25 read) across different periods
+  var streakActive = true, streak = 0, longest = 0;
   for (var i = 0; i < 365; i++) {
     var d = new Date(today); d.setDate(d.getDate() - i);
     var ds = (d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
     var state = null;
     try { state = JSON.parse(localStorage.getItem('fl_rules25_' + ds) || 'null'); } catch(e) {}
-    if (!state) continue;
-    var readCount = Object.keys(state).filter(function(k) { return state[k]; }).length;
+    var readCount = state ? Object.keys(state).filter(function(k) { return state[k]; }).length : 0;
     var isComplete = readCount >= 25;
+    var anyRead = readCount > 0;
+
+    // Streak: consecutive days where at least 1 rule was read (count reading, not full completion)
+    if (streakActive) {
+      if (anyRead) { streak++; longest = Math.max(longest, streak); }
+      else if (i === 0) { /* today not yet read — don't break streak */ }
+      else { streakActive = false; }
+    } else {
+      if (anyRead) { streak = 1; longest = Math.max(longest, streak); }
+      else streak = 0;
+    }
 
     if (isComplete) {
-      // This week (last 7 days)
-      if (i < 7) { stats.thisWeek++; stats.weekDays = Math.max(stats.weekDays, i + 1); }
-      // This month
+      if (i < 7) stats.thisWeek++;
       if (ds.substring(0, 7) === todayStr.substring(0, 7)) stats.thisMonth++;
-      // This year
       if (ds.substring(0, 4) === todayStr.substring(0, 4)) stats.thisYear++;
       stats.lifetimeCycles++;
     }
-    if (i < 7) stats.weekDays = 7;
   }
+  stats.currentStreak = streak;
+  stats.longestStreak = longest;
 
   // Count days in current month
   stats.monthDays = today.getDate();
@@ -176,13 +203,17 @@ function renderRules() {
   // Tracking stats
   if (trackingEl) {
     var stats = compute25RulesStats();
+    var sColor = stats.currentStreak >= 7 ? 'var(--green)' : stats.currentStreak >= 3 ? 'var(--gold)' : 'var(--cyan)';
     trackingEl.innerHTML =
       '<div class="panel-section" style="border-color:rgba(0,212,255,0.12);margin-top:24px">' +
         '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--cyan);margin-bottom:16px;font-weight:700">READING TRACKER</div>' +
-        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">' +
+        '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px">' +
+          ruleStatCard(stats.currentStreak + ' days', 'CURRENT STREAK', sColor) +
+          ruleStatCard(stats.longestStreak + ' days', 'BEST STREAK', 'var(--gold)') +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">' +
           ruleStatCard(stats.thisWeek + '/7', 'THIS WEEK', stats.thisWeek >= 6 ? 'var(--green)' : 'var(--cyan)') +
           ruleStatCard(stats.thisMonth + '/' + stats.monthDays, 'THIS MONTH', 'var(--cyan)') +
-          ruleStatCard(stats.thisYear + '/' + stats.yearDays, 'THIS YEAR', 'var(--cyan)') +
           ruleStatCard(stats.lifetimeCycles, 'LIFETIME DAYS', 'var(--gold)') +
         '</div>' +
       '</div>';
@@ -229,6 +260,7 @@ function randomRule25() {
 
 // Init on load — delayed to ensure DAILY_RULES is available
 setTimeout(function() {
+  _rules25Backfill();        // set fl_daily_rule_read_* for all past days where rules were read
   renderRules();
   loadRules25FromSupabase(); // restore from Supabase if localStorage empty/stale
 }, 100);

@@ -118,11 +118,17 @@ function renderBrahmaDaily() {
   var editable = isBrahmaEditable(date);
 
   var clean = isCleanDay(data);
+  var stateColor = clean ? 'var(--green)' : '#FF5252';
   var s = document.getElementById('brahma-status');
-  if (s) { s.textContent = clean ? 'CLEAN' : 'RELAPSE'; s.style.color = clean ? 'var(--green)' : 'var(--brahma)'; }
+  if (s) { s.textContent = clean ? 'CLEAN' : 'FEAR'; s.style.color = stateColor; }
+  var titleEl = document.getElementById('brahma-panel-title');
+  if (titleEl) titleEl.style.color = stateColor;
   var streak = computeBrahmaStreak();
   var badge = document.getElementById('brahma-streak-badge');
-  if (badge) badge.textContent = 'STREAK: ' + streak.currentStreak + ' DAYS';
+  if (badge) {
+    badge.textContent = 'STREAK: ' + streak.currentStreak + ' DAYS';
+    badge.style.color = streak.currentStreak >= 7 ? 'var(--green)' : streak.currentStreak >= 1 ? 'var(--gold)' : '#FF5252';
+  }
 
   // ── RULE STATES ──
   var purityHeld  = !(data.porn === true || data.masturbate === true);

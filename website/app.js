@@ -1151,6 +1151,12 @@ function updateSyncStatus() {
 // ── CORE FETCH — with queue fallback ──
 // Public tables that don't need user_id (anonymous access)
 const SB_PUBLIC_TABLES = ['comments', 'comment_reactions', 'visitor_identities', 'auth_audit_log'];
+// Tables that have no user_id column — skip auto-injection to prevent 400 errors
+const SB_NO_USERID_TABLES = [
+  'tomorrow_plan',
+  'expense_log', 'income_log', 'investment_log', 'finance_budgets', 'finance_recurring',
+  'finance_annual_budgets', 'finance_networth', 'finance_fire_config'
+];
 
 async function sbFetch(table, method, body, query) {
   if (!SB.init()) {
@@ -1159,7 +1165,8 @@ async function sbFetch(table, method, body, query) {
   }
 
   // Auto-inject user_id for authenticated writes to personal tables
-  if (body && method !== 'GET' && SB_PUBLIC_TABLES.indexOf(table) < 0) {
+  // Skip tables that don't have a user_id column (prevents 400 errors)
+  if (body && method !== 'GET' && SB_PUBLIC_TABLES.indexOf(table) < 0 && SB_NO_USERID_TABLES.indexOf(table) < 0) {
     var uid = getAuthUserId();
     if (uid) body.user_id = uid;
   }
