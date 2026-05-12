@@ -70,9 +70,11 @@ function switchPanel(panelId) {
   if (panelId === 'health-dashboard') { if (typeof loadHealthData === 'function') loadHealthData(); }
   if (panelId === 'finance') { if (typeof renderFinancePanel === 'function') renderFinancePanel('overview'); }
   if (panelId === 'finance-add') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('add'); } }
-  if (panelId === 'finance-timeline') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('timeline'); } }
+  if (panelId === 'finance-analytics') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('analytics'); } }
+  if (panelId === 'finance-manage') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('manage'); } }
   if (panelId === 'finance-invest') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('invest'); } }
-  if (panelId === 'finance-budgets') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('settings'); } }
+  if (panelId === 'finance-timeline') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('manage'); } }
+  if (panelId === 'finance-budgets') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('manage'); } }
 }
 
 // Legacy support — map old switchTab calls to switchPanel
