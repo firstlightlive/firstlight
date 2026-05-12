@@ -615,20 +615,49 @@
       h+='</svg></div>';
     }
     h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;flex:1">';
-    var hKpis=[
-      {l:'RESTING HR', v:fmt(today.resting_hr,0)+' bpm', s:'7d:'+fmt(stats.avgRHR7,0)+'  30d:'+fmt(stats.avgRHR30,0), c:C.hr},
-      {l:'HRV', v:fmt(today.hrv_avg,0)+' ms', s:'7d:'+fmt(stats.avgHRV7,0)+'  30d:'+fmt(stats.avgHRV30,0), c:C.hrv},
-      {l:'VO2 MAX', v:fmt(today.vo2_max,1), s:'Longevity index', c:C.vo2},
-      {l:'SPO2', v:(spo2Val(today)?fmt(spo2Val(today),1)+'%':'—'), s:'Blood oxygen', c:C.spo2}
-    ];
-    for (var ki=0;ki<hKpis.length;ki++) {
-      var kp=hKpis[ki];
-      h+='<div style="background:'+C.cardBg+';border:1px solid '+C.cardBorder+';border-radius:10px;padding:12px;text-align:center">';
-      h+='<div style="font:700 8px \'IBM Plex Mono\';color:'+kp.c+';letter-spacing:2px;margin-bottom:6px">'+kp.l+'</div>';
-      h+='<div style="font:700 18px \'IBM Plex Mono\';color:'+C.textBright+'">'+kp.v+'</div>';
-      h+='<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-top:3px">'+kp.s+'</div>';
-      h+='</div>';
+
+    // Sparse metrics (HRV, VO2, SpO2, RHR) may not update every day.
+    // Find last known value across all historical data so we never show — when data exists.
+    var sortedAll = allData.slice().sort(function(a,b){return a.date<b.date?-1:1;});
+    function _lastKnown(field, selectorFn) {
+      var fn = selectorFn || function(d) { return d[field]; };
+      for (var _i = sortedAll.length - 1; _i >= 0; _i--) {
+        var _v = fn(sortedAll[_i]);
+        if (_v != null && _v > 0) return { val: _v, date: sortedAll[_i].date, daysAgo: Math.round((new Date(today.date||sortedAll[sortedAll.length-1].date) - new Date(sortedAll[_i].date)) / 86400000) };
+      }
+      return null;
     }
+    var lkRHR = today.resting_hr ? null : _lastKnown('resting_hr');
+    var lkHRV = today.hrv_avg ? null : _lastKnown('hrv_avg');
+    var lkVO2 = today.vo2_max ? null : _lastKnown('vo2_max');
+    var lkSpo2 = spo2Val(today) ? null : _lastKnown('blood_oxygen_pct', function(d) { return spo2Val(d); });
+
+    function _kpiCard(label, primaryVal, subLine, color, lastKnown) {
+      var isStale = !primaryVal && lastKnown;
+      var displayVal = primaryVal || (lastKnown ? lastKnown.val : null);
+      var staleBadge = isStale && lastKnown.daysAgo > 0 ? '<div style="font:700 8px \'IBM Plex Mono\';color:'+C.warn+';margin-top:3px;letter-spacing:1px">'+lastKnown.daysAgo+'d ago</div>' : '';
+      var border = isStale ? '1px solid rgba(245,166,35,0.2)' : '1px solid '+C.cardBorder;
+      return '<div style="background:'+C.cardBg+';border:'+border+';border-radius:10px;padding:12px;text-align:center">' +
+        '<div style="font:700 8px \'IBM Plex Mono\';color:'+color+';letter-spacing:2px;margin-bottom:6px">'+label+'</div>' +
+        '<div style="font:700 18px \'IBM Plex Mono\';color:'+(isStale?'rgba(255,255,255,0.5)':C.textBright)+'">'+(displayVal!=null?displayVal:'—')+'</div>' +
+        '<div style="font:9px \'IBM Plex Mono\';color:'+C.text+';margin-top:3px">'+subLine+'</div>' +
+        staleBadge +
+        '</div>';
+    }
+
+    h += _kpiCard('RESTING HR',
+      today.resting_hr ? fmt(today.resting_hr,0)+' bpm' : null,
+      '7d:'+fmt(stats.avgRHR7,0)+'  30d:'+fmt(stats.avgRHR30,0), C.hr, lkRHR ? {val: fmt(lkRHR.val,0)+' bpm', daysAgo: lkRHR.daysAgo} : null);
+    h += _kpiCard('HRV',
+      today.hrv_avg ? fmt(today.hrv_avg,0)+' ms' : null,
+      '7d:'+fmt(stats.avgHRV7,0)+'  30d:'+fmt(stats.avgHRV30,0), C.hrv, lkHRV ? {val: fmt(lkHRV.val,0)+' ms', daysAgo: lkHRV.daysAgo} : null);
+    h += _kpiCard('VO2 MAX',
+      today.vo2_max ? fmt(today.vo2_max,1) : null,
+      'Longevity index', C.vo2, lkVO2 ? {val: fmt(lkVO2.val,1), daysAgo: lkVO2.daysAgo} : null);
+    h += _kpiCard('SPO2',
+      spo2Val(today) ? fmt(spo2Val(today),1)+'%' : null,
+      'Blood oxygen', C.spo2, lkSpo2 ? {val: fmt(lkSpo2.val,1)+'%', daysAgo: lkSpo2.daysAgo} : null);
+
     h+='</div></div></div>';
 
     // RHR + HRV side by side
