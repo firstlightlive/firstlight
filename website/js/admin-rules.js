@@ -26,6 +26,44 @@ function getRules25State() {
 function saveRules25State(state) {
   var today = getEffectiveToday();
   localStorage.setItem('fl_rules25_' + today, JSON.stringify(state));
+  // Sync to Supabase via mastery_log (prefixed date avoids conflict with mastery data)
+  if (typeof syncSave === 'function') {
+    syncSave('mastery_log', { date: 'rules25_' + today, items: JSON.stringify(state) }, 'date');
+  }
+}
+
+// ── LOAD TODAY'S STATE FROM SUPABASE (fallback if localStorage is empty) ──
+async function loadRules25FromSupabase() {
+  var today = getEffectiveToday();
+  try {
+    var cached = localStorage.getItem('fl_rules25_' + today);
+    var hasLocal = cached && Object.keys(JSON.parse(cached || '{}')).length > 0;
+    var sbUrl = (typeof FL !== 'undefined' && FL.SUPABASE_URL) || localStorage.getItem('fl_supabase_url') || '';
+    var sbKey = (typeof FL !== 'undefined' && FL.SUPABASE_ANON_KEY) || localStorage.getItem('fl_supabase_key') || '';
+    if (!sbUrl || !sbKey) return;
+    var resp = await fetch(sbUrl + '/rest/v1/mastery_log?date=eq.rules25_' + today + '&select=items', {
+      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+    });
+    var rows = await resp.json();
+    if (!rows || !rows.length || !rows[0].items) return;
+    var remote = typeof rows[0].items === 'string' ? JSON.parse(rows[0].items) : rows[0].items;
+    if (!hasLocal) {
+      // No local data — restore from Supabase
+      localStorage.setItem('fl_rules25_' + today, JSON.stringify(remote));
+      renderRules();
+    } else {
+      // Merge: any rule marked true remotely wins (most permissive)
+      var local = JSON.parse(cached);
+      var merged = Object.assign({}, remote, local);
+      var changed = JSON.stringify(merged) !== JSON.stringify(local);
+      if (changed) {
+        localStorage.setItem('fl_rules25_' + today, JSON.stringify(merged));
+        renderRules();
+      }
+    }
+  } catch(e) {
+    console.warn('[Rules25] Supabase load failed:', e);
+  }
 }
 
 // ── COMPUTE 25-RULES TRACKING STATS ──
@@ -162,11 +200,9 @@ function ruleStatCard(val, label, color) {
 function toggle25Rule(ruleNum) {
   var state = getRules25State();
   state[ruleNum] = !state[ruleNum];
-  saveRules25State(state);
+  saveRules25State(state); // saves to localStorage + Supabase
   renderRules();
   markSaved();
-
-  // All 25 state stored in localStorage only — no Supabase sync
 }
 
 // ── MARK ALL 25 READ ──
@@ -175,10 +211,9 @@ function markAll25Read() {
   var allRead = Object.keys(state).filter(function(k) { return state[k]; }).length >= 25;
   if (allRead) return; // Already all read
   for (var i = 1; i <= 25; i++) state[i] = true;
-  saveRules25State(state);
+  saveRules25State(state); // saves to localStorage + Supabase
   renderRules();
   markSaved();
-  // No Supabase sync — localStorage only
 }
 
 // ── RANDOM RULE ──
@@ -193,5 +228,8 @@ function randomRule25() {
 }
 
 // Init on load — delayed to ensure DAILY_RULES is available
-setTimeout(function() { renderRules(); }, 100);
+setTimeout(function() {
+  renderRules();
+  loadRules25FromSupabase(); // restore from Supabase if localStorage empty/stale
+}, 100);
  
