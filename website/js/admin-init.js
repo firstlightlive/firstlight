@@ -732,6 +732,7 @@ function buildDashboardStats() {
   }
   // Finance dashboard widget
   if (typeof renderFinanceDashboardWidget === 'function') renderFinanceDashboardWidget();
+  if (typeof renderFireDashboardWidget === 'function') renderFireDashboardWidget();
 }
 buildDashboardStats();
 

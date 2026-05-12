@@ -747,6 +747,14 @@
         </div>
       </div>
 
+      <div class="cc-group" data-group="fire">
+        <div class="cc-group-header"><span class="cc-arrow">▶</span> 🔥 FIRE & NET WORTH</div>
+        <div class="cc-group-items">
+          <div class="cc-item" data-panel="fire"><span class="cc-icon">◈</span> FIRE Calculator</div>
+          <div class="cc-item" data-panel="networth"><span class="cc-icon">▦</span> Net Worth</div>
+        </div>
+      </div>
+
       <div class="cc-group" data-group="content">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 📸 CONTENT ENGINE</div>
         <div class="cc-group-items">
@@ -1025,6 +1033,9 @@
 
         <!-- ── FINANCIAL FORTRESS WIDGET ── -->
         <div id="finance-dashboard-widget"></div>
+
+        <!-- ── FIRE JOURNEY WIDGET ── -->
+        <div id="fire-dashboard-widget"></div>
 
       </div>
 
@@ -3133,6 +3144,28 @@
       <div class="cc-panel" id="p-finance-budgets"></div>
 
       <!-- ════════════════════════════════════════════════
+           PANEL: FIRE CALCULATOR
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-fire">
+        <div class="cc-panel-header">
+          <div class="cc-panel-title">FIRE CALCULATOR</div>
+          <div class="cc-panel-desc">Financial Independence · Retire Early · Corpus · Projections</div>
+        </div>
+        <div id="fire-container"></div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
+           PANEL: NET WORTH TRACKER
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-networth">
+        <div class="cc-panel-header">
+          <div class="cc-panel-title">NET WORTH TRACKER</div>
+          <div class="cc-panel-desc">Assets · Liabilities · Monthly snapshots · Wealth history</div>
+        </div>
+        <div id="networth-container"></div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
            PANEL: LOGOUT
            ════════════════════════════════════════════════ -->
       <div class="cc-panel" id="p-logout">
@@ -3263,6 +3296,7 @@
   <script src="js/admin-weekly-review.js"></script>
   <script src="js/admin-body-weight.js"></script>
   <script src="js/admin-finance.js"></script>
+  <script src="js/admin-fire.js"></script>
   <script src="js/admin-init.js"></script>
 
   <!-- Sidebar mobile interaction — must load LAST after all modules -->

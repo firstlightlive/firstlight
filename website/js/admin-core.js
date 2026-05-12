@@ -75,6 +75,8 @@ function switchPanel(panelId) {
   if (panelId === 'finance-invest') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('invest'); } }
   if (panelId === 'finance-timeline') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('manage'); } }
   if (panelId === 'finance-budgets') { if (typeof renderFinancePanel === 'function') { document.querySelectorAll('.cc-panel').forEach(function(p){p.classList.toggle('active',p.id==='p-finance');}); renderFinancePanel('manage'); } }
+  if (panelId === 'fire') { if (typeof renderFirePanel === 'function') renderFirePanel('calculator'); }
+  if (panelId === 'networth') { if (typeof renderNetWorthPanel === 'function') renderNetWorthPanel(); }
 }
 
 // Legacy support — map old switchTab calls to switchPanel

@@ -94,6 +94,23 @@ function getFinAnnualBudgets(year) {
 
 function saveFinAnnualBudgets(year, budgets) {
   localStorage.setItem('fl_finance_annual_budgets_' + year, JSON.stringify(budgets));
+  var SUPA = (typeof FL !== 'undefined' && FL.SUPABASE_URL) || '';
+  var KEY  = (typeof FL !== 'undefined' && FL.SUPABASE_ANON_KEY) || '';
+  if (!SUPA || !KEY) return;
+  var jwt = KEY;
+  try {
+    var ref = SUPA.split('//')[1].split('.')[0];
+    var sess = JSON.parse(localStorage.getItem('sb-' + ref + '-auth-token') || 'null');
+    if (sess && sess.access_token) jwt = sess.access_token;
+  } catch(e) {}
+  var rows = Object.keys(budgets).map(function(cat) {
+    return { year: year, category: cat, annual_budget: budgets[cat], updated_at: new Date().toISOString() };
+  });
+  fetch(SUPA + '/rest/v1/finance_annual_budgets', {
+    method: 'POST',
+    headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + jwt, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+    body: JSON.stringify(rows)
+  }).catch(function() {});
 }
 
 // ── DATA LAYER — RECURRING BILLS ──
