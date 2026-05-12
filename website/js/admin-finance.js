@@ -200,8 +200,15 @@ function _buildFinOverview() {
   var monthName = today.toLocaleString('default', { month: 'long' }).toUpperCase();
   var html = '';
 
+  // Today's spend banner
+  var todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  var todaySpend = stats.expenses.filter(function(e){return e.date===todayStr;}).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);
+
   // Header
-  html += '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--cyan);margin-bottom:16px">' + monthName + ' ' + year + '</div>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+  html += '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--cyan)">' + monthName + ' ' + year + '</div>';
+  html += '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">Today: <span style="color:var(--gold);font-weight:700">' + finFmt(todaySpend) + '</span></div>';
+  html += '</div>';
 
   // Summary cards 2x2
   html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px">';
@@ -212,11 +219,27 @@ function _buildFinOverview() {
       (sub ? '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-top:2px">' + sub + '</div>' : '') +
       '</div>';
   }
-  html += sumCard('TOTAL SPENT', finFmt(stats.totalExpense), budgetPct > 100 ? 'var(--red)' : budgetPct > 80 ? 'var(--gold)' : 'var(--green)', budgetPct + '% of ₹' + Math.round(totalBudget/1000) + 'K budget');
+  html += sumCard('THIS MONTH SPENT', finFmt(stats.totalExpense), budgetPct > 100 ? 'var(--red)' : budgetPct > 80 ? 'var(--gold)' : 'var(--green)', budgetPct + '% of ₹' + Math.round(totalBudget/1000) + 'K budget');
   html += sumCard('INCOME', finFmt(stats.totalIncome), 'var(--cyan)', stats.totalIncome > 0 ? 'logged this month' : 'add via ADD tab');
   html += sumCard('INVESTED', finFmt(stats.totalInvest), 'var(--gold)', 'this month');
   var srColor = stats.savingsRate >= 30 ? 'var(--green)' : stats.savingsRate >= 0 ? 'var(--gold)' : 'var(--red)';
   html += sumCard('SAVINGS RATE', stats.savingsRate + '%', srColor, finFmt(stats.savings) + ' saved');
+  html += '</div>';
+
+  // Yearly summary
+  var yearStats = computeFinYear(year);
+  var ySrColor = yearStats.savingsRate >= 30 ? 'var(--green)' : yearStats.savingsRate >= 0 ? 'var(--gold)' : 'var(--red)';
+  html += '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-muted);margin-bottom:8px">' + year + ' ANNUAL SUMMARY</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px">';
+  function yCard(label, val, color) {
+    return '<div style="text-align:center;padding:10px 4px;background:var(--bg3);border:1px solid rgba(0,212,255,0.06);border-radius:8px">' +
+      '<div style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:' + color + '">' + val + '</div>' +
+      '<div style="font-family:var(--font-mono);font-size:7px;letter-spacing:1.5px;color:var(--text-dim);margin-top:3px">' + label + '</div></div>';
+  }
+  html += yCard('SPENT', finFmt(yearStats.totalExpense), 'var(--red)');
+  html += yCard('INCOME', finFmt(yearStats.totalIncome), 'var(--cyan)');
+  html += yCard('INVESTED', finFmt(yearStats.totalInvest), 'var(--gold)');
+  html += yCard('SAVINGS %', yearStats.savingsRate + '%', ySrColor);
   html += '</div>';
 
   // Budget tracker
@@ -260,11 +283,18 @@ function _buildFinOverview() {
   });
   html += '</div>';
 
-  // Recent 5 expenses
-  if (stats.expenses.length > 0) {
-    html += '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-muted);margin-bottom:8px">RECENT</div>';
-    var recent = stats.expenses.slice().sort(function(a,b){ return b.date > a.date ? 1 : -1; }).slice(0,5);
-    recent.forEach(function(e) {
+  // Recent 7 expenses — scan last 2 months to find truly latest
+  var recentAll = stats.expenses.slice();
+  if (recentAll.length < 7) {
+    var prevDate = new Date(year, month - 1, 1);
+    var prev = getFinExpenses(prevDate.getFullYear(), prevDate.getMonth());
+    recentAll = recentAll.concat(prev);
+  }
+  recentAll.sort(function(a,b){ return b.date > a.date ? 1 : (b.date < a.date ? -1 : 0); });
+  var recent7 = recentAll.slice(0, 7);
+  if (recent7.length > 0) {
+    html += '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-muted);margin-bottom:8px">RECENT TRANSACTIONS</div>';
+    recent7.forEach(function(e) {
       var cat = FINANCE_CATS.find(function(c) { return c.id === e.category; }) || { icon: '📦', color: '#9E9E9E' };
       html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(0,212,255,0.04)">';
       html += '<span>' + cat.icon + '</span>';
@@ -390,13 +420,19 @@ function _buildFinTimeline() {
 
   // Income this month
   if (stats.income.length > 0) {
-    html += '<div style="margin-top:20px;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--green);margin-bottom:8px">INCOME</div>';
+    var incTotal = stats.income.reduce(function(s,i){return s+(parseFloat(i.amount)||0);},0);
+    html += '<div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html += '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--green)">INCOME</div>';
+    html += '<div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--green)">' + finFmt(incTotal) + ' total</div>';
+    html += '</div>';
     stats.income.forEach(function(i) {
       html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(0,229,160,0.05)">';
       html += '<span style="font-size:15px">💵</span>';
       html += '<div style="flex:1"><div style="font-family:var(--font-mono);font-size:11px;color:var(--text)">' + (i.description || i.source) + '</div>';
       html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">' + i.date + ' · ' + i.source + '</div></div>';
-      html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--green)">+₹' + parseFloat(i.amount).toFixed(0) + '</div></div>';
+      html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--green)">+₹' + parseFloat(i.amount).toFixed(0) + '</div>';
+      html += '<span onclick="deleteFinIncome(\'' + i.id + '\',\'' + i.date + '\')" style="color:var(--text-dim);cursor:pointer;font-size:16px;padding:0 6px;opacity:0.5;-webkit-tap-highlight-color:transparent" title="Delete">×</span>';
+      html += '</div>';
     });
   }
 
@@ -425,11 +461,13 @@ function _buildFinInvest() {
   html += '<input type="text" id="fin-inv-name" class="form-input" style="font-size:12px;padding:8px 12px" placeholder="Parag Parikh Flexi Cap..."></div>';
   html += '<div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:6px">DATE</div>';
   html += '<input type="date" id="fin-inv-date" class="form-input" style="font-size:12px;padding:8px 12px" value="' + today + '"></div></div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
   html += '<div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:6px">UNITS (optional)</div>';
   html += '<input type="number" id="fin-inv-units" class="form-input" style="font-size:12px;padding:8px 12px" placeholder="0.0000" step="0.0001"></div>';
   html += '<div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:6px">NAV / PRICE (optional)</div>';
   html += '<input type="number" id="fin-inv-nav" class="form-input" style="font-size:12px;padding:8px 12px" placeholder="0.00" step="0.01"></div></div>';
+  html += '<div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:6px">NOTES (optional)</div>';
+  html += '<input type="text" id="fin-inv-notes" class="form-input" style="font-size:12px;padding:8px 12px" placeholder="Folio number, reason, broker..."></div>';
   html += '<button onclick="finSubmitInvestment()" style="width:100%;padding:12px;background:rgba(245,166,35,0.1);color:var(--gold);font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:2px;border:1px solid rgba(245,166,35,0.3);border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent" id="fin-inv-btn">+ ADD INVESTMENT</button>';
   html += '</div>';
 
@@ -456,12 +494,15 @@ function _buildFinInvest() {
     html += '</div>';
     // Recent history
     html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px">HISTORY</div>';
-    investments.slice(0, 30).forEach(function(inv) {
-      html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(245,166,35,0.05)">';
+    investments.slice(0, 50).forEach(function(inv) {
+      html += '<div style="padding:8px 0;border-bottom:1px solid rgba(245,166,35,0.05)">';
+      html += '<div style="display:flex;align-items:center;gap:8px">';
       html += '<div style="flex:1"><div style="font-family:var(--font-mono);font-size:11px;color:var(--text)">' + inv.name + '</div>';
-      html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">' + inv.date + ' · ' + inv.type + (inv.units ? ' · ' + parseFloat(inv.units).toFixed(4) + ' units' : '') + (inv.nav ? ' @ ₹' + parseFloat(inv.nav).toFixed(2) : '') + '</div></div>';
+      html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">' + inv.date + ' · ' + inv.type + (inv.units ? ' · ' + parseFloat(inv.units).toFixed(4) + 'u' : '') + (inv.nav ? ' @ ₹' + parseFloat(inv.nav).toFixed(2) : '') + '</div></div>';
       html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--gold)">₹' + parseFloat(inv.amount).toFixed(0) + '</div>';
       html += '<span onclick="finDeleteInvestment(\'' + inv.id + '\')" style="color:var(--text-dim);cursor:pointer;font-size:16px;padding:0 6px;opacity:0.5;-webkit-tap-highlight-color:transparent">×</span>';
+      html += '</div>';
+      if (inv.notes) html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-top:2px;padding-left:2px;font-style:italic">' + inv.notes + '</div>';
       html += '</div>';
     });
     html += '</div>';
@@ -487,7 +528,17 @@ function _buildFinSettings() {
   });
   html += '<button onclick="finSaveBudgets()" id="fin-budget-btn" style="width:100%;margin-top:8px;padding:12px;background:var(--cyan);color:#0A0C10;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:2px;border:none;border-radius:8px;cursor:pointer">SAVE BUDGETS</button>';
   html += '</div>';
-  html += '<div style="text-align:center;padding:12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">Total monthly budget: <span style="color:var(--cyan);font-weight:700">' + finFmt(total) + '</span></div>';
+  html += '<div style="text-align:center;padding:10px 0 4px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">Total monthly budget: <span style="color:var(--cyan);font-weight:700">' + finFmt(total) + '</span></div>';
+
+  // Data export section
+  html += '<div class="panel-section" style="border-color:rgba(0,212,255,0.08);margin-top:0">';
+  html += '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-muted);margin-bottom:12px">DATA EXPORT (10-YEAR ARCHIVE)</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:8px">';
+  html += '<button onclick="finExportCSV()" style="width:100%;padding:10px;background:transparent;color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:1.5px;border:1px solid rgba(0,212,255,0.2);border-radius:8px;cursor:pointer">↓ EXPORT ALL EXPENSES (CSV)</button>';
+  html += '<button onclick="finExportInvestCSV()" style="width:100%;padding:10px;background:transparent;color:var(--gold);font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:1.5px;border:1px solid rgba(245,166,35,0.2);border-radius:8px;cursor:pointer">↓ EXPORT INVESTMENTS (CSV)</button>';
+  html += '</div>';
+  html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-top:10px;line-height:1.7">Exports all data from local storage as CSV. Run monthly for a complete 10-year archive. Supabase stores all data indefinitely as primary backup.</div>';
+  html += '</div>';
 
   return html;
 }
@@ -561,12 +612,15 @@ function finSubmitInvestment() {
     type: document.getElementById('fin-inv-type').value,
     name: name,
     units: parseFloat(document.getElementById('fin-inv-units').value) || null,
-    nav: parseFloat(document.getElementById('fin-inv-nav').value) || null
+    nav: parseFloat(document.getElementById('fin-inv-nav').value) || null,
+    notes: ((document.getElementById('fin-inv-notes') || {}).value || '').trim()
   });
   document.getElementById('fin-inv-amount').value = '';
   document.getElementById('fin-inv-name').value = '';
   document.getElementById('fin-inv-units').value = '';
   document.getElementById('fin-inv-nav').value = '';
+  var notesEl = document.getElementById('fin-inv-notes');
+  if (notesEl) notesEl.value = '';
   if (typeof markSaved === 'function') markSaved();
   renderFinancePanel('invest');
 }
@@ -719,12 +773,84 @@ function fciAddExpense() {
   renderFinanceDashboardWidget();
 }
 
+// ── YEARLY HELPERS ──
+function computeFinYear(year) {
+  var totalExpense = 0, totalIncome = 0, totalInvest = 0;
+  var byCat = {};
+  FINANCE_CATS.forEach(function(c) { byCat[c.id] = 0; });
+  for (var m = 0; m < 12; m++) {
+    var ms = computeFinMonth(year, m);
+    totalExpense += ms.totalExpense;
+    totalIncome += ms.totalIncome;
+    totalInvest += ms.totalInvest;
+    FINANCE_CATS.forEach(function(c) { byCat[c.id] += ms.byCat[c.id] || 0; });
+  }
+  var savings = totalIncome - totalExpense - totalInvest;
+  var savingsRate = totalIncome > 0 ? Math.round(savings / totalIncome * 100) : 0;
+  return { totalExpense: totalExpense, totalIncome: totalIncome, totalInvest: totalInvest, savings: savings, savingsRate: savingsRate, byCat: byCat };
+}
+
+function deleteFinIncome(id, date) {
+  var parts = date.split('-');
+  var year = parseInt(parts[0]), month = parseInt(parts[1]) - 1;
+  var key = 'fl_income_' + _finMonthKey(year, month);
+  var incomes = [];
+  try { incomes = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+  localStorage.setItem(key, JSON.stringify(incomes.filter(function(i) { return i.id !== id; })));
+  if (typeof sbFetch === 'function') sbFetch('income_log', 'DELETE', null, '?id=eq.' + id);
+  renderFinancePanel('timeline');
+}
+
+function finExportCSV() {
+  var today = new Date();
+  var rows = ['Date,Category,Description,Amount,Payment Mode'];
+  // Export all expense months in localStorage
+  for (var y = today.getFullYear() - 10; y <= today.getFullYear(); y++) {
+    for (var m = 0; m < 12; m++) {
+      var mk = _finMonthKey(y, m);
+      var expenses = [];
+      try { expenses = JSON.parse(localStorage.getItem('fl_expenses_' + mk) || '[]'); } catch(e) {}
+      expenses.forEach(function(e) {
+        var desc = (e.description || '').replace(/,/g, ';').replace(/"/g, "'");
+        rows.push([e.date, e.category, '"' + desc + '"', parseFloat(e.amount).toFixed(2), e.payment_mode || 'UPI'].join(','));
+      });
+    }
+  }
+  var csv = rows.join('\n');
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'firstlight_expenses_' + today.toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function finExportInvestCSV() {
+  var rows = ['Date,Type,Name,Amount,Units,NAV,Notes'];
+  getFinInvestments().forEach(function(i) {
+    rows.push([i.date, i.type, '"' + (i.name||'').replace(/"/g,"'") + '"', parseFloat(i.amount).toFixed(2), i.units||'', i.nav||'', '"' + (i.notes||'').replace(/"/g,"'") + '"'].join(','));
+  });
+  var blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'firstlight_investments_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
 // ── BOOTSTRAP FROM SUPABASE ──
 (function _finLoadFromSupabase() {
   var SUPA = (typeof FL !== 'undefined' && FL.SUPABASE_URL) || '';
   var KEY = (typeof FL !== 'undefined' && FL.SUPABASE_ANON_KEY) || '';
   if (!SUPA || !KEY) return;
-  var headers = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY };
+  // Use session JWT for authenticated RLS tables (anon key alone is blocked)
+  var jwt = KEY;
+  try {
+    var ref = SUPA.split('//')[1].split('.')[0];
+    var sess = JSON.parse(localStorage.getItem('sb-' + ref + '-auth-token') || 'null');
+    if (sess && sess.access_token) jwt = sess.access_token;
+  } catch(e) {}
+  var headers = { 'apikey': KEY, 'Authorization': 'Bearer ' + jwt };
 
   var sixAgo = new Date(Date.now() - 180 * 86400000);
   var since = sixAgo.getFullYear() + '-' + String(sixAgo.getMonth()+1).padStart(2,'0') + '-01';
