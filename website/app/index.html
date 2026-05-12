@@ -5997,11 +5997,11 @@ function downloadStoriesCard(){
 // STORY STUDIO — 10 templates + day-of-week scheduling
 // High quality: 2160x3840 canvas, 2x scale, 0.97 JPEG
 
-const STORY_SCHEDULE=['number','streak','clock','dashboard','stakes','receipt','redline','witness','compare','heatmap','noir','light','dawn','paper','unclaimed','route'];
-const STORY_NAMES=['THE NUMBER','THE STREAK','THE CLOCK','THE DASHBOARD','THE STAKES','THE RECEIPT','THE REDLINE','THE WITNESS','THE COMPARE','THE HEATMAP','THE NOIR','THE LIGHT','THE DAWN','THE PAPER','THE UNCLAIMED','THE ROUTE'];
-const STORY_ICONS=['\uD83D\uDD22','\uD83D\uDD25','\u23F0','\uD83D\uDCCA','\uD83D\uDCB0','\uD83E\uDDFE','\uD83D\uDFE5','\uD83D\uDC41','\u2194\uFE0F','\uD83D\uDFE9','\uD83C\uDF03','\u2600\uFE0F','\uD83C\uDF05','\uD83D\uDCF0','\u267B\uFE0F','\uD83D\uDDFA\uFE0F'];
-const STORY_DESCS=['Giant KM hero','Day counter + dots','Start time hero','All stats grid','Danger zone','Thermal receipt','Minimalist threat','Reply challenge','Day 1 vs Today','Streak grid','Dark cyan dashboard','Cream KM + watch','Cream clock emboss','White serif minimal','Black unclaimed only','Satellite map + stats'];
-const STORY_DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY'];
+const STORY_SCHEDULE=['number','streak','clock','dashboard','stakes','receipt','redline','witness','compare','heatmap','noir','light','dawn','paper','unclaimed','route','blueprint','telegram','film','manifesto','devotion','scoreboard','ledger','press','carbon','mirror'];
+const STORY_NAMES=['THE NUMBER','THE STREAK','THE CLOCK','THE DASHBOARD','THE STAKES','THE RECEIPT','THE REDLINE','THE WITNESS','THE COMPARE','THE HEATMAP','THE NOIR','THE LIGHT','THE DAWN','THE PAPER','THE UNCLAIMED','THE ROUTE','THE BLUEPRINT','THE TELEGRAM','THE FILM','THE MANIFESTO','THE DEVOTION','THE SCOREBOARD','THE LEDGER','THE PRESS','THE CARBON','THE MIRROR'];
+const STORY_ICONS=['\uD83D\uDD22','\uD83D\uDD25','\u23F0','\uD83D\uDCCA','\uD83D\uDCB0','\uD83E\uDDFE','\uD83D\uDFE5','\uD83D\uDC41','\u2194\uFE0F','\uD83D\uDFE9','\uD83C\uDF03','\u2600\uFE0F','\uD83C\uDF05','\uD83D\uDCF0','\u267B\uFE0F','\uD83D\uDDFA\uFE0F','\uD83D\uDCCF','\uD83D\uDCDF','\uD83C\uDF9E','\uD83D\uDCDC','\uD83C\uDF0C','\uD83C\uDFDF','\uD83D\uDCCA','\uD83D\uDCF0','\u26A1','\uD83E\uDE9E'];
+const STORY_DESCS=['Giant KM hero','Day counter + dots','Start time hero','All stats grid','Danger zone','Thermal receipt','Minimalist threat','Reply challenge','Day 1 vs Today','Streak grid','Dark cyan dashboard','Cream KM + watch','Cream clock emboss','White serif minimal','Black unclaimed only','Satellite map + stats','Engineering grid callouts','Western Union format','Three-frame film strip','Raw prose intensity wall','Pre-dawn stars + 3:15 AM','Stadium LED scoreboard','Accounting balance sheet','Newspaper front page','Carbon weave premium tech','Full-bleed photo + data wall'];
+const STORY_DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY'];
 
 (function initStorySchedule(){
   var el=document.getElementById('storySchedule');var label=document.getElementById('storyTodayLabel');if(!el)return;
@@ -6534,7 +6534,492 @@ function genStoryTemplate(idx){
       c.font='400 12px "JetBrains Mono",monospace';c.fillStyle='#999';
       c.fillText('www.firstlight.live',W/2,H-46);
       return Promise.resolve();
-    }
+    },
+    // 16: THE BLUEPRINT — Engineering grid with crosshairs and callout annotations
+    function(){
+      c.fillStyle='#060A12';c.fillRect(0,0,W,H);
+      c.strokeStyle='rgba(80,140,255,0.06)';c.lineWidth=1;
+      for(var gx=0;gx<=W;gx+=40){c.beginPath();c.moveTo(gx,0);c.lineTo(gx,H);c.stroke();}
+      for(var gy=0;gy<=H;gy+=40){c.beginPath();c.moveTo(0,gy);c.lineTo(W,gy);c.stroke();}
+      c.fillStyle='rgba(80,140,255,0.15)';
+      for(var gxi=0;gxi<=W;gxi+=40){for(var gyi=0;gyi<=H;gyi+=40){c.beginPath();c.arc(gxi,gyi,1.5,0,Math.PI*2);c.fill();}}
+      var tb={x:W-380,y:H-210,w:340,h:170};
+      c.strokeStyle='rgba(80,140,255,0.25)';c.lineWidth=0.8;c.strokeRect(tb.x,tb.y,tb.w,tb.h);
+      c.beginPath();c.moveTo(tb.x,tb.y+44);c.lineTo(tb.x+tb.w,tb.y+44);c.stroke();
+      c.beginPath();c.moveTo(tb.x+tb.w/2,tb.y+44);c.lineTo(tb.x+tb.w/2,tb.y+tb.h);c.stroke();
+      c.textAlign='left';c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(80,140,255,0.45)';
+      c.fillText('PROJECT: FIRST LIGHT',tb.x+8,tb.y+18);c.fillText('DISCIPLINE ARCHITECTURE',tb.x+8,tb.y+34);
+      c.fillText('SHEET: DAY '+String(day).padStart(3,'0'),tb.x+8,tb.y+66);c.fillText('SCALE: 1:1',tb.x+8,tb.y+84);
+      c.fillText('STATUS: ACTIVE',tb.x+8,tb.y+102);c.fillText('TOLERANCE: ZERO',tb.x+8,tb.y+120);
+      c.fillText('SITE: BANGALORE',tb.x+8,tb.y+138);c.fillText('INTEGRITY: MAINTAINED',tb.x+tb.w/2+8,tb.y+66);
+      c.fillText('STAKE: \u20B9'+formatIndianCurrency(stake),tb.x+tb.w/2+8,tb.y+84);c.fillText('FAILURES: 0',tb.x+tb.w/2+8,tb.y+102);
+      c.textAlign='left';c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(80,140,255,0.4)';c.fillText('FIRST LIGHT / DISCIPLINE ARCHITECTURE / DAY '+day,48,40);
+      c.fillStyle='rgba(80,140,255,0.2)';c.fillRect(0,50,W,0.5);
+      var cX=W/2,cY=840;
+      [220,160,100,50].forEach(function(r2,i){c.strokeStyle='rgba(80,140,255,'+(0.06+i*0.04)+')';c.lineWidth=0.8;c.beginPath();c.arc(cX,cY,r2,0,Math.PI*2);c.stroke();});
+      c.strokeStyle='rgba(80,140,255,0.12)';c.lineWidth=0.5;c.setLineDash([5,5]);
+      c.beginPath();c.moveTo(cX-300,cY);c.lineTo(cX+300,cY);c.stroke();
+      c.beginPath();c.moveTo(cX,cY-300);c.lineTo(cX,cY+300);c.stroke();
+      c.setLineDash([]);
+      c.textAlign='center';c.font='900 200px "Rajdhani",sans-serif';c.fillStyle='rgba(130,180,255,0.07)';c.fillText(day,cX+4,cY+74);
+      c.fillStyle='rgba(180,220,255,0.9)';c.shadowColor='rgba(80,140,255,0.5)';c.shadowBlur=40;c.fillText(day,cX,cY+70);c.shadowBlur=0;
+      c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(80,140,255,0.4)';c.fillText('CONSECUTIVE DAYS \u2014 ZERO BREAKS',cX,cY-240);
+      function callout(ox,oy,lx,ly,cat,val){
+        c.strokeStyle='rgba(255,180,0,0.5)';c.lineWidth=0.8;c.setLineDash([3,4]);
+        c.beginPath();c.moveTo(ox,oy);c.lineTo(lx,ly);c.stroke();c.setLineDash([]);
+        c.fillStyle='rgba(255,180,0,0.6)';c.beginPath();c.arc(ox,oy,3,0,Math.PI*2);c.fill();
+        var isRight=lx>W/2;c.textAlign=isRight?'left':'right';var tx=isRight?lx+10:lx-10;
+        c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,180,0,0.45)';c.fillText(cat,tx,ly-8);
+        c.font='800 20px "Rajdhani",sans-serif';c.fillStyle='rgba(220,240,255,0.9)';c.fillText(val,tx,ly+12);
+      }
+      callout(cX-90,cY-90,120,480,'DISTANCE',(km||'\u2014')+' KM');
+      callout(cX+90,cY-90,W-120,480,'DURATION',(mn||'\u2014')+' MIN');
+      callout(cX-120,cY,80,840,'PACE',fmtP()+'/KM');
+      callout(cX+120,cY,W-80,840,'HEART RATE',(bpmV||'\u2014')+' BPM');
+      callout(cX-90,cY+90,120,1200,'DAILY STAKE','\u20B9'+formatIndianCurrency(stake));
+      callout(cX+90,cY+90,W-120,1200,'TOTAL UNCLAIMED','\u20B9'+formatIndianCurrency(totalRisk));
+      c.textAlign='left';c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(80,140,255,0.3)';
+      c.fillText('NOTE 1: ALL DIMENSIONS GPS-VERIFIED. NO ROUNDING.',60,1380);
+      c.fillText('NOTE 2: STRUCTURAL TOLERANCE = ZERO MISSED DAYS.',60,1404);
+      c.fillText('NOTE 3: LOAD BEARING \u2014 \u20B9'+formatIndianCurrency(stake)+' PER DAY.',60,1428);
+      c.fillText('MATERIAL SPEC: HUMAN GRIT \u2014 GRADE A.',60,1452);
+      c.fillText('@firstlightlive \u00B7 www.firstlight.live',60,1490);
+      return Promise.resolve();
+    },
+    // 17: THE TELEGRAM — Western Union format ALL CAPS with STOP
+    function(){
+      c.fillStyle='#F0EAD0';c.fillRect(0,0,W,H);
+      for(var gi=0;gi<12000;gi++){c.fillStyle='rgba(0,0,0,'+(Math.random()*0.018)+')';c.fillRect(Math.random()*W,Math.random()*H,1.5,1.5);}
+      c.fillStyle='#1A1A80';c.fillRect(0,0,W,180);c.fillRect(0,H-140,W,140);
+      c.textAlign='center';c.font='900 44px "Rajdhani",sans-serif';c.fillStyle='#FFD700';c.shadowColor='rgba(255,215,0,0.3)';c.shadowBlur=10;
+      c.fillText('WESTERN UNION TELEGRAM',W/2,72);c.shadowBlur=0;
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.55)';
+      c.fillText('FIRST LIGHT ACCOUNTABILITY NETWORK \u00B7 BANGALORE DIVISION',W/2,102);
+      var now=new Date();var ds=['SUN','MON','TUE','WED','THU','FRI','SAT'][now.getDay()]+' '+now.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now.getMonth()]+' '+now.getFullYear();
+      c.textAlign='left';c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.45)';c.fillText('DATE: '+ds,40,142);
+      c.textAlign='right';c.fillText('NO. FL-'+String(day).padStart(4,'0'),W-40,142);
+      var ty=220;
+      c.fillStyle='#1A1A80';c.fillRect(40,ty,W-80,1.5);
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='#2A2A80';c.textAlign='left';
+      c.fillText('TO: @FIRSTLIGHT_FOLLOWERS \u00B7 ALL WITNESSES',40,ty+22);
+      c.fillText('FROM: ANUPAM KUMAR, BANGALORE \u00B7 VIA: FIRST LIGHT SYSTEM',40,ty+44);
+      c.fillStyle='#1A1A80';c.fillRect(40,ty+58,W-80,1.5);
+      ty=340;
+      c.font='700 28px "JetBrains Mono",monospace';c.fillStyle='#0A0A30';
+      var tLines=['DAY '+String(day).padStart(3,'0')+' STOP','RAN '+(km||'\u2014')+' KM IN '+(mn||'\u2014')+' MIN STOP','WAKE TIME '+(fmt12(wStart)||'3:15 AM')+' STOP'];
+      if(bpmV)tLines.push('HEART RATE '+bpmV+' BPM STOP');
+      tLines.push('FOOD '+(food?'CLEAN':'VIOLATED')+' STOP');
+      tLines.push('GYM '+(gymD?'DONE':'PENDING')+' STOP');
+      tLines.push('STREAK ALIVE STOP');
+      tLines.push('STAKE \u20B9'+formatIndianCurrency(stake)+' STOP');
+      tLines.push('TOTAL \u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED STOP');
+      tLines.push('ZERO BREAKS STOP');
+      tLines.forEach(function(l){c.textAlign='center';c.fillText(l,W/2,ty);ty+=62;});
+      c.fillStyle='#1A1A80';c.fillRect(40,ty+10,W-80,1);
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='#3A3A80';c.textAlign='center';
+      c.fillText('DELIVERED: GPS VERIFIED \u00B7 STRAVA CONFIRMED \u00B7 '+day+' DAYS \u00B7 0 FAILURES',W/2,ty+38);
+      c.fillText('RECEIPT: FL-DAY-'+day+' \u00B7 FIRSTLIGHT.LIVE',W/2,ty+60);
+      c.font='700 22px "Rajdhani",sans-serif';c.fillStyle='#FFD700';c.fillText('@firstlightlive \u00B7 www.firstlight.live',W/2,H-70);
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.45)';c.fillText('CHECK DELIVERY STATUS AT FIRSTLIGHT.LIVE',W/2,H-44);
+      return Promise.resolve();
+    },
+    // 18: THE FILM — Cinematic three-frame film strip
+    function(){return lp(i1||iM).then(function(ph){
+      c.fillStyle='#050505';c.fillRect(0,0,W,H);
+      var pW2=70,pH2=48,pGp=28,pR=5,pLx=12,pRx=W-pLx-pW2;
+      for(var py=50;py<H-50;py+=pH2+pGp){
+        c.strokeStyle='rgba(255,255,255,0.22)';c.lineWidth=1.5;
+        rr(c,pLx,py,pW2,pH2,pR);c.stroke();rr(c,pRx,py,pW2,pH2,pR);c.stroke();
+      }
+      c.strokeStyle='rgba(255,255,255,0.08)';c.lineWidth=1;
+      c.beginPath();c.moveTo(pLx+pW2+10,0);c.lineTo(pLx+pW2+10,H);c.stroke();
+      c.beginPath();c.moveTo(pRx-10,0);c.lineTo(pRx-10,H);c.stroke();
+      var fX=pLx+pW2+18,fW=W-2*(pLx+pW2+18);
+      c.textAlign='left';c.font='600 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.45)';
+      c.fillText('FL-'+String(day).padStart(4,'0')+'  \u25C7  FIRSTLIGHT',fX,36);
+      c.textAlign='right';c.fillText('FRAME: DAY-'+day+'  \u25C7  '+new Date().getFullYear(),fX+fW,36);
+      var f1Y=54,f1H=560;
+      c.strokeStyle='rgba(255,255,255,0.1)';c.lineWidth=1;c.strokeRect(fX,f1Y,fW,f1H);
+      if(ph){
+        c.save();c.rect(fX,f1Y,fW,f1H);c.clip();
+        var sc=Math.max(fW/ph.width,f1H/ph.height);
+        c.drawImage(ph,fX+(fW-ph.width*sc)/2,f1Y+(f1H-ph.height*sc)/2,ph.width*sc,ph.height*sc);
+        var ov=c.createLinearGradient(0,f1Y+f1H-140,0,f1Y+f1H);ov.addColorStop(0,'transparent');ov.addColorStop(1,'rgba(0,0,0,0.88)');
+        c.fillStyle=ov;c.fillRect(fX,f1Y,fW,f1H);c.restore();
+        c.textAlign='center';c.font='900 56px "Rajdhani",sans-serif';c.fillStyle='#fff';c.shadowColor='rgba(0,0,0,0.9)';c.shadowBlur=14;
+        c.fillText(fmt12(wStart)||'3:15 AM',fX+fW/2,f1Y+f1H-24);c.shadowBlur=0;
+      }else{
+        c.fillStyle='rgba(255,255,255,0.03)';c.fillRect(fX,f1Y,fW,f1H);
+        c.textAlign='center';c.font='900 90px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,150,0.15)';
+        c.fillText(fmt12(wStart)||'3:15 AM',fX+fW/2,f1Y+f1H/2+32);
+      }
+      c.textAlign='left';c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.3)';c.fillText('FRAME 01/03 \u2014 THE ALARM',fX,f1Y+f1H+18);
+      var f2Y=f1Y+f1H+30,f2H=420;
+      c.strokeStyle='rgba(255,255,255,0.1)';c.lineWidth=1;c.strokeRect(fX,f2Y,fW,f2H);
+      c.fillStyle='rgba(20,20,20,0.5)';c.fillRect(fX,f2Y,fW,f2H);
+      c.textAlign='center';c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.4)';c.fillText('THE RUN \u2014 DAY '+day,fX+fW/2,f2Y+38);
+      c.font='900 130px "Rajdhani",sans-serif';c.fillStyle='#fff';c.shadowColor='rgba(255,200,0,0.3)';c.shadowBlur=20;
+      c.fillText(km||'\u2014',fX+fW/2,f2Y+190);c.shadowBlur=0;
+      c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.6)';c.fillText('K I L O M E T E R S',fX+fW/2,f2Y+230);
+      c.font='800 34px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.65)';
+      c.fillText([fmtP()+'/KM',mn?(mn+' MIN'):'',bpmV?(bpmV+' BPM'):''].filter(Boolean).join('  \u00B7  '),fX+fW/2,f2Y+290);
+      c.textAlign='left';c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.3)';c.fillText('FRAME 02/03 \u2014 THE RUN',fX,f2Y+f2H+18);
+      var f3Y=f2Y+f2H+30,f3H=340;
+      c.strokeStyle='rgba(255,255,255,0.1)';c.lineWidth=1;c.strokeRect(fX,f3Y,fW,f3H);
+      c.fillStyle='rgba(15,0,0,0.65)';c.fillRect(fX,f3Y,fW,f3H);
+      c.textAlign='center';c.font='700 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,100,100,0.5)';c.fillText('THE STAKES',fX+fW/2,f3Y+36);
+      c.font='900 88px "Rajdhani",sans-serif';c.fillStyle='#FF5252';c.shadowColor='rgba(255,30,30,0.5)';c.shadowBlur=24;
+      c.fillText('\u20B9'+formatIndianCurrency(stake),fX+fW/2,f3Y+152);c.shadowBlur=0;
+      c.font='600 15px "JetBrains Mono",monospace';c.fillStyle='rgba(255,100,100,0.6)';c.fillText('IF I MISS  \u00B7  YOU COLLECT',fX+fW/2,f3Y+200);
+      c.font='800 40px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.75)';
+      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED',fX+fW/2,f3Y+280);
+      c.textAlign='left';c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.3)';c.fillText('FRAME 03/03 \u2014 THE COVENANT',fX,f3Y+f3H+18);
+      c.textAlign='center';c.font='600 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.25)';
+      c.fillText('@firstlightlive \u00B7 www.firstlight.live \u00B7 SHOT AT 3:15 AM \u00B7 DEVELOPED IN SWEAT',W/2,H-22);
+      return Promise.resolve();
+    });},
+    // 19: THE MANIFESTO — Raw prose intensity wall
+    function(){
+      c.fillStyle='#070707';c.fillRect(0,0,W,H);
+      var rg2=c.createLinearGradient(0,H,0,H-600);rg2.addColorStop(0,'rgba(180,20,20,0.05)');rg2.addColorStop(1,'transparent');
+      c.fillStyle=rg2;c.fillRect(0,0,W,H);
+      c.fillStyle='#FF1744';c.fillRect(48,100,3,H-220);
+      c.textAlign='left';c.font='500 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,23,68,0.5)';
+      c.fillText('FIRSTLIGHT \u2014 DAY '+day+' \u2014 ACCOUNTABILITY LOG',70,60);
+      c.fillStyle='rgba(255,23,68,0.12)';c.fillRect(70,76,W-140,1);
+      var mLines=[
+        {t:'I do not run because I want to.',sz:22,cl:'rgba(255,255,255,0.35)',y:136},
+        {t:'I run because I said I would.',sz:28,cl:'rgba(255,255,255,0.55)',y:188},
+        {t:'There is a difference.',sz:20,cl:'rgba(255,255,255,0.3)',y:236},
+        {t:'',y:280},
+        {t:'Want is a feeling.',sz:22,cl:'rgba(255,255,255,0.35)',y:328},
+        {t:'Feelings are unreliable.',sz:25,cl:'rgba(255,255,255,0.42)',y:376},
+        {t:'Words are not.',sz:32,cl:'rgba(255,255,255,0.65)',y:428},
+        {t:'',y:474},
+        {t:'\u20B9'+formatIndianCurrency(stake)+' says I show up.',sz:38,cl:'rgba(255,82,82,0.85)',y:530},
+        {t:'Every day. Without fail.',sz:32,cl:'rgba(255,255,255,0.7)',y:586},
+        {t:'Rain. Travel. Injury. Fatigue.',sz:24,cl:'rgba(255,255,255,0.45)',y:634},
+        {t:'None of it matters.',sz:30,cl:'rgba(255,255,255,0.6)',y:684},
+        {t:'',y:728},
+        {t:'Today: '+(km||'\u2014')+' km. '+fmt12(wStart)+'.',sz:30,cl:'rgba(255,200,0,0.8)',y:788},
+        {t:'Day '+day+'. Zero missed.',sz:44,cl:'#fff',y:848},
+        {t:'',y:892},
+        {t:'The body argued.',sz:22,cl:'rgba(255,255,255,0.32)',y:940},
+        {t:'The covenant won.',sz:36,cl:'rgba(255,82,82,0.9)',y:998},
+        {t:'',y:1044},
+        {t:'It always does.',sz:52,cl:'rgba(255,255,255,0.95)',y:1112},
+        {t:'',y:1160},
+        {t:'This is not discipline.',sz:20,cl:'rgba(255,255,255,0.28)',y:1210},
+        {t:'This is identity.',sz:28,cl:'rgba(255,255,255,0.52)',y:1262},
+        {t:'I am First Light.',sz:44,cl:'#FF1744',y:1328}
+      ];
+      mLines.forEach(function(l){
+        if(!l.t)return;
+        c.textAlign='left';
+        c.font=(l.sz>=36?'900':'700')+' '+l.sz+'px "'+(l.sz>=36?'Rajdhani':'JetBrains Mono')+'",monospace';
+        c.fillStyle=l.cl;
+        if(l.cl==='#FF1744'){c.shadowColor='rgba(255,23,68,0.4)';c.shadowBlur=12;}
+        c.fillText(l.t,70,l.y);c.shadowBlur=0;
+      });
+      c.fillStyle='rgba(255,23,68,0.12)';c.fillRect(70,H-180,W-140,1);
+      c.font='500 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.18)';
+      c.fillText('@firstlightlive \u00B7 www.firstlight.live',70,H-148);
+      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' unclaimed \u00B7 '+day+' days \u00B7 zero misses',70,H-118);
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,23,68,0.28)';
+      c.fillText('firstlight.live / the streak / the evidence / the system',70,H-88);
+      return Promise.resolve();
+    },
+    // 20: THE DEVOTION — Pre-dawn sky gradient + 3:15 AM + stars
+    function(){
+      var skyG=c.createLinearGradient(0,0,0,H);
+      skyG.addColorStop(0,'#020008');skyG.addColorStop(0.28,'#060018');skyG.addColorStop(0.58,'#0A0020');skyG.addColorStop(0.80,'#1A0828');skyG.addColorStop(0.91,'#3D1520');skyG.addColorStop(1,'#8B3020');
+      c.fillStyle=skyG;c.fillRect(0,0,W,H);
+      for(var si=0;si<280;si++){
+        var sx=Math.random()*W,sy=Math.random()*H*0.68,ss=Math.random()*2.2+0.3;
+        c.fillStyle='rgba(255,255,255,'+(Math.random()*0.7+0.2)+')';c.beginPath();c.arc(sx,sy,ss,0,Math.PI*2);c.fill();
+      }
+      var horG=c.createRadialGradient(W/2,H,0,W/2,H,800);
+      horG.addColorStop(0,'rgba(220,80,30,0.28)');horG.addColorStop(0.4,'rgba(150,40,20,0.1)');horG.addColorStop(1,'transparent');
+      c.fillStyle=horG;c.fillRect(0,0,W,H);
+      var timeStr=fmt12(wStart)||'3:15 AM';
+      c.textAlign='center';c.font='900 140px "DM Serif Display",serif';
+      c.fillStyle='rgba(255,220,150,0.07)';c.fillText(timeStr,W/2+4,544);
+      c.fillStyle='rgba(255,220,150,0.9)';c.shadowColor='rgba(255,180,80,0.5)';c.shadowBlur=60;
+      c.fillText(timeStr,W/2,540);c.shadowBlur=0;
+      c.font='600 17px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,100,0.42)';
+      c.fillText('BRAHMA MUHURTA \u00B7 THE SACRED HOUR',W/2,602);
+      var dg=c.createLinearGradient(0,0,W,0);dg.addColorStop(0,'transparent');dg.addColorStop(0.5,'rgba(255,200,100,0.32)');dg.addColorStop(1,'transparent');
+      c.fillStyle=dg;c.fillRect(0,642,W,1.5);
+      c.font='900 110px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.85)';c.shadowColor='rgba(255,180,80,0.22)';c.shadowBlur=18;
+      c.fillText(km||'\u2014',W/2,800);c.shadowBlur=0;
+      c.font='600 20px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,100,0.5)';c.fillText('K I L O M E T E R S',W/2,850);
+      c.fillStyle='rgba(255,255,255,0.1)';c.fillRect(W/2-80,876,160,1);
+      c.font='800 42px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.6)';
+      c.fillText([fmtP()+'/KM',mn?(mn+' MIN'):'',bpmV?(bpmV+' BPM'):''].filter(Boolean).join('  \u00B7  '),W/2,940);
+      c.font='400 28px "DM Serif Display",serif';c.fillStyle='rgba(255,220,150,0.68)';
+      c.fillText('Before the world wakes,',W/2,1068);c.fillText('the oath holds.',W/2,1114);
+      c.fillStyle='rgba(255,255,255,0.08)';c.fillRect(W/2-80,1148,160,1);
+      c.font='700 20px "Rajdhani",sans-serif';c.fillStyle='rgba(255,220,150,0.4)';
+      c.fillText('DAY '+day+'  \u00B7  ZERO BREAKS  \u00B7  \u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED',W/2,1196);
+      c.font='600 17px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.32)';
+      c.fillText((food?'\u2705':'\u25A1')+' FOOD  '+(runD?'\u2705':'\u25A1')+' RUN  '+(gymD?'\u2705':'\u25A1')+' GYM',W/2,1264);
+      var botG2=c.createLinearGradient(0,H-160,0,H);botG2.addColorStop(0,'transparent');botG2.addColorStop(1,'rgba(0,0,0,0.55)');
+      c.fillStyle=botG2;c.fillRect(0,H-160,W,160);
+      c.font='400 24px "DM Serif Display",serif';c.fillStyle='rgba(255,220,150,0.48)';c.fillText('@firstlightlive',W/2,H-72);
+      c.font='500 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,100,0.28)';c.fillText('www.firstlight.live',W/2,H-46);
+      return Promise.resolve();
+    },
+    // 21: THE SCOREBOARD — Stadium LED sports display
+    function(){
+      c.fillStyle='#030303';c.fillRect(0,0,W,H);
+      c.fillStyle='rgba(255,255,255,0.022)';
+      for(var lx=0;lx<W;lx+=6){for(var ly=0;ly<H;ly+=6){c.beginPath();c.arc(lx,ly,1,0,Math.PI*2);c.fill();}}
+      var topG=c.createRadialGradient(W/2,0,0,W/2,0,600);topG.addColorStop(0,'rgba(255,240,0,0.05)');topG.addColorStop(1,'transparent');
+      c.fillStyle=topG;c.fillRect(0,0,W,H);
+      c.fillStyle='#0A0A0A';c.fillRect(0,0,W,140);
+      c.strokeStyle='rgba(255,240,0,0.18)';c.lineWidth=1;c.strokeRect(0,0,W,140);
+      c.textAlign='center';c.font='700 15px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.55)';
+      c.fillText('FIRSTLIGHT ACCOUNTABILITY ARENA \u00B7 LIVE SCOREBOARD',W/2,50);
+      var now=new Date();
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.32)';
+      c.fillText(['SUN','MON','TUE','WED','THU','FRI','SAT'][now.getDay()]+' \u00B7 DAY '+day+' \u00B7 STREAK IN PROGRESS',W/2,80);
+      function scorePanel(x,y,w,h,team,score,tC,sC){
+        c.fillStyle='rgba(255,255,255,0.03)';rr(c,x,y,w,h,8);c.fill();
+        c.strokeStyle=tC+'33';c.lineWidth=1;rr(c,x,y,w,h,8);c.stroke();
+        c.textAlign='center';c.font='700 15px "JetBrains Mono",monospace';c.fillStyle=tC;c.fillText(team,x+w/2,y+38);
+        c.font='900 155px "Rajdhani",sans-serif';c.fillStyle=sC;c.shadowColor=sC;c.shadowBlur=28;c.fillText(score,x+w/2,y+190);c.shadowBlur=0;
+      }
+      var pY=158,pH=258,gap=18,pW=(W-120-gap)/2;
+      scorePanel(60,pY,pW,pH,'DISCIPLINE',day,'rgba(0,230,100,0.8)','#00E676');
+      scorePanel(60+pW+gap,pY,pW,pH,'QUIT','0','rgba(255,82,82,0.6)','rgba(255,82,82,0.4)');
+      c.textAlign='center';c.font='900 44px "Rajdhani",sans-serif';c.fillStyle='rgba(255,240,0,0.45)';c.fillText('VS',W/2,pY+pH/2+16);
+      c.fillStyle='rgba(255,240,0,0.12)';c.fillRect(60,pY+pH+18,W-120,1.5);
+      var tickY=pY+pH+46;
+      c.fillStyle='rgba(255,240,0,0.07)';c.fillRect(0,tickY,W,52);
+      c.font='700 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.65)';
+      c.fillText('\u25C0 LIVE: '+day+' DAYS \u00B7 '+(km||'\u2014')+' KM TODAY \u00B7 '+fmt12(wStart)+' \u00B7 \u20B9'+formatIndianCurrency(stake)+' AT STAKE \u00B7 ZERO MISSES \u25B6',W/2,tickY+33);
+      var rsY=tickY+72;
+      c.font='700 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.38)';c.fillText("TODAY'S PERFORMANCE",W/2,rsY);
+      var sData=[{v:km||'\u2014',u:'KM',l:'DISTANCE'},{v:fmtP(),u:'/KM',l:'PACE'},{v:mn||'\u2014',u:'MIN',l:'DURATION'}];
+      var sbW=258,sbH=158,sbG=18,sbSX=(W-3*sbW-2*sbG)/2;
+      sData.forEach(function(s,si){
+        var sx=sbSX+si*(sbW+sbG),sy=rsY+18;
+        c.fillStyle='rgba(0,230,100,0.05)';rr(c,sx,sy,sbW,sbH,8);c.fill();
+        c.strokeStyle='rgba(0,230,100,0.18)';c.lineWidth=1;rr(c,sx,sy,sbW,sbH,8);c.stroke();
+        c.textAlign='center';c.font='900 58px "Rajdhani",sans-serif';c.fillStyle='#fff';c.shadowColor='rgba(0,230,100,0.28)';c.shadowBlur=8;
+        c.fillText(s.v,sx+sbW/2,sy+76);c.shadowBlur=0;
+        c.font='700 11px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,100,0.58)';c.fillText(s.u,sx+sbW/2,sy+102);
+        c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.28)';c.fillText(s.l,sx+sbW/2,sy+128);
+      });
+      if(bpmV){c.font='700 20px "JetBrains Mono",monospace';c.fillStyle='rgba(255,100,100,0.65)';c.textAlign='center';c.fillText('\u2764  '+bpmV+' BPM  AVG',W/2,rsY+204);}
+      var fzY=1120;
+      c.fillStyle='rgba(255,240,0,0.05)';c.fillRect(0,fzY,W,220);
+      c.fillStyle='rgba(255,240,0,0.13)';c.fillRect(0,fzY,W,1.5);c.fillRect(0,fzY+220,W,1.5);
+      c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.42)';c.textAlign='center';c.fillText('PENALTY IF GAME ENDS',W/2,fzY+38);
+      c.font='900 115px "Rajdhani",sans-serif';c.fillStyle='#FFD600';c.shadowColor='rgba(255,214,0,0.38)';c.shadowBlur=28;
+      c.fillText('\u20B9'+formatIndianCurrency(stake),W/2,fzY+170);c.shadowBlur=0;
+      var ckY=fzY+242;
+      c.font='600 17px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.38)';c.textAlign='center';
+      c.fillText((food?'\u2705':'\u25A1')+' FOOD   '+(runD?'\u2705':'\u25A1')+' RUN   '+(gymD?'\u2705':'\u25A1')+' GYM',W/2,ckY);
+      var pbY=ckY+58;var pbW=W-120;var pbPct=Math.min(dn/365,1);
+      c.fillStyle='rgba(255,255,255,0.05)';rr(c,60,pbY,pbW,22,11);c.fill();
+      var pbG=c.createLinearGradient(60,0,60+pbW*pbPct,0);pbG.addColorStop(0,'rgba(0,230,100,0.8)');pbG.addColorStop(1,'rgba(0,200,80,0.5)');
+      c.fillStyle=pbG;c.shadowColor='rgba(0,230,100,0.38)';c.shadowBlur=7;rr(c,60,pbY,pbW*pbPct,22,11);c.fill();c.shadowBlur=0;
+      c.font='700 12px "Rajdhani",sans-serif';c.fillStyle='#fff';c.textAlign='center';c.fillText(day+' / 365',W/2,pbY+16);
+      c.font='700 17px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,100,0.45)';c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED \u00B7 '+day+' DAYS',W/2,pbY+52);
+      c.fillStyle='rgba(255,240,0,0.1)';c.fillRect(0,H-96,W,96);
+      c.font='700 20px "Rajdhani",sans-serif';c.fillStyle='rgba(255,240,0,0.55)';c.fillText('@firstlightlive \u00B7 www.firstlight.live',W/2,H-58);
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.28)';c.fillText('DISCIPLINE WINS. EVERY TIME.',W/2,H-32);
+      return Promise.resolve();
+    },
+    // 22: THE LEDGER — Double-entry accounting of discipline
+    function(){
+      c.fillStyle='#F8F5EE';c.fillRect(0,0,W,H);
+      c.strokeStyle='rgba(0,100,50,0.06)';c.lineWidth=0.5;
+      for(var gy2=0;gy2<H;gy2+=36){c.beginPath();c.moveTo(0,gy2);c.lineTo(W,gy2);c.stroke();}
+      c.fillStyle='#003D1A';c.fillRect(0,0,W,170);
+      c.textAlign='center';c.font='900 46px "DM Serif Display",serif';c.fillStyle='#C8D8C0';
+      c.fillText('FIRSTLIGHT LEDGER',W/2,68);
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(200,216,192,0.55)';
+      c.fillText('DISCIPLINE ACCOUNTING \u00B7 DAY '+day+' \u00B7 PERIOD OPEN',W/2,98);
+      var now2=new Date();var ds2=['SUN','MON','TUE','WED','THU','FRI','SAT'][now2.getDay()]+' '+now2.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now2.getMonth()]+' '+now2.getFullYear();
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(200,216,192,0.4)';c.fillText(ds2+' \u00B7 BANGALORE \u00B7 ANUPAM KUMAR',W/2,126);c.fillText('ACCOUNT: #FL-001 \u00B7 STATUS: ACTIVE \u00B7 AUDITOR: PUBLIC',W/2,150);
+      var colH=210;
+      c.fillStyle='#EAE4D6';c.fillRect(0,colH,W,48);c.strokeStyle='rgba(0,80,30,0.13)';c.lineWidth=0.8;c.strokeRect(0,colH,W,48);
+      c.textAlign='left';c.font='700 12px "JetBrains Mono",monospace';c.fillStyle='#003D1A';
+      c.fillText('DESCRIPTION',50,colH+30);c.textAlign='right';c.fillText('DEBIT',W/2-20,colH+30);c.fillText('CREDIT',W-50,colH+30);
+      c.strokeStyle='rgba(0,80,30,0.12)';c.lineWidth=0.8;
+      c.beginPath();c.moveTo(W/2,colH);c.lineTo(W/2,H-230);c.stroke();
+      var eY=colH+80,lhE=58;
+      function entry(desc,deb,crd,hi){
+        if(hi){c.fillStyle='rgba(0,80,30,0.04)';c.fillRect(0,eY-lhE+8,W,lhE);}
+        c.strokeStyle='rgba(0,80,30,0.07)';c.lineWidth=0.5;c.beginPath();c.moveTo(30,eY+8);c.lineTo(W-30,eY+8);c.stroke();
+        c.textAlign='left';c.font='500 13px "JetBrains Mono",monospace';c.fillStyle='#1A2A1A';c.fillText(desc,50,eY);
+        if(deb){c.textAlign='right';c.font='700 15px "Rajdhani",sans-serif';c.fillStyle='rgba(200,50,50,0.7)';c.fillText(deb,W/2-20,eY);}
+        if(crd){c.textAlign='right';c.font='700 15px "Rajdhani",sans-serif';c.fillStyle='rgba(0,120,60,0.85)';c.fillText(crd,W-50,eY);}
+        eY+=lhE;
+      }
+      entry('Comfortable sleep',sleepH?sleepH+'h sacrificed':'—','');
+      entry('Phone in hand (morning)','REFUSED','+ Clarity');
+      entry('Distance run today','',(km||'—')+' km done',true);
+      entry('Excuses generated','ZERO','+ Streak');
+      entry('Junk food',food?'REFUSED':'\u2212',food?'+ Code clean':'');
+      entry('Gym session',gymD?'\u2212':'\u2212',gymD?'+ Strength built':'',true);
+      entry('Daily stake earned','',(km?'\u20B9'+formatIndianCurrency(stake):'—'));
+      c.strokeStyle='#003D1A';c.lineWidth=1;
+      c.beginPath();c.moveTo(30,eY-10);c.lineTo(W-30,eY-10);c.stroke();
+      c.beginPath();c.moveTo(30,eY-6);c.lineTo(W-30,eY-6);c.stroke();
+      eY+=18;
+      c.textAlign='left';c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='#003D1A';c.fillText('TOTAL UNCLAIMED (CREDIT)',50,eY);
+      c.textAlign='right';c.font='900 26px "Rajdhani",sans-serif';c.fillStyle='#003D1A';c.shadowColor='rgba(0,120,60,0.28)';c.shadowBlur=7;
+      c.fillText('\u20B9'+formatIndianCurrency(totalRisk),W-50,eY);c.shadowBlur=0;eY+=52;
+      c.textAlign='left';c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='rgba(200,50,50,0.65)';c.fillText('FAILURES RECORDED',50,eY);
+      c.textAlign='right';c.font='900 26px "Rajdhani",sans-serif';c.fillStyle='rgba(200,50,50,0.58)';c.fillText('NIL',W-50,eY);eY+=58;
+      c.fillStyle='#003D1A';c.fillRect(30,eY,W-60,68);
+      c.textAlign='left';c.font='700 14px "JetBrains Mono",monospace';c.fillStyle='#C8D8C0';c.fillText('NET POSITION: DISCIPLINE SURPLUS',50,eY+26);
+      c.textAlign='right';c.font='900 24px "Rajdhani",sans-serif';c.fillStyle='#7CFFA0';c.fillText('+'+day+' DAYS \u2014 ZERO DEFICIT',W-50,eY+52);
+      var audY=eY+100;c.textAlign='center';c.font='400 12px "JetBrains Mono",monospace';c.fillStyle='rgba(0,60,20,0.38)';
+      c.fillText('Certified: Anupam Kumar \u00B7 Witnessed: firstlight.live followers',W/2,audY);
+      c.fillText('@firstlightlive \u00B7 www.firstlight.live \u00B7 The streak. The evidence.',W/2,audY+26);
+      return Promise.resolve();
+    },
+    // 23: THE PRESS — Newspaper front page
+    function(){
+      c.fillStyle='#F9F6EF';c.fillRect(0,0,W,H);
+      for(var ni=0;ni<8000;ni++){c.fillStyle='rgba(0,0,0,'+(Math.random()*0.012)+')';c.fillRect(Math.random()*W,Math.random()*H,2,2);}
+      c.strokeStyle='#111';c.lineWidth=2;c.strokeRect(40,40,W-80,H-80);
+      c.fillStyle='#111';c.fillRect(40,40,W-80,3);c.fillRect(40,186,W-80,3);c.fillRect(40,200,W-80,1);
+      c.textAlign='center';c.font='900 62px "DM Serif Display",serif';c.fillStyle='#0A0A0A';
+      c.fillText('THE FIRSTLIGHT TIMES',W/2,110);
+      var now3=new Date();var ds3=now3.getDate()+' '+['January','February','March','April','May','June','July','August','September','October','November','December'][now3.getMonth()]+' '+now3.getFullYear();
+      c.font='400 12px "JetBrains Mono",monospace';c.fillStyle='#444';
+      c.fillText(ds3,W/2-60,146);c.fillText('STREAK: DAY '+day,W/2+120,146);
+      c.fillText('"THE STREAK. THE EVIDENCE. THE SYSTEM." \u2014 FIRST LIGHT',W/2,172);
+      c.textAlign='left';c.font='900 56px "DM Serif Display",serif';c.fillStyle='#0A0A0A';
+      c.fillText('BANGALORE ARCHITECT',60,268);c.fillText('COMPLETES DAY '+String(day).padStart(3,'0'),60,334);c.fillText('WITHOUT EXCEPTION',60,400);
+      c.font='500 16px "JetBrains Mono",monospace';c.fillStyle='#444';
+      c.fillText('' + (km||'—') + ' km at ' + (fmt12(wStart)||'3:15 AM') + '. \u20B9' + formatIndianCurrency(stake) + ' at stake.',60,440);
+      c.fillText('Streak unbroken. Witnesses confirm zero violations.',60,466);
+      c.fillStyle='#111';c.fillRect(60,486,W-120,2);
+      var bY=506,colW=Math.floor((W-200)/2),c1X=60,c2X=c1X+colW+80,lhN=30;
+      c.font='400 15px "JetBrains Mono",monospace';c.fillStyle='#222';
+      var col1=['BANGALORE \u2014 In what observers call','a display of uncommon resolve, Anupam','Kumar completed Day '+String(day).padStart(3,'0')+' this morning.','','He rose at '+(fmt12(wStart)||'3:15 AM')+', completed',''+km+' km on foot, followed by gym.','No food code violations recorded.','','Total unclaimed penalty: \u20B9'+formatIndianCurrency(totalRisk),'remains untouched. Zero excuses.','GPS-verified. Strava-confirmed.','The line holds.'];
+      col1.forEach(function(ln,i){c.textAlign='left';c.fillText(ln,c1X,bY+i*lhN);});
+      c.strokeStyle='rgba(0,0,0,0.13)';c.lineWidth=1;c.strokeRect(c2X-10,bY-18,colW+20,col1.length*lhN+10);
+      c.font='700 12px "JetBrains Mono",monospace';c.fillStyle='#111';c.fillText("TODAY'S STATS",c2X,bY-5);
+      var statLines=['DISTANCE: '+(km||'—')+' km','PACE: '+fmtP()+'/km','DURATION: '+(mn||'—')+' min','HEART RATE: '+(bpmV||'—')+' bpm','SLEEP: '+(sleepH||'—')+' hrs','','DAILY STAKE: \u20B9'+formatIndianCurrency(stake),'TOTAL AT RISK: \u20B9'+formatIndianCurrency(totalRisk),'MISSES: 0','','FOOD: '+(food?'CLEAN':'—'),'RUN: '+(runD?'DONE':'—'),'GYM: '+(gymD?'DONE':'—')];
+      c.font='400 14px "JetBrains Mono",monospace';c.fillStyle='#333';
+      statLines.forEach(function(ln,i){c.fillText(ln,c2X,bY+i*lhN);});
+      var capY=bY+col1.length*lhN+28;
+      c.strokeStyle='#999';c.lineWidth=0.8;c.strokeRect(c1X,capY,W-120,130);
+      c.fillStyle='#EEE';c.fillRect(c1X,capY,W-120,130);
+      c.textAlign='center';c.font='400 13px "JetBrains Mono",monospace';c.fillStyle='#999';
+      c.fillText('[ Day '+day+' \u2014 '+ds3+' \u2014 Bangalore, India ]',W/2,capY+62);
+      c.font='300 11px "JetBrains Mono",monospace';c.fillStyle='#AAA';
+      c.fillText('Strava-verified. Run: '+(km||'—')+' km at '+(fmt12(wStart)||'3:15 AM')+'.',W/2,capY+96);
+      c.fillStyle='#111';c.fillRect(40,H-88,W-80,2);
+      c.textAlign='center';c.font='700 15px "JetBrains Mono",monospace';c.fillStyle='#222';
+      c.fillText('@firstlightlive  \u00B7  www.firstlight.live  \u00B7  THE STREAK. THE EVIDENCE.',W/2,H-58);
+      return Promise.resolve();
+    },
+    // 24: THE CARBON — Premium dark carbon weave + metallic stats
+    function(){
+      c.fillStyle='#080808';c.fillRect(0,0,W,H);
+      var cSz=20;
+      for(var cxi=0;cxi<W;cxi+=cSz){
+        for(var cyi=0;cyi<H;cyi+=cSz){
+          var isOdd=((Math.floor(cxi/cSz)+Math.floor(cyi/cSz))%2===0);
+          c.fillStyle=isOdd?'rgba(255,255,255,0.022)':'rgba(255,255,255,0.008)';c.fillRect(cxi,cyi,cSz,cSz);
+          c.strokeStyle=isOdd?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.014)';c.lineWidth=0.5;
+          c.beginPath();c.moveTo(cxi,cyi);c.lineTo(cxi+cSz,cyi+cSz);c.stroke();
+        }
+      }
+      var acG=c.createLinearGradient(0,0,W,0);
+      acG.addColorStop(0,'rgba(0,212,255,0.8)');acG.addColorStop(0.5,'rgba(255,215,0,0.7)');acG.addColorStop(1,'rgba(0,212,255,0.8)');
+      c.fillStyle=acG;c.fillRect(0,0,W,3);c.fillRect(0,H-3,W,3);
+      c.fillStyle='rgba(255,215,0,0.55)';c.fillRect(48,80,2,H-160);
+      c.textAlign='left';c.font='900 36px "Rajdhani",sans-serif';
+      var bG2=c.createLinearGradient(60,50,340,82);bG2.addColorStop(0,'#00D4FF');bG2.addColorStop(0.5,'#FFD700');bG2.addColorStop(1,'#00D4FF');
+      c.fillStyle=bG2;c.shadowColor='rgba(0,212,255,0.48)';c.shadowBlur=20;c.fillText('FIRST LIGHT',60,78);c.shadowBlur=0;
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.32)';c.fillText('PERFORMANCE SYSTEM \u2014 ANUPAM KUMAR \u2014 BANGALORE',60,100);
+      c.textAlign='right';c.font='900 24px "Rajdhani",sans-serif';c.fillStyle='rgba(255,215,0,0.65)';c.fillText('DAY '+day,W-60,80);
+      c.textAlign='center';c.font='900 240px "Rajdhani",sans-serif';
+      var kmG=c.createLinearGradient(0,300,0,650);kmG.addColorStop(0,'rgba(255,255,255,0.95)');kmG.addColorStop(1,'rgba(255,255,255,0.22)');
+      c.fillStyle=kmG;c.shadowColor='rgba(0,212,255,0.28)';c.shadowBlur=38;c.fillText(km||'\u2014',W/2,600);c.shadowBlur=0;
+      c.font='700 20px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.58)';c.fillText('K I L O M E T E R S',W/2,660);
+      var hData=[{v:fmtP(),l:'PACE',u:'/KM'},{v:mn||'\u2014',l:'DURATION',u:'MIN'},{v:bpmV||'\u2014',l:'HEART',u:'BPM'},{v:fmt12(wStart)||'\u2014',l:'START',u:'TIME'}];
+      var hW=218,hH=128,hGp=16,hSX=(W-2*hW-hGp)/2,hSY=700;
+      hData.forEach(function(hd,hi){
+        var hx=hSX+(hi%2)*(hW+hGp),hy=hSY+Math.floor(hi/2)*(hH+hGp);
+        c.fillStyle='rgba(255,255,255,0.03)';rr(c,hx,hy,hW,hH,10);c.fill();
+        var bdr=c.createLinearGradient(hx,hy,hx+hW,hy+hH);bdr.addColorStop(0,'rgba(0,212,255,0.28)');bdr.addColorStop(1,'rgba(255,215,0,0.13)');
+        c.strokeStyle=bdr;c.lineWidth=1;rr(c,hx,hy,hW,hH,10);c.stroke();
+        c.textAlign='center';c.font='900 46px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.88)';
+        c.fillText(hd.v,hx+hW/2,hy+60);
+        c.font='700 10px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.48)';c.fillText(hd.u,hx+hW/2,hy+80);
+        c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.32)';c.fillText(hd.l,hx+hW/2,hy+hH+4);
+      });
+      var stY=1020;
+      c.fillStyle='rgba(255,215,0,0.05)';rr(c,60,stY,W-120,200,12);c.fill();
+      c.strokeStyle='rgba(255,215,0,0.18)';c.lineWidth=1;rr(c,60,stY,W-120,200,12);c.stroke();
+      c.textAlign='center';c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.38)';c.fillText('DAILY PERFORMANCE BOND',W/2,stY+34);
+      c.font='900 98px "Rajdhani",sans-serif';
+      var stG2=c.createLinearGradient(0,stY+52,0,stY+168);stG2.addColorStop(0,'#FFD700');stG2.addColorStop(1,'rgba(255,180,0,0.55)');
+      c.fillStyle=stG2;c.shadowColor='rgba(255,215,0,0.38)';c.shadowBlur=22;c.fillText('\u20B9'+formatIndianCurrency(stake),W/2,stY+148);c.shadowBlur=0;
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.32)';c.fillText('IF I MISS \u00B7 YOU COLLECT \u00B7 TOTAL UNCLAIMED: \u20B9'+formatIndianCurrency(totalRisk),W/2,stY+190);
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=(food&&runD&&gymD)?'rgba(0,230,100,0.65)':'rgba(255,165,0,0.65)';
+      c.fillText((food?'\u2713':'\u2717')+' FOOD   '+(runD?'\u2713':'\u2717')+' RUN   '+(gymD?'\u2713':'\u2717')+' GYM',W/2,1270);
+      c.fillStyle=acG;c.fillRect(0,H-118,W,1);
+      c.font='700 22px "Rajdhani",sans-serif';c.fillStyle='rgba(0,212,255,0.58)';c.fillText('@firstlightlive',W/2,H-72);
+      c.font='500 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.32)';c.fillText('www.firstlight.live',W/2,H-46);
+      return Promise.resolve();
+    },
+    // 25: THE MIRROR — Full-bleed photo with data overlay panel
+    function(){return lp(i1||i2||iM).then(function(ph){
+      c.fillStyle='#0A0A0A';c.fillRect(0,0,W,H);
+      if(ph){
+        var scPh=Math.max(W/ph.width,H/ph.height);
+        c.drawImage(ph,(W-ph.width*scPh)/2,(H-ph.height*scPh)/2,ph.width*scPh,ph.height*scPh);
+        var leftV=c.createLinearGradient(0,0,W,0);leftV.addColorStop(0,'rgba(0,0,0,0.15)');leftV.addColorStop(0.45,'rgba(0,0,0,0.05)');leftV.addColorStop(1,'rgba(0,0,0,0.88)');
+        c.fillStyle=leftV;c.fillRect(0,0,W,H);
+        var topV=c.createLinearGradient(0,0,0,280);topV.addColorStop(0,'rgba(0,0,0,0.58)');topV.addColorStop(1,'transparent');
+        c.fillStyle=topV;c.fillRect(0,0,W,280);
+        var botV=c.createLinearGradient(0,H-280,0,H);botV.addColorStop(0,'transparent');botV.addColorStop(1,'rgba(0,0,0,0.65)');
+        c.fillStyle=botV;c.fillRect(0,H-280,W,280);
+      }
+      var panW=450,panX=W-panW-18;
+      c.fillStyle='rgba(4,4,10,0.82)';rr(c,panX,78,panW,H-156,16);c.fill();
+      c.strokeStyle='rgba(0,212,255,0.18)';c.lineWidth=1;rr(c,panX,78,panW,H-156,16);c.stroke();
+      c.textAlign='left';c.font='700 28px "DM Serif Display",serif';c.fillStyle='rgba(255,255,255,0.88)';c.shadowColor='rgba(0,0,0,0.8)';c.shadowBlur=8;
+      c.fillText('FIRST',56,70);c.fillText('LIGHT',56,106);c.shadowBlur=0;
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.28)';c.fillText('www.firstlight.live',56,128);
+      var px=panX+22,pw=panW-44,py=120;
+      c.textAlign='left';c.font='700 12px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.48)';
+      c.fillText('THIS IS WHAT',px,py);py+=22;c.fillText('3:15 AM LOOKS LIKE.',px,py);py+=18;
+      c.fillStyle='rgba(0,212,255,0.18)';c.fillRect(px,py,pw,1);py+=24;
+      c.font='900 100px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.88)';c.shadowColor='rgba(0,212,255,0.28)';c.shadowBlur=14;
+      c.fillText(day,px,py+88);c.shadowBlur=0;
+      c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.48)';c.fillText('CONSECUTIVE DAYS',px,py+118);py+=150;
+      function mirStat(label,val){
+        c.textAlign='left';c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.38)';c.fillText(label,px,py);
+        c.font='800 26px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.82)';c.fillText(val,px,py+22);py+=52;
+      }
+      mirStat('DISTANCE',(km||'\u2014')+' KM');
+      mirStat('PACE',fmtP()+'/KM');
+      mirStat('DURATION',(mn||'\u2014')+' MIN');
+      if(bpmV)mirStat('HEART RATE',bpmV+' BPM');
+      mirStat('START TIME',fmt12(wStart)||'3:15 AM');
+      c.fillStyle='rgba(0,212,255,0.13)';c.fillRect(px,py,pw,1);py+=22;
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.48)';c.fillText('DAILY STAKE',px,py);py+=22;
+      c.font='900 50px "Rajdhani",sans-serif';c.fillStyle='rgba(255,215,0,0.88)';c.shadowColor='rgba(255,215,0,0.28)';c.shadowBlur=11;
+      c.fillText('\u20B9'+formatIndianCurrency(stake),px,py+44);c.shadowBlur=0;py+=68;
+      c.font='700 13px "Rajdhani",sans-serif';c.fillStyle='rgba(255,215,0,0.38)';c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED',px,py);py+=36;
+      c.font='600 13px "JetBrains Mono",monospace';c.fillStyle=(food&&runD&&gymD)?'rgba(0,230,100,0.68)':'rgba(255,165,0,0.68)';
+      c.fillText((food?'\u2713':'\u2717')+' FOOD  '+(runD?'\u2713':'\u2717')+' RUN  '+(gymD?'\u2713':'\u2717')+' GYM',px,py);
+      c.textAlign='left';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.65)';c.shadowColor='rgba(0,0,0,0.9)';c.shadowBlur=6;
+      c.fillText('@firstlightlive',56,H-72);c.fillText('www.firstlight.live',56,H-46);c.shadowBlur=0;
+      return Promise.resolve();
+    })}
   ];
 
   T[idx]().then(function(){
