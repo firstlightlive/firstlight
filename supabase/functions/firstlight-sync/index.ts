@@ -494,19 +494,47 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
         row.workout_total_cal = wArr.reduce((s: number, w) => s + Number(w.calories || 0), 0)
       }
 
-      row.raw_payload = data.raw
+      // ── FAULT-TOLERANT MERGE: fetch existing row, never let a re-export degrade stored data ──
+      const { data: existingRow } = await supaAdmin
+        .from('health_daily')
+        .select('sleep_hours,vo2_max,workout_count,workout_types,workout_total_min,workout_total_cal,raw_payload')
+        .eq('date', date)
+        .maybeSingle()
 
-      // Max-wins for sleep across all tables: fetch stored value once, use the higher of new vs stored
+      // 1. raw_payload: MERGE (new keys win, old keys preserved) — never wipe complete data with partial
+      const existingRaw = (existingRow?.raw_payload as Record<string, unknown>) || {}
+      row.raw_payload = { ...existingRaw, ...(data.raw as Record<string, unknown>) }
+
+      // 2. VO2 Max: max-wins — it's sparse (updates every 2-4 wks), never let re-export lower it
+      if (existingRow?.vo2_max != null) {
+        const storedVO2 = Number(existingRow.vo2_max)
+        if (!row.vo2_max || storedVO2 > Number(row.vo2_max)) {
+          row.vo2_max = storedVO2
+        }
+      }
+
+      // 3. Workout data: preserve existing if this export has none (partial exports won't wipe workouts)
+      if ((!wArr || wArr.length === 0) && existingRow?.workout_count) {
+        row.workout_count   = existingRow.workout_count
+        row.workout_types   = existingRow.workout_types
+        row.workout_total_min = existingRow.workout_total_min
+        row.workout_total_cal = existingRow.workout_total_cal
+      }
+
+      // 4. Sleep: max-wins — check BOTH health_daily and sleep_log, take the highest stored value
       let finalSleepHours = row.sleep_hours ? Number(row.sleep_hours) : 0
+      const storedInDaily  = existingRow?.sleep_hours ? Number(existingRow.sleep_hours) : 0
+      if (storedInDaily > finalSleepHours) finalSleepHours = storedInDaily
+
       if (finalSleepHours > 0) {
         const { data: existingSleep } = await supaAdmin.from('sleep_log').select('sleep_hours').eq('date', date).maybeSingle()
-        const storedSleep = existingSleep?.sleep_hours ? Number(existingSleep.sleep_hours) : 0
-        if (storedSleep > finalSleepHours) {
-          // Stored value is better — use it in all tables (another export won't degrade data)
-          finalSleepHours = storedSleep
-          row.sleep_hours = storedSleep
-          row.sleep_score = sleepScore({ ...row, sleep_hours: storedSleep })
-        }
+        const storedInSleepLog = existingSleep?.sleep_hours ? Number(existingSleep.sleep_hours) : 0
+        if (storedInSleepLog > finalSleepHours) finalSleepHours = storedInSleepLog
+      }
+
+      if (finalSleepHours > (row.sleep_hours ? Number(row.sleep_hours) : 0)) {
+        row.sleep_hours = finalSleepHours
+        row.sleep_score = sleepScore({ ...row, sleep_hours: finalSleepHours })
       }
 
       await supaUpsert('health_daily', row, 'date')
