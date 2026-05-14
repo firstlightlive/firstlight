@@ -1313,10 +1313,10 @@
     .ts-mission-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 20px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px}
     .ts-mission-day{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--text-dim,#8a9bb0);letter-spacing:3px}
     .ts-mission-day strong{color:#fff;font-weight:700}
-    .ts-mission-score{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:2px;font-weight:700}
-    .ts-mission-score.all-done{color:#66BB6A;text-shadow:0 0 12px rgba(102,187,106,0.4)}
-    .ts-mission-score.partial{color:#F5A623}
-    .ts-mission-score.none{color:rgba(255,255,255,0.3)}
+    .ts-status-chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .ts-chip{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;letter-spacing:1px;font-weight:700;padding:4px 10px;border-radius:20px;transition:all 0.3s;white-space:nowrap}
+    .ts-chip-done{color:#66BB6A;background:rgba(102,187,106,0.12);border:1px solid rgba(102,187,106,0.25)}
+    .ts-chip-pending{color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)}
     .ts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
     @media(max-width:768px){.ts-grid{grid-template-columns:1fr}}
     @media(min-width:601px) and (max-width:900px){.ts-grid{grid-template-columns:1fr 1fr}}
@@ -1409,7 +1409,11 @@
       <!-- Mission bar -->
       <div class="ts-mission-bar">
         <div class="ts-mission-day">DAY <strong data-day>—</strong> · MISSION STATUS</div>
-        <div class="ts-mission-score none" id="tsMissionScore">LOADING…</div>
+        <div class="ts-status-chips">
+          <span class="ts-chip ts-chip-pending" id="tsChipRun">🏃 —</span>
+          <span class="ts-chip ts-chip-pending" id="tsChipGym">🏋️ —</span>
+          <span class="ts-chip ts-chip-pending" id="tsChipSleep">💤 —</span>
+        </div>
       </div>
 
       <!-- 3 sport cards -->
@@ -1913,13 +1917,15 @@
         setTsBadge('tsRunBadge', hasRun, 'PENDING');
         setTsBadge('tsGymBadge', hasGym, 'PENDING');
 
-        // Mission score
-        var scoreEl = document.getElementById('tsMissionScore');
-        if (scoreEl) {
-          if (doneCount === 3) { scoreEl.textContent = 'ALL SYSTEMS GO ✓'; scoreEl.className = 'ts-mission-score all-done'; }
-          else if (doneCount > 0) { scoreEl.textContent = doneCount + '/3 COMPLETE'; scoreEl.className = 'ts-mission-score partial'; }
-          else { scoreEl.textContent = 'AWAITING DATA'; scoreEl.className = 'ts-mission-score none'; }
+        // Mission chips — one per sport, shows individual status
+        function setTsChip(id, done, doneLabel, pendingLabel) {
+          var el = document.getElementById(id); if (!el) return;
+          el.textContent = done ? doneLabel : pendingLabel;
+          el.className = 'ts-chip ' + (done ? 'ts-chip-done' : 'ts-chip-pending');
         }
+        setTsChip('tsChipRun', hasRun, '🏃 DONE', '🏃 PENDING');
+        setTsChip('tsChipGym', hasGym, '🏋️ DONE', '🏋️ PENDING');
+        setTsChip('tsChipSleep', hasSleep, '💤 DONE', '💤 SYNCING');
 
         // ── UPDATE STATUS BEACON ──
         var beacon = document.getElementById('proofBeacon');
