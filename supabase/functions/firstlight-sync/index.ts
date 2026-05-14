@@ -586,12 +586,33 @@ async function igProxy(body: Record<string, unknown>) {
 
   // New format: { endpoint, params }
   if (body.endpoint) {
+    const endpoint = String(body.endpoint)
     const params = (body.params || {}) as Record<string, string>
     params.access_token = igToken
-    const qs = Object.entries(params).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&')
-    const apiUrl = 'https://graph.facebook.com/v21.0/' + body.endpoint + '?' + qs
-    const resp = await fetch(apiUrl, { method: 'POST' })
-    return await resp.json()
+
+    // GET request (status checks) — short params only, no caption risk
+    if (body.method === 'GET') {
+      const qs = Object.entries(params).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&')
+      const apiUrl = 'https://graph.facebook.com/v21.0/' + endpoint + '?' + qs
+      const resp = await fetch(apiUrl, { method: 'GET' })
+      return await resp.json()
+    }
+
+    // POST request — use form body to avoid URL length limits with long captions
+    const formBody = Object.entries(params)
+      .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+      .join('&')
+    const apiUrl = 'https://graph.facebook.com/v21.0/' + endpoint
+    const resp = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody
+    })
+    const result = await resp.json()
+    if (result.error) {
+      console.error('[igProxy] IG API error:', JSON.stringify(result.error))
+    }
+    return result
   }
 
   throw new Error('Missing endpoint or url')

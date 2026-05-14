@@ -7704,11 +7704,43 @@ async function _igCreateItem(imageUrl){
 }
 
 // Create + publish carousel
+async function _igWaitForContainer(containerId,maxTries){
+  // Poll container status_code until FINISHED (Instagram requirement before media_publish)
+  maxTries=maxTries||12;
+  for(var t=0;t<maxTries;t++){
+    await new Promise(function(r){setTimeout(r,2500);});
+    try{
+      var st=await _igAPIGet(containerId,{fields:'status_code'});
+      console.log('[IG] Container '+containerId+' status: '+(st&&st.status_code));
+      if(st&&st.status_code==='FINISHED') return true;
+      if(st&&st.status_code==='ERROR') throw new Error('Container processing failed on Instagram side');
+    }catch(e2){if(e2.message.indexOf('Container processing')>=0) throw e2;/* retry on network error */}
+  }
+  console.warn('[IG] Container status check timed out — attempting publish anyway');
+  return false;
+}
+
+async function _igAPIGet(endpoint,params){
+  try{
+    var p=params||{};
+    var res=await fetch(_IG_SYNC_URL+'?action=ig-proxy&admin_key='+_ADMIN_KEY,{
+      method:'POST',signal:AbortSignal.timeout(20000),
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+FL.SUPABASE_ANON_KEY},
+      body:JSON.stringify({endpoint:endpoint,params:p,method:'GET'})
+    });
+    if(res.ok) return await res.json();
+    throw new Error('Status check HTTP '+res.status);
+  }catch(e){console.warn('[IG] Status check failed:',e.message);return null;}
+}
+
 async function _igPublishCarouselContainer(childIds,caption){
-  const d=await _igAPI(_IG_ACCOUNT+'/media',{media_type:'CAROUSEL',children:childIds.join(','),caption:caption});
-  // Wait for container to be ready (IG needs time to process images)
-  await new Promise(r=>setTimeout(r,3000));
-  const pd=await _igAPI(_IG_ACCOUNT+'/media_publish',{creation_id:d.id});
+  var d=await _igAPI(_IG_ACCOUNT+'/media',{media_type:'CAROUSEL',children:childIds.join(','),caption:caption});
+  if(!d||!d.id) throw new Error('Carousel container creation failed — no ID returned. Check caption length or image URLs.');
+  console.log('[IG] Carousel container created: '+d.id+'. Waiting for FINISHED status...');
+  // Poll until container is ready (avoids media_publish_failed errors)
+  await _igWaitForContainer(d.id);
+  var pd=await _igAPI(_IG_ACCOUNT+'/media_publish',{creation_id:d.id});
+  if(!pd||!pd.id) throw new Error('media_publish returned no ID');
   return pd.id;
 }
 
@@ -7779,6 +7811,7 @@ async function igPublishCarousel(){
     }
 
     // Step 5: Publish carousel with caption
+    _igLog(log,'Waiting for Instagram to process containers (this can take 10-30s)...','var(--gold)');
     _igLog(log,'Publishing carousel to Instagram...','#E1306C');
     const mediaId=await _igPublishCarouselContainer(childIds,caption);
     _igLog(log,'\u2713 CAROUSEL PUBLISHED! Media ID: '+mediaId,'var(--mint)');
