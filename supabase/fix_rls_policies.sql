@@ -26,7 +26,7 @@ BEGIN
         'ekadashi_log','weekly_schedule','tomorrow_plan','slips','config','daily_logs',
         'sleep_log','stories_completions','engagement_counters','architecture_log','voice_entries',
         'proof_archive','instagram_posts','strava_activities','comments','comment_reactions',
-        'body_weight',
+        'body_weight','weekly_metrics','monthly_grids','goals','goal_comments','health_daily',
         'expense_log','income_log','investment_log','finance_budgets',
         'finance_recurring','finance_annual_budgets','finance_networth','finance_fire_config'
       )
@@ -50,7 +50,7 @@ DECLARE
     'ekadashi_log','weekly_schedule','tomorrow_plan','slips','config','daily_logs',
     'sleep_log','stories_completions','engagement_counters','architecture_log','voice_entries',
     'proof_archive','instagram_posts','strava_activities','comments','comment_reactions',
-    'body_weight',
+    'body_weight','weekly_metrics','monthly_grids','goals','goal_comments','health_daily',
     'expense_log','income_log','investment_log','finance_budgets',
     'finance_recurring','finance_annual_budgets','finance_networth','finance_fire_config'
   ];

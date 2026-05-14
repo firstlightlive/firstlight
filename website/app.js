@@ -1154,11 +1154,20 @@ const SB_PUBLIC_TABLES = ['comments', 'comment_reactions', 'visitor_identities',
 // Tables that have no user_id column — skip auto-injection to prevent 400 errors
 // Single-user app: none of the app tables use user_id for RLS (open_access policies)
 const SB_NO_USERID_TABLES = [
-  // Daily tracking
+  // Daily tracking (new sync tables)
   'deepwork_log', 'mastery_log', 'rituals_log', 'brahma_log', 'brahma_monthly',
   'gym_workouts', 'gym_prs', 'body_weight', 'ekadashi_log', 'reading_log',
   'journal_entries', 'journal_notes', 'journal_insights', 'daily_checkin',
   'weekly_schedule', 'tomorrow_plan', 'slips', 'races',
+  // Legacy sync tables (old schema, still used by app.js sync functions)
+  'daily_rituals', 'daily_logs', 'weekly_metrics', 'monthly_grids', 'deep_work_sessions',
+  'mastery_daily', 'mastery_weekly', 'mastery_monthly_scores', 'mastery_ideas',
+  'brahma_daily', 'brahma_weekly',
+  // Feature tables
+  'stories_completions', 'goals', 'goal_comments', 'config',
+  'architecture_log', 'voice_entries', 'health_daily',
+  // Public tracking (no user_id column — inject would cause 400 even for logged-in admin)
+  'site_visits', 'site_stats', 'engagement_counters',
   // Finance
   'expense_log', 'income_log', 'investment_log', 'finance_budgets', 'finance_recurring',
   'finance_annual_budgets', 'finance_networth', 'finance_fire_config'
