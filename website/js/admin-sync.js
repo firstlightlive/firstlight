@@ -408,9 +408,13 @@ function pullAllFromSupabase() {
     { table: 'deepwork_log', query: '?date=eq.' + today, handler: function(rows) {
       rows.forEach(function(r) {
         if (r.date) {
+          var localKey = 'fl_deepwork_' + r.date;
+          // Don't overwrite data saved locally in the last 3 minutes
+          var writeTime = typeof _getLocalWriteTime === 'function' ? _getLocalWriteTime('deepwork_log_' + r.date + '_') : 0;
+          if (writeTime > Date.now() - 3 * 60 * 1000) { console.log('[Sync] Skip deepwork pull — saved locally ' + Math.round((Date.now()-writeTime)/1000) + 's ago'); return; }
           var blocks = r.blocks;
           if (typeof blocks === 'string') { try { blocks = JSON.parse(blocks); } catch(e) { blocks = []; } }
-          localStorage.setItem('fl_deepwork_' + r.date, JSON.stringify({ blocks: blocks, bigWin: r.big_win }));
+          localStorage.setItem(localKey, JSON.stringify({ blocks: blocks, bigWin: r.big_win }));
         }
       });
       // Re-render deepwork UI immediately if the panel is currently active

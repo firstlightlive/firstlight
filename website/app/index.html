@@ -5997,11 +5997,11 @@ function downloadStoriesCard(){
 // STORY STUDIO — 10 templates + day-of-week scheduling
 // High quality: 2160x3840 canvas, 2x scale, 0.97 JPEG
 
-const STORY_SCHEDULE=['number','streak','clock','dashboard','stakes','receipt','redline','witness','compare','heatmap','noir','light','dawn','paper','unclaimed','route','blueprint','telegram','film','manifesto','devotion','scoreboard','ledger','press','carbon','mirror'];
-const STORY_NAMES=['THE NUMBER','THE STREAK','THE CLOCK','THE DASHBOARD','THE STAKES','THE RECEIPT','THE REDLINE','THE WITNESS','THE COMPARE','THE HEATMAP','THE NOIR','THE LIGHT','THE DAWN','THE PAPER','THE UNCLAIMED','THE ROUTE','THE BLUEPRINT','THE TELEGRAM','THE FILM','THE MANIFESTO','THE DEVOTION','THE SCOREBOARD','THE LEDGER','THE PRESS','THE CARBON','THE MIRROR'];
-const STORY_ICONS=['\uD83D\uDD22','\uD83D\uDD25','\u23F0','\uD83D\uDCCA','\uD83D\uDCB0','\uD83E\uDDFE','\uD83D\uDFE5','\uD83D\uDC41','\u2194\uFE0F','\uD83D\uDFE9','\uD83C\uDF03','\u2600\uFE0F','\uD83C\uDF05','\uD83D\uDCF0','\u267B\uFE0F','\uD83D\uDDFA\uFE0F','\uD83D\uDCCF','\uD83D\uDCDF','\uD83C\uDF9E','\uD83D\uDCDC','\uD83C\uDF0C','\uD83C\uDFDF','\uD83D\uDCCA','\uD83D\uDCF0','\u26A1','\uD83E\uDE9E'];
-const STORY_DESCS=['Giant KM hero','Day counter + dots','Start time hero','All stats grid','Danger zone','Thermal receipt','Minimalist threat','Reply challenge','Day 1 vs Today','Streak grid','Dark cyan dashboard','Cream KM + watch','Cream clock emboss','White serif minimal','Black unclaimed only','Satellite map + stats','Engineering grid callouts','Western Union format','Three-frame film strip','Raw prose intensity wall','Pre-dawn stars + 3:15 AM','Stadium LED scoreboard','Accounting balance sheet','Newspaper front page','Carbon weave premium tech','Full-bleed photo + data wall'];
-const STORY_DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY'];
+const STORY_SCHEDULE=['number','streak','clock','dashboard','stakes','receipt','redline','witness','compare','heatmap','noir','light','dawn','paper','unclaimed','route','blueprint','telegram','film','manifesto','devotion','scoreboard','ledger','press','carbon','mirror','vault','signal','radar','capsule','mosaic','poster','glitch','cypher','neon','sanction'];
+const STORY_NAMES=['THE NUMBER','THE STREAK','THE CLOCK','THE DASHBOARD','THE STAKES','THE RECEIPT','THE REDLINE','THE WITNESS','THE COMPARE','THE HEATMAP','THE NOIR','THE LIGHT','THE DAWN','THE PAPER','THE UNCLAIMED','THE ROUTE','THE BLUEPRINT','THE TELEGRAM','THE FILM','THE MANIFESTO','THE DEVOTION','THE SCOREBOARD','THE LEDGER','THE PRESS','THE CARBON','THE MIRROR','THE VAULT','THE SIGNAL','THE RADAR','THE CAPSULE','THE MOSAIC','THE POSTER','THE GLITCH','THE CYPHER','THE NEON','THE SANCTION'];
+const STORY_ICONS=['\uD83D\uDD22','\uD83D\uDD25','\u23F0','\uD83D\uDCCA','\uD83D\uDCB0','\uD83E\uDDFE','\uD83D\uDFE5','\uD83D\uDC41','\u2194\uFE0F','\uD83D\uDFE9','\uD83C\uDF03','\u2600\uFE0F','\uD83C\uDF05','\uD83D\uDCF0','\u267B\uFE0F','\uD83D\uDDFA\uFE0F','\uD83D\uDCCF','\uD83D\uDCDF','\uD83C\uDF9E','\uD83D\uDCDC','\uD83C\uDF0C','\uD83C\uDFDF','\uD83D\uDCCA','\uD83D\uDCF0','\u26A1','\uD83E\uDE9E','\uD83D\uDD10','\uD83D\uDC93','\uD83D\uDCE1','\uD83D\uDCDC','\uD83C\uDFA8','\u2B50','\u26A1','\uD83D\uDD12','\uD83C\uDF06','\u2696\uFE0F'];
+const STORY_DESCS=['Giant KM hero','Day counter + dots','Start time hero','All stats grid','Danger zone','Thermal receipt','Minimalist threat','Reply challenge','Day 1 vs Today','Streak grid','Dark cyan dashboard','Cream KM + watch','Cream clock emboss','White serif minimal','Black unclaimed only','Satellite map + stats','Engineering grid callouts','Western Union format','Three-frame film strip','Raw prose intensity wall','Pre-dawn stars + 3:15 AM','Stadium LED scoreboard','Accounting balance sheet','Newspaper front page','Carbon weave premium tech','Full-bleed photo + data wall','Gold vault door + streak security','EKG heartbeat monitor pulse','Military radar + data points','Time capsule letter to future self','Mondrian color block data art','Soviet-era propaganda poster','RGB glitch distortion art','Encrypted code terminal reveal','Neon city skyline cyberpunk','Legal contract + penalty clause'];
+const STORY_DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY'];
 
 (function initStorySchedule(){
   var el=document.getElementById('storySchedule');var label=document.getElementById('storyTodayLabel');if(!el)return;
@@ -7019,7 +7019,336 @@ function genStoryTemplate(idx){
       c.textAlign='left';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.65)';c.shadowColor='rgba(0,0,0,0.9)';c.shadowBlur=6;
       c.fillText('@firstlightlive',56,H-72);c.fillText('www.firstlight.live',56,H-46);c.shadowBlur=0;
       return Promise.resolve();
-    })}
+    })},
+
+    // 26: THE VAULT — Bank vault door, streak as secured wealth
+    function(){
+      // Gunmetal background
+      c.fillStyle='#0A0B0D';c.fillRect(0,0,W,H);
+      var bg2=c.createRadialGradient(W/2,H/2,0,W/2,H/2,900);
+      bg2.addColorStop(0,'rgba(212,168,67,0.06)');bg2.addColorStop(1,'transparent');
+      c.fillStyle=bg2;c.fillRect(0,0,W,H);
+      // Vault door circle
+      var cx2=W/2,cy2=760,R=420;
+      // Outer ring chrome
+      for(var ri=0;ri<6;ri++){c.strokeStyle='rgba(212,168,67,'+(0.5-ri*0.07)+')';c.lineWidth=4-ri*0.5;c.beginPath();c.arc(cx2,cy2,R-ri*12,0,Math.PI*2);c.stroke();}
+      // Vault door fill
+      var vGrad=c.createRadialGradient(cx2-80,cy2-80,20,cx2,cy2,R);
+      vGrad.addColorStop(0,'rgba(60,55,45,1)');vGrad.addColorStop(0.6,'rgba(30,28,22,1)');vGrad.addColorStop(1,'rgba(15,14,11,1)');
+      c.fillStyle=vGrad;c.beginPath();c.arc(cx2,cy2,R-6,0,Math.PI*2);c.fill();
+      // Vault spokes (locking bolts) — 8 bolts
+      for(var bi=0;bi<8;bi++){var ang=bi*Math.PI/4;var bx=cx2+Math.cos(ang)*(R-50),by=cy2+Math.sin(ang)*(R-50);var bGrad=c.createRadialGradient(bx-8,by-8,2,bx,by,22);bGrad.addColorStop(0,'rgba(255,220,120,0.9)');bGrad.addColorStop(1,'rgba(140,100,30,0.9)');c.fillStyle=bGrad;c.beginPath();c.arc(bx,by,20,0,Math.PI*2);c.fill();c.strokeStyle='rgba(255,200,80,0.4)';c.lineWidth=1.5;c.beginPath();c.arc(bx,by,20,0,Math.PI*2);c.stroke();}
+      // Center combination wheel
+      var wGrad=c.createRadialGradient(cx2-30,cy2-30,5,cx2,cy2,140);
+      wGrad.addColorStop(0,'rgba(255,220,100,0.95)');wGrad.addColorStop(0.5,'rgba(180,130,30,0.9)');wGrad.addColorStop(1,'rgba(100,70,10,0.9)');
+      c.fillStyle=wGrad;c.beginPath();c.arc(cx2,cy2,130,0,Math.PI*2);c.fill();
+      // Wheel tick marks
+      for(var ti=0;ti<60;ti++){var ta=ti*(Math.PI*2/60),tLen=ti%5===0?20:10;c.strokeStyle=ti%5===0?'rgba(0,0,0,0.7)':'rgba(0,0,0,0.4)';c.lineWidth=ti%5===0?3:1.5;c.beginPath();c.moveTo(cx2+Math.cos(ta)*110,cy2+Math.sin(ta)*110);c.lineTo(cx2+Math.cos(ta)*(110-tLen),cy2+Math.sin(ta)*(110-tLen));c.stroke();}
+      // Day number on wheel
+      c.textAlign='center';c.font='900 64px "Rajdhani",sans-serif';c.fillStyle='rgba(0,0,0,0.85)';c.fillText(day,cx2,cy2+22);
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.6)';c.fillText('DAYS SECURED',cx2,cy2+50);
+      // Brand top
+      c.textAlign='left';c.font='600 22px "DM Serif Display",serif';c.fillStyle='rgba(212,168,67,0.85)';c.fillText('FIRST LIGHT',48,72);
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(212,168,67,0.4)';c.fillText('VAULT OF UNBROKEN DAYS',48,96);
+      // Stats below vault
+      var sy=1250,sx=80,sw=(W-160)/3;
+      var vStats=[{v:km||'\u2014',u:'KM',l:'RUN'},{v:'\u20B9'+formatIndianCurrency(stake),u:'/DAY',l:'AT STAKE'},{v:'\u20B9'+formatIndianCurrency(totalRisk),u:'',l:'UNCLAIMED'}];
+      vStats.forEach(function(s,i){var x=sx+i*(sw+20);c.fillStyle='rgba(212,168,67,0.06)';rr(c,x,sy,sw,120,10);c.fill();c.strokeStyle='rgba(212,168,67,0.15)';c.lineWidth=1;rr(c,x,sy,sw,120,10);c.stroke();c.textAlign='center';c.font='800 36px "Rajdhani",sans-serif';c.fillStyle='rgba(212,168,67,0.9)';c.fillText(s.v,x+sw/2,sy+52);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(212,168,67,0.4)';c.fillText(s.u,x+sw/2,sy+70);c.fillText(s.l,x+sw/2,sy+96);});
+      // SECURED text
+      c.textAlign='center';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(46,232,154,0.7)';c.fillText('\u2713 VAULT SECURED \u00B7 ZERO BREACHES',W/2,1440);
+      c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(212,168,67,0.35)';c.fillText('www.firstlight.live',W/2,H-80);c.fillText(handleIG,W/2,H-52);
+      return Promise.resolve();
+    },
+
+    // 27: THE SIGNAL — EKG heartbeat monitor
+    function(){
+      c.fillStyle='#030A06';c.fillRect(0,0,W,H);
+      // Grid lines — medical monitor grid
+      c.strokeStyle='rgba(0,200,80,0.07)';c.lineWidth=1;
+      for(var gx=0;gx<W;gx+=48){c.beginPath();c.moveTo(gx,0);c.lineTo(gx,H);c.stroke();}
+      for(var gy=0;gy<H;gy+=48){c.beginPath();c.moveTo(0,gy);c.lineTo(W,gy);c.stroke();}
+      // Header
+      c.textAlign='left';c.font='700 14px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.7)';c.fillText('PATIENT: ANUPAM KUMAR  |  MONITOR ACTIVE',48,60);
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.4)';c.fillText('DAY '+day+'  |  STATUS: RUNNING  |  HR: '+(bpmV||'--')+' BPM',48,88);
+      // Blinking dot
+      c.fillStyle='rgba(0,230,80,0.9)';c.beginPath();c.arc(W-64,68,10,0,Math.PI*2);c.fill();
+      c.fillStyle='rgba(0,230,80,0.25)';c.beginPath();c.arc(W-64,68,20,0,Math.PI*2);c.fill();
+      // EKG trace — piecewise line that makes the classic heartbeat shape
+      var eY=440,eH=280;
+      c.strokeStyle='rgba(0,230,80,0.9)';c.lineWidth=3.5;c.shadowColor='rgba(0,230,80,0.7)';c.shadowBlur=12;c.beginPath();
+      var pts=[[0,eY],[80,eY],[120,eY],[136,eY-20],[144,eY+40],[152,eY-eH*0.85],[164,eY+eH*0.45],[176,eY-eH*0.2],[188,eY-eH*0.1],[200,eY],[240,eY],[268,eY-eH*0.6],[284,eY+eH*0.3],[296,eY-eH*0.15],[308,eY],[360,eY],[396,eY-20],[404,eY+40],[412,eY-eH*0.85],[424,eY+eH*0.45],[436,eY-eH*0.2],[448,eY-eH*0.1],[460,eY],[520,eY],[556,eY-20],[564,eY+40],[572,eY-eH*0.85],[584,eY+eH*0.45],[596,eY-eH*0.2],[608,eY-eH*0.1],[620,eY],[680,eY],[716,eY-20],[724,eY+40],[732,eY-eH*0.85],[744,eY+eH*0.45],[756,eY-eH*0.2],[768,eY-eH*0.1],[780,eY],[860,eY],[900,eY-20],[908,eY+40],[916,eY-eH*0.85],[928,eY+eH*0.45],[940,eY-eH*0.2],[952,eY-eH*0.1],[964,eY],[1080,eY]];
+      pts.forEach(function(p,i){if(i===0)c.moveTo(p[0],p[1]);else c.lineTo(p[0],p[1]);});c.stroke();c.shadowBlur=0;
+      // Flatline zone label
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,82,82,0.6)';c.textAlign='left';c.fillText('FLATLINE IF MISSED',48,H/2+40);
+      // Divider
+      c.strokeStyle='rgba(0,230,80,0.15)';c.lineWidth=1;c.setLineDash([8,8]);c.beginPath();c.moveTo(48,H/2+60);c.lineTo(W-48,H/2+60);c.stroke();c.setLineDash([]);
+      // Big KM below
+      c.textAlign='center';c.font='900 180px "Rajdhani",sans-serif';c.fillStyle='rgba(0,230,80,0.9)';c.shadowColor='rgba(0,230,80,0.5)';c.shadowBlur=40;c.fillText(km||'\u2014',W/2,900);c.shadowBlur=0;
+      c.font='700 20px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.5)';c.fillText('K I L O M E T E R S  R U N',W/2,950);
+      // Vital stats
+      var vitals=[{v:bpmV||'--',l:'BPM'},{v:mn||'--',l:'MIN'},{v:fmtP(),l:'PACE'},{v:sleepH||'--',l:'SLEEP HRS'}];
+      var vY=1050,vW=(W-96)/4;
+      vitals.forEach(function(vi,i){var x=48+i*vW;c.fillStyle='rgba(0,230,80,0.04)';rr(c,x,vY,vW-8,100,8);c.fill();c.strokeStyle='rgba(0,230,80,0.12)';c.lineWidth=1;rr(c,x,vY,vW-8,100,8);c.stroke();c.textAlign='center';c.font='700 34px "Rajdhani",sans-serif';c.fillStyle='rgba(0,230,80,0.85)';c.fillText(vi.v,x+vW/2-4,vY+54);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.4)';c.fillText(vi.l,x+vW/2-4,vY+78);});
+      // Stake warning
+      c.textAlign='center';c.font='700 22px "Rajdhani",sans-serif';c.fillStyle='rgba(255,82,82,0.8)';c.fillText('\u20B9'+formatIndianCurrency(stake)+' PENALTY IF FLATLINE',W/2,1220);
+      c.font='500 12px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.35)';c.fillText(day+' DAYS \u00B7 ZERO FLATLINES',W/2,1260);
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.4)';c.fillText('www.firstlight.live  \u00B7  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    },
+
+    // 28: THE RADAR — Military circular radar with stats at compass points
+    function(){
+      c.fillStyle='#030B09';c.fillRect(0,0,W,H);
+      var rCx=W/2,rCy=680,rR=400;
+      // Concentric rings with scan lines
+      for(var ri2=1;ri2<=5;ri2++){c.strokeStyle='rgba(0,230,100,'+(0.04+ri2*0.03)+')';c.lineWidth=1;c.beginPath();c.arc(rCx,rCy,rR*ri2/5,0,Math.PI*2);c.stroke();}
+      // Cross hairs
+      c.strokeStyle='rgba(0,230,100,0.12)';c.lineWidth=1;c.beginPath();c.moveTo(rCx-rR-20,rCy);c.lineTo(rCx+rR+20,rCy);c.stroke();c.beginPath();c.moveTo(rCx,rCy-rR-20);c.lineTo(rCx,rCy+rR+20);c.stroke();
+      // Diagonal faint lines
+      c.strokeStyle='rgba(0,230,100,0.05)';c.lineWidth=1;
+      for(var da=0;da<8;da++){var da2=da*Math.PI/4;c.beginPath();c.moveTo(rCx,rCy);c.lineTo(rCx+Math.cos(da2)*(rR+20),rCy+Math.sin(da2)*(rR+20));c.stroke();}
+      // Rotating sweep gradient
+      var swG=c.createConicalGradient?c.createConicalGradient(rCx,rCy,0):null;
+      c.save();c.globalAlpha=0.18;c.fillStyle='rgba(0,230,100,0.5)';c.beginPath();c.moveTo(rCx,rCy);c.arc(rCx,rCy,rR,-Math.PI/2,-Math.PI/2+Math.PI*0.6);c.closePath();c.fill();c.globalAlpha=1;c.restore();
+      // Center target
+      c.strokeStyle='rgba(0,230,100,0.8)';c.lineWidth=2;c.beginPath();c.arc(rCx,rCy,18,0,Math.PI*2);c.stroke();c.strokeStyle='rgba(0,230,100,0.4)';c.lineWidth=1.5;c.beginPath();c.arc(rCx,rCy,6,0,Math.PI*2);c.stroke();
+      // Day number in center
+      c.textAlign='center';c.font='900 44px "Rajdhani",sans-serif';c.fillStyle='rgba(0,230,100,0.9)';c.fillText('D'+day,rCx,rCy+16);
+      // Data points at compass positions — N/E/S/W + diagonals
+      var rPts=[{a:-Math.PI/2,v:km||'\u2014',u:'KM',l:'RUN'},{a:0,v:mn||'\u2014',u:'MIN',l:'TIME'},{a:Math.PI/2,v:bpmV||'\u2014',u:'BPM',l:'HR'},{a:Math.PI,v:fmtP(),u:'PACE',l:'MIN/KM'},{a:-Math.PI/4,v:sleepH||'\u2014',u:'HRS',l:'SLEEP'},{a:Math.PI/4,v:'\u20B9'+formatIndianCurrency(stake),u:'',l:'STAKE'},{a:3*Math.PI/4,v:day,u:'DAYS',l:'STREAK'},{a:-3*Math.PI/4,v:(food&&runD&&gymD)?'100%':'--',u:'DONE',l:'STATUS'}];
+      rPts.forEach(function(pt){var px2=rCx+Math.cos(pt.a)*(rR+80),py2=rCy+Math.sin(pt.a)*(rR+80);c.fillStyle='rgba(0,230,100,0.06)';rr(c,px2-60,py2-36,120,72,8);c.fill();c.strokeStyle='rgba(0,230,100,0.2)';c.lineWidth=1;rr(c,px2-60,py2-36,120,72,8);c.stroke();c.textAlign='center';c.font='700 26px "Rajdhani",sans-serif';c.fillStyle='rgba(0,230,100,0.9)';c.fillText(pt.v,px2,py2);c.font='500 8px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,100,0.4)';c.fillText(pt.u,px2,py2+18);c.fillText(pt.l,px2,py2+30);
+        // Line to radar edge
+        c.strokeStyle='rgba(0,230,100,0.1)';c.lineWidth=1;c.setLineDash([4,6]);c.beginPath();c.moveTo(rCx+Math.cos(pt.a)*20,rCy+Math.sin(pt.a)*20);c.lineTo(rCx+Math.cos(pt.a)*(rR-10),rCy+Math.sin(pt.a)*(rR-10));c.stroke();c.setLineDash([]);});
+      // Header
+      c.textAlign='left';c.font='700 11px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,100,0.6)';c.fillText('FIRST LIGHT TACTICAL DISPLAY',48,60);c.fillStyle='rgba(0,230,100,0.3)';c.font='500 10px "JetBrains Mono",monospace';c.fillText('SIGNAL ACTIVE \u00B7 ZERO BREACH',48,84);
+      c.textAlign='right';c.font='700 11px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,100,0.5)';c.fillText('TARGET LOCKED',W-48,72);
+      // Bottom brand
+      c.textAlign='center';c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,100,0.35)';c.fillText('www.firstlight.live  \u00B7  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    },
+
+    // 29: THE CAPSULE — Time capsule letter to future self
+    function(){
+      // Deep aged paper
+      c.fillStyle='#F2EDD7';c.fillRect(0,0,W,H);
+      // Paper grain
+      for(var gi=0;gi<12000;gi++){c.fillStyle='rgba(139,115,76,'+(Math.random()*0.04)+')';c.fillRect(Math.random()*W,Math.random()*H,1,1);}
+      // Top aged stain
+      var stain=c.createRadialGradient(W/2,0,0,W/2,0,600);stain.addColorStop(0,'rgba(160,120,60,0.15)');stain.addColorStop(1,'transparent');c.fillStyle=stain;c.fillRect(0,0,W,H);
+      // Bottom aged stain
+      var stain2=c.createRadialGradient(W*0.8,H,0,W*0.8,H,500);stain2.addColorStop(0,'rgba(160,120,60,0.12)');stain2.addColorStop(1,'transparent');c.fillStyle=stain2;c.fillRect(0,0,W,H);
+      // Top wax seal area
+      c.fillStyle='rgba(139,30,30,0.85)';c.beginPath();c.arc(W/2,130,70,0,Math.PI*2);c.fill();
+      c.strokeStyle='rgba(100,20,20,0.5)';c.lineWidth=3;c.beginPath();c.arc(W/2,130,70,0,Math.PI*2);c.stroke();
+      c.textAlign='center';c.font='700 28px "DM Serif Display",serif';c.fillStyle='rgba(255,220,180,0.95)';c.fillText('FL',W/2,122);c.font='400 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,220,180,0.7)';c.fillText('SEALED',W/2,148);
+      // Stamp postmark top right
+      c.strokeStyle='rgba(139,80,40,0.4)';c.lineWidth=2;rr(c,W-190,50,160,90,4);c.stroke();c.textAlign='center';c.font='700 10px "JetBrains Mono",monospace';c.fillStyle='rgba(139,80,40,0.7)';c.fillText('FIRSTLIGHT.LIVE',W-110,80);c.fillText('DAY '+day,W-110,100);c.fillText('DO NOT BEND',W-110,120);
+      // Letter content
+      var lx=80,ly=240,lw=W-160;c.textAlign='left';c.fillStyle='rgba(60,40,15,0.85)';
+      c.font='400 28px "DM Serif Display",serif';c.fillText('To: The Man I\'m Becoming',lx,ly);ly+=42;
+      c.font='400 20px "DM Serif Display",serif';c.fillStyle='rgba(60,40,15,0.6)';c.fillText('From: Day '+day+' Anupam',lx,ly);ly+=50;
+      c.fillStyle='rgba(100,70,20,0.3)';c.fillRect(lx,ly,lw,1);ly+=32;
+      c.font='400 22px "DM Serif Display",serif';c.fillStyle='rgba(60,40,15,0.8)';
+      var lines2=['Today I woke up and ran.','That\'s the whole story.','',' '+( km||'—')+' km. '+(mn||'—')+' min. Still here.','','The money is still mine — ₹'+formatIndianCurrency(stake)+'/day.','₹'+formatIndianCurrency(totalRisk)+' unclaimed. Every. Single. Day.','','When you read this, remember:','the body that ran today','made you who you are then.'];
+      lines2.forEach(function(ln){if(ln===''){ly+=20;return;}c.fillText(ln,lx,ly);ly+=36;});
+      ly+=20;c.fillStyle='rgba(100,70,20,0.3)';c.fillRect(lx,ly,lw,1);ly+=36;
+      c.font='400 22px "DM Serif Display",serif';c.fillStyle='rgba(60,40,15,0.6)';c.fillText('Yours in discipline,',lx,ly);ly+=38;
+      c.font='700 28px "DM Serif Display",serif';c.fillStyle='rgba(80,50,15,0.85)';c.fillText('Anupam  —  Day '+day,lx,ly);
+      // Bottom stamp
+      c.textAlign='center';c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(139,80,40,0.4)';c.fillText('www.firstlight.live  \u00B7  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    },
+
+    // 30: THE MOSAIC — Mondrian-inspired geometric color blocks
+    function(){
+      c.fillStyle='#F5F0E8';c.fillRect(0,0,W,H);
+      var border=8;
+      // Define blocks: [x, y, w, h, color] as fractions of W/H
+      var blocks=[
+        [0,0,0.5,0.22,'#E8001A'],[0.5,0,0.5,0.22,'#003594'],
+        [0,0.22,0.33,0.28,'#003594'],[0.33,0.22,0.67,0.14,'#F2D200'],[0.33,0.36,0.35,0.14,'#F5F0E8'],[0.68,0.22,0.32,0.28,'#E8001A'],
+        [0,0.5,0.5,0.18,'#F2D200'],[0.5,0.5,0.5,0.18,'#F5F0E8'],
+        [0,0.68,0.25,0.32,'#F5F0E8'],[0.25,0.68,0.45,0.16,'#E8001A'],[0.25,0.84,0.45,0.16,'#003594'],[0.7,0.68,0.3,0.32,'#F2D200']
+      ];
+      blocks.forEach(function(b){var bx=b[0]*W,by=b[1]*H,bw=b[2]*W,bh=b[3]*H;c.fillStyle=b[4];c.fillRect(bx+border/2,by+border/2,bw-border,bh-border);});
+      // Black grid lines
+      c.fillStyle='#1A1A1A';
+      var hLines=[0,0.22,0.36,0.5,0.68,0.84,1];var vLines=[0,0.33,0.5,0.68,0.7,1];
+      hLines.forEach(function(hl){c.fillRect(0,hl*H-border/2,W,border);});
+      vLines.forEach(function(vl){c.fillRect(vl*W-border/2,0,border,H);});
+      // Data labels in the blocks — contrasting colors
+      function mText(tx,ty,tw,th,text,col,sz){c.textAlign='center';c.font='900 '+sz+'px "Rajdhani",sans-serif';c.fillStyle=col;c.fillText(text,tx+tw/2,ty+th/2+sz*0.35);}
+      function mSub(tx,ty,tw,th,text,col){c.textAlign='center';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle=col;c.fillText(text,tx+tw/2,ty+th*0.8);}
+      mText(0,0,W*0.5,H*0.22,'D '+day,'#F5F0E8',72);mSub(0,0,W*0.5,H*0.22,'DAYS ALIVE','rgba(255,255,255,0.6)');
+      mText(W*0.5,0,W*0.5,H*0.22,km||'\u2014','#F5F0E8',72);mSub(W*0.5,0,W*0.5,H*0.22,'KILOMETERS','rgba(255,255,255,0.6)');
+      mText(0,H*0.22,W*0.33,H*0.28,mn||'\u2014','#F5F0E8',52);mSub(0,H*0.22,W*0.33,H*0.28,'MINUTES','rgba(255,255,255,0.6)');
+      mText(W*0.33,H*0.22,W*0.67,H*0.14,'\u20B9'+formatIndianCurrency(stake),'#1A1A1A',40);
+      mText(W*0.33,H*0.36,W*0.35,H*0.14,fmtP(),'#1A1A1A',38);mSub(W*0.33,H*0.36,W*0.35,H*0.14,'PACE','rgba(0,0,0,0.5)');
+      mText(W*0.68,H*0.22,W*0.32,H*0.28,bpmV||'\u2014','#F5F0E8',52);mSub(W*0.68,H*0.22,W*0.32,H*0.28,'BPM','rgba(255,255,255,0.5)');
+      mText(0,H*0.5,W*0.5,H*0.18,'\u20B9'+formatIndianCurrency(totalRisk),'#1A1A1A',38);
+      mSub(0,H*0.5,W*0.5,H*0.18,'UNCLAIMED','rgba(0,0,0,0.5)');
+      mText(W*0.5,H*0.5,W*0.5,H*0.18,sleepH||'\u2014','#1A1A1A',52);mSub(W*0.5,H*0.5,W*0.5,H*0.18,'HRS SLEEP','rgba(0,0,0,0.5)');
+      mText(W*0.25,H*0.68,W*0.45,H*0.16,'FIRST','#F5F0E8',44);
+      mText(W*0.25,H*0.84,W*0.45,H*0.16,'LIGHT','#F5F0E8',44);
+      mText(W*0.7,H*0.68,W*0.3,H*0.32,'www\nfirst\nlight','#1A1A1A',22);
+      return Promise.resolve();
+    },
+
+    // 31: THE POSTER — Soviet-era propaganda poster aesthetic
+    function(){
+      // Aged cream background
+      c.fillStyle='#EDE0C4';c.fillRect(0,0,W,H);
+      // Red half at top
+      var redH=H*0.48;
+      c.fillStyle='#B71C1C';c.fillRect(0,0,W,redH);
+      // Decorative top stripe
+      c.fillStyle='#880000';c.fillRect(0,0,W,12);
+      // Star at top center
+      var starCx=W/2,starCy=100,starR=55;
+      c.fillStyle='#EDE0C4';c.beginPath();
+      for(var si=0;si<5;si++){var sa1=si*4*Math.PI/5-Math.PI/2,sa2=si*4*Math.PI/5+2*Math.PI/5-Math.PI/2;c.moveTo(starCx+Math.cos(sa1)*starR,starCy+Math.sin(sa1)*starR);c.lineTo(starCx+Math.cos(sa2)*(starR*0.42),starCy+Math.sin(sa2)*(starR*0.42));}
+      c.closePath();c.fill();
+      // "FIRST LIGHT" bold propaganda title
+      c.textAlign='center';c.font='900 110px "Rajdhani",sans-serif';c.fillStyle='#EDE0C4';c.letterSpacing='8px';c.fillText('FIRST',W/2,280);c.fillText('LIGHT',W/2,390);
+      // Subtitle strip
+      c.fillStyle='#1A1A1A';c.fillRect(0,redH,W,60);c.textAlign='center';c.font='700 20px "JetBrains Mono",monospace';c.fillStyle='#EDE0C4';c.fillText('DAILY REPORT \u2014 DAY '+day,W/2,redH+38);
+      // Stats in bold black grid on cream
+      var py2=redH+100;c.fillStyle='#1A1A1A';
+      function pStat(label,val){c.textAlign='left';c.font='700 14px "JetBrains Mono",monospace';c.fillStyle='#8B0000';c.fillText('\u25BA '+label,80,py2);c.textAlign='right';c.font='900 40px "Rajdhani",sans-serif';c.fillStyle='#1A1A1A';c.fillText(val,W-80,py2);c.fillStyle='rgba(0,0,0,0.15)';c.fillRect(80,py2+8,W-160,1);py2+=58;}
+      pStat('RUN DISTANCE',( km||'\u2014')+' KM');pStat('DURATION',(mn||'\u2014')+' MIN');if(bpmV)pStat('HEART RATE',bpmV+' BPM');pStat('DAILY STAKE','\u20B9'+formatIndianCurrency(stake));pStat('UNCLAIMED','\u20B9'+formatIndianCurrency(totalRisk));pStat('FOOD CODE',food?'CLEAN':'BROKEN');
+      // Bottom slogan
+      c.fillStyle='#8B0000';c.fillRect(0,H-140,W,4);
+      c.textAlign='center';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='#8B0000';c.fillText('NO EXCUSES. NO QUARTER. INFINITE.', W/2,H-100);
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.5)';c.fillText('www.firstlight.live  \u00B7  '+handleIG,W/2,H-60);
+      c.fillStyle='#8B0000';c.fillRect(0,H-36,W,4);
+      return Promise.resolve();
+    },
+
+    // 32: THE GLITCH — RGB glitch distortion art
+    function(){
+      c.fillStyle='#050507';c.fillRect(0,0,W,H);
+      // Background noise scanlines
+      for(var sl=0;sl<H;sl+=4){c.fillStyle='rgba(255,255,255,'+(Math.random()*0.015)+')';c.fillRect(0,sl,W,2);}
+      // RED channel — offset left
+      c.globalAlpha=0.65;c.globalCompositeOperation='screen';c.fillStyle='rgba(255,0,60,0.8)';c.font='900 240px "Rajdhani",sans-serif';c.textAlign='center';c.fillText(day,-24+W/2,580);
+      // GREEN channel — center
+      c.fillStyle='rgba(0,255,80,0.8)';c.fillText(day,W/2,590);
+      // BLUE channel — offset right
+      c.fillStyle='rgba(0,80,255,0.8)';c.fillText(day,24+W/2,572);
+      c.globalCompositeOperation='source-over';c.globalAlpha=1;
+      // Glitch horizontal bars
+      for(var gb=0;gb<8;gb++){var gy2=100+Math.random()*1200,gh2=4+Math.random()*24;c.fillStyle='rgba(255,255,255,'+(Math.random()*0.08)+')';c.fillRect(0,gy2,W,gh2);c.fillStyle='rgba(255,0,100,'+(Math.random()*0.06)+')';c.fillRect(Math.random()*W-200,gy2+2,400,gh2/2);}
+      // "DAYS" label
+      c.textAlign='center';c.font='700 20px "JetBrains Mono",monospace';c.fillStyle='rgba(0,255,80,0.7)';c.fillText('D A Y S  O F  N O  M I S S E S',W/2,660);
+      // Corrupt stats display
+      var glitchStats=[['DIST',km||'\u2014','KM'],['TIME',mn||'\u2014','MIN'],['BPM',bpmV||'\u2014','♡'],['PACE',fmtP(),'MIN/KM']];
+      var gsY=740,gsW=(W-80)/4;
+      glitchStats.forEach(function(gs,i){var gx2=40+i*(gsW+8);c.fillStyle='rgba(255,255,255,0.02)';c.fillRect(gx2,gsY,gsW,100);
+        // RGB offset effect on each stat
+        c.globalAlpha=0.7;c.fillStyle='rgba(255,0,60,0.8)';c.font='700 34px "Rajdhani",sans-serif';c.textAlign='center';c.fillText(gs[1],gx2+gsW/2-2,gsY+50);
+        c.fillStyle='rgba(0,255,80,0.8)';c.fillText(gs[1],gx2+gsW/2,gsY+52);c.globalAlpha=1;
+        c.fillStyle='rgba(255,255,255,0.9)';c.fillText(gs[1],gx2+gsW/2+2,gsY+48);
+        c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(0,255,80,0.6)';c.fillText(gs[0],gx2+gsW/2,gsY+70);c.fillText(gs[2],gx2+gsW/2,gsY+88);});
+      // Stake in glitch red
+      c.textAlign='center';c.globalAlpha=0.8;c.font='900 80px "Rajdhani",sans-serif';c.fillStyle='rgba(255,0,60,0.9)';c.fillText('\u20B9'+formatIndianCurrency(stake),W/2-3,920);c.fillStyle='rgba(0,255,80,0.8)';c.fillText('\u20B9'+formatIndianCurrency(stake),W/2+3,922);c.globalAlpha=1;c.fillStyle='rgba(255,255,255,0.9)';c.fillText('\u20B9'+formatIndianCurrency(stake),W/2,918);
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,0,60,0.6)';c.fillText('IF I MISS \u2014 YOU COLLECT',W/2,968);
+      // Bottom corrupted footer
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(0,255,80,0.35)';c.fillText('www.firstlight.live  |  '+handleIG,W/2,H-60);
+      c.fillStyle='rgba(255,0,60,0.15)';c.fillRect(0,H-100,W,2);c.fillStyle='rgba(0,255,80,0.15)';c.fillRect(0,H-97,W,2);
+      return Promise.resolve();
+    },
+
+    // 33: THE CYPHER — Encrypted code terminal reveal
+    function(){
+      c.fillStyle='#080810';c.fillRect(0,0,W,H);
+      // Purple/violet accent
+      var pG=c.createRadialGradient(W/2,500,0,W/2,500,700);pG.addColorStop(0,'rgba(120,60,255,0.08)');pG.addColorStop(1,'transparent');c.fillStyle=pG;c.fillRect(0,0,W,H);
+      // Binary rain columns (decorative background)
+      var binChars='01░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬';
+      c.font='12px "JetBrains Mono",monospace';
+      for(var bc=0;bc<22;bc++){var bCol=48+bc*45;for(var br2=0;br2<55;br2++){c.fillStyle='rgba(100,50,255,'+(Math.random()*0.12)+')';c.fillText(binChars[Math.floor(Math.random()*binChars.length)],bCol,36+br2*36);}}
+      // Decrypt box — center card
+      c.fillStyle='rgba(20,10,50,0.95)';rr(c,48,220,W-96,1320,16);c.fill();c.strokeStyle='rgba(120,60,255,0.4)';c.lineWidth=1.5;rr(c,48,220,W-96,1320,16);c.stroke();
+      // Terminal header
+      c.textAlign='left';c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='rgba(120,60,255,0.8)';c.fillText('\u25B6 FIRSTLIGHT.DECRYPT  v'+day+'.0.0',80,270);c.fillStyle='rgba(120,60,255,0.3)';c.fillRect(80,285,W-160,1);
+      // Encrypted → decrypted reveal lines
+      var lines3=[['SUBJECT_ID:','ANUPAM_KUMAR'],['CLEARANCE:','ALPHA_'+day],['RUN_DISTANCE:',((km||'?')+'_KM').toUpperCase()],['DURATION:',((mn||'?')+'_MINUTES').toUpperCase()],['PACE:',fmtP().replace(':','_')],['HEART_RATE:',((bpmV||'---')+'_BPM').toUpperCase()],['STAKE_DAILY:',('RS_'+formatIndianCurrency(stake)).toUpperCase()],['TOTAL_SECURED:',('RS_'+formatIndianCurrency(totalRisk)).toUpperCase()],['FOOD_CODE:',(food?'CLEAN':'VIOLATION').toUpperCase()],['BREACH_ALERT:','ZERO_DETECTED'],['STATUS:','MISSION_ACTIVE']];
+      var lY=320;
+      lines3.forEach(function(l2){c.textAlign='left';c.font='600 15px "JetBrains Mono",monospace';c.fillStyle='rgba(120,60,255,0.55)';c.fillText(l2[0],80,lY);c.fillStyle='rgba(200,160,255,0.9)';c.textAlign='right';c.font='700 15px "JetBrains Mono",monospace';c.fillText(l2[1],W-80,lY);c.strokeStyle='rgba(120,60,255,0.06)';c.lineWidth=0.5;c.beginPath();c.moveTo(80,lY+8);c.lineTo(W-80,lY+8);c.stroke();lY+=88;});
+      // "DECRYPTION COMPLETE"
+      c.textAlign='center';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(120,60,255,0.7)';c.fillText('\u2713 DECRYPTION COMPLETE',W/2,1590);c.fillStyle='rgba(120,60,255,0.2)';c.fillRect(80,1600,W-160,1);
+      // Brand
+      c.font='400 28px "DM Serif Display",serif';c.fillStyle='rgba(120,60,255,0.5)';c.fillText('FIRST LIGHT',W/2,70);c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(120,60,255,0.3)';c.fillText('www.firstlight.live  \u00B7  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    },
+
+    // 34: THE NEON — Cyberpunk neon city skyline
+    function(){
+      // Night sky gradient
+      c.fillStyle='#050210';c.fillRect(0,0,W,H);
+      var skyG=c.createLinearGradient(0,0,0,H*0.65);skyG.addColorStop(0,'#050210');skyG.addColorStop(0.5,'#0A0420');skyG.addColorStop(1,'#0E0530');c.fillStyle=skyG;c.fillRect(0,0,W,H*0.65);
+      // Stars
+      for(var st=0;st<120;st++){c.fillStyle='rgba(255,255,255,'+(0.1+Math.random()*0.4)+')';c.fillRect(Math.random()*W,Math.random()*H*0.45,1+Math.random(),1+Math.random());}
+      // City silhouette — dark buildings
+      c.fillStyle='#0A0815';
+      var buildings=[[0,420,80,360],[85,380,60,400],[150,350,90,430],[245,400,50,380],[300,320,110,460],[415,370,70,410],[490,310,100,470],[595,360,60,420],[660,280,120,500],[785,350,80,430],[870,390,65,390],[940,340,100,440],[1045,380,35,400]];
+      buildings.forEach(function(b){c.fillRect(b[0],b[1],b[2],H-b[1]);// windows
+        for(var w2=0;w2<4;w2++)for(var wr=0;wr<8;wr++){if(Math.random()>0.35){var wc=Math.random()>0.5?'rgba(255,200,80,0.5)':'rgba(0,200,255,0.3)';c.fillStyle=wc;c.fillRect(b[0]+6+w2*18,b[1]+12+wr*22,10,14);}}});
+      // Reflection in wet street — gradient floor
+      var streetY=H*0.65;var streetG=c.createLinearGradient(0,streetY,0,H);streetG.addColorStop(0,'#120A28');streetG.addColorStop(1,'#0A0610');c.fillStyle=streetG;c.fillRect(0,streetY,W,H-streetY);
+      // Neon reflections on wet street
+      var neons=[{x:W/2,col:'rgba(255,20,200,0.15)',r:600},{x:W*0.3,col:'rgba(0,200,255,0.1)',r:400},{x:W*0.7,col:'rgba(255,100,20,0.08)',r:350}];
+      neons.forEach(function(n){var ng=c.createRadialGradient(n.x,streetY+20,0,n.x,streetY+20,n.r);ng.addColorStop(0,n.col);ng.addColorStop(1,'transparent');c.fillStyle=ng;c.fillRect(0,streetY,W,H-streetY);});
+      // MAIN DATA — neon sign style
+      c.shadowBlur=30;c.textAlign='center';
+      c.shadowColor='rgba(255,20,200,0.8)';c.font='900 180px "Rajdhani",sans-serif';c.fillStyle='rgba(255,40,220,0.9)';c.fillText(day,W/2,420);
+      c.shadowColor='rgba(0,220,255,0.6)';c.font='700 22px "JetBrains Mono",monospace';c.fillStyle='rgba(0,220,255,0.9)';c.fillText('D A Y S  \u00B7  N O  M I S S E S',W/2,470);c.shadowBlur=0;
+      // Neon sign boards for stats
+      var neonStats=[{v:( km||'\u2014')+' KM',col:'rgba(255,20,200,0.9)',glow:'rgba(255,20,200,0.6)'},{v:(mn||'\u2014')+' MIN',col:'rgba(0,220,255,0.9)',glow:'rgba(0,220,255,0.5)'},{v:'\u20B9'+formatIndianCurrency(stake),col:'rgba(255,160,20,0.9)',glow:'rgba(255,160,20,0.5)'}];
+      var nsY=H*0.72,nsW=(W-96-32)/3;
+      neonStats.forEach(function(ns,i){var nx=48+i*(nsW+16);c.strokeStyle=ns.col;c.lineWidth=2;c.shadowColor=ns.glow;c.shadowBlur=20;rr(c,nx,nsY,nsW,100,8);c.stroke();c.textAlign='center';c.font='700 36px "Rajdhani",sans-serif';c.fillStyle=ns.col;c.shadowColor=ns.glow;c.shadowBlur=16;c.fillText(ns.v,nx+nsW/2,nsY+56);c.shadowBlur=0;});
+      // Footer neon
+      c.textAlign='center';c.font='700 20px "DM Serif Display",serif';c.fillStyle='rgba(255,20,200,0.7)';c.shadowColor='rgba(255,20,200,0.5)';c.shadowBlur=14;c.fillText('FIRST LIGHT',W/2,H*0.94);c.shadowBlur=0;
+      c.font='500 12px "JetBrains Mono",monospace';c.fillStyle='rgba(0,220,255,0.35)';c.fillText('www.firstlight.live  \u00B7  '+handleIG,W/2,H-55);
+      return Promise.resolve();
+    },
+
+    // 35: THE SANCTION — Legal contract with penalty clause
+    function(){
+      c.fillStyle='#FAFAF8';c.fillRect(0,0,W,H);
+      // Subtle paper texture
+      for(var gi=0;gi<6000;gi++){c.fillStyle='rgba(0,0,0,'+(Math.random()*0.015)+')';c.fillRect(Math.random()*W,Math.random()*H,1,1);}
+      // Red top bar
+      c.fillStyle='#C50000';c.fillRect(0,0,W,10);
+      c.fillStyle='#1A1A1A';c.fillRect(0,10,W,4);
+      // Header
+      c.textAlign='center';c.font='400 18px "DM Serif Display",serif';c.fillStyle='rgba(0,0,0,0.5)';c.fillText('ACCOUNTABILITY COVENANT — LEGALLY BINDING',W/2,65);
+      c.font='700 58px "DM Serif Display",serif';c.fillStyle='#1A1A1A';c.fillText('FIRST LIGHT',W/2,140);
+      c.fillStyle='rgba(0,0,0,0.2)';c.fillRect(80,160,W-160,1.5);
+      // Case number + date
+      c.textAlign='left';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.4)';c.fillText('CASE #FL-'+String(day).padStart(4,'0')+'\u2003\u2003\u2003REF: '+handleIG,80,195);
+      c.textAlign='right';c.fillText('JURISDICTION: PUBLIC INTERNET',W-80,195);
+      c.fillStyle='rgba(0,0,0,0.15)';c.fillRect(80,205,W-160,1);
+      // Party block
+      var py3=240;c.textAlign='left';c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.5)';c.fillText('PARTY A (OBLIGOR):',80,py3);c.font='400 22px "DM Serif Display",serif';c.fillStyle='#1A1A1A';c.fillText('Anupam Kumar  \u00B7  @firstlightlive',80,py3+28);
+      c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.5)';c.fillText('OBLIGATION:',80,py3+70);c.font='400 20px "DM Serif Display",serif';c.fillStyle='#1A1A1A';c.fillText('Run every day. Food clean. Gym after run.',80,py3+96);
+      c.fillStyle='rgba(0,0,0,0.1)';c.fillRect(80,py3+115,W-160,1);
+      // Penalty table
+      var tY=390;c.fillStyle='rgba(197,0,0,0.04)';rr(c,80,tY,W-160,460,8);c.fill();c.strokeStyle='rgba(197,0,0,0.2)';c.lineWidth=1;rr(c,80,tY,W-160,460,8);c.stroke();
+      c.textAlign='center';c.font='700 14px "JetBrains Mono",monospace';c.fillStyle='rgba(197,0,0,0.7)';c.fillText('BREACH PENALTY SCHEDULE',W/2,tY+30);
+      c.fillStyle='rgba(197,0,0,0.15)';c.fillRect(80,tY+40,W-160,1);
+      var clauses=[['§1 DAILY STAKE','\u20B9'+formatIndianCurrency(stake)+' / DAY'],['§2 STREAK (DAYS)',day+' CONSECUTIVE'],['§3 TOTAL SECURED','\u20B9'+formatIndianCurrency(totalRisk)],['§4 TODAY\'S RUN',(km||'\u2014')+' KM  \u00B7  '+(mn||'\u2014')+' MIN'],['§5 HEART RATE',(bpmV||'\u2014')+' BPM'],['§6 FOOD CODE',(food?'CLEAN \u2013 COVENANT UPHELD':'VIOLATION \u2013 PENALTY DUE')],['§7 BREACH COUNT','ZERO']];
+      var cY=tY+60;clauses.forEach(function(cl){c.textAlign='left';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.45)';c.fillText(cl[0],100,cY);c.textAlign='right';c.font='700 20px "Rajdhani",sans-serif';c.fillStyle=cl[0].includes('BREACH')&&cl[1]==='ZERO'?'rgba(0,160,60,0.9)':cl[0].includes('FOOD')&&!food?'rgba(197,0,0,0.9)':'#1A1A1A';c.fillText(cl[1],W-100,cY);c.strokeStyle='rgba(0,0,0,0.07)';c.lineWidth=0.5;c.beginPath();c.moveTo(100,cY+10);c.lineTo(W-100,cY+10);c.stroke();cY+=56;});
+      // Signature section
+      c.fillStyle='rgba(0,0,0,0.1)';c.fillRect(80,870,W-160,1.5);
+      c.textAlign='left';c.font='400 22px "DM Serif Display",serif';c.fillStyle='rgba(0,0,0,0.6)';c.fillText('Executed in public. Witnessed by the internet.',80,910);
+      c.font='700 28px "Rajdhani",sans-serif';c.fillStyle='#1A1A1A';c.fillText('Anupam Kumar \u2014 Day '+day,80,950);
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.35)';c.fillText('DAY '+day+'  \u00B7  NO BREACH  \u00B7  COVENANT ACTIVE',80,980);
+      // Red bottom bar
+      c.fillStyle='#C50000';c.fillRect(0,H-10,W,10);c.fillStyle='#1A1A1A';c.fillRect(0,H-14,W,4);
+      c.textAlign='center';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.4)';c.fillText('www.firstlight.live  \u00B7  '+handleIG,W/2,H-30);
+      return Promise.resolve();
+    }
   ];
 
   T[idx]().then(function(){

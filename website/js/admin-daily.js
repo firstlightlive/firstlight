@@ -90,9 +90,22 @@ function saveDeepWork() {
   });
   var dwData = { blocks: blocks, bigWin: document.getElementById('dwBigWin').value };
   localStorage.setItem(key, JSON.stringify(dwData));
-  // Sync to Supabase
+  // Sync to Supabase — show status on failure
   if (typeof syncSave === 'function') {
-    syncSave('deepwork_log', { date: dateStr, blocks: dwData.blocks, big_win: dwData.bigWin || '' }, 'date');
+    syncSave('deepwork_log', { date: dateStr, blocks: dwData.blocks, big_win: dwData.bigWin || '' }, 'date')
+      .then(function(result) {
+        var el = document.getElementById('dw-sync-status');
+        if (!el) { el = document.createElement('div'); el.id = 'dw-sync-status'; el.style.cssText = 'font-family:var(--font-mono);font-size:10px;margin-top:6px;padding:6px 10px;border-radius:4px'; document.querySelector('#p-deepwork .btn-primary').after(el); }
+        if (result === null) {
+          el.style.cssText += 'color:var(--gold);background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2)';
+          el.textContent = '⚠ Saved locally, Supabase sync queued (check console for error)';
+        } else {
+          el.style.cssText += 'color:var(--green);background:rgba(0,230,118,0.05);border:1px solid rgba(0,230,118,0.1)';
+          el.textContent = '✓ Synced to Supabase';
+          setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3000);
+        }
+      })
+      .catch(function(e) { console.error('[DeepWork] Save error:', e); });
   }
   markSaved();
   flashBtn(document.querySelector('#p-deepwork .btn-primary'), 'SAVED ✓');

@@ -274,6 +274,23 @@ function syncSleepNow(){
 }
 
 // ── INIT DASHBOARD ──
+// Pre-fill fl_log with done:true for all days from streak start → yesterday
+// (mirrors initStreakLog in index.html so dots are green without visiting story generator)
+function ensureStreakLog(){
+  try{
+    const origin=new Date(2026,1,10);origin.setHours(0,0,0,0);
+    const today=new Date();today.setHours(0,0,0,0);
+    const log=JSON.parse(localStorage.getItem('fl_log')||'{}');
+    let changed=false;
+    for(let d=new Date(origin);d<today;d.setDate(d.getDate()+1)){
+      const dk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      if(!log[dk]){log[dk]={done:true,day:Math.floor((d-origin)/86400000)+1};changed=true;}
+    }
+    if(changed)localStorage.setItem('fl_log',JSON.stringify(log));
+  }catch(e){}
+}
+ensureStreakLog();
+
 function initDash(){
   const day=getDayNum();
   const ist=getNowIST();
