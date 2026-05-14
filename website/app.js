@@ -1152,8 +1152,14 @@ function updateSyncStatus() {
 // Public tables that don't need user_id (anonymous access)
 const SB_PUBLIC_TABLES = ['comments', 'comment_reactions', 'visitor_identities', 'auth_audit_log'];
 // Tables that have no user_id column — skip auto-injection to prevent 400 errors
+// Single-user app: none of the app tables use user_id for RLS (open_access policies)
 const SB_NO_USERID_TABLES = [
-  'tomorrow_plan',
+  // Daily tracking
+  'deepwork_log', 'mastery_log', 'rituals_log', 'brahma_log', 'brahma_monthly',
+  'gym_workouts', 'gym_prs', 'body_weight', 'ekadashi_log', 'reading_log',
+  'journal_entries', 'journal_notes', 'journal_insights', 'daily_checkin',
+  'weekly_schedule', 'tomorrow_plan', 'slips', 'races',
+  // Finance
   'expense_log', 'income_log', 'investment_log', 'finance_budgets', 'finance_recurring',
   'finance_annual_budgets', 'finance_networth', 'finance_fire_config'
 ];
