@@ -289,7 +289,12 @@ renderJournalArchive();
     var count = 0;
     data.forEach(function(d) {
       var key = 'fl_deepwork_' + d.date;
-      if (!localStorage.getItem(key)) { localStorage.setItem(key, JSON.stringify({ blocks: d.blocks, bigWin: d.big_win })); count++; }
+      if (!localStorage.getItem(key)) {
+        var blks = d.blocks || [];
+        if (typeof blks === 'string') { try { blks = JSON.parse(blks); } catch(e) { blks = []; } }
+        localStorage.setItem(key, JSON.stringify({ blocks: blks, bigWin: d.big_win || '' }));
+        count++;
+      }
     });
     if (count > 0) console.log('[Bootstrap] Deep work: ' + count + ' entries restored');
   });

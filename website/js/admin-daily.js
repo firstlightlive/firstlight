@@ -92,7 +92,7 @@ function saveDeepWork() {
   localStorage.setItem(key, JSON.stringify(dwData));
   // Sync to Supabase
   if (typeof syncSave === 'function') {
-    syncSave('deepwork_log', { date: dateStr, blocks: JSON.stringify(dwData.blocks), big_win: dwData.bigWin || '' }, 'date');
+    syncSave('deepwork_log', { date: dateStr, blocks: dwData.blocks, big_win: dwData.bigWin || '' }, 'date');
   }
   markSaved();
   flashBtn(document.querySelector('#p-deepwork .btn-primary'), 'SAVED ✓');
@@ -127,7 +127,9 @@ function loadDeepWorkForDate(dateStr) {
   });
   var bw = document.getElementById('dwBigWin'); if (bw) bw.value = '';
   if (data) {
-    (data.blocks || []).forEach(function(b, i) {
+    var blocks = data.blocks || [];
+    if (typeof blocks === 'string') { try { blocks = JSON.parse(blocks); } catch(e) { blocks = []; } }
+    blocks.forEach(function(b, i) {
       if (!dwBlocks[i]) return;
       var ti = dwBlocks[i].querySelector('.dw-time input'); if (ti) ti.value = b.time || '';
       var txs = dwBlocks[i].querySelectorAll('input[type="text"]'); if (txs[1]) txs[1].value = b.task || '';
