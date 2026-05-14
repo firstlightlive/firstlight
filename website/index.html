@@ -1503,6 +1503,10 @@
           <div class="streak-num-label">TOTAL KM RUN</div>
         </div>
         <div class="streak-num-card">
+          <div class="streak-num-val" id="statTotalCycle" style="color:#26C6DA">—</div>
+          <div class="streak-num-label">KM CYCLED</div>
+        </div>
+        <div class="streak-num-card">
           <div class="streak-num-val" id="statGymSessions">—</div>
           <div class="streak-num-label">GYM SESSIONS</div>
         </div>
@@ -1882,6 +1886,19 @@
 
     // Auto-refresh every 60 seconds (catches new syncs)
     setInterval(loadDashboardData, 60000);
+
+    // Load cycling distance from Strava
+    fetch(SUPA + '/rest/v1/strava_activities?select=distance&type=eq.Ride', {
+      headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(rides) {
+      var cycleKm = 0;
+      if (rides && rides.length) rides.forEach(function(r) { cycleKm += parseFloat(r.distance || 0) / 1000; });
+      var el = document.getElementById('statTotalCycle');
+      if (el) el.textContent = Math.round(cycleKm) > 0 ? Math.round(cycleKm) + '+' : '—';
+    })
+    .catch(function() {});
 
     // Load Instagram posts — direct fetch, no dependencies
     (function() {
