@@ -5997,18 +5997,18 @@ function downloadStoriesCard(){
 // STORY STUDIO — 10 templates + day-of-week scheduling
 // High quality: 2160x3840 canvas, 2x scale, 0.97 JPEG
 
-const STORY_SCHEDULE=['number','streak','clock','dashboard','stakes','receipt','redline','witness','compare','heatmap','noir','light','dawn','paper','unclaimed','route','blueprint','telegram','film','manifesto','devotion','scoreboard','ledger','press','carbon','mirror','vault','signal','radar','capsule','mosaic','poster','glitch','cypher','neon','sanction'];
-const STORY_NAMES=['THE NUMBER','THE STREAK','THE CLOCK','THE DASHBOARD','THE STAKES','THE RECEIPT','THE REDLINE','THE WITNESS','THE COMPARE','THE HEATMAP','THE NOIR','THE LIGHT','THE DAWN','THE PAPER','THE UNCLAIMED','THE ROUTE','THE BLUEPRINT','THE TELEGRAM','THE FILM','THE MANIFESTO','THE DEVOTION','THE SCOREBOARD','THE LEDGER','THE PRESS','THE CARBON','THE MIRROR','THE VAULT','THE SIGNAL','THE RADAR','THE CAPSULE','THE MOSAIC','THE POSTER','THE GLITCH','THE CYPHER','THE NEON','THE SANCTION'];
-const STORY_ICONS=['\uD83D\uDD22','\uD83D\uDD25','\u23F0','\uD83D\uDCCA','\uD83D\uDCB0','\uD83E\uDDFE','\uD83D\uDFE5','\uD83D\uDC41','\u2194\uFE0F','\uD83D\uDFE9','\uD83C\uDF03','\u2600\uFE0F','\uD83C\uDF05','\uD83D\uDCF0','\u267B\uFE0F','\uD83D\uDDFA\uFE0F','\uD83D\uDCCF','\uD83D\uDCDF','\uD83C\uDF9E','\uD83D\uDCDC','\uD83C\uDF0C','\uD83C\uDFDF','\uD83D\uDCCA','\uD83D\uDCF0','\u26A1','\uD83E\uDE9E','\uD83D\uDD10','\uD83D\uDC93','\uD83D\uDCE1','\uD83D\uDCDC','\uD83C\uDFA8','\u2B50','\u26A1','\uD83D\uDD12','\uD83C\uDF06','\u2696\uFE0F'];
-const STORY_DESCS=['Giant KM hero','Day counter + dots','Start time hero','All stats grid','Danger zone','Thermal receipt','Minimalist threat','Reply challenge','Day 1 vs Today','Streak grid','Dark cyan dashboard','Cream KM + watch','Cream clock emboss','White serif minimal','Black unclaimed only','Satellite map + stats','Engineering grid callouts','Western Union format','Three-frame film strip','Raw prose intensity wall','Pre-dawn stars + 3:15 AM','Stadium LED scoreboard','Accounting balance sheet','Newspaper front page','Carbon weave premium tech','Full-bleed photo + data wall','Gold vault door + streak security','EKG heartbeat monitor pulse','Military radar + data points','Time capsule letter to future self','Mondrian color block data art','Soviet-era propaganda poster','RGB glitch distortion art','Encrypted code terminal reveal','Neon city skyline cyberpunk','Legal contract + penalty clause'];
-const STORY_DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY'];
+const STORY_SCHEDULE=['number','streak','clock','dashboard','stakes','receipt','redline','witness','compare','heatmap','noir','light','dawn','paper','unclaimed','route','blueprint','telegram','film','manifesto','devotion','scoreboard','ledger','press','carbon','mirror','vault','signal','radar','capsule','mosaic','poster','glitch','cypher','neon','sanction','century','orbit','pyramid','forge','wall','belt','proclamation','constellation'];
+const STORY_NAMES=['THE NUMBER','THE STREAK','THE CLOCK','THE DASHBOARD','THE STAKES','THE RECEIPT','THE REDLINE','THE WITNESS','THE COMPARE','THE HEATMAP','THE NOIR','THE LIGHT','THE DAWN','THE PAPER','THE UNCLAIMED','THE ROUTE','THE BLUEPRINT','THE TELEGRAM','THE FILM','THE MANIFESTO','THE DEVOTION','THE SCOREBOARD','THE LEDGER','THE PRESS','THE CARBON','THE MIRROR','THE VAULT','THE SIGNAL','THE RADAR','THE CAPSULE','THE MOSAIC','THE POSTER','THE GLITCH','THE CYPHER','THE NEON','THE SANCTION','THE CENTURY','THE ORBIT','THE PYRAMID','THE FORGE','THE WALL','THE BELT','THE PROCLAMATION','THE CONSTELLATION'];
+const STORY_ICONS=['\uD83D\uDD22','\uD83D\uDD25','\u23F0','\uD83D\uDCCA','\uD83D\uDCB0','\uD83E\uDDFE','\uD83D\uDFE5','\uD83D\uDC41','\u2194\uFE0F','\uD83D\uDFE9','\uD83C\uDF03','\u2600\uFE0F','\uD83C\uDF05','\uD83D\uDCF0','\u267B\uFE0F','\uD83D\uDDFA\uFE0F','\uD83D\uDCCF','\uD83D\uDCDF','\uD83C\uDF9E','\uD83D\uDCDC','\uD83C\uDF0C','\uD83C\uDFDF','\uD83D\uDCCA','\uD83D\uDCF0','\u26A1','\uD83E\uDE9E','\uD83D\uDD10','\uD83D\uDC93','\uD83D\uDCE1','\uD83D\uDCDC','\uD83C\uDFA8','\u2B50','\u26A1','\uD83D\uDD12','\uD83C\uDF06','\u2696\uFE0F','\uD83C\uDFCF','\uD83C\uDF0D','\uD83D\uDD3A','\u2694\uFE0F','\uD83D\uDCB8','\uD83C\uDFC6','\uD83D\uDCDC','\u2728'];
+const STORY_DESCS=['Giant KM hero','Day counter + dots','Start time hero','All stats grid','Danger zone','Thermal receipt','Minimalist threat','Reply challenge','Day 1 vs Today','Streak grid','Dark cyan dashboard','Cream KM + watch','Cream clock emboss','White serif minimal','Black unclaimed only','Satellite map + stats','Engineering grid callouts','Western Union format','Three-frame film strip','Raw prose intensity wall','Pre-dawn stars + 3:15 AM','Stadium LED scoreboard','Accounting balance sheet','Newspaper front page','Carbon weave premium tech','Full-bleed photo + data wall','Gold vault door + streak security','EKG heartbeat monitor pulse','Military radar + data points','Time capsule letter to future self','Mondrian color block data art','Soviet-era propaganda poster','RGB glitch distortion art','Encrypted code terminal reveal','Neon city skyline cyberpunk','Legal contract + penalty clause','Cricket 100* NOT OUT scoreboard','Earth orbit + deep space progress','Egyptian pyramid built stone by stone','Forge blade from raw iron milestone','Stack of Rs.500 notes not forfeited','Championship belt with day engraved','Royal decree parchment + wax seal','Starfield constellation of all days'];
+const STORY_DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','MILE','MILE','MILE','MILE','MILE','MILE','MILE','MILE'];
 
 (function initStorySchedule(){
   var el=document.getElementById('storySchedule');var label=document.getElementById('storyTodayLabel');if(!el)return;
   var today=new Date().getDay();var todayIdx=today===0?6:today-1;
   if(label)label.textContent='TODAY \u2192 '+STORY_NAMES[todayIdx];
   var html='';
-  for(var i=0;i<STORY_NAMES.length;i++){var isToday=(i===todayIdx&&i<7);var bg=isToday?'background:rgba(224,64,251,0.12);border-color:rgba(224,64,251,0.4)':'background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08)';var dayC=isToday?'color:#E040FB;font-weight:700':'color:var(--smoke)';var nameC='color:var(--bone)';var dot=isToday?'<span style="color:#E040FB;font-size:10px">\u25CF TODAY</span>':'<span style="color:var(--ash);font-size:8px">\u25B6</span>';
+  for(var i=0;i<STORY_NAMES.length;i++){var isToday=(i===todayIdx&&i<7);var isMile=STORY_DAYS[i]==='MILE';var bg=isToday?'background:rgba(224,64,251,0.12);border-color:rgba(224,64,251,0.4)':isMile?'background:rgba(245,166,35,0.05);border-color:rgba(245,166,35,0.2)':'background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08)';var dayC=isToday?'color:#E040FB;font-weight:700':isMile?'color:#F5A623;font-weight:700':'color:var(--smoke)';var nameC='color:var(--bone)';var dot=isToday?'<span style="color:#E040FB;font-size:10px">\u25CF TODAY</span>':isMile?'<span style="color:#F5A623;font-size:8px">\u2605 MILE</span>':'<span style="color:var(--ash);font-size:8px">\u25B6</span>';
     html+='<div style="display:grid;grid-template-columns:36px 1fr 50px;align-items:center;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all .15s;border:1px solid rgba(61,58,55,.15);'+bg+'" onclick="genStoryTemplate('+i+');this.style.borderColor=\'#E040FB\';this.style.background=\'rgba(224,64,251,0.15)\'" onmouseenter="this.style.borderColor=\'rgba(224,64,251,0.3)\';this.style.background=\'rgba(224,64,251,0.06)\'" onmouseleave="this.style.borderColor=\'\';this.style.background=\'\'"><span style="font-family:\'JetBrains Mono\',monospace;font-size:8px;letter-spacing:1px;'+dayC+'">'+STORY_DAYS[i]+'</span><span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;'+nameC+'">'+STORY_ICONS[i]+' '+STORY_NAMES[i]+' <span style="font-size:7px;color:var(--ash)">'+STORY_DESCS[i]+'</span></span>'+dot+'</div>';}
   el.innerHTML=html;
 })();
@@ -7347,6 +7347,203 @@ function genStoryTemplate(idx){
       // Red bottom bar
       c.fillStyle='#C50000';c.fillRect(0,H-10,W,10);c.fillStyle='#1A1A1A';c.fillRect(0,H-14,W,4);
       c.textAlign='center';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(0,0,0,0.4)';c.fillText('www.firstlight.live  \u00B7  '+handleIG,W/2,H-30);
+      return Promise.resolve();
+    }
+
+    // 36: THE CENTURY — Cricket 100* NOT OUT scoreboard (milestone)
+    ,function(){
+      c.fillStyle='#0A0800';c.fillRect(0,0,W,H);
+      // Stadium lights glow
+      [[W*0.1,H*0.04],[W*0.35,H*0.02],[W*0.65,H*0.02],[W*0.9,H*0.04],[W*0.1,H*0.96],[W*0.35,H*0.98],[W*0.65,H*0.98],[W*0.9,H*0.96]].forEach(function(l){var lg=c.createRadialGradient(l[0],l[1],0,l[0],l[1],220);lg.addColorStop(0,'rgba(255,220,100,0.28)');lg.addColorStop(1,'transparent');c.fillStyle=lg;c.fillRect(0,0,W,H);});
+      // Confetti
+      for(var ci=0;ci<100;ci++){var cx2=Math.random()*W,cy2=Math.random()*H,cl=['#F5A623','#FF5252','#00E676','#00D4FF','#FFFFFF'][Math.floor(Math.random()*5)];c.fillStyle=cl;c.globalAlpha=0.5+Math.random()*0.5;c.save();c.translate(cx2,cy2);c.rotate(Math.random()*Math.PI);c.fillRect(-10,-3,20,5);c.restore();}
+      c.globalAlpha=1;
+      // Header
+      c.textAlign='center';c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(245,166,35,0.6)';c.fillText('FIRST LIGHT  ·  CENTURY MILESTONE',W/2,68);
+      // Giant day number with glow
+      c.font='900 240px "Rajdhani",sans-serif';c.fillStyle='#F5A623';c.shadowColor='rgba(245,166,35,0.85)';c.shadowBlur=90;c.textAlign='center';c.fillText(day,W/2,530);c.shadowBlur=0;
+      // NOT OUT badge
+      var ng=c.createLinearGradient(W/2-150,554,W/2+150,610);ng.addColorStop(0,'rgba(245,166,35,0.2)');ng.addColorStop(1,'rgba(245,166,35,0.08)');c.fillStyle=ng;rr(c,W/2-150,554,300,58,29);c.fill();c.strokeStyle='rgba(245,166,35,0.5)';c.lineWidth=1.5;rr(c,W/2-150,554,300,58,29);c.stroke();
+      c.font='800 22px "JetBrains Mono",monospace';c.fillStyle='#F5A623';c.fillText('* NOT  OUT *',W/2,591);
+      // Scoreboard — cricket style
+      var scY=680,scCols=[{v:km||'—',l:'KM'},{v:mn||'—',l:'MIN'},{v:bpmV||'—',l:'BPM'},{v:'₹'+formatIndianCurrency(totalRisk),l:'UNCLAIMED'}];
+      var scW=(W-40)/4;
+      scCols.forEach(function(s,i){var x=20+i*scW;c.fillStyle=i%2===0?'rgba(245,166,35,0.07)':'rgba(245,166,35,0.03)';c.fillRect(x,scY,scW-2,108);c.textAlign='center';c.font='800 40px "Rajdhani",sans-serif';c.fillStyle='rgba(245,166,35,0.9)';c.fillText(s.v,x+scW/2,scY+56);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(245,166,35,0.4)';c.fillText(s.l,x+scW/2,scY+80);});
+      c.font='500 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.4)';c.fillText('DAYS OF UNBROKEN DISCIPLINE',W/2,870);
+      // Progress dots — all days
+      var dN=parseInt(day)||1,dotSz=10,dotGap=4,dotsPerRow=20;
+      var dotW2=dotsPerRow*(dotSz+dotGap)-dotGap,dotX=(W-dotW2)/2,dotY=920;
+      for(var di=0;di<dN;di++){var dc=Math.floor(di/dotsPerRow),dr=di%dotsPerRow,isLast=di===dN-1;c.fillStyle=isLast?'#F5A623':di>dN-8?'rgba(245,166,35,0.7)':'rgba(245,166,35,0.32)';if(isLast){c.shadowColor='rgba(245,166,35,0.9)';c.shadowBlur=14;}c.beginPath();c.arc(dotX+dr*(dotSz+dotGap)+dotSz/2,dotY+dc*(dotSz+dotGap)+dotSz/2,dotSz/2,0,Math.PI*2);c.fill();c.shadowBlur=0;}
+      c.font='700 24px "Rajdhani",sans-serif';c.fillStyle='rgba(245,166,35,0.65)';c.fillText('₹'+formatIndianCurrency(stake)+' / DAY  ·  EVERY DAY EARNED',W/2,1280);
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(245,166,35,0.3)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    }
+
+    // 37: THE ORBIT — Earth orbit progress, deep space
+    ,function(){
+      c.fillStyle='#000308';c.fillRect(0,0,W,H);
+      for(var si=0;si<600;si++){c.fillStyle='rgba(255,255,255,'+(0.15+Math.random()*0.85)+')';c.beginPath();c.arc(Math.random()*W,Math.random()*H,Math.random()*1.4,0,Math.PI*2);c.fill();}
+      var sunG=c.createRadialGradient(W/2,H+180,0,W/2,H+180,620);sunG.addColorStop(0,'rgba(255,160,50,0.35)');sunG.addColorStop(0.5,'rgba(200,80,10,0.12)');sunG.addColorStop(1,'transparent');c.fillStyle=sunG;c.fillRect(0,0,W,H);
+      var eCx=W/2,eCy=760,eR=110;
+      var earthG=c.createRadialGradient(eCx-28,eCy-28,8,eCx,eCy,eR);earthG.addColorStop(0,'rgba(40,110,230,1)');earthG.addColorStop(0.4,'rgba(30,160,80,0.85)');earthG.addColorStop(0.7,'rgba(20,80,200,1)');earthG.addColorStop(1,'rgba(10,40,100,1)');
+      c.fillStyle=earthG;c.beginPath();c.arc(eCx,eCy,eR,0,Math.PI*2);c.fill();
+      c.fillStyle='rgba(255,255,255,0.12)';c.beginPath();c.ellipse(eCx-20,eCy-36,56,13,0.3,0,Math.PI*2);c.fill();c.beginPath();c.ellipse(eCx+26,eCy+18,38,9,-0.2,0,Math.PI*2);c.fill();
+      var atmG=c.createRadialGradient(eCx,eCy,eR-4,eCx,eCy,eR+22);atmG.addColorStop(0,'rgba(100,180,255,0.28)');atmG.addColorStop(1,'transparent');c.fillStyle=atmG;c.beginPath();c.arc(eCx,eCy,eR+22,0,Math.PI*2);c.fill();
+      var orR=330;c.strokeStyle='rgba(0,212,255,0.1)';c.lineWidth=1.5;c.setLineDash([8,14]);c.beginPath();c.ellipse(eCx,eCy,orR,orR*0.34,0,0,Math.PI*2);c.stroke();c.setLineDash([]);
+      var prog=Math.min((parseInt(day)||1)/365,1),sA=-Math.PI/2,eA=sA+prog*Math.PI*2;
+      c.strokeStyle='rgba(0,212,255,0.65)';c.lineWidth=2.5;c.shadowColor='rgba(0,212,255,0.5)';c.shadowBlur=10;c.beginPath();c.ellipse(eCx,eCy,orR,orR*0.34,0,sA,eA);c.stroke();c.shadowBlur=0;
+      var mA=sA+prog*Math.PI*2,mx=eCx+Math.cos(mA)*orR,my=eCy+Math.sin(mA)*orR*0.34;
+      c.fillStyle='#00D4FF';c.shadowColor='rgba(0,212,255,0.9)';c.shadowBlur=22;c.beginPath();c.arc(mx,my,12,0,Math.PI*2);c.fill();c.shadowBlur=0;c.fillStyle='rgba(0,0,0,0.8)';c.beginPath();c.arc(mx,my,5,0,Math.PI*2);c.fill();
+      c.textAlign='center';c.font='900 150px "Rajdhani",sans-serif';c.fillStyle='rgba(0,212,255,0.92)';c.shadowColor='rgba(0,212,255,0.5)';c.shadowBlur=40;c.fillText('DAY '+day,W/2,290);c.shadowBlur=0;
+      c.font='700 16px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.55)';c.fillText(Math.round(prog*1000)/10+'% OF ONE FULL ORBIT',W/2,336);
+      var oStats=[{v:km||'—',u:'KM',l:'DISTANCE'},{v:'₹'+formatIndianCurrency(totalRisk),u:'',l:'UNCLAIMED'},{v:day,u:'DAYS',l:'IN ORBIT'}];
+      var osY=1160,osW=(W-120)/3;oStats.forEach(function(s,i){var x=60+i*(osW+20);c.fillStyle='rgba(0,212,255,0.04)';rr(c,x,osY,osW,108,10);c.fill();c.strokeStyle='rgba(0,212,255,0.12)';c.lineWidth=1;rr(c,x,osY,osW,108,10);c.stroke();c.textAlign='center';c.font='800 34px "Rajdhani",sans-serif';c.fillStyle='rgba(0,212,255,0.86)';c.fillText(s.v,x+osW/2,osY+50);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.36)';c.fillText(s.u,x+osW/2,osY+70);c.fillText(s.l,x+osW/2,osY+88);});
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.28)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    }
+
+    // 38: THE PYRAMID — Egyptian pyramid built stone by stone
+    ,function(){
+      var skyG=c.createLinearGradient(0,0,0,H*0.58);skyG.addColorStop(0,'#060402');skyG.addColorStop(1,'#180E06');c.fillStyle=skyG;c.fillRect(0,0,W,H*0.58);
+      var sandG=c.createLinearGradient(0,H*0.58,0,H);sandG.addColorStop(0,'#3A2810');sandG.addColorStop(1,'#201408');c.fillStyle=sandG;c.fillRect(0,H*0.58,W,H*0.42);
+      for(var si=0;si<220;si++){c.fillStyle='rgba(255,220,130,'+(0.25+Math.random()*0.75)+')';c.beginPath();c.arc(Math.random()*W,Math.random()*H*0.5,Math.random()*1.5,0,Math.PI*2);c.fill();}
+      c.fillStyle='rgba(255,230,150,0.88)';c.beginPath();c.arc(W*0.82,H*0.1,42,0,Math.PI*2);c.fill();c.fillStyle='#060402';c.beginPath();c.arc(W*0.82+16,H*0.1-5,36,0,Math.PI*2);c.fill();
+      var dN2=parseInt(day)||1,bH=16,bW=40,bGap=2,bPerRow=22,rows=Math.ceil(dN2/bPerRow);
+      var baseY=H*0.70,count=0;
+      for(var row=0;row<rows&&count<dN2;row++){
+        var rowCount=Math.min(bPerRow-row,bPerRow,dN2-count);var rowW=rowCount*(bW+bGap)-bGap;var startX=(W-rowW)/2;var rowY=baseY-(row+1)*(bH+bGap);
+        for(var b=0;b<rowCount&&count<dN2;b++){
+          var bx=startX+b*(bW+bGap),by=rowY,isTop=(count===dN2-1);
+          var sg=c.createLinearGradient(bx,by,bx,by+bH);sg.addColorStop(0,isTop?'rgba(255,200,70,0.95)':'rgba(200,160,80,0.85)');sg.addColorStop(1,isTop?'rgba(180,130,30,0.9)':'rgba(130,95,40,0.85)');
+          c.fillStyle=sg;c.fillRect(bx,by,bW,bH);c.strokeStyle='rgba(0,0,0,0.28)';c.lineWidth=0.5;c.strokeRect(bx,by,bW,bH);count++;
+        }
+      }
+      var capY=baseY-rows*(bH+bGap)-20;c.fillStyle='rgba(255,200,70,0.18)';c.beginPath();c.arc(W/2,capY,55,0,Math.PI*2);c.fill();
+      c.textAlign='center';c.font='900 120px "Rajdhani",sans-serif';c.fillStyle='rgba(245,166,35,0.92)';c.shadowColor='rgba(245,166,35,0.5)';c.shadowBlur=36;c.fillText('DAY '+day,W/2,210);c.shadowBlur=0;
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(245,166,35,0.45)';c.fillText('STONES LAID IN THE DESERT OF DISCIPLINE',W/2,250);
+      var hY=H*0.78,hStats=[{v:km||'—',l:'KM'},{v:'₹'+formatIndianCurrency(stake),l:'/DAY'},{v:'₹'+formatIndianCurrency(totalRisk),l:'SECURED'}],hW=(W-80)/3;
+      hStats.forEach(function(s,i){var x=40+i*(hW+20);c.fillStyle='rgba(245,166,35,0.06)';rr(c,x,hY,hW,96,6);c.fill();c.strokeStyle='rgba(245,166,35,0.18)';c.lineWidth=1;rr(c,x,hY,hW,96,6);c.stroke();c.textAlign='center';c.font='800 30px "Rajdhani",sans-serif';c.fillStyle='rgba(245,166,35,0.82)';c.fillText(s.v,x+hW/2,hY+48);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(245,166,35,0.38)';c.fillText(s.l,x+hW/2,hY+70);});
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(245,166,35,0.28)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    }
+
+    // 39: THE FORGE — Sword being forged from raw iron
+    ,function(){
+      c.fillStyle='#060200';c.fillRect(0,0,W,H);
+      var lG=c.createRadialGradient(W/2,H,0,W/2,H,720);lG.addColorStop(0,'rgba(255,80,0,0.45)');lG.addColorStop(0.4,'rgba(200,40,0,0.18)');lG.addColorStop(1,'transparent');c.fillStyle=lG;c.fillRect(0,0,W,H);
+      var fG=c.createRadialGradient(W/2,920,0,W/2,920,480);fG.addColorStop(0,'rgba(255,130,0,0.35)');fG.addColorStop(0.6,'rgba(180,50,0,0.12)');fG.addColorStop(1,'transparent');c.fillStyle=fG;c.fillRect(0,0,W,H);
+      for(var sp=0;sp<140;sp++){var sx=W/2+(Math.random()-0.5)*580,sy=720+Math.random()*380,ss=Math.random()*2.8;c.fillStyle='rgba(255,'+(120+Math.floor(Math.random()*100))+',20,'+(0.4+Math.random()*0.6)+')';c.beginPath();c.arc(sx,sy,ss,0,Math.PI*2);c.fill();}
+      c.save();c.translate(W/2,870);
+      var blG=c.createLinearGradient(-28,0,28,0);blG.addColorStop(0,'rgba(255,200,80,0.18)');blG.addColorStop(0.5,'rgba(255,220,130,0.92)');blG.addColorStop(1,'rgba(255,200,80,0.18)');
+      c.fillStyle=blG;c.beginPath();c.moveTo(0,-450);c.lineTo(20,0);c.lineTo(-20,0);c.closePath();c.fill();
+      c.shadowColor='rgba(255,140,0,0.9)';c.shadowBlur=28;c.strokeStyle='rgba(255,220,150,0.7)';c.lineWidth=1.5;c.beginPath();c.moveTo(0,-450);c.lineTo(20,0);c.lineTo(-20,0);c.closePath();c.stroke();c.shadowBlur=0;
+      c.fillStyle='rgba(180,130,50,0.9)';c.fillRect(-44,-8,88,16);
+      var hG=c.createLinearGradient(-12,0,12,0);hG.addColorStop(0,'rgba(90,50,15,1)');hG.addColorStop(0.5,'rgba(170,110,40,1)');hG.addColorStop(1,'rgba(90,50,15,1)');c.fillStyle=hG;c.fillRect(-12,8,24,80);c.restore();
+      c.textAlign='center';c.font='900 140px "Rajdhani",sans-serif';c.fillStyle='rgba(255,130,0,0.92)';c.shadowColor='rgba(255,100,0,0.7)';c.shadowBlur=48;c.fillText('DAY '+day,W/2,260);c.shadowBlur=0;
+      var dN3=parseInt(day)||1,stage=dN3<30?'RAW IRON':dN3<60?'FIRST BLOOM':dN3<90?'BILLET FORMED':dN3<180?'BAR TEMPERED':dN3<365?'BLADE HARDENED':'MASTER BLADE',stCol=dN3<30?'rgba(180,180,180,0.65)':dN3<90?'rgba(255,150,50,0.8)':dN3<180?'rgba(255,200,50,0.82)':'rgba(255,220,100,0.92)';
+      c.font='700 20px "JetBrains Mono",monospace';c.fillStyle=stCol;c.fillText(stage,W/2,314);
+      var pbW=W-160,pbX=80,pbY=368,pbH=12;c.fillStyle='rgba(255,100,0,0.1)';rr(c,pbX,pbY,pbW,pbH,6);c.fill();var pf=Math.min(dN3/365,1);var pbGr=c.createLinearGradient(pbX,0,pbX+pbW,0);pbGr.addColorStop(0,'rgba(160,60,0,0.8)');pbGr.addColorStop(0.5,'rgba(255,140,0,0.9)');pbGr.addColorStop(1,'rgba(255,220,100,0.92)');c.fillStyle=pbGr;rr(c,pbX,pbY,pbW*pf,pbH,6);c.fill();
+      ['ORE','BLOOM','BILLET','BAR','BLADE','MASTER'].forEach(function(st,i){c.textAlign='center';c.font='500 9px "JetBrains Mono",monospace';var sx=[0,0.16,0.32,0.5,0.66,0.9][i];c.fillStyle=sx<=pf?'rgba(255,180,50,0.72)':'rgba(255,255,255,0.18)';c.fillText(st,pbX+sx*pbW,pbY+28);});
+      var fStats=[{v:km||'—',l:'KM'},{v:'₹'+formatIndianCurrency(totalRisk),l:'UNCLAIMED'},{v:bpmV||'—',l:'BPM'},{v:sleepH||'—',l:'SLEEP HRS'}];
+      var fsY=1150,fsW=(W-80)/4;fStats.forEach(function(s,i){var x=40+i*fsW;c.fillStyle='rgba(255,100,0,0.05)';rr(c,x,fsY,fsW-8,98,8);c.fill();c.strokeStyle='rgba(255,100,0,0.14)';c.lineWidth=1;rr(c,x,fsY,fsW-8,98,8);c.stroke();c.textAlign='center';c.font='700 30px "Rajdhani",sans-serif';c.fillStyle='rgba(255,160,50,0.86)';c.fillText(s.v,x+fsW/2,fsY+46);c.font='500 8px "JetBrains Mono",monospace';c.fillStyle='rgba(255,100,0,0.38)';c.fillText(s.l,x+fsW/2,fsY+66);});
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,100,0,0.32)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    }
+
+    // 40: THE WALL — Stack of Rs.500 notes not forfeited
+    ,function(){
+      c.fillStyle='#060806';c.fillRect(0,0,W,H);
+      var bg2=c.createRadialGradient(W/2,600,0,W/2,600,700);bg2.addColorStop(0,'rgba(0,200,80,0.06)');bg2.addColorStop(1,'transparent');c.fillStyle=bg2;c.fillRect(0,0,W,H);
+      var total=parseInt(totalRisk)||0,noteVal=500,notesN=Math.min(Math.ceil(total/noteVal),80);
+      var nW=155,nH=68,nGap=3,nPerCol=10,cols=Math.ceil(notesN/nPerCol);
+      var wallW=cols*(nW+nGap)-nGap,wallX=Math.max(40,(W-wallW)/2),wallBaseY=H-130;
+      var nc=0;
+      for(var col=0;col<cols&&nc<notesN;col++){
+        for(var row=nPerCol-1;row>=0&&nc<notesN;row--){
+          var nx=wallX+col*(nW+nGap),ny=wallBaseY-( (nPerCol-row)*(nH+nGap));
+          if(nx+nW>W-30)continue;
+          var nGrad=c.createLinearGradient(nx,ny,nx,ny+nH);nGrad.addColorStop(0,'rgba(22,110,55,0.92)');nGrad.addColorStop(0.5,'rgba(16,85,42,0.88)');nGrad.addColorStop(1,'rgba(10,58,28,0.9)');
+          c.fillStyle=nGrad;rr(c,nx,ny,nW,nH,4);c.fill();c.strokeStyle='rgba(0,180,80,0.18)';c.lineWidth=0.5;rr(c,nx,ny,nW,nH,4);c.stroke();
+          c.textAlign='center';c.font='600 10px "JetBrains Mono",monospace';c.fillStyle='rgba(100,255,150,0.42)';c.fillText('₹500',nx+nW/2,ny+nH/2+4);nc++;
+        }
+      }
+      c.textAlign='center';c.font='900 96px "Rajdhani",sans-serif';c.fillStyle='rgba(0,230,80,0.9)';c.shadowColor='rgba(0,230,80,0.5)';c.shadowBlur=40;c.fillText('₹'+formatIndianCurrency(total),W/2,190);c.shadowBlur=0;
+      c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.52)';c.fillText('NOT FORFEITED IN '+day+' DAYS',W/2,236);
+      c.font='500 13px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.28)';c.fillText('₹'+formatIndianCurrency(stake)+'/DAY · EVERY DAY SAVED IS EARNED',W/2,274);
+      var wStats=[{v:km||'—',l:'KM TODAY'},{v:bpmV||'—',l:'BPM'},{v:day,l:'DAYS STREAK'},{v:'₹'+formatIndianCurrency(stake),l:'/DAY STAKE'}];
+      var wsY=310,wsW=(W-80)/4;wStats.forEach(function(s,i){var x=40+i*wsW;c.fillStyle='rgba(0,230,80,0.04)';rr(c,x,wsY,wsW-8,88,6);c.fill();c.strokeStyle='rgba(0,230,80,0.1)';c.lineWidth=1;rr(c,x,wsY,wsW-8,88,6);c.stroke();c.textAlign='center';c.font='700 26px "Rajdhani",sans-serif';c.fillStyle='rgba(0,230,80,0.82)';c.fillText(s.v,x+wsW/2,wsY+42);c.font='500 8px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.32)';c.fillText(s.l,x+wsW/2,wsY+60);});
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,80,0.28)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-56);
+      return Promise.resolve();
+    }
+
+    // 41: THE BELT — Championship belt with day number engraved
+    ,function(){
+      c.fillStyle='#060402';c.fillRect(0,0,W,H);
+      var lG2=c.createRadialGradient(W/2,880,0,W/2,880,900);lG2.addColorStop(0,'rgba(100,60,10,0.28)');lG2.addColorStop(1,'transparent');c.fillStyle=lG2;c.fillRect(0,0,W,H);
+      var bY=640,bH=280;var strG=c.createLinearGradient(0,bY,0,bY+bH);strG.addColorStop(0,'rgba(75,38,5,1)');strG.addColorStop(0.3,'rgba(115,60,8,1)');strG.addColorStop(0.7,'rgba(115,60,8,1)');strG.addColorStop(1,'rgba(75,38,5,1)');c.fillStyle=strG;c.fillRect(0,bY,W,bH);
+      c.strokeStyle='rgba(175,115,25,0.38)';c.lineWidth=2;c.beginPath();c.moveTo(0,bY+8);c.lineTo(W,bY+8);c.stroke();c.beginPath();c.moveTo(0,bY+bH-8);c.lineTo(W,bY+bH-8);c.stroke();
+      var pW=540,pH=210,pX=(W-pW)/2,pY=bY+(bH-pH)/2;var pGr=c.createLinearGradient(pX,pY,pX+pW,pY+pH);pGr.addColorStop(0,'rgba(200,155,55,1)');pGr.addColorStop(0.25,'rgba(255,215,90,1)');pGr.addColorStop(0.5,'rgba(210,165,60,1)');pGr.addColorStop(0.75,'rgba(255,215,90,1)');pGr.addColorStop(1,'rgba(175,125,35,1)');c.fillStyle=pGr;rr(c,pX,pY,pW,pH,14);c.fill();c.strokeStyle='rgba(255,235,150,0.55)';c.lineWidth=2.5;rr(c,pX,pY,pW,pH,14);c.stroke();c.strokeStyle='rgba(120,78,8,0.38)';c.lineWidth=1;rr(c,pX+8,pY+8,pW-16,pH-16,10);c.stroke();
+      c.fillStyle='rgba(255,255,255,0.88)';c.beginPath();c.moveTo(W/2,pY+18);c.lineTo(W/2+22,pY+pH/2);c.lineTo(W/2,pY+pH-18);c.lineTo(W/2-22,pY+pH/2);c.closePath();c.fill();
+      c.textAlign='center';c.font='900 76px "Rajdhani",sans-serif';c.fillStyle='rgba(55,25,4,0.9)';c.fillText(day,W/2,bY+bH/2+26);c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(55,25,4,0.65)';c.fillText('DAYS',W/2,bY+bH/2+50);
+      var spW=98,spH=112;[pX-spW-10,pX+pW+10].forEach(function(spX){c.fillStyle='rgba(175,125,36,0.88)';rr(c,spX,bY+(bH-spH)/2,spW,spH,10);c.fill();c.strokeStyle='rgba(255,215,90,0.38)';c.lineWidth=1.5;rr(c,spX,bY+(bH-spH)/2,spW,spH,10);c.stroke();c.textAlign='center';c.font='700 10px "JetBrains Mono",monospace';c.fillStyle='rgba(55,25,4,0.65)';c.fillText('FIRST',spX+spW/2,bY+(bH-spH)/2+42);c.fillText('LIGHT',spX+spW/2,bY+(bH-spH)/2+60);});
+      c.textAlign='center';c.font='900 58px "Rajdhani",sans-serif';c.fillStyle='rgba(212,168,67,0.9)';c.shadowColor='rgba(212,168,67,0.5)';c.shadowBlur=28;c.fillText('UNDISPUTED CHAMPION',W/2,155);c.shadowBlur=0;
+      c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(212,168,67,0.48)';c.fillText('OF DISCIPLINE',W/2,194);
+      var bsY=1070,bsW=(W-80)/4;[{v:km||'—',l:'KM TODAY'},{v:bpmV||'—',l:'BPM'},{v:'₹'+formatIndianCurrency(totalRisk),l:'SECURED'},{v:'₹'+formatIndianCurrency(stake),l:'/DAY'}].forEach(function(s,i){var x=40+i*bsW;c.fillStyle='rgba(212,168,67,0.04)';rr(c,x,bsY,bsW-8,98,8);c.fill();c.strokeStyle='rgba(212,168,67,0.12)';c.lineWidth=1;rr(c,x,bsY,bsW-8,98,8);c.stroke();c.textAlign='center';c.font='700 28px "Rajdhani",sans-serif';c.fillStyle='rgba(212,168,67,0.86)';c.fillText(s.v,x+bsW/2,bsY+46);c.font='500 8px "JetBrains Mono",monospace';c.fillStyle='rgba(212,168,67,0.34)';c.fillText(s.l,x+bsW/2,bsY+64);});
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(212,168,67,0.28)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    }
+
+    // 42: THE PROCLAMATION — Royal decree parchment with wax seal
+    ,function(){
+      c.fillStyle='#080510';c.fillRect(0,0,W,H);
+      var royG=c.createRadialGradient(W/2,H/2,0,W/2,H/2,800);royG.addColorStop(0,'rgba(100,0,180,0.12)');royG.addColorStop(1,'transparent');c.fillStyle=royG;c.fillRect(0,0,W,H);
+      var dX=55,dY=130,dW=W-110,dH=H-260;
+      var pchG=c.createLinearGradient(dX,dY,dX+dW,dY+dH);pchG.addColorStop(0,'rgba(255,246,222,0.97)');pchG.addColorStop(0.5,'rgba(250,238,200,0.95)');pchG.addColorStop(1,'rgba(240,225,185,0.97)');c.fillStyle=pchG;rr(c,dX,dY,dW,dH,6);c.fill();
+      c.strokeStyle='rgba(100,58,0,0.28)';c.lineWidth=2;rr(c,dX,dY,dW,dH,6);c.stroke();
+      c.fillStyle='rgba(160,105,15,0.8)';c.fillRect(dX,dY,dW,5);c.fillRect(dX,dY+dH-5,dW,5);c.fillRect(dX,dY,5,dH);c.fillRect(dX+dW-5,dY,5,dH);
+      c.strokeStyle='rgba(140,88,8,0.25)';c.lineWidth=1;c.setLineDash([4,4]);rr(c,dX+18,dY+18,dW-36,dH-36,4);c.stroke();c.setLineDash([]);
+      c.textAlign='center';c.font='700 26px "DM Serif Display",serif';c.fillStyle='rgba(95,45,0,0.9)';c.fillText('☄ ROYAL PROCLAMATION ☄',W/2,dY+52);
+      c.fillStyle='rgba(115,65,0,0.25)';c.fillRect(dX+38,dY+62,dW-76,1);
+      c.font='600 13px "DM Serif Display",serif';c.fillStyle='rgba(75,35,0,0.65)';c.fillText('BE IT KNOWN TO ALL WITNESSING PARTIES',W/2,dY+94);
+      c.fillStyle='rgba(115,65,0,0.18)';c.fillRect(dX+38,dY+102,dW-76,1);
+      var tx=dX+46,tY=dY+138;var dN4=parseInt(day)||1;
+      function ordinal2(n){var s=['th','st','nd','rd'];var v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+      var dLines=['THAT on this day, the '+ordinal2(dN4),'of unbroken covenant,','','ANUPAM KUMAR hath fulfilled','ALL obligations of the accord:','','✦ Run completed: '+(km||'—')+' KM','  in '+(mn||'—')+' minutes','','✦ Brahmacharya: maintained','✦ No food violation','✦ Stakes: ₹'+formatIndianCurrency(stake)+'/day','','✦ Total secured: ₹'+formatIndianCurrency(totalRisk)];
+      c.textAlign='left';c.font='400 19px "DM Serif Display",serif';c.fillStyle='rgba(58,28,4,0.85)';
+      dLines.forEach(function(l){if(l===''){tY+=12;return;}c.fillText(l,tx,tY);tY+=30;});
+      tY+=8;c.fillStyle='rgba(115,65,0,0.25)';c.fillRect(tx,tY,dW-92,1);tY+=34;
+      c.font='400 17px "DM Serif Display",serif';c.fillStyle='rgba(58,28,4,0.58)';c.fillText('Signed under seal,',tx,tY);tY+=32;
+      c.font='700 20px "DM Serif Display",serif';c.fillStyle='rgba(75,38,4,0.9)';c.fillText('Anupam Kumar — Day '+day,tx,tY);
+      c.fillStyle='rgba(155,18,18,0.9)';c.beginPath();c.arc(dX+dW-76,dY+dH-76,48,0,Math.PI*2);c.fill();c.strokeStyle='rgba(95,8,8,0.45)';c.lineWidth=2;c.beginPath();c.arc(dX+dW-76,dY+dH-76,48,0,Math.PI*2);c.stroke();c.textAlign='center';c.font='700 15px "DM Serif Display",serif';c.fillStyle='rgba(255,200,155,0.92)';c.fillText('FL',dX+dW-76,dY+dH-70);c.font='400 9px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,155,0.65)';c.fillText('SEALED',dX+dW-76,dY+dH-52);
+      c.textAlign='center';c.font='400 20px "DM Serif Display",serif';c.fillStyle='rgba(155,95,215,0.65)';c.fillText('FIRST LIGHT',W/2,88);
+      c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(155,95,215,0.3)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-60);
+      return Promise.resolve();
+    }
+
+    // 43: THE CONSTELLATION — Starfield where every day is a star
+    ,function(){
+      c.fillStyle='#010108';c.fillRect(0,0,W,H);
+      var mwG=c.createLinearGradient(0,H*0.28,W,H*0.68);mwG.addColorStop(0,'transparent');mwG.addColorStop(0.5,'rgba(100,80,200,0.07)');mwG.addColorStop(1,'transparent');c.fillStyle=mwG;c.fillRect(0,0,W,H);
+      for(var bs=0;bs<450;bs++){c.fillStyle='rgba(255,255,255,'+(0.08+Math.random()*0.65)+')';c.beginPath();c.arc(Math.random()*W,Math.random()*H,Math.random()*1.3,0,Math.PI*2);c.fill();}
+      var dN5=parseInt(day)||1;var milestones=[7,14,21,30,50,60,75,90,100,108,150,180,200,250,300,365,500];
+      var arcR=340,arcCx=W/2,arcCy=1020,totalArc=Math.PI*1.4,sArc=-Math.PI/2-totalArc/2;
+      var sPos=[];
+      for(var di=1;di<=dN5;di++){var prog2=(dN5<=1)?0:(di-1)/(dN5-1);var ang=sArc+prog2*totalArc;var r2=arcR+Math.sin(prog2*Math.PI)*55;sPos.push({x:arcCx+Math.cos(ang)*r2,y:arcCy+Math.sin(ang)*r2,d:di});}
+      c.strokeStyle='rgba(160,110,255,0.06)';c.lineWidth=1;
+      for(var si2=1;si2<sPos.length;si2++){c.beginPath();c.moveTo(sPos[si2-1].x,sPos[si2-1].y);c.lineTo(sPos[si2].x,sPos[si2].y);c.stroke();}
+      sPos.forEach(function(s){
+        var isMile2=milestones.indexOf(s.d)>=0,isToday2=s.d===dN5;
+        var sz2=isToday2?13:isMile2?7:2.5,col2=isToday2?'rgba(255,200,50,1)':isMile2?'rgba(200,145,255,0.9)':'rgba(140,110,220,0.45)';
+        if(isToday2||isMile2){c.shadowColor=isToday2?'rgba(255,200,50,0.8)':'rgba(180,100,255,0.6)';c.shadowBlur=isToday2?22:10;}
+        c.fillStyle=col2;c.beginPath();c.arc(s.x,s.y,sz2,0,Math.PI*2);c.fill();c.shadowBlur=0;
+        if(isMile2&&s.d<dN5){c.textAlign='center';c.font='500 8px "JetBrains Mono",monospace';c.fillStyle='rgba(175,110,255,0.45)';c.fillText(s.d,s.x,s.y-11);}
+        if(isToday2){c.textAlign='center';c.font='700 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,50,0.82)';c.fillText('DAY '+s.d,s.x,s.y-20);}
+      });
+      c.textAlign='center';c.font='900 136px "Rajdhani",sans-serif';c.fillStyle='rgba(180,120,255,0.92)';c.shadowColor='rgba(180,100,255,0.5)';c.shadowBlur=48;c.fillText('DAY '+day,W/2,236);c.shadowBlur=0;
+      c.font='500 14px "JetBrains Mono",monospace';c.fillStyle='rgba(180,120,255,0.38)';c.fillText('YOUR CONSTELLATION · '+dN5+' STARS EARNED',W/2,280);
+      var nextM=null;for(var mi=0;mi<milestones.length;mi++){if(milestones[mi]>dN5){nextM=milestones[mi];break;}}
+      if(nextM){c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,50,0.48)';c.fillText('NEXT MILESTONE: DAY '+nextM+' · '+(nextM-dN5)+' DAYS AWAY',W/2,H-108);}
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(180,120,255,0.24)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-62);
       return Promise.resolve();
     }
   ];
