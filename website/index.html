@@ -1309,39 +1309,54 @@
       }
     }
 
-    /* ── TODAY'S STATUS REDESIGN ── */
-    .ts-mission-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 20px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px}
+    /* ── TODAY'S STATUS ── */
+    .ts-mission-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 20px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px;flex-wrap:wrap;gap:10px}
     .ts-mission-day{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--text-dim,#8a9bb0);letter-spacing:3px}
     .ts-mission-day strong{color:#fff;font-weight:700}
-    .ts-status-chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .ts-chip{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;letter-spacing:1px;font-weight:700;padding:4px 10px;border-radius:20px;transition:all 0.3s;white-space:nowrap}
+    .ts-status-chips{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .ts-chip{font-family:'IBM Plex Mono',monospace;font-size:0.5rem;letter-spacing:1px;font-weight:700;padding:3px 8px;border-radius:20px;transition:all 0.3s;white-space:nowrap}
     .ts-chip-done{color:#66BB6A;background:rgba(102,187,106,0.12);border:1px solid rgba(102,187,106,0.25)}
-    .ts-chip-pending{color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)}
-    .ts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    @media(max-width:768px){.ts-grid{grid-template-columns:1fr}}
-    @media(min-width:601px) and (max-width:900px){.ts-grid{grid-template-columns:1fr 1fr}}
+    .ts-chip-pending{color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)}
+    .ts-chip-rest{color:rgba(255,255,255,0.15);background:transparent;border:1px solid rgba(255,255,255,0.05)}
+    /* Row 1: SLEEP + RUN anchors */
+    .ts-grid-anchors{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
+    @media(max-width:600px){.ts-grid-anchors{grid-template-columns:1fr}}
+    /* Row 2: GYM + BIKE + SWIM compact */
+    .ts-grid-sports{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media(max-width:600px){.ts-grid-sports{grid-template-columns:1fr}}
+    @media(min-width:601px) and (max-width:800px){.ts-grid-sports{grid-template-columns:1fr 1fr}}
+    /* Cards */
     .ts-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px 20px 18px;position:relative;overflow:hidden;transition:transform 0.3s,box-shadow 0.3s}
     .ts-card:hover{transform:translateY(-2px)}
     .ts-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:16px 16px 0 0}
+    .ts-card--compact{padding:16px 16px 14px}
     .ts-card--sleep{border-color:rgba(0,212,255,0.12)}.ts-card--sleep::before{background:linear-gradient(90deg,#00D4FF,#0099CC)}
     .ts-card--run{border-color:rgba(252,76,2,0.12)}.ts-card--run::before{background:linear-gradient(90deg,#FC4C02,#FF8A50)}
     .ts-card--gym{border-color:rgba(171,71,188,0.12)}.ts-card--gym::before{background:linear-gradient(90deg,#AB47BC,#CE93D8)}
+    .ts-card--bike{border-color:rgba(0,230,118,0.12)}.ts-card--bike::before{background:linear-gradient(90deg,#00E676,#69F0AE)}
+    .ts-card--swim{border-color:rgba(0,176,255,0.12)}.ts-card--swim::before{background:linear-gradient(90deg,#00B0FF,#40C4FF)}
     .ts-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .ts-card--compact .ts-card-head{margin-bottom:12px}
     .ts-card-sport{display:flex;align-items:center;gap:8px}
     .ts-card-icon{font-size:16px;line-height:1}
     .ts-card-label{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;letter-spacing:3px;font-weight:700}
     .ts-card--sleep .ts-card-label{color:#00D4FF}
     .ts-card--run .ts-card-label{color:#FC4C02}
     .ts-card--gym .ts-card-label{color:#AB47BC}
+    .ts-card--bike .ts-card-label{color:#00E676}
+    .ts-card--swim .ts-card-label{color:#00B0FF}
     .ts-card-badge{font-family:'IBM Plex Mono',monospace;font-size:0.5rem;letter-spacing:1px;font-weight:700;padding:3px 8px;border-radius:4px}
     .ts-badge-done{color:#66BB6A;background:rgba(102,187,106,0.1);border:1px solid rgba(102,187,106,0.25)}
     .ts-badge-pending{color:#F5A623;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2)}
+    .ts-badge-rest{color:rgba(255,255,255,0.2);background:transparent;border:1px solid rgba(255,255,255,0.07)}
     .ts-card-value{font-family:'IBM Plex Mono',monospace;font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;color:#fff;line-height:1;margin-bottom:10px}
+    .ts-card--compact .ts-card-value{font-size:clamp(1.1rem,2.5vw,1.5rem);margin-bottom:6px}
     .ts-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
     .ts-progress-track{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
     .ts-progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#00D4FF,#00E676);transition:width 1s ease;width:0%}
     .ts-progress-pct{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim,#8a9bb0);min-width:28px;text-align:right}
     .ts-card-sub{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-dim,#8a9bb0);line-height:1.6;margin-top:4px}
+    .ts-card--compact .ts-card-sub{font-size:0.55rem}
     .ts-verify{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:0.5rem;letter-spacing:1px;color:rgba(255,255,255,0.25)}
     .ts-verify::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
   </style>
@@ -1410,14 +1425,16 @@
       <div class="ts-mission-bar">
         <div class="ts-mission-day">DAY <strong data-day>—</strong> · MISSION STATUS</div>
         <div class="ts-status-chips">
+          <span class="ts-chip ts-chip-pending" id="tsChipSleep">💤 —</span>
           <span class="ts-chip ts-chip-pending" id="tsChipRun">🏃 —</span>
           <span class="ts-chip ts-chip-pending" id="tsChipGym">🏋️ —</span>
-          <span class="ts-chip ts-chip-pending" id="tsChipSleep">💤 —</span>
+          <span class="ts-chip ts-chip-pending" id="tsChipBike">🚴 —</span>
+          <span class="ts-chip ts-chip-pending" id="tsChipSwim">🏊 —</span>
         </div>
       </div>
 
-      <!-- 3 sport cards -->
-      <div class="ts-grid">
+      <!-- Row 1: SLEEP + RUN (anchors) -->
+      <div class="ts-grid-anchors">
 
         <!-- SLEEP -->
         <div class="ts-card ts-card--sleep">
@@ -1453,8 +1470,13 @@
           <div class="ts-verify">GPS VERIFIED · STRAVA</div>
         </div>
 
+      </div>
+
+      <!-- Row 2: GYM + BIKE + SWIM (one fires per day) -->
+      <div class="ts-grid-sports">
+
         <!-- GYM -->
-        <div class="ts-card ts-card--gym">
+        <div class="ts-card ts-card--gym ts-card--compact">
           <div class="ts-card-head">
             <div class="ts-card-sport">
               <span class="ts-card-icon">🏋️</span>
@@ -1462,11 +1484,39 @@
             </div>
             <span class="ts-card-badge ts-badge-pending" id="tsGymBadge">—</span>
           </div>
-          <div class="ts-card-value" style="font-size:clamp(1rem,2.5vw,1.6rem);display:flex;align-items:center;gap:8px">
+          <div class="ts-card-value" style="display:flex;align-items:center;gap:8px">
             <span class="status-dot green" id="tsGymDot" style="display:none"></span>
             <span data-gym-status>—</span>
           </div>
-          <div class="ts-card-sub" data-gym-time>Gym stats synced by 7:30 AM via Strava</div>
+          <div class="ts-card-sub" data-gym-time>Synced via Strava</div>
+          <div class="ts-verify">STRAVA VERIFIED</div>
+        </div>
+
+        <!-- BIKE -->
+        <div class="ts-card ts-card--bike ts-card--compact">
+          <div class="ts-card-head">
+            <div class="ts-card-sport">
+              <span class="ts-card-icon">🚴</span>
+              <span class="ts-card-label">BIKE</span>
+            </div>
+            <span class="ts-card-badge ts-badge-pending" id="tsBikeBadge">—</span>
+          </div>
+          <div class="ts-card-value" data-bike-km>—</div>
+          <div class="ts-card-sub" data-bike-time>GPS tracked via Strava</div>
+          <div class="ts-verify">GPS VERIFIED · STRAVA</div>
+        </div>
+
+        <!-- SWIM -->
+        <div class="ts-card ts-card--swim ts-card--compact">
+          <div class="ts-card-head">
+            <div class="ts-card-sport">
+              <span class="ts-card-icon">🏊</span>
+              <span class="ts-card-label">SWIM</span>
+            </div>
+            <span class="ts-card-badge ts-badge-pending" id="tsSwimBadge">—</span>
+          </div>
+          <div class="ts-card-value" data-swim-km>—</div>
+          <div class="ts-card-sub" data-swim-time>Tracked via Strava</div>
           <div class="ts-verify">STRAVA VERIFIED</div>
         </div>
 
@@ -1886,46 +1936,96 @@
 
         // Gym
         var gymEl = document.querySelector('[data-gym-status]');
+        var gymTimeEl = document.querySelector('[data-gym-time]');
         var hasGym = todayProof && todayProof.gym;
         if (gymEl) {
           if (hasGym) {
             gymEl.textContent = 'CHECK-IN ✓';
             var gymDot = document.getElementById('tsGymDot'); if (gymDot) gymDot.style.display = '';
           } else if (hour >= 8) {
-            gymEl.textContent = hasRun ? 'REST DAY' : 'AWAITING SYNC';
+            gymEl.textContent = 'REST DAY';
           } else {
             gymEl.textContent = 'AWAITING SYNC';
           }
         }
 
+        // Bike
+        var bikeEl = document.querySelector('[data-bike-km]');
+        var bikeTimeEl = document.querySelector('[data-bike-time]');
+        var hasBike = todayProof && todayProof.cycle_km && parseFloat(todayProof.cycle_km) > 0;
+        if (bikeEl) {
+          if (hasBike) {
+            bikeEl.textContent = parseFloat(todayProof.cycle_km).toFixed(1) + ' KM';
+            if (bikeTimeEl && todayProof.cycle_time_sec) {
+              var bMins = Math.floor(todayProof.cycle_time_sec / 60);
+              var bHrs = Math.floor(bMins / 60);
+              var bMinRem = bMins % 60;
+              bikeTimeEl.textContent = bHrs > 0 ? bHrs + 'h ' + bMinRem + 'min · GPS STRAVA' : bMins + ' min · GPS STRAVA';
+            }
+          } else if (hour >= 8) {
+            bikeEl.textContent = 'REST DAY';
+            bikeEl.style.fontSize = '14px';
+          } else {
+            bikeEl.textContent = 'AWAITING SYNC';
+            bikeEl.style.fontSize = '14px';
+          }
+        }
+
+        // Swim
+        var swimEl = document.querySelector('[data-swim-km]');
+        var swimTimeEl = document.querySelector('[data-swim-time]');
+        var hasSwim = todayProof && todayProof.swim_km && parseFloat(todayProof.swim_km) > 0;
+        if (swimEl) {
+          if (hasSwim) {
+            swimEl.textContent = parseFloat(todayProof.swim_km).toFixed(2) + ' KM';
+            if (swimTimeEl && todayProof.swim_time_sec) {
+              var sMins = Math.floor(todayProof.swim_time_sec / 60);
+              swimTimeEl.textContent = sMins + ' min · STRAVA';
+            }
+          } else if (hour >= 8) {
+            swimEl.textContent = 'REST DAY';
+            swimEl.style.fontSize = '14px';
+          } else {
+            swimEl.textContent = 'AWAITING SYNC';
+            swimEl.style.fontSize = '14px';
+          }
+        }
+
         // ── TODAY'S STATUS — badges + mission score ──
         var hasSleep = todayProof && todayProof.sleep_hrs && parseFloat(todayProof.sleep_hrs) >= 6;
-        var doneCount = (hasRun ? 1 : 0) + (hasGym ? 1 : 0) + (hasSleep ? 1 : 0);
+        var hasSecondSport = hasGym || hasBike || hasSwim;
+        var doneCount = (hasRun ? 1 : 0) + (hasSecondSport ? 1 : 0) + (hasSleep ? 1 : 0);
 
-        function setTsBadge(id, done, pendingLabel) {
+        function setTsBadge(id, done, restDay, pendingLabel) {
           var el = document.getElementById(id); if (!el) return;
           if (done) { el.textContent = 'DONE ✓'; el.className = 'ts-card-badge ts-badge-done'; }
+          else if (restDay) { el.textContent = 'REST'; el.className = 'ts-card-badge ts-badge-rest'; }
           else { el.textContent = pendingLabel || 'PENDING'; el.className = 'ts-card-badge ts-badge-pending'; }
         }
 
-        // Sleep badge — show pct
+        // Sleep badge
         var sleepHrs = todayProof && todayProof.sleep_hrs ? parseFloat(todayProof.sleep_hrs) : 0;
         var sleepPct = Math.min(100, Math.round(sleepHrs / 6 * 100));
         var sleepPctEl = document.getElementById('tsSleepPct'); if (sleepPctEl) sleepPctEl.textContent = sleepHrs > 0 ? sleepPct + '%' : '—';
-        setTsBadge('tsSleepBadge', hasSleep, sleepHrs > 0 ? sleepPct + '%' : 'PENDING');
+        setTsBadge('tsSleepBadge', hasSleep, false, sleepHrs > 0 ? sleepPct + '%' : 'PENDING');
 
-        setTsBadge('tsRunBadge', hasRun, 'PENDING');
-        setTsBadge('tsGymBadge', hasGym, 'PENDING');
+        setTsBadge('tsRunBadge', hasRun, false, 'PENDING');
+        setTsBadge('tsGymBadge', hasGym, !hasGym && hour >= 8, 'PENDING');
+        setTsBadge('tsBikeBadge', hasBike, !hasBike && hour >= 8, 'PENDING');
+        setTsBadge('tsSwimBadge', hasSwim, !hasSwim && hour >= 8, 'PENDING');
 
-        // Mission chips — one per sport, shows individual status
-        function setTsChip(id, done, doneLabel, pendingLabel) {
+        // Mission chips
+        function setTsChip(id, done, rest, doneLabel, pendingLabel) {
           var el = document.getElementById(id); if (!el) return;
-          el.textContent = done ? doneLabel : pendingLabel;
-          el.className = 'ts-chip ' + (done ? 'ts-chip-done' : 'ts-chip-pending');
+          if (done) { el.textContent = doneLabel; el.className = 'ts-chip ts-chip-done'; }
+          else if (rest) { el.textContent = pendingLabel.split(' ')[0] + ' REST'; el.className = 'ts-chip ts-chip-rest'; }
+          else { el.textContent = pendingLabel; el.className = 'ts-chip ts-chip-pending'; }
         }
-        setTsChip('tsChipRun', hasRun, '🏃 DONE', '🏃 PENDING');
-        setTsChip('tsChipGym', hasGym, '🏋️ DONE', '🏋️ PENDING');
-        setTsChip('tsChipSleep', hasSleep, '💤 DONE', '💤 SYNCING');
+        setTsChip('tsChipSleep', hasSleep, false, '💤 DONE', '💤 SYNCING');
+        setTsChip('tsChipRun', hasRun, false, '🏃 DONE', '🏃 PENDING');
+        setTsChip('tsChipGym', hasGym, !hasGym && hour >= 8, '🏋️ DONE', '🏋️ PENDING');
+        setTsChip('tsChipBike', hasBike, !hasBike && hour >= 8, '🚴 DONE', '🚴 PENDING');
+        setTsChip('tsChipSwim', hasSwim, !hasSwim && hour >= 8, '🏊 DONE', '🏊 PENDING');
 
         // ── UPDATE STATUS BEACON ──
         var beacon = document.getElementById('proofBeacon');
