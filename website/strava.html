@@ -754,6 +754,20 @@
         if (fastestRidePace < 999) prHtml += '<div class="sv-pr-card" style="border-color:rgba(38,198,218,0.2)"><div class="sv-pr-dist" style="color:#26C6DA">BEST RIDE PACE</div><div class="sv-pr-time">' + fmtPace(fastestRidePace) + '/km</div><div class="sv-pr-date">Fastest recorded</div></div>';
       }
 
+      // Swimming PRs
+      if (swims.length) {
+        var longestSwim = null;
+        swims.forEach(function(s) {
+          var km = parseFloat(s.distance||0) / 1000;
+          if (!longestSwim || km > parseFloat(longestSwim.distance)/1000) longestSwim = s;
+        });
+        var totalSwimDist = swims.reduce(function(s,a) { return s + parseFloat(a.distance||0); }, 0) / 1000;
+        prHtml += '<div class="sv-pr-card" style="border-color:rgba(0,229,255,0.2)"><div class="sv-pr-dist" style="color:#00E5FF">TOTAL SWIMS</div><div class="sv-pr-time">' + swims.length + '</div><div class="sv-pr-date">' + totalSwimDist.toFixed(1) + ' km lifetime</div></div>';
+        if (longestSwim) prHtml += '<div class="sv-pr-card" style="border-color:rgba(0,229,255,0.2)"><div class="sv-pr-dist" style="color:#00E5FF">LONGEST SWIM</div><div class="sv-pr-time">' + (parseFloat(longestSwim.distance)/1000).toFixed(2) + ' km</div><div class="sv-pr-date">' + fmtDate(longestSwim.start_date_local) + '</div></div>';
+        var longestSwimTime = swims.reduce(function(best, s) { return s.moving_time > (best ? best.moving_time : 0) ? s : best; }, null);
+        if (longestSwimTime) prHtml += '<div class="sv-pr-card" style="border-color:rgba(0,229,255,0.2)"><div class="sv-pr-dist" style="color:#00E5FF">LONGEST SESSION</div><div class="sv-pr-time">' + fmtTime(longestSwimTime.moving_time) + '</div><div class="sv-pr-date">' + fmtDate(longestSwimTime.start_date_local) + '</div></div>';
+      }
+
       prGrid.innerHTML = prHtml;
     }
 
