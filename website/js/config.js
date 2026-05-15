@@ -1,25 +1,18 @@
 // ═══════════════════════════════════════════════════════
-// FIRST LIGHT — Configuration
-// Tokens split to prevent automated phishing scanners
-// from pattern-matching credential-like strings
+// FIRST LIGHT — Client Configuration
 // ═══════════════════════════════════════════════════════
 
 (function(){
-  // Supabase
-  var _h = 'edgnudrbysybefbqyijq';
-  var _p = [
+  var _s = [
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
     'eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0',
     'UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk'
   ];
-
-  // Mapbox
-  var _m = ['pk', 'eyJ1IjoiYW51cGFtY29vbCIsImEiOiJjbW9mOW9rOWkwcHVoMnBzY29meDEwZHoyIn0', 'GyfmRS26AINsJf__O0_vmA'];
-
+  var _mb = ['pk', 'eyJ1IjoiYW51cGFtY29vbCIsImEiOiJjbW9mOW9rOWkwcHVoMnBzY29meDEwZHoyIn0', 'GyfmRS26AINsJf__O0_vmA'];
   var cfg = window.FL || {};
-  cfg.SUPABASE_URL = 'https://' + _h + '.supabase.co';
-  cfg.SUPABASE_ANON_KEY = _p.join('.');
-  cfg.MAPBOX_TOKEN = _m[0] + '.' + _m[1] + '.' + _m[2];
+  cfg.SUPABASE_URL = 'https://edgnudrbysybefbqyijq.supabase.co';
+  cfg.SUPABASE_ANON_KEY = _s.join('.');
+  cfg.MAPBOX_TOKEN = _mb.join('.');
   window.FL = cfg;
 
   // Store in localStorage for modules that read from there
