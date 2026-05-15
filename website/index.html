@@ -1934,7 +1934,7 @@
           }
         }
 
-        // Gym
+        // Gym — can happen any time (morning or evening)
         var gymEl = document.querySelector('[data-gym-status]');
         var gymTimeEl = document.querySelector('[data-gym-time]');
         var hasGym = todayProof && todayProof.gym;
@@ -1942,14 +1942,14 @@
           if (hasGym) {
             gymEl.textContent = 'CHECK-IN ✓';
             var gymDot = document.getElementById('tsGymDot'); if (gymDot) gymDot.style.display = '';
-          } else if (hour >= 8) {
+          } else if (hour >= 23) {
             gymEl.textContent = 'REST DAY';
           } else {
-            gymEl.textContent = 'AWAITING SYNC';
+            gymEl.textContent = 'PENDING';
           }
         }
 
-        // Bike
+        // Bike — can happen any time
         var bikeEl = document.querySelector('[data-bike-km]');
         var bikeTimeEl = document.querySelector('[data-bike-time]');
         var hasBike = todayProof && todayProof.cycle_km && parseFloat(todayProof.cycle_km) > 0;
@@ -1962,16 +1962,16 @@
               var bMinRem = bMins % 60;
               bikeTimeEl.textContent = bHrs > 0 ? bHrs + 'h ' + bMinRem + 'min · GPS STRAVA' : bMins + ' min · GPS STRAVA';
             }
-          } else if (hour >= 8) {
+          } else if (hour >= 23) {
             bikeEl.textContent = 'REST DAY';
             bikeEl.style.fontSize = '14px';
           } else {
-            bikeEl.textContent = 'AWAITING SYNC';
+            bikeEl.textContent = 'PENDING';
             bikeEl.style.fontSize = '14px';
           }
         }
 
-        // Swim
+        // Swim — can happen any time
         var swimEl = document.querySelector('[data-swim-km]');
         var swimTimeEl = document.querySelector('[data-swim-time]');
         var hasSwim = todayProof && todayProof.swim_km && parseFloat(todayProof.swim_km) > 0;
@@ -1982,11 +1982,11 @@
               var sMins = Math.floor(todayProof.swim_time_sec / 60);
               swimTimeEl.textContent = sMins + ' min · STRAVA';
             }
-          } else if (hour >= 8) {
+          } else if (hour >= 23) {
             swimEl.textContent = 'REST DAY';
             swimEl.style.fontSize = '14px';
           } else {
-            swimEl.textContent = 'AWAITING SYNC';
+            swimEl.textContent = 'PENDING';
             swimEl.style.fontSize = '14px';
           }
         }
@@ -2010,9 +2010,9 @@
         setTsBadge('tsSleepBadge', hasSleep, false, sleepHrs > 0 ? sleepPct + '%' : 'PENDING');
 
         setTsBadge('tsRunBadge', hasRun, false, 'PENDING');
-        setTsBadge('tsGymBadge', hasGym, !hasGym && hour >= 8, 'PENDING');
-        setTsBadge('tsBikeBadge', hasBike, !hasBike && hour >= 8, 'PENDING');
-        setTsBadge('tsSwimBadge', hasSwim, !hasSwim && hour >= 8, 'PENDING');
+        setTsBadge('tsGymBadge', hasGym, !hasGym && hour >= 23, 'PENDING');
+        setTsBadge('tsBikeBadge', hasBike, !hasBike && hour >= 23, 'PENDING');
+        setTsBadge('tsSwimBadge', hasSwim, !hasSwim && hour >= 23, 'PENDING');
 
         // Mission chips
         function setTsChip(id, done, rest, doneLabel, pendingLabel) {
@@ -2023,9 +2023,9 @@
         }
         setTsChip('tsChipSleep', hasSleep, false, '💤 DONE', '💤 SYNCING');
         setTsChip('tsChipRun', hasRun, false, '🏃 DONE', '🏃 PENDING');
-        setTsChip('tsChipGym', hasGym, !hasGym && hour >= 8, '🏋️ DONE', '🏋️ PENDING');
-        setTsChip('tsChipBike', hasBike, !hasBike && hour >= 8, '🚴 DONE', '🚴 PENDING');
-        setTsChip('tsChipSwim', hasSwim, !hasSwim && hour >= 8, '🏊 DONE', '🏊 PENDING');
+        setTsChip('tsChipGym', hasGym, !hasGym && hour >= 23, '🏋️ DONE', '🏋️ PENDING');
+        setTsChip('tsChipBike', hasBike, !hasBike && hour >= 23, '🚴 DONE', '🚴 PENDING');
+        setTsChip('tsChipSwim', hasSwim, !hasSwim && hour >= 23, '🏊 DONE', '🏊 PENDING');
 
         // ── UPDATE STATUS BEACON ──
         var beacon = document.getElementById('proofBeacon');
