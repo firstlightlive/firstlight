@@ -75,6 +75,9 @@ function renderCheckin() {
   var container = document.getElementById('checkin-container');
   if (!container) return;
 
+  // Auto-check for missed seal punishments on every panel open
+  checkMissedSealPunishments();
+
   var date = getEffectiveToday();
   var locked = typeof isDateLocked === 'function' && isDateLocked(date);
   var existing = getCheckin(date);
@@ -407,6 +410,68 @@ function sealTheDay() {
   if (btn && typeof flashBtn === 'function') flashBtn(btn, 'SEALED \u2713');
 
   renderCheckin();
+}
+
+// ── AUTO-PUNISHMENT: Missed day seal ──
+// Runs once per page load when checkin panel opens.
+// Checks last 7 locked days — any unsealed day → permanent slip.
+var _sealCheckDone = false;
+function checkMissedSealPunishments() {
+  if (_sealCheckDone) return;
+  _sealCheckDone = true;
+  var today = getEffectiveToday();
+  var newSlips = [];
+
+  for (var i = 1; i <= 7; i++) {
+    var d = new Date(today + 'T12:00:00');
+    d.setDate(d.getDate() - i);
+    var dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+
+    // Only punish locked days
+    if (!isDateLocked(dateStr)) continue;
+
+    var checkin = getCheckin(dateStr);
+    // If sealed → fine
+    if (checkin && checkin.sealed === true) continue;
+
+    // Check dedup in localStorage slips
+    var slips = [];
+    try { slips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) {}
+    var exists = slips.some(function(s) { return s.rule === 'Missed Day Seal' && s.date === dateStr; });
+    if (exists) continue;
+
+    // Create slip
+    var slip = {
+      id: 'slip_seal_' + dateStr + '_' + Date.now(),
+      date: dateStr,
+      rule: 'Missed Day Seal',
+      category: 'DISCIPLINE VIOLATION',
+      description: 'Day ' + dateStr + ' was never sealed in the FirstLight system.',
+      function_met: false,
+      upstream_gap: 'Did not open the checkin panel and seal the day before midnight IST.',
+      insight: 'Every day must be sealed — no exceptions. The system cannot verify your discipline without a seal.',
+      penalty_type: '10km run OR 20km walk OR 40km cycling',
+      penalty_km: 10,
+      penalty_walk_km: 20,
+      penalty_cycling_km: 40,
+      penalty_status: 'pending',
+      proof_url: null,
+      created_at: new Date().toISOString(),
+      immutable: true
+    };
+
+    slips.push(slip);
+    localStorage.setItem('fl_slips', JSON.stringify(slips));
+
+    if (typeof syncSave === 'function') syncSave('slips', slip, 'id');
+    if (typeof sbFetch === 'function') sbFetch('slips', 'POST', slip, '?on_conflict=id');
+
+    newSlips.push(dateStr);
+  }
+
+  if (newSlips.length > 0) {
+    alert('⚠ MISSED SEAL PENALTY\n\nYou did not seal the following day(s):\n' + newSlips.join(', ') + '\n\nPunishment per day: 10 KM RUN  OR  20 KM WALK  OR  40 KM CYCLING\n\nThese slips are PERMANENT and cannot be deleted.\nServe every penalty before the streak continues.');
+  }
 }
 
 // ── AUTO-PUNISHMENT: App data not updated by end of day ──
