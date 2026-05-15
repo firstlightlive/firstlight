@@ -63,6 +63,7 @@
     .sv-month-bar-run{background:linear-gradient(90deg,var(--strava),#FF8A50)}
     .sv-month-bar-walk{background:linear-gradient(90deg,#00E676,#69F0AE)}
     .sv-month-bar-swim{background:linear-gradient(90deg,#00B0FF,#40C4FF)}
+    .sv-month-bar-ride{background:linear-gradient(90deg,#26C6DA,#4DD0E1)}
     .sv-month-bar-other{background:linear-gradient(90deg,#AB47BC,#CE93D8)}
     .sv-month-val{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:#fff;min-width:70px;text-align:right;font-weight:700}
 
@@ -331,6 +332,7 @@
   </div>
   <div class="sv-legend">
     <div class="sv-legend-item"><div class="sv-legend-dot" style="background:var(--strava)"></div> Run</div>
+    <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#26C6DA"></div> Ride</div>
     <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#00E676"></div> Walk</div>
     <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#00B0FF"></div> Swim</div>
     <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#AB47BC"></div> Other</div>
@@ -624,7 +626,7 @@
     var runs = acts.filter(function(a) { return a.type === 'Run'; });
     var walks = acts.filter(function(a) { return a.type === 'Walk'; });
     var swims = acts.filter(function(a) { return a.type === 'Swim'; });
-    var rides = acts.filter(function(a) { return a.type === 'Ride'; });
+    var rides = acts.filter(function(a) { return a.type === 'Ride' || a.type === 'VirtualRide'; });
     var workouts = acts.filter(function(a) { return a.type === 'Workout' || a.type === 'WeightTraining'; });
     var totalDist = acts.reduce(function(s,a) { return s + parseFloat(a.distance || 0); }, 0) / 1000;
     var totalTime = acts.reduce(function(s,a) { return s + (a.moving_time || 0); }, 0) / 3600;
@@ -737,6 +739,21 @@
         document.getElementById('svAvgHR').textContent = avgHR;
         document.getElementById('svMaxHR').textContent = maxHR;
       }
+      // Cycling PRs
+      if (rides.length) {
+        var longestRide = null, fastestRidePace = 999;
+        rides.forEach(function(r) {
+          var km = parseFloat(r.distance||0) / 1000;
+          var pace = r.moving_time && km > 0 ? r.moving_time / 60 / km : 999;
+          if (!longestRide || km > parseFloat(longestRide.distance)/1000) longestRide = r;
+          if (pace < fastestRidePace && km >= 5) fastestRidePace = pace;
+        });
+        var rideDist = rides.reduce(function(s,a) { return s + parseFloat(a.distance||0); }, 0) / 1000;
+        prHtml += '<div class="sv-pr-card" style="border-color:rgba(38,198,218,0.2)"><div class="sv-pr-dist" style="color:#26C6DA">TOTAL RIDES</div><div class="sv-pr-time">' + rides.length + '</div><div class="sv-pr-date">' + Math.round(rideDist) + ' km lifetime</div></div>';
+        if (longestRide) prHtml += '<div class="sv-pr-card" style="border-color:rgba(38,198,218,0.2)"><div class="sv-pr-dist" style="color:#26C6DA">LONGEST RIDE</div><div class="sv-pr-time">' + (parseFloat(longestRide.distance)/1000).toFixed(1) + ' km</div><div class="sv-pr-date">' + fmtDate(longestRide.start_date_local) + '</div></div>';
+        if (fastestRidePace < 999) prHtml += '<div class="sv-pr-card" style="border-color:rgba(38,198,218,0.2)"><div class="sv-pr-dist" style="color:#26C6DA">BEST RIDE PACE</div><div class="sv-pr-time">' + fmtPace(fastestRidePace) + '/km</div><div class="sv-pr-date">Fastest recorded</div></div>';
+      }
+
       prGrid.innerHTML = prHtml;
     }
 
@@ -745,9 +762,10 @@
     acts.forEach(function(a) {
       var m = a.start_date_local ? a.start_date_local.substring(0,7) : '';
       if (!m) return;
-      if (!monthly[m]) monthly[m] = { run: 0, walk: 0, swim: 0, other: 0, total: 0 };
+      if (!monthly[m]) monthly[m] = { run: 0, ride: 0, walk: 0, swim: 0, other: 0, total: 0 };
       var km = parseFloat(a.distance||0) / 1000;
       if (a.type === 'Run') monthly[m].run += km;
+      else if (a.type === 'Ride' || a.type === 'VirtualRide') monthly[m].ride += km;
       else if (a.type === 'Walk') monthly[m].walk += km;
       else if (a.type === 'Swim') monthly[m].swim += km;
       else monthly[m].other += km;
@@ -761,22 +779,27 @@
       var mHtml = '';
       months.forEach(function(m) {
         var d = monthly[m];
-        var pctRun = (d.run / maxKm * 100).toFixed(1);
+        var pctRun  = (d.run  / maxKm * 100).toFixed(1);
+        var pctRide = (d.ride / maxKm * 100).toFixed(1);
         var pctWalk = (d.walk / maxKm * 100).toFixed(1);
         var pctSwim = (d.swim / maxKm * 100).toFixed(1);
+        var pctOther = (d.other / maxKm * 100).toFixed(1);
         var label = mLabels[parseInt(m.split('-')[1])] || m;
         mHtml += '<div class="sv-month-row">';
         mHtml += '<span class="sv-month-label">' + label + '</span>';
         var tooltip = label + ': ' + d.total.toFixed(1) + ' km total';
-        if (d.run > 0) tooltip += ' | Run: ' + d.run.toFixed(1) + ' km';
-        if (d.walk > 0) tooltip += ' | Walk: ' + d.walk.toFixed(1) + ' km';
-        if (d.swim > 0) tooltip += ' | Swim: ' + d.swim.toFixed(1) + ' km';
-        if (d.other > 0) tooltip += ' | Other: ' + d.other.toFixed(1) + ' km';
+        if (d.run > 0)   tooltip += ' | Run: '  + d.run.toFixed(1)  + ' km';
+        if (d.ride > 0)  tooltip += ' | Ride: ' + d.ride.toFixed(1) + ' km';
+        if (d.walk > 0)  tooltip += ' | Walk: ' + d.walk.toFixed(1) + ' km';
+        if (d.swim > 0)  tooltip += ' | Swim: ' + d.swim.toFixed(1) + ' km';
+        if (d.other > 0) tooltip += ' | Other: '+ d.other.toFixed(1)+ ' km';
         mHtml += '<div class="sv-month-bar-wrap" title="' + tooltip + '" style="cursor:pointer">';
         mHtml += '<div style="display:flex;height:100%">';
-        if (d.run > 0) mHtml += '<div class="sv-month-bar sv-month-bar-run" style="width:' + pctRun + '%" title="Run: ' + d.run.toFixed(1) + ' km"></div>';
-        if (d.walk > 0) mHtml += '<div class="sv-month-bar sv-month-bar-walk" style="width:' + pctWalk + '%" title="Walk: ' + d.walk.toFixed(1) + ' km"></div>';
-        if (d.swim > 0) mHtml += '<div class="sv-month-bar sv-month-bar-swim" style="width:' + pctSwim + '%" title="Swim: ' + d.swim.toFixed(1) + ' km"></div>';
+        if (d.run > 0)   mHtml += '<div class="sv-month-bar sv-month-bar-run"   style="width:' + pctRun   + '%" title="Run: '   + d.run.toFixed(1)   + ' km"></div>';
+        if (d.ride > 0)  mHtml += '<div class="sv-month-bar sv-month-bar-ride"  style="width:' + pctRide  + '%" title="Ride: '  + d.ride.toFixed(1)  + ' km"></div>';
+        if (d.walk > 0)  mHtml += '<div class="sv-month-bar sv-month-bar-walk"  style="width:' + pctWalk  + '%" title="Walk: '  + d.walk.toFixed(1)  + ' km"></div>';
+        if (d.swim > 0)  mHtml += '<div class="sv-month-bar sv-month-bar-swim"  style="width:' + pctSwim  + '%" title="Swim: '  + d.swim.toFixed(1)  + ' km"></div>';
+        if (d.other > 0) mHtml += '<div class="sv-month-bar sv-month-bar-other" style="width:' + pctOther + '%" title="Other: ' + d.other.toFixed(1) + ' km"></div>';
         mHtml += '</div></div>';
         mHtml += '<span class="sv-month-val">' + d.total.toFixed(1) + ' km</span>';
         mHtml += '</div>';
