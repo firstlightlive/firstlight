@@ -382,10 +382,16 @@ function sealTheDay() {
     food_violation:       manual.food_violation || '',
     wake_time:            manual.wake_time || '',
     lights_out:           manual.lights_out || '',
+    no_phone_office:      manual.no_phone_office !== false,
+    stocks_done:          manual.stocks_done === true,
+    stocks_count:         manual.stocks_count || 0,
+    deep_stocks:          manual.deep_stocks === true,
+    reading_15min:        manual.reading_15min === true,
     device_free:          manual.device_free !== false,
     mood:                 manual.mood || 5,
     energy:               manual.energy || 5,
     journal_note:         manual.journal_note || '',
+    _weekendTasks:        manual._weekendTasks || {},
     sealed:               true,
     sealed_at:            new Date().toISOString()
   });
