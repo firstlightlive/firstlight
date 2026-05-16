@@ -453,10 +453,10 @@ function checkMissedSealPunishments() {
       function_met: false,
       upstream_gap: 'Did not open the checkin panel and seal the day before midnight IST.',
       insight: 'Every day must be sealed — no exceptions. The system cannot verify your discipline without a seal.',
-      penalty_type: '10km run OR 20km walk OR 40km cycling',
-      penalty_km: 10,
-      penalty_walk_km: 20,
-      penalty_cycling_km: 40,
+      penalty_type: '25km walk OR 50km cycling',
+      penalty_km: 25,
+      penalty_walk_km: 25,
+      penalty_cycling_km: 50,
       penalty_status: 'pending',
       proof_url: null,
       created_at: new Date().toISOString(),
@@ -473,7 +473,7 @@ function checkMissedSealPunishments() {
   }
 
   if (newSlips.length > 0) {
-    alert('⚠ MISSED SEAL PENALTY\n\nYou did not seal the following day(s):\n' + newSlips.join(', ') + '\n\nPunishment per day: 10 KM RUN  OR  20 KM WALK  OR  40 KM CYCLING\n\nThese slips are PERMANENT and cannot be deleted.\nServe every penalty before the streak continues.');
+    alert('⚠ MISSED SEAL PENALTY\n\nYou did not seal the following day(s):\n' + newSlips.join(', ') + '\n\nPunishment per day: 25 KM WALK  OR  50 KM CYCLING\n\nThese slips are PERMANENT and cannot be deleted.\nServe every penalty before the streak continues.');
   }
 }
 

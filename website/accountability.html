@@ -275,13 +275,14 @@
 (function() {
   // ── PUNISHMENT RULES — each category has its own non-negotiable penalty ──
   var PENALTY_MAP = {
-    food_violation:     { base_km: 20, desc: 'walk — no shortcuts' },
-    missed_run:         { base_km: 20, desc: 'walk — the run you skipped, multiplied' },
-    brahmacharya_gate:  { base_km: 50, desc: 'walk + run OR cycling (2x)' },
-    device_at_home:     { base_km: 20, desc: 'walk — the fortress was breached' },
-    missed_diary:       { base_km: 20, desc: 'walk — the record matters' }
+    food_violation:        { base_km: 20, desc: 'walk — no shortcuts' },
+    missed_run:            { base_km: 20, desc: 'walk — the run you skipped, multiplied' },
+    brahmacharya_gate:     { base_km: 50, desc: 'walk + run OR cycling (2x)' },
+    device_at_home:        { base_km: 20, desc: 'walk — the fortress was breached' },
+    missed_diary:          { base_km: 20, desc: 'walk — the record matters' },
+    'DISCIPLINE VIOLATION':{ base_km: 25, desc: 'walk OR 50 km cycling — day was never sealed' }
   };
-  var DEFAULT_PENALTY = { base_km: 20, desc: 'walk' };
+  var DEFAULT_PENALTY = { base_km: 25, desc: 'walk OR 50 km cycling' };
   var ESC = { GRACE: 7, DAILY: 3, CAP: 70, CASCADE_BASE: 25, CYCLE_MULT: 2 };
 
   function calcEscalatedKm(slip) {
