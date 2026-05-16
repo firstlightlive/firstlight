@@ -75,8 +75,9 @@ function renderCheckin() {
   var container = document.getElementById('checkin-container');
   if (!container) return;
 
-  // Auto-check for missed seal punishments on every panel open
+  // Auto-check for missed punishments on every panel open
   checkMissedSealPunishments();
+  checkMissedRunPunishment();
 
   var date = getEffectiveToday();
   var locked = typeof isDateLocked === 'function' && isDateLocked(date);
@@ -474,6 +475,59 @@ function checkMissedSealPunishments() {
 
   if (newSlips.length > 0) {
     alert('⚠ MISSED SEAL PENALTY\n\nYou did not seal the following day(s):\n' + newSlips.join(', ') + '\n\nPunishment per day: 25 KM WALK  OR  50 KM CYCLING\n\nThese slips are PERMANENT and cannot be deleted.\nServe every penalty before the streak continues.');
+  }
+}
+
+// ── AUTO-PUNISHMENT: No run before 6:15 AM ──
+// Runs once per page load. Checks at 7 AM IST+ (45 min after deadline — allows Strava sync).
+var _runCheckDone = false;
+async function checkMissedRunPunishment() {
+  if (_runCheckDone) return;
+  var now = typeof getNowIST === 'function' ? getNowIST() : new Date();
+  var h = now.getHours(), m = now.getMinutes();
+  // Only fire after 7:00 AM IST — gives 5:55 AM and 6:15 AM syncs time to complete
+  if (h < 7) return;
+  _runCheckDone = true;
+
+  var today = getEffectiveToday();
+
+  // Dedup: skip if slip already exists for today
+  var slips = [];
+  try { slips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) {}
+  var exists = slips.some(function(s) { return s.category === 'missed_run' && s.date === today; });
+  if (exists) return;
+
+  // Check strava_activities: any Run that started before 06:15 today
+  if (typeof sbFetch !== 'function') return;
+  try {
+    var runs = await sbFetch('strava_activities', 'GET', null,
+      '?type=eq.Run&start_date_local=gte.' + today + 'T00:00:00&start_date_local=lt.' + today + 'T06:15:00&select=id,name,distance,start_date_local&limit=1');
+    if (runs && Array.isArray(runs) && runs.length > 0) return; // Early run found — no penalty
+
+    // No run before 6:15 AM → create slip
+    var clientId = 'slip_run_' + today + '_' + Date.now();
+    var slip = {
+      id: clientId,
+      client_id: clientId,
+      date: today,
+      rule: 'body',
+      category: 'missed_run',
+      function_met: 'auto-detected',
+      failure_point: 'No Strava run activity recorded before 6:15 AM IST on ' + today + '. The morning run is non-negotiable.',
+      insight: 'The run must be completed and synced before 6:15 AM every day. No exceptions.',
+      penalty: '20km_walk',
+      penalty_status: 'pending',
+      proof_km: null,
+      created_at: new Date().toISOString()
+    };
+
+    slips.push(slip);
+    localStorage.setItem('fl_slips', JSON.stringify(slips));
+    if (typeof syncSlip === 'function') syncSlip(slip);
+
+    alert('⚠ MISSED RUN PENALTY\n\nNo run before 6:15 AM on ' + today + '\n\nPunishment: 20 KM WALK\n\nThis slip is PERMANENT. Clear it with a verified Strava walk.');
+  } catch(e) {
+    console.warn('[Run Check]', e.message);
   }
 }
 

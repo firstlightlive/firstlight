@@ -1421,6 +1421,15 @@
       <div class="section-label">TODAY'S STATUS</div>
       <h2 class="section-title">Live Dashboard</h2>
 
+      <!-- Run missed deadline banner — hidden by default, shown via JS after 6:15 AM if no run -->
+      <div id="runMissedBanner" style="display:none;align-items:center;gap:12px;padding:12px 18px;margin-bottom:16px;background:rgba(255,82,82,0.07);border:1px solid rgba(255,82,82,0.25);border-radius:10px">
+        <span style="font-size:1.3rem">⚠</span>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;font-weight:700;letter-spacing:2px;color:#FF5252">RUN NOT COMPLETED BEFORE 6:15 AM</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:rgba(255,82,82,0.7);margin-top:3px">Penalty triggered: 20 KM WALK · Complete and sync Strava to clear</div>
+        </div>
+      </div>
+
       <!-- Mission bar -->
       <div class="ts-mission-bar">
         <div class="ts-mission-day">DAY <strong data-day>—</strong> · MISSION STATUS</div>
@@ -1893,6 +1902,20 @@
         var todayProof = (data && data.length > 0) ? data[0] : null;
         var hasRun = todayProof && todayProof.run_km && parseFloat(todayProof.run_km) > 0;
 
+        // Run deadline: must complete before 6:15 AM IST
+        var pastRunDeadline = (hour > 6) || (hour === 6 && minute >= 15);
+        var runMissed = pastRunDeadline && !hasRun;
+
+        // Show/hide run missed banner
+        var runBanner = document.getElementById('runMissedBanner');
+        if (runBanner) {
+          if (runMissed) {
+            runBanner.style.display = 'flex';
+          } else {
+            runBanner.style.display = 'none';
+          }
+        }
+
         // Sleep — try proof_archive first, fallback to sleep_log table
         var sleepEl = document.querySelector('[data-sleep-hrs]');
         var sleepBar = document.querySelector('[data-sleep-bar]');
@@ -2009,7 +2032,25 @@
         var sleepPctEl = document.getElementById('tsSleepPct'); if (sleepPctEl) sleepPctEl.textContent = sleepHrs > 0 ? sleepPct + '%' : '—';
         setTsBadge('tsSleepBadge', hasSleep, false, sleepHrs > 0 ? sleepPct + '%' : 'PENDING');
 
-        setTsBadge('tsRunBadge', hasRun, false, 'PENDING');
+        setTsBadge('tsRunBadge', hasRun, false, runMissed ? 'MISSED ⚠' : 'PENDING');
+        var runSubEl = document.querySelector('[data-run-time]');
+        if (runSubEl) {
+          if (hasRun) { /* keep existing pace text */ }
+          else if (runMissed) {
+            runSubEl.textContent = '⚠ NOT COMPLETED BEFORE 6:15 AM — PENALTY ACTIVE';
+            runSubEl.style.color = 'var(--red, #FF5252)';
+          } else if (pastRunDeadline) {
+            runSubEl.textContent = 'Checking Strava sync...';
+          } else {
+            runSubEl.textContent = 'Must finish before 6:15 AM IST · Syncs at 5:55 AM';
+          }
+        }
+        var runBadgeEl = document.getElementById('tsRunBadge');
+        if (runBadgeEl && runMissed) {
+          runBadgeEl.className = 'ts-card-badge ts-badge-rest';
+          runBadgeEl.style.color = 'var(--red,#FF5252)';
+          runBadgeEl.style.borderColor = 'rgba(255,82,82,0.3)';
+        }
         setTsBadge('tsGymBadge', hasGym, !hasGym && hour >= 23, 'PENDING');
         setTsBadge('tsBikeBadge', hasBike, !hasBike && hour >= 23, 'PENDING');
         setTsBadge('tsSwimBadge', hasSwim, !hasSwim && hour >= 23, 'PENDING');
@@ -2022,7 +2063,9 @@
           else { el.textContent = pendingLabel; el.className = 'ts-chip ts-chip-pending'; }
         }
         setTsChip('tsChipSleep', hasSleep, false, '💤 DONE', '💤 SYNCING');
-        setTsChip('tsChipRun', hasRun, false, '🏃 DONE', '🏃 PENDING');
+        setTsChip('tsChipRun', hasRun, false, '🏃 DONE', runMissed ? '🏃 MISSED ⚠' : '🏃 PENDING');
+        var chipRun = document.getElementById('tsChipRun');
+        if (chipRun && runMissed) { chipRun.style.color = 'var(--red,#FF5252)'; chipRun.style.borderColor = 'rgba(255,82,82,0.3)'; }
         setTsChip('tsChipGym', hasGym, !hasGym && hour >= 23, '🏋️ DONE', '🏋️ PENDING');
         setTsChip('tsChipBike', hasBike, !hasBike && hour >= 23, '🚴 DONE', '🚴 PENDING');
         setTsChip('tsChipSwim', hasSwim, !hasSwim && hour >= 23, '🏊 DONE', '🏊 PENDING');
