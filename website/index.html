@@ -1889,9 +1889,10 @@
     // Sync Live Dashboard — proof-based display
     // Only shows today's data AFTER sync confirms proof exists
     function loadDashboardData() {
-      var todayStr = (function(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')})();
-      var hour = new Date().getHours();
-      var minute = new Date().getMinutes();
+      var _ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+      var todayStr = _ist.getFullYear() + '-' + String(_ist.getMonth()+1).padStart(2,'0') + '-' + String(_ist.getDate()).padStart(2,'0');
+      var hour = _ist.getHours();
+      var minute = _ist.getMinutes();
 
       // Fetch today's specific row (not latest — specifically TODAY)
       fetch(SUPA + '/rest/v1/proof_archive?date=eq.' + todayStr + '&select=*', {

@@ -500,11 +500,25 @@ async function checkMissedRunPunishment() {
   // Check strava_activities: any Run that started before 06:15 today
   if (typeof sbFetch !== 'function') return;
   try {
+    // 1. Also check Supabase slips for dedup (covers fresh-device case)
+    var remoteSlips = await sbFetch('slips', 'GET', null,
+      '?category=eq.missed_run&date=eq.' + today + '&select=id&limit=1');
+    if (remoteSlips && Array.isArray(remoteSlips) && remoteSlips.length > 0) return; // Already in DB
+
+    // 2. Query strava_activities for a run before 6:15 AM IST today
     var runs = await sbFetch('strava_activities', 'GET', null,
       '?type=eq.Run&start_date_local=gte.' + today + 'T00:00:00&start_date_local=lt.' + today + 'T06:15:00&select=id,name,distance,start_date_local&limit=1');
-    if (runs && Array.isArray(runs) && runs.length > 0) return; // Early run found — no penalty
 
-    // No run before 6:15 AM → create slip
+    // CRITICAL: if network failed (null returned), do NOT penalise — bail safely
+    if (runs === null || runs === undefined) {
+      console.warn('[Run Check] sbFetch returned null — skipping to avoid false penalty');
+      _runCheckDone = false; // allow retry next panel open
+      return;
+    }
+
+    if (Array.isArray(runs) && runs.length > 0) return; // Early run found — no penalty ✓
+
+    // No run before 6:15 AM confirmed → create slip
     var clientId = 'slip_run_' + today + '_' + Date.now();
     var slip = {
       id: clientId,
@@ -527,7 +541,8 @@ async function checkMissedRunPunishment() {
 
     alert('⚠ MISSED RUN PENALTY\n\nNo run before 6:15 AM on ' + today + '\n\nPunishment: 20 KM WALK\n\nThis slip is PERMANENT. Clear it with a verified Strava walk.');
   } catch(e) {
-    console.warn('[Run Check]', e.message);
+    console.warn('[Run Check] error — skipping to avoid false penalty:', e.message);
+    _runCheckDone = false; // allow retry
   }
 }
 
