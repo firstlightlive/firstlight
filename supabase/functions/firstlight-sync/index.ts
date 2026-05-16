@@ -157,10 +157,28 @@ async function syncInstagram(log: string[]) {
   if (!posts?.data?.length) { log.push('Instagram: no posts'); return }
 
   const streakStart = new Date('2026-02-10')
-  let synced = 0
+  let synced = 0, skipped = 0
+
+  // Pre-load already-synced dates to prevent duplicate posts per day
+  const { data: existingPosts } = await supaAdmin.from('instagram_posts').select('id,timestamp')
+  const syncedDates = new Set<string>()
+  const syncedIds = new Set<string>()
+  for (const ep of (existingPosts || [])) {
+    if (ep.timestamp) syncedDates.add(ep.timestamp.split('T')[0])
+    if (ep.id) syncedIds.add(String(ep.id))
+  }
+
   for (const p of posts.data) {
     const postDate = new Date(p.timestamp)
+    const dateStr = postDate.toISOString().split('T')[0]
     const dayNum = Math.floor((postDate.getTime() - streakStart.getTime()) / 86400000) + 1
+
+    // Skip if a different post for this date already exists in DB (dedup by date)
+    if (syncedDates.has(dateStr) && !syncedIds.has(String(p.id))) {
+      skipped++
+      continue
+    }
+
     const row = {
       id: p.id, ig_id: p.id,
       caption: (p.caption || '').substring(0, 10000),
@@ -170,9 +188,9 @@ async function syncInstagram(log: string[]) {
       like_count: p.like_count || 0, comments_count: p.comments_count || 0,
       day_number: dayNum
     }
-    try { await supaUpsert('instagram_posts', row, 'id'); synced++ } catch (_e) { /* skip */ }
+    try { await supaUpsert('instagram_posts', row, 'id'); synced++; syncedDates.add(dateStr) } catch (_e) { /* skip */ }
   }
-  log.push(`Instagram: ${synced}/${posts.data.length} synced`)
+  log.push(`Instagram: ${synced}/${posts.data.length} synced, ${skipped} duplicates skipped`)
 
   // Migrate images to Supabase Storage (instead of GCS)
   await migrateImagesToStorage(log, igToken)

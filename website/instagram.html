@@ -150,7 +150,15 @@
           if (page.length < pageSize) hasMore = false;
         } else { hasMore = false; }
       }
-      var posts = allData;
+      // Deduplicate: keep only the first post per calendar date (some days have 2 posts)
+      var _seenDates = {};
+      var posts = allData.filter(function(p) {
+        var d = p.timestamp ? p.timestamp.split('T')[0] : null;
+        if (!d) return true;
+        if (_seenDates[d]) return false;
+        _seenDates[d] = true;
+        return true;
+      });
       if (posts && Array.isArray(posts) && posts.length > 0) {
         allPosts = posts;
         renderProfile();
