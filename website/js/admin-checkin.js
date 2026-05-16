@@ -414,7 +414,7 @@ function sealTheDay() {
 
 // ── AUTO-PUNISHMENT: Missed day seal ──
 // Runs once per page load when checkin panel opens.
-// Checks last 30 locked days — any unsealed day → permanent slip.
+// Checks last 7 locked days — only punishes days where a checkin record EXISTS but was never sealed.
 var _sealCheckDone = false;
 function checkMissedSealPunishments() {
   if (_sealCheckDone) return;
@@ -422,7 +422,7 @@ function checkMissedSealPunishments() {
   var today = getEffectiveToday();
   var newSlips = [];
 
-  for (var i = 1; i <= 30; i++) {
+  for (var i = 1; i <= 7; i++) {
     var d = new Date(today + 'T12:00:00');
     d.setDate(d.getDate() - i);
     var dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -433,6 +433,9 @@ function checkMissedSealPunishments() {
     var checkin = getCheckin(dateStr);
     // If sealed → fine
     if (checkin && checkin.sealed === true) continue;
+    // Only punish if a checkin record exists but wasn't sealed (not just any empty day)
+    var hasActivity = checkin && Object.keys(checkin).length > 0;
+    if (!hasActivity) continue;
 
     // Check dedup in localStorage slips
     var slips = [];

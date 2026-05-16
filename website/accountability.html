@@ -567,35 +567,13 @@
     }, 15000);
   }
 
-  // ── INIT: generate missed-seal slips from this device's localStorage ──
-  // This ensures slips appear even if the checkin panel was never opened today
-  (function generateLocalMissedSealSlips() {
-    if (typeof getEffectiveToday !== 'function' || typeof isDateLocked !== 'function') return;
-    var today = getEffectiveToday();
-    var localSlips = [];
-    try { localSlips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) { return; }
-    var changed = false;
-    for (var i = 1; i <= 30; i++) {
-      var d = new Date(today + 'T12:00:00');
-      d.setDate(d.getDate() - i);
-      var ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-      if (!isDateLocked(ds)) continue;
-      var checkin = {};
-      try { checkin = JSON.parse(localStorage.getItem('fl_checkin_' + ds) || '{}'); } catch(e) {}
-      if (checkin && checkin.sealed === true) continue;
-      var exists = localSlips.some(function(s) { return s.rule === 'Missed Day Seal' && s.date === ds; });
-      if (exists) continue;
-      localSlips.push({
-        id: 'slip_seal_' + ds + '_auto',
-        date: ds,
-        rule: 'Missed Day Seal',
-        category: 'DISCIPLINE VIOLATION',
-        penalty_status: 'pending',
-        created_at: new Date().toISOString()
-      });
-      changed = true;
-    }
-    if (changed) localStorage.setItem('fl_slips', JSON.stringify(localSlips));
+  // ── INIT: clean up any falsely auto-generated slips (slip_seal_*_auto) ──
+  (function cleanupAutoSlips() {
+    try {
+      var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
+      var cleaned = slips.filter(function(s) { return !s.id || !s.id.endsWith('_auto'); });
+      if (cleaned.length !== slips.length) localStorage.setItem('fl_slips', JSON.stringify(cleaned));
+    } catch(e) {}
   })();
 
   loadSlips();
