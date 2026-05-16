@@ -196,19 +196,43 @@ async function syncInstagram(log: string[]) {
   await migrateImagesToStorage(log, igToken)
 }
 
-async function migrateImagesToStorage(log: string[], _igToken: string) {
-  const { data: posts } = await supaAdmin.from('instagram_posts')
-    .select('id,media_url,day_number')
+async function migrateImagesToStorage(log: string[], igToken: string) {
+  // Fetch posts that still need migration: null URL OR non-supabase CDN URL
+  // Process 20 per call — ordered newest first so streak days get migrated first
+  const { data: cdnPosts } = await supaAdmin.from('instagram_posts')
+    .select('id,ig_id,media_url,day_number')
     .not('media_url', 'like', '%supabase%')
     .not('media_url', 'is', null)
-    .limit(5)
+    .order('day_number', { ascending: false })
+    .limit(15)
 
-  if (!posts?.length) return
+  const { data: nullPosts } = await supaAdmin.from('instagram_posts')
+    .select('id,ig_id,media_url,day_number')
+    .is('media_url', null)
+    .order('day_number', { ascending: false })
+    .limit(10)
+
+  const posts = [...(cdnPosts || []), ...(nullPosts || [])]
+  if (!posts.length) { log.push('IG→Storage: all images already migrated'); return }
+
   let migrated = 0
   for (const p of posts) {
-    if (!p.media_url || p.media_url.includes('supabase')) continue
+    if ((p.media_url || '').includes('supabase')) continue
     try {
-      const imgResp = await fetch(p.media_url)
+      let imgUrl = p.media_url as string | null
+
+      // For null or expired CDN URLs: refresh from IG API to get fresh URL
+      if (!imgUrl && igToken) {
+        const mediaId = p.ig_id || p.id
+        const fresh = await fetch(
+          `https://graph.facebook.com/v21.0/${mediaId}?fields=id,media_url,thumbnail_url&access_token=${igToken}`
+        ).then(r => r.json())
+        imgUrl = fresh.media_url || fresh.thumbnail_url || null
+      }
+
+      if (!imgUrl) continue
+
+      const imgResp = await fetch(imgUrl)
       if (!imgResp.ok) continue
       const blob = await imgResp.blob()
       const path = `instagram/day${p.day_number || 0}_${p.id.substring(0, 8)}.jpg`
@@ -218,9 +242,9 @@ async function migrateImagesToStorage(log: string[], _igToken: string) {
         await supaAdmin.from('instagram_posts').update({ media_url: publicUrl }).eq('id', p.id)
         migrated++
       }
-    } catch (_e) { /* skip */ }
+    } catch (_e) { /* skip individual errors */ }
   }
-  if (migrated > 0) log.push(`IG→Storage: ${migrated} images migrated`)
+  log.push(`IG→Storage: ${migrated}/${posts.length} images migrated`)
 }
 
 // ═══════════════════════════════════════════
