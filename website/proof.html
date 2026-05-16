@@ -292,14 +292,17 @@
     .then(function(data) {
       if (!data || !data.length) return;
 
-      allRows = data.map(function(r) {
+      // Only keep streak days (day_number > 0) — filter out pre-streak 2025 data
+      var streakData = data.filter(function(r) { return r.day_number && r.day_number > 0; });
+
+      allRows = streakData.map(function(r) {
         var runMin = r.run_time_sec ? Math.floor(r.run_time_sec / 60) : 0;
         var runSec = r.run_time_sec ? r.run_time_sec % 60 : 0;
         var km = r.run_km ? parseFloat(r.run_km) : 0;
         var paceVal = (r.run_time_sec && km > 0) ? r.run_time_sec / 60 / km : null;
         var paceStr = paceVal ? Math.floor(paceVal) + "'" + String(Math.round((paceVal % 1) * 60)).padStart(2,'0') + '"' : (r.run_pace || '—');
         return {
-          day: r.day_number || 0,
+          day: r.day_number,
           date: r.date,
           sleep: r.sleep_hrs ? parseFloat(r.sleep_hrs).toFixed(1) : '—',
           sleepNum: r.sleep_hrs ? parseFloat(r.sleep_hrs) : null,
@@ -312,8 +315,8 @@
           hrNum: r.avg_hr ? parseFloat(r.avg_hr) : null,
           gym: r.gym || false,
           food: r.food_clean !== false,
-          unclaimed: (r.day_number || 0) * (FL.STAKE_PER_DAY || 15000),
-          source: r.run_source === 'strava' ? 'Strava ✓' : 'IG'
+          unclaimed: r.day_number * (FL.STAKE_PER_DAY || 15000),
+          source: r.run_source === 'strava' ? 'Strava ✓' : 'Apple Watch'
         };
       });
       allRows.sort(function(a,b) { return b.day - a.day; });

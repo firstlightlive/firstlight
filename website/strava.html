@@ -62,7 +62,7 @@
     .sv-month-bar{height:100%;border-radius:6px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center}
     .sv-month-bar-run{background:linear-gradient(90deg,var(--strava),#FF8A50)}
     .sv-month-bar-walk{background:linear-gradient(90deg,#00E676,#69F0AE)}
-    .sv-month-bar-swim{background:linear-gradient(90deg,#00B0FF,#40C4FF)}
+    .sv-month-bar-swim{background:linear-gradient(90deg,#7C4DFF,#B47CFF)}
     .sv-month-bar-ride{background:linear-gradient(90deg,#26C6DA,#4DD0E1)}
     .sv-month-bar-other{background:linear-gradient(90deg,#AB47BC,#CE93D8)}
     .sv-month-val{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:#fff;min-width:70px;text-align:right;font-weight:700}
@@ -252,14 +252,14 @@
     <div class="sv-dna-seg" style="background:linear-gradient(90deg,#FC4C02,#FF6B35);flex:60"><span>RUN</span></div>
     <div class="sv-dna-seg" style="background:linear-gradient(90deg,#26C6DA,#4DD0E1);flex:15"><span>RIDE</span></div>
     <div class="sv-dna-seg" style="background:linear-gradient(90deg,#66BB6A,#81C784);flex:10"><span>WALK</span></div>
-    <div class="sv-dna-seg" style="background:linear-gradient(90deg,#00E5FF,#40C4FF);flex:5"><span></span></div>
+    <div class="sv-dna-seg" style="background:linear-gradient(90deg,#7C4DFF,#B47CFF);flex:5"><span></span></div>
     <div class="sv-dna-seg" style="background:linear-gradient(90deg,#AB47BC,#CE93D8);flex:10"><span>GYM</span></div>
   </div>
   <div class="sv-dna-labels" id="svDNALabels">
     <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#FC4C02"></div>Run <span class="sv-dna-pct" id="dnaRunPct">—</span></div>
     <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#26C6DA"></div>Ride <span class="sv-dna-pct" id="dnaRidePct">—</span></div>
     <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#66BB6A"></div>Walk <span class="sv-dna-pct" id="dnaWalkPct">—</span></div>
-    <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#00E5FF"></div>Swim <span class="sv-dna-pct" id="dnaSwimPct">—</span></div>
+    <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#7C4DFF"></div>Swim <span class="sv-dna-pct" id="dnaSwimPct">—</span></div>
     <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#AB47BC"></div>Gym <span class="sv-dna-pct" id="dnaGymPct">—</span></div>
   </div>
 </div>
@@ -334,7 +334,7 @@
     <div class="sv-legend-item"><div class="sv-legend-dot" style="background:var(--strava)"></div> Run</div>
     <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#26C6DA"></div> Ride</div>
     <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#00E676"></div> Walk</div>
-    <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#00B0FF"></div> Swim</div>
+    <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#7C4DFF"></div> Swim</div>
     <div class="sv-legend-item"><div class="sv-legend-dot" style="background:#AB47BC"></div> Other</div>
   </div>
 </div>
@@ -364,12 +364,12 @@
       <div class="sv-sport-dist" id="svWalkDist">—</div>
       <div class="sv-sport-bar"><div class="sv-sport-bar-inner" id="svWalkBar" style="background:#66BB6A;width:0%"></div></div>
     </div>
-    <div class="sv-sport-card" style="background:linear-gradient(145deg,rgba(0,229,255,0.08),rgba(0,229,255,0.02));border:1px solid rgba(0,229,255,0.2)">
+    <div class="sv-sport-card" style="background:linear-gradient(145deg,rgba(124,77,255,0.08),rgba(124,77,255,0.02));border:1px solid rgba(124,77,255,0.2)">
       <div class="sv-sport-icon">🏊</div>
-      <div class="sv-sport-count" style="color:#00E5FF" id="svSwimCount">—</div>
-      <div class="sv-sport-type" style="color:#00E5FF">SWIMS</div>
+      <div class="sv-sport-count" style="color:#7C4DFF" id="svSwimCount">—</div>
+      <div class="sv-sport-type" style="color:#7C4DFF">SWIMS</div>
       <div class="sv-sport-dist" id="svSwimDist">—</div>
-      <div class="sv-sport-bar"><div class="sv-sport-bar-inner" id="svSwimBar" style="background:#00E5FF;width:0%"></div></div>
+      <div class="sv-sport-bar"><div class="sv-sport-bar-inner" id="svSwimBar" style="background:#7C4DFF;width:0%"></div></div>
     </div>
     <div class="sv-sport-card" style="background:linear-gradient(145deg,rgba(171,71,188,0.08),rgba(171,71,188,0.02));border:1px solid rgba(171,71,188,0.2)">
       <div class="sv-sport-icon">🏋️</div>
@@ -697,7 +697,7 @@
         { name: 'RUN',  count: runs.length,     color: 'linear-gradient(90deg,#FC4C02,#FF6B35)', pctId: 'dnaRunPct' },
         { name: 'RIDE', count: rides.length,    color: 'linear-gradient(90deg,#26C6DA,#4DD0E1)', pctId: 'dnaRidePct' },
         { name: 'WALK', count: walks.length,    color: 'linear-gradient(90deg,#66BB6A,#81C784)', pctId: 'dnaWalkPct' },
-        { name: 'SWIM', count: swims.length,    color: 'linear-gradient(90deg,#00E5FF,#40C4FF)', pctId: 'dnaSwimPct' },
+        { name: 'SWIM', count: swims.length,    color: 'linear-gradient(90deg,#7C4DFF,#B47CFF)', pctId: 'dnaSwimPct' },
         { name: 'GYM',  count: workouts.length, color: 'linear-gradient(90deg,#AB47BC,#CE93D8)', pctId: 'dnaGymPct' }
       ];
       var dnaHtml = '';
@@ -762,10 +762,10 @@
           if (!longestSwim || km > parseFloat(longestSwim.distance)/1000) longestSwim = s;
         });
         var totalSwimDist = swims.reduce(function(s,a) { return s + parseFloat(a.distance||0); }, 0) / 1000;
-        prHtml += '<div class="sv-pr-card" style="border-color:rgba(0,229,255,0.2)"><div class="sv-pr-dist" style="color:#00E5FF">TOTAL SWIMS</div><div class="sv-pr-time">' + swims.length + '</div><div class="sv-pr-date">' + totalSwimDist.toFixed(1) + ' km lifetime</div></div>';
-        if (longestSwim) prHtml += '<div class="sv-pr-card" style="border-color:rgba(0,229,255,0.2)"><div class="sv-pr-dist" style="color:#00E5FF">LONGEST SWIM</div><div class="sv-pr-time">' + (parseFloat(longestSwim.distance)/1000).toFixed(2) + ' km</div><div class="sv-pr-date">' + fmtDate(longestSwim.start_date_local) + '</div></div>';
+        prHtml += '<div class="sv-pr-card" style="border-color:rgba(124,77,255,0.2)"><div class="sv-pr-dist" style="color:#7C4DFF">TOTAL SWIMS</div><div class="sv-pr-time">' + swims.length + '</div><div class="sv-pr-date">' + totalSwimDist.toFixed(1) + ' km lifetime</div></div>';
+        if (longestSwim) prHtml += '<div class="sv-pr-card" style="border-color:rgba(124,77,255,0.2)"><div class="sv-pr-dist" style="color:#7C4DFF">LONGEST SWIM</div><div class="sv-pr-time">' + (parseFloat(longestSwim.distance)/1000).toFixed(2) + ' km</div><div class="sv-pr-date">' + fmtDate(longestSwim.start_date_local) + '</div></div>';
         var longestSwimTime = swims.reduce(function(best, s) { return s.moving_time > (best ? best.moving_time : 0) ? s : best; }, null);
-        if (longestSwimTime) prHtml += '<div class="sv-pr-card" style="border-color:rgba(0,229,255,0.2)"><div class="sv-pr-dist" style="color:#00E5FF">LONGEST SESSION</div><div class="sv-pr-time">' + fmtTime(longestSwimTime.moving_time) + '</div><div class="sv-pr-date">' + fmtDate(longestSwimTime.start_date_local) + '</div></div>';
+        if (longestSwimTime) prHtml += '<div class="sv-pr-card" style="border-color:rgba(124,77,255,0.2)"><div class="sv-pr-dist" style="color:#7C4DFF">LONGEST SESSION</div><div class="sv-pr-time">' + fmtTime(longestSwimTime.moving_time) + '</div><div class="sv-pr-date">' + fmtDate(longestSwimTime.start_date_local) + '</div></div>';
       }
 
       prGrid.innerHTML = prHtml;
@@ -923,7 +923,7 @@
         var mins = Math.round((a.moving_time||0) / 60);
         var hr = a.average_heartrate ? Math.round(a.average_heartrate) + ' bpm' : '';
         var typeEmoji = a.type === 'Run' ? '🏃' : a.type === 'Walk' ? '🚶' : a.type === 'Ride' ? '🚴' : a.type === 'Swim' ? '🏊' : a.type === 'Workout' || a.type === 'WeightTraining' ? '🏋️' : '⚡';
-        var typeColor = a.type === 'Run' ? 'var(--strava)' : a.type === 'Walk' ? '#66BB6A' : a.type === 'Ride' ? '#26C6DA' : a.type === 'Swim' ? '#00E5FF' : '#AB47BC';
+        var typeColor = a.type === 'Run' ? 'var(--strava)' : a.type === 'Walk' ? '#66BB6A' : a.type === 'Ride' ? '#26C6DA' : a.type === 'Swim' ? '#7C4DFF' : '#AB47BC';
         var date = a.start_date_local ? new Date(a.start_date_local) : new Date();
         var dateStr = date.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][date.getMonth()] + ' ' + date.getFullYear();
         var stravaLink = 'https://www.strava.com/activities/' + a.id;
