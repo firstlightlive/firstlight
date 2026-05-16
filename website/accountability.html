@@ -306,7 +306,7 @@
     // Try Supabase first
     if (typeof SB !== 'undefined' && SB.init()) {
       try {
-        slips = await sbFetch('slips', 'GET', null, '?select=id,date,day_number,rule,category,penalty,penalty_status,proof_km,proof_strava_url,cleared_at,created_at&order=date.desc,created_at.desc');
+        slips = await sbFetch('slips', 'GET', null, '?select=id,date,rule,category,penalty,penalty_status,proof_km,proof_strava_url,proof_strava_activity_id,cleared_at,created_at,cascade_level,parent_slip_id,client_id&order=date.desc,created_at.desc');
         if (slips && Array.isArray(slips)) {
           updateLiveStatus('LIVE — SUPABASE');
         } else {
