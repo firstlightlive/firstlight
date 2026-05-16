@@ -405,19 +405,25 @@
     });
 
     /* ── PAGINATION ── */
+    function scrollToTable() {
+      var wrap = document.querySelector('.table-wrap');
+      if (!wrap) return;
+      var top = wrap.getBoundingClientRect().top + window.pageYOffset - 80;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }
     document.getElementById('prevPage').addEventListener('click', function(){
-      if(currentPage > 1){ currentPage--; _showAll = false; renderTable(); }
+      if(currentPage > 1){ currentPage--; _showAll = false; renderTable(); scrollToTable(); }
     });
     document.getElementById('nextPage').addEventListener('click', function(){
       var totalPages = Math.ceil(filteredRows.length / PER_PAGE);
-      if(currentPage < totalPages){ currentPage++; _showAll = false; renderTable(); }
+      if(currentPage < totalPages){ currentPage++; _showAll = false; renderTable(); scrollToTable(); }
     });
     document.getElementById('firstPage').addEventListener('click', function(){
-      currentPage = 1; _showAll = false; renderTable();
+      currentPage = 1; _showAll = false; renderTable(); scrollToTable();
     });
     document.getElementById('lastPage').addEventListener('click', function(){
       var totalPages = Math.ceil(filteredRows.length / PER_PAGE);
-      currentPage = totalPages; _showAll = false; renderTable();
+      currentPage = totalPages; _showAll = false; renderTable(); scrollToTable();
     });
     document.getElementById('showAllBtn').addEventListener('click', function(){
       _showAll = !_showAll;
