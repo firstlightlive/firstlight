@@ -298,17 +298,30 @@
   var _lastSlipCount = 0;
   var _pollTimer = null;
 
-  // ── LOAD FROM SUPABASE (primary) with localStorage fallback ──
+  // ── LOAD FROM SUPABASE (primary) merged with localStorage ──
   async function loadSlips() {
     updateLiveStatus('LOADING...');
     var slips = null;
+
+    // Always load localStorage slips (missed-seal penalties may only exist here)
+    var localSlips = [];
+    try { localSlips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) { localSlips = []; }
 
     // Try Supabase first
     if (typeof SB !== 'undefined' && SB.init()) {
       try {
         slips = await sbFetch('slips', 'GET', null, '?select=id,date,rule,category,penalty,penalty_status,proof_km,proof_strava_url,proof_strava_activity_id,cleared_at,created_at,cascade_level,parent_slip_id,client_id&order=date.desc,created_at.desc');
         if (slips && Array.isArray(slips)) {
-          updateLiveStatus('LIVE — SUPABASE');
+          // Merge: add localStorage slips not yet synced to Supabase (anon INSERT is blocked by RLS)
+          var sbIds = new Set(slips.map(function(s) { return s.id; }));
+          var localOnly = localSlips.filter(function(s) { return s.id && !sbIds.has(s.id); });
+          if (localOnly.length > 0) {
+            slips = slips.concat(localOnly);
+            slips.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+            updateLiveStatus('LIVE — SUPABASE + ' + localOnly.length + ' LOCAL');
+          } else {
+            updateLiveStatus('LIVE — SUPABASE');
+          }
         } else {
           slips = null;
         }
@@ -319,9 +332,9 @@
       }
     }
 
-    // Fallback to localStorage
+    // Fallback to localStorage only
     if (!slips) {
-      try { slips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) { slips = []; }
+      slips = localSlips;
       // Sort descending by date
       slips.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
       updateLiveStatus('OFFLINE — SHOWING LOCAL CACHE');
@@ -554,7 +567,37 @@
     }, 15000);
   }
 
-  // ── INIT ──
+  // ── INIT: generate missed-seal slips from this device's localStorage ──
+  // This ensures slips appear even if the checkin panel was never opened today
+  (function generateLocalMissedSealSlips() {
+    if (typeof getEffectiveToday !== 'function' || typeof isDateLocked !== 'function') return;
+    var today = getEffectiveToday();
+    var localSlips = [];
+    try { localSlips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) { return; }
+    var changed = false;
+    for (var i = 1; i <= 30; i++) {
+      var d = new Date(today + 'T12:00:00');
+      d.setDate(d.getDate() - i);
+      var ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      if (!isDateLocked(ds)) continue;
+      var checkin = {};
+      try { checkin = JSON.parse(localStorage.getItem('fl_checkin_' + ds) || '{}'); } catch(e) {}
+      if (checkin && checkin.sealed === true) continue;
+      var exists = localSlips.some(function(s) { return s.rule === 'Missed Day Seal' && s.date === ds; });
+      if (exists) continue;
+      localSlips.push({
+        id: 'slip_seal_' + ds + '_auto',
+        date: ds,
+        rule: 'Missed Day Seal',
+        category: 'DISCIPLINE VIOLATION',
+        penalty_status: 'pending',
+        created_at: new Date().toISOString()
+      });
+      changed = true;
+    }
+    if (changed) localStorage.setItem('fl_slips', JSON.stringify(localSlips));
+  })();
+
   loadSlips();
   startPolling();
 
