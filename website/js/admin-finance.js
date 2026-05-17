@@ -213,6 +213,65 @@ function deleteFinIncome(id, date) {
   renderFinancePanel('manage');
 }
 
+window.finEditIncome = function(id, date) {
+  var row = document.getElementById('fin-inc-row-' + id);
+  if (!row) return;
+  // Toggle off if already editing
+  if (row.querySelector('.fin-inc-edit-form')) { renderFinancePanel('manage'); return; }
+
+  var parts = date.split('-');
+  var year = parseInt(parts[0]), month = parseInt(parts[1]) - 1;
+  var incomes = getFinIncome(year, month);
+  var item = incomes.find(function(i) { return i.id === id; });
+  if (!item) return;
+
+  var srcOptions = INCOME_SOURCES.map(function(s) {
+    return '<option' + (s === item.source ? ' selected' : '') + '>' + s + '</option>';
+  }).join('');
+
+  var form = document.createElement('div');
+  form.className = 'fin-inc-edit-form';
+  form.style.cssText = 'padding:10px 0 8px;display:grid;grid-template-columns:1fr 1fr;gap:8px';
+  form.innerHTML =
+    '<input type="number" id="fie-amount-' + id + '" value="' + item.amount + '" class="form-input" style="font-size:14px;padding:7px 10px" placeholder="Amount">' +
+    '<select id="fie-source-' + id + '" class="form-input" style="font-size:11px;padding:7px 10px">' + srcOptions + '</select>' +
+    '<input type="text" id="fie-desc-' + id + '" value="' + (item.description || '') + '" class="form-input" style="font-size:11px;padding:7px 10px" placeholder="Note...">' +
+    '<div style="display:flex;gap:6px">' +
+      '<button onclick="finSaveIncomeEdit(\'' + id + '\',\'' + date + '\')" style="flex:1;padding:7px;background:rgba(0,229,160,0.1);color:var(--green);border:1px solid rgba(0,229,160,0.3);border-radius:6px;font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;-webkit-tap-highlight-color:transparent">SAVE</button>' +
+      '<button onclick="renderFinancePanel(\'manage\')" style="flex:1;padding:7px;background:transparent;color:var(--text-dim);border:1px solid rgba(255,255,255,0.08);border-radius:6px;font-family:var(--font-mono);font-size:10px;cursor:pointer;-webkit-tap-highlight-color:transparent">CANCEL</button>' +
+    '</div>';
+  row.appendChild(form);
+  document.getElementById('fie-amount-' + id).focus();
+};
+
+window.finSaveIncomeEdit = function(id, date) {
+  var parts = date.split('-');
+  var year = parseInt(parts[0]), month = parseInt(parts[1]) - 1;
+  var incomes = getFinIncome(year, month);
+  var idx = incomes.findIndex(function(i) { return i.id === id; });
+  if (idx === -1) return;
+
+  var amount = parseFloat((document.getElementById('fie-amount-' + id) || {}).value);
+  var source = (document.getElementById('fie-source-' + id) || {}).value || incomes[idx].source;
+  var desc   = (document.getElementById('fie-desc-' + id)   || {}).value;
+
+  if (!amount || amount <= 0) { alert('Enter a valid amount'); return; }
+
+  incomes[idx].amount = amount;
+  incomes[idx].source = source;
+  incomes[idx].description = desc;
+  incomes[idx].updated_at = new Date().toISOString();
+
+  localStorage.setItem('fl_income_' + _finMonthKey(year, month), JSON.stringify(incomes));
+  if (typeof syncSave === 'function') {
+    syncSave('income_log', {
+      id: incomes[idx].id, date: incomes[idx].date, amount: incomes[idx].amount,
+      source: incomes[idx].source, description: incomes[idx].description || ''
+    }, 'id');
+  }
+  renderFinancePanel('manage');
+};
+
 // ── COMPUTATIONS ──
 function computeFinMonth(year, month) {
   var expenses = getFinExpenses(year, month);
@@ -698,13 +757,15 @@ function _buildFinManage() {
     html += '<div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--green)">' + finFmt(incTotal) + '</div>';
     html += '</div>';
     stats.income.forEach(function(i) {
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(0,229,160,0.05)">';
+      html += '<div id="fin-inc-row-' + i.id + '" style="border-bottom:1px solid rgba(0,229,160,0.05)">';
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0">';
       html += '<span style="font-size:15px">💵</span>';
       html += '<div style="flex:1"><div style="font-family:var(--font-mono);font-size:11px;color:var(--text)">' + (i.description || i.source) + '</div>';
       html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">' + i.date + ' · ' + i.source + '</div></div>';
       html += '<div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--green)">+₹' + parseFloat(i.amount).toFixed(0) + '</div>';
+      html += '<span onclick="finEditIncome(\'' + i.id + '\',\'' + i.date + '\')" style="color:var(--cyan);cursor:pointer;font-size:14px;padding:0 5px;opacity:0.6;-webkit-tap-highlight-color:transparent" title="Edit">✎</span>';
       html += '<span onclick="deleteFinIncome(\'' + i.id + '\',\'' + i.date + '\')" style="color:var(--text-dim);cursor:pointer;font-size:16px;padding:0 6px;opacity:0.5;-webkit-tap-highlight-color:transparent">×</span>';
-      html += '</div>';
+      html += '</div></div>';
     });
   }
 

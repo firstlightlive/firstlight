@@ -414,13 +414,17 @@ function sealTheDay() {
 }
 
 // ── AUTO-PUNISHMENT: Missed day seal ──
-// Runs once per page load when checkin panel opens.
 // Checks last 7 locked days — only punishes days where a checkin record EXISTS but was never sealed.
+// Runs ONCE per calendar day (persisted in localStorage), not just once per page load.
 var _sealCheckDone = false;
-function checkMissedSealPunishments() {
+async function checkMissedSealPunishments() {
   if (_sealCheckDone) return;
-  _sealCheckDone = true;
+  // Persist the "already checked today" flag — prevents re-alerting on every page load
   var today = getEffectiveToday();
+  var lastCheck = localStorage.getItem('fl_seal_check_date');
+  if (lastCheck === today) { _sealCheckDone = true; return; }
+  _sealCheckDone = true;
+
   var newSlips = [];
 
   for (var i = 1; i <= 7; i++) {
@@ -438,15 +442,30 @@ function checkMissedSealPunishments() {
     var hasActivity = checkin && Object.keys(checkin).length > 0;
     if (!hasActivity) continue;
 
-    // Check dedup in localStorage slips
+    // DETERMINISTIC ID — prevents duplicate even if Date.now() changes
+    var slipId = 'slip_seal_' + dateStr;
+
+    // Dedup check 1: localStorage
     var slips = [];
     try { slips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) {}
-    var exists = slips.some(function(s) { return s.rule === 'Missed Day Seal' && s.date === dateStr; });
-    if (exists) continue;
+    var localExists = slips.some(function(s) {
+      return s.date === dateStr && (s.rule === 'Missed Day Seal' || (s.id && s.id.startsWith('slip_seal_' + dateStr)));
+    });
+    if (localExists) continue;
 
-    // Create slip
+    // Dedup check 2: Supabase (covers fresh device / cleared localStorage)
+    if (typeof sbFetch === 'function') {
+      try {
+        var remote = await sbFetch('slips', 'GET', null,
+          '?select=id&date=eq.' + dateStr + '&rule=eq.Missed Day Seal&limit=1');
+        if (remote && Array.isArray(remote) && remote.length > 0) continue;
+      } catch(_e) { /* network fail — still create locally */ }
+    }
+
+    // Create slip with DETERMINISTIC id
     var slip = {
-      id: 'slip_seal_' + dateStr + '_' + Date.now(),
+      id: slipId,
+      client_id: slipId,
       date: dateStr,
       rule: 'Missed Day Seal',
       category: 'DISCIPLINE VIOLATION',
@@ -473,13 +492,16 @@ function checkMissedSealPunishments() {
     newSlips.push(dateStr);
   }
 
+  // Mark today's check as done — prevents re-alerting on subsequent page loads today
+  localStorage.setItem('fl_seal_check_date', today);
+
   if (newSlips.length > 0) {
     alert('⚠ MISSED SEAL PENALTY\n\nYou did not seal the following day(s):\n' + newSlips.join(', ') + '\n\nPunishment per day: 25 KM WALK  OR  50 KM CYCLING\n\nThese slips are PERMANENT and cannot be deleted.\nServe every penalty before the streak continues.');
   }
 }
 
 // ── AUTO-PUNISHMENT: No run before 6:15 AM ──
-// Runs once per page load. Checks at 7 AM IST+ (45 min after deadline — allows Strava sync).
+// Runs ONCE per calendar day (persisted in localStorage). Checks at 7 AM IST+.
 var _runCheckDone = false;
 async function checkMissedRunPunishment() {
   if (_runCheckDone) return;
@@ -487,42 +509,54 @@ async function checkMissedRunPunishment() {
   var h = now.getHours(), m = now.getMinutes();
   // Only fire after 7:00 AM IST — gives 5:55 AM and 6:15 AM syncs time to complete
   if (h < 7) return;
-  _runCheckDone = true;
 
   var today = getEffectiveToday();
 
-  // Dedup: skip if slip already exists for today
+  // Persist guard: only check once per calendar day across page loads
+  var lastRunCheck = localStorage.getItem('fl_run_check_date');
+  if (lastRunCheck === today) { _runCheckDone = true; return; }
+  _runCheckDone = true;
+
+  // Dedup check 1: localStorage
   var slips = [];
   try { slips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) {}
-  var exists = slips.some(function(s) { return s.category === 'missed_run' && s.date === today; });
-  if (exists) return;
+  var localExists = slips.some(function(s) {
+    return s.date === today && (s.category === 'missed_run' || (s.id && s.id.startsWith('slip_run_' + today)));
+  });
+  if (localExists) { localStorage.setItem('fl_run_check_date', today); return; }
 
-  // Check strava_activities: any Run that started before 06:15 today
   if (typeof sbFetch !== 'function') return;
   try {
-    // 1. Also check Supabase slips for dedup (covers fresh-device case)
+    // Dedup check 2: Supabase
     var remoteSlips = await sbFetch('slips', 'GET', null,
       '?category=eq.missed_run&date=eq.' + today + '&select=id&limit=1');
-    if (remoteSlips && Array.isArray(remoteSlips) && remoteSlips.length > 0) return; // Already in DB
+    if (remoteSlips && Array.isArray(remoteSlips) && remoteSlips.length > 0) {
+      localStorage.setItem('fl_run_check_date', today);
+      return;
+    }
 
-    // 2. Query strava_activities for a run before 6:15 AM IST today
+    // Check strava_activities for a run before 6:15 AM IST today
     var runs = await sbFetch('strava_activities', 'GET', null,
       '?type=eq.Run&start_date_local=gte.' + today + 'T00:00:00&start_date_local=lt.' + today + 'T06:15:00&select=id,name,distance,start_date_local&limit=1');
 
     // CRITICAL: if network failed (null returned), do NOT penalise — bail safely
     if (runs === null || runs === undefined) {
       console.warn('[Run Check] sbFetch returned null — skipping to avoid false penalty');
-      _runCheckDone = false; // allow retry next panel open
+      _runCheckDone = false; // allow retry only on network failure
       return;
     }
 
-    if (Array.isArray(runs) && runs.length > 0) return; // Early run found — no penalty ✓
+    if (Array.isArray(runs) && runs.length > 0) {
+      // Run found — no penalty ✓. Mark today as checked.
+      localStorage.setItem('fl_run_check_date', today);
+      return;
+    }
 
-    // No run before 6:15 AM confirmed → create slip
-    var clientId = 'slip_run_' + today + '_' + Date.now();
+    // No run before 6:15 AM confirmed → create slip with DETERMINISTIC id
+    var slipId = 'slip_run_' + today;
     var slip = {
-      id: clientId,
-      client_id: clientId,
+      id: slipId,
+      client_id: slipId,
       date: today,
       rule: 'body',
       category: 'missed_run',
@@ -537,12 +571,13 @@ async function checkMissedRunPunishment() {
 
     slips.push(slip);
     localStorage.setItem('fl_slips', JSON.stringify(slips));
+    localStorage.setItem('fl_run_check_date', today);
     if (typeof syncSlip === 'function') syncSlip(slip);
 
     alert('⚠ MISSED RUN PENALTY\n\nNo run before 6:15 AM on ' + today + '\n\nPunishment: 20 KM WALK\n\nThis slip is PERMANENT. Clear it with a verified Strava walk.');
   } catch(e) {
     console.warn('[Run Check] error — skipping to avoid false penalty:', e.message);
-    _runCheckDone = false; // allow retry
+    // Do NOT reset _runCheckDone — prevents infinite retry loops on persistent errors
   }
 }
 
