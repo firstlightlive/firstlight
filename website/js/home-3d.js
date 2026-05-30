@@ -44,7 +44,7 @@
     var schedule = [
       { fromDay: 1, amount: 15000 },
       { fromDay: 101, amount: 20000 },
-      { fromDay: 111, amount: 5000 }
+      { fromDay: 110, amount: 5000 }
     ];
     var total = 0;
     for (var i = 0; i < schedule.length; i++) {

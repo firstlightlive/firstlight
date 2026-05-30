@@ -225,7 +225,7 @@ function formatINRFull(num) {
 var STAKE_SCHEDULE = [
   { fromDay: 1, amount: 15000 },
   { fromDay: 101, amount: 20000 },
-  { fromDay: 111, amount: 5000 }
+  { fromDay: 110, amount: 5000 }
 ];
 
 function getCurrentStake(day) {
