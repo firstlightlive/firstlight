@@ -141,20 +141,24 @@
       color:#fff; margin-bottom:40px; letter-spacing:1px;
     }
 
-    /* ═══ SPORT DNA — Horizontal Bar ═══ */
-    .sv-dna-bar { display:flex; height:56px; border-radius:14px; overflow:hidden; gap:2px; margin-bottom:16px; }
-    .sv-dna-seg {
-      display:flex; align-items:center; justify-content:center;
-      font-family:var(--s-mono); font-size:11px; font-weight:700;
-      color:rgba(255,255,255,0.9); transition:flex 1.2s cubic-bezier(0.4,0,0.2,1);
-      overflow:hidden; min-width:0; position:relative;
-    }
-    .sv-dna-seg::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,0.1),transparent); pointer-events:none; }
-    .sv-dna-seg span { white-space:nowrap; padding:0 8px; overflow:hidden; text-shadow:0 1px 3px rgba(0,0,0,0.4); }
-    .sv-dna-labels { display:flex; gap:20px; flex-wrap:wrap; margin-top:14px; }
-    .sv-dna-label { display:flex; align-items:center; gap:6px; font-family:var(--s-mono); font-size:11px; color:var(--s-dim); }
-    .sv-dna-dot { width:10px; height:10px; border-radius:3px; }
-    .sv-dna-pct { color:#fff; font-weight:700; }
+    /* ═══ SPORT DNA — Circular Ring + Galaxy ═══ */
+    .sv-dna-layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:center; margin-bottom:24px; }
+    @media(max-width:600px) { .sv-dna-layout { grid-template-columns:1fr; } }
+    .sv-dna-ring-wrap { position:relative; width:280px; height:280px; margin:0 auto; }
+    @media(max-width:480px) { .sv-dna-ring-wrap { width:220px; height:220px; } }
+    #svDNARing { width:100%; height:100%; }
+    .sv-dna-ring-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+    .sv-dna-ring-total { font-family:var(--s-mono); font-size:2.4rem; font-weight:700; color:#fff; }
+    .sv-dna-ring-label { font-family:var(--s-mono); font-size:9px; letter-spacing:3px; color:var(--s-dim); }
+    .sv-dna-legend { display:flex; flex-direction:column; gap:10px; }
+    .sv-dna-legend-item { display:flex; align-items:center; gap:12px; padding:10px 14px; background:rgba(255,255,255,0.02); border-radius:10px; transition:all 0.3s; cursor:default; }
+    .sv-dna-legend-item:hover { background:rgba(255,255,255,0.04); transform:translateX(4px); }
+    .sv-dna-legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+    .sv-dna-legend-name { font-family:var(--s-mono); font-size:11px; color:#fff; font-weight:600; flex:1; }
+    .sv-dna-legend-count { font-family:var(--s-mono); font-size:12px; color:#fff; font-weight:700; }
+    .sv-dna-legend-pct { font-family:var(--s-mono); font-size:10px; color:var(--s-dim); min-width:36px; text-align:right; }
+    .sv-dna-legend-bar { flex:1; height:4px; background:rgba(255,255,255,0.04); border-radius:2px; overflow:hidden; min-width:60px; }
+    .sv-dna-legend-fill { height:100%; border-radius:2px; transition:width 1.5s cubic-bezier(0.4,0,0.2,1); }
 
     /* ═══ SPORT CARDS ═══ */
     .sv-sport-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:40px; }
@@ -444,27 +448,28 @@
 <div class="sv-container reveal" id="svDNAWrap">
   <div class="sv-section-label">SPORT DNA</div>
   <div class="sv-section-title">Training Profile</div>
-  <!-- Orbital sport ring -->
-  <div class="sv-orbit-wrap reveal">
-    <canvas id="svOrbitCanvas"></canvas>
-    <div class="sv-orbit-center">
-      <div class="sv-orbit-total" id="svOrbitTotal">--</div>
-      <div class="sv-orbit-label">ACTIVITIES</div>
+
+  <div class="sv-dna-layout">
+    <!-- Left: Supernova Galaxy -->
+    <div class="sv-orbit-wrap">
+      <canvas id="svOrbitCanvas"></canvas>
+      <div class="sv-orbit-center">
+        <div class="sv-orbit-total" id="svOrbitTotal">--</div>
+        <div class="sv-orbit-label">ACTIVITIES</div>
+      </div>
     </div>
-  </div>
-  <div class="sv-dna-bar" id="svDNABar">
-    <div class="sv-dna-seg" style="background:linear-gradient(90deg,#FC4C02,#FF6B35);flex:60"><span>RUN</span></div>
-    <div class="sv-dna-seg" style="background:linear-gradient(90deg,#00D4FF,#4DD0E1);flex:15"><span>RIDE</span></div>
-    <div class="sv-dna-seg" style="background:linear-gradient(90deg,#00E676,#69F0AE);flex:10"><span>WALK</span></div>
-    <div class="sv-dna-seg" style="background:linear-gradient(90deg,#00B0FF,#40C4FF);flex:5"><span></span></div>
-    <div class="sv-dna-seg" style="background:linear-gradient(90deg,#AB47BC,#CE93D8);flex:10"><span>GYM</span></div>
-  </div>
-  <div class="sv-dna-labels" id="svDNALabels">
-    <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#FC4C02"></div>Run <span class="sv-dna-pct" id="dnaRunPct">&mdash;</span></div>
-    <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#00D4FF"></div>Ride <span class="sv-dna-pct" id="dnaRidePct">&mdash;</span></div>
-    <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#00E676"></div>Walk <span class="sv-dna-pct" id="dnaWalkPct">&mdash;</span></div>
-    <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#00B0FF"></div>Swim <span class="sv-dna-pct" id="dnaSwimPct">&mdash;</span></div>
-    <div class="sv-dna-label"><div class="sv-dna-dot" style="background:#AB47BC"></div>Gym <span class="sv-dna-pct" id="dnaGymPct">&mdash;</span></div>
+
+    <!-- Right: Circular Ring + Legend -->
+    <div>
+      <div class="sv-dna-ring-wrap">
+        <canvas id="svDNARing"></canvas>
+        <div class="sv-dna-ring-center">
+          <div class="sv-dna-ring-total" id="svDNARingTotal">--</div>
+          <div class="sv-dna-ring-label">SESSIONS</div>
+        </div>
+      </div>
+      <div class="sv-dna-legend" id="svDNALegend"></div>
+    </div>
   </div>
 </div>
 
@@ -1579,9 +1584,126 @@
     var filtered = sports.filter(function(s) { return s.count > 0; });
     window._orbitSports = filtered;
     if (typeof window._initSupernova === 'function') window._initSupernova(filtered);
+    var total = sports.reduce(function(a,b){return a+b.count;},0);
     var totalEl = document.getElementById('svOrbitTotal');
-    if (totalEl) totalEl.textContent = sports.reduce(function(a,b){return a+b.count;},0);
+    if (totalEl) totalEl.textContent = total;
+    var ringTotal = document.getElementById('svDNARingTotal');
+    if (ringTotal) ringTotal.textContent = total;
+
+    // Draw animated ring chart
+    drawDNARing(filtered, total);
+    // Build legend
+    buildDNALegend(filtered, total);
   };
+
+  function drawDNARing(sports, total) {
+    var canvas = document.getElementById('svDNARing');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var size = canvas.parentElement.offsetWidth;
+    canvas.width = size * 2; canvas.height = size * 2;
+    canvas.style.width = size + 'px'; canvas.style.height = size + 'px';
+    ctx.scale(2, 2);
+    var cx = size/2, cy = size/2, r = size/2 - 20;
+    var lineW = 18;
+
+    // Background ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = lineW;
+    ctx.stroke();
+
+    // Animate arcs drawing in
+    var startAngle = -Math.PI / 2;
+    var gap = 0.04; // gap between segments
+    var progress = 0;
+    var targetProgress = 1;
+    var animStart = Date.now();
+
+    function animate() {
+      var elapsed = Date.now() - animStart;
+      progress = Math.min(1, elapsed / 1500); // 1.5s animation
+      var ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+
+      // Clear and redraw background
+      ctx.clearRect(0, 0, size, size);
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+      ctx.lineWidth = lineW;
+      ctx.stroke();
+
+      var angle = startAngle;
+      sports.forEach(function(s) {
+        var pct = s.count / total;
+        var sweep = (Math.PI * 2 - gap * sports.length) * pct * ease;
+        if (sweep < 0.01) { angle += sweep + gap; return; }
+
+        // Parse color for glow
+        var rm=252,gm=76,bm=2;
+        var m = s.color.match(/#([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})/i);
+        if (m) { rm=parseInt(m[1],16); gm=parseInt(m[2],16); bm=parseInt(m[3],16); }
+
+        // Glow
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, angle, angle + sweep);
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = lineW + 6;
+        ctx.lineCap = 'round';
+        ctx.globalAlpha = 0.15;
+        ctx.shadowColor = 'rgba('+rm+','+gm+','+bm+',0.6)';
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+
+        // Main arc
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, angle, angle + sweep);
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = lineW;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Percentage label on arc midpoint
+        if (pct > 0.05) {
+          var midAngle = angle + sweep / 2;
+          var lx = cx + Math.cos(midAngle) * (r + lineW + 10);
+          var ly = cy + Math.sin(midAngle) * (r + lineW + 10);
+          ctx.font = '700 9px "IBM Plex Mono"';
+          ctx.fillStyle = s.color;
+          ctx.textAlign = 'center';
+          ctx.fillText(Math.round(pct * 100) + '%', lx, ly + 3);
+          ctx.textAlign = 'left';
+        }
+
+        angle += sweep + gap;
+      });
+
+      if (progress < 1) requestAnimationFrame(animate);
+    }
+    animate();
+  }
+
+  function buildDNALegend(sports, total) {
+    var el = document.getElementById('svDNALegend');
+    if (!el) return;
+    var maxCount = Math.max.apply(null, sports.map(function(s){return s.count})) || 1;
+    var html = '';
+    sports.forEach(function(s) {
+      var pct = Math.round(s.count / total * 100);
+      var barW = Math.round(s.count / maxCount * 100);
+      html += '<div class="sv-dna-legend-item">';
+      html += '<div class="sv-dna-legend-dot" style="background:'+s.color+';box-shadow:0 0 8px '+s.color+'"></div>';
+      html += '<div class="sv-dna-legend-name">'+s.name+'</div>';
+      html += '<div class="sv-dna-legend-bar"><div class="sv-dna-legend-fill" style="width:'+barW+'%;background:'+s.color+'"></div></div>';
+      html += '<div class="sv-dna-legend-count">'+s.count+'</div>';
+      html += '<div class="sv-dna-legend-pct" style="color:'+s.color+'">'+pct+'%</div>';
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  }
 
   // Weekly gauge
   window._drawGauge = function(km, breakdown) {
