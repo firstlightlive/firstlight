@@ -196,14 +196,14 @@
       position: relative;
       display: inline-block;
       margin-bottom: 16px;
-      /* Reserve space for the outermost ring (640px / 2 = 320px radius) */
-      padding: min(320px, 50vw) 0;
+      /* Reserve space for the outermost ring (640px/2=320px on desktop, 50vw on mobile) */
+      padding: min(320px, 52vw) 0;
     }
 
     /* Ring 5 — RED — thick, innermost, fast pulse */
     .hero-day-ring-5 {
       position: absolute; top: 50%; left: 50%;
-      width: min(380px, 85vw); height: min(380px, 85vw);
+      width: min(380px, 58vw); height: min(380px, 58vw);
       transform: translate(-50%, -50%);
       border-radius: 50%;
       border: 3px solid rgba(255,82,82,0.2);
@@ -221,7 +221,7 @@
     /* Ring 1 — CYAN — thick, pulsing */
     .hero-day-ring {
       position: absolute; top: 50%; left: 50%;
-      width: min(430px, 90vw); height: min(430px, 90vw);
+      width: min(430px, 68vw); height: min(430px, 68vw);
       transform: translate(-50%, -50%);
       border-radius: 50%;
       border: 2px solid rgba(0,212,255,0.3);
@@ -239,7 +239,7 @@
     /* Ring 4 — STRAVA ORANGE — dashed, fast */
     .hero-day-ring-4 {
       position: absolute; top: 50%; left: 50%;
-      width: min(480px, 94vw); height: min(480px, 94vw);
+      width: min(480px, 76vw); height: min(480px, 76vw);
       transform: translate(-50%, -50%);
       border-radius: 50%;
       border: 1px dashed rgba(252,76,2,0.18);
@@ -256,7 +256,7 @@
     /* Ring 2 — GREEN — counter-rotate */
     .hero-day-ring-2 {
       position: absolute; top: 50%; left: 50%;
-      width: min(530px, 96vw); height: min(530px, 96vw);
+      width: min(530px, 84vw); height: min(530px, 84vw);
       transform: translate(-50%, -50%);
       border-radius: 50%;
       border: 2px solid rgba(0,230,118,0.2);
@@ -274,7 +274,7 @@
     /* Ring 3 — GOLD — slow */
     .hero-day-ring-3 {
       position: absolute; top: 50%; left: 50%;
-      width: min(580px, 98vw); height: min(580px, 98vw);
+      width: min(580px, 92vw); height: min(580px, 92vw);
       transform: translate(-50%, -50%);
       border-radius: 50%;
       border: 2px solid rgba(245,166,35,0.15);
