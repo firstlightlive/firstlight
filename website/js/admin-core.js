@@ -37,6 +37,7 @@ function switchPanel(panelId) {
   if (panelId === 'morning' || panelId === 'midday' || panelId === 'evening') initRitualDateNav(panelId);
   if (panelId === 'deepwork') { initDeepWorkDateNav(); if (typeof loadDeepWorkForDate === 'function') loadDeepWorkForDate(deepworkDate || (typeof getEffectiveToday === 'function' ? getEffectiveToday() : new Date().toISOString().slice(0,10))); }
   if (panelId === 'deepwork-analytics') buildDWAnalytics();
+  if (panelId === 'food-scanner' && typeof renderFoodScanner === 'function') { renderFoodScanner(); }
   if (panelId === 'gym-log') { initGymDateNav(); renderGymLog(); }
   if (panelId === 'gym-analytics') buildGymAnalytics();
   if (panelId === 'gym-exercises') renderExerciseLibrary('push');
