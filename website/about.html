@@ -52,6 +52,17 @@
       );
     }
 
+    /* ── Responsive ── */
+    @media(max-width:768px) {
+      .about-grid { grid-template-columns:1fr; gap:32px; }
+      .hero-stat-bar { grid-template-columns:repeat(2,1fr); }
+      .feature-grid { grid-template-columns:1fr; }
+    }
+    @media(max-width:480px) {
+      .about-grid { padding:40px 0; }
+      .hero-stat-bar { grid-template-columns:1fr; }
+    }
+
     /* ── 7D Particle Layer ── */
     #aboutParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
     .about-page { position:relative; z-index:2; }
