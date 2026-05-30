@@ -177,9 +177,10 @@
     .esc-sub { font-family:var(--mono); font-size:0.55rem; color:var(--dim); margin-top:2px; }
     @media(max-width:480px) { .esc-grid { grid-template-columns:1fr; } }
 
-    /* ═══ GSAP ═══ */
+    /* ═══ GSAP — with CSS fallback ═══ */
     .reveal { opacity:0; transform:translateY(25px); }
     .reveal-scale { opacity:0; transform:scale(0.96); }
+    .no-gsap .reveal, .no-gsap .reveal-scale { opacity:1; transform:none; }
 
     /* ═══ Empty State ═══ */
     .empty { text-align:center; padding:80px 20px; }
@@ -608,15 +609,19 @@ if (typeof Lenis !== 'undefined') {
 
 // ── GSAP reveals ──
 if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-  gsap.utils.toArray('.reveal').forEach(function(el) {
-    gsap.to(el, { opacity:1, y:0, duration:0.7, ease:'power3.out',
-      scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
-  });
-  gsap.utils.toArray('.reveal-scale').forEach(function(el) {
-    gsap.to(el, { opacity:1, scale:1, duration:0.7, ease:'back.out(1.4)',
-      scrollTrigger: { trigger:el, start:'top 85%', toggleActions:'play none none none' } });
-  });
+  try {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal').forEach(function(el) {
+      gsap.to(el, { opacity:1, y:0, duration:0.7, ease:'power3.out',
+        scrollTrigger: { trigger:el, start:'top 90%', toggleActions:'play none none none' } });
+    });
+    gsap.utils.toArray('.reveal-scale').forEach(function(el) {
+      gsap.to(el, { opacity:1, scale:1, duration:0.7, ease:'back.out(1.4)',
+        scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
+    });
+  } catch(e) { document.body.classList.add('no-gsap'); }
+} else {
+  document.body.classList.add('no-gsap');
 }
 
 // ── Three.js particles ──

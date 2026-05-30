@@ -285,6 +285,53 @@
   </div>
 </div>
 
+<!-- ═══ TODAY'S IRONMAN CONTRIBUTION ═══ -->
+<div class="im-container" style="padding-bottom:60px">
+  <div class="im-label reveal">TODAY'S EFFORT</div>
+  <div class="im-heading reveal">Daily Ironman Contribution</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <!-- Half -->
+    <div style="padding:24px;background:var(--im-glass);border:1px solid var(--im-border);border-radius:16px;backdrop-filter:blur(16px)" class="reveal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-family:var(--im-mono);font-size:0.65rem;font-weight:700;color:#fff;letter-spacing:2px">HALF 70.3</div>
+        <div id="imHalfTodayPct" style="font-family:var(--im-mono);font-size:1.2rem;font-weight:700;color:var(--im-gold)">0%</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-family:var(--im-mono);font-size:0.6rem;color:var(--im-swim);margin-bottom:4px"><span>SWIM</span><span id="imHalfSwimTodayKm">0.00</span> / 1.9 km</div>
+        <div style="height:5px;background:rgba(0,176,255,0.1);border-radius:3px;overflow:hidden"><div id="imHalfSwimToday" style="height:100%;width:0%;background:var(--im-swim);border-radius:3px;transition:width 1.5s"></div></div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-family:var(--im-mono);font-size:0.6rem;color:var(--im-bike);margin-bottom:4px"><span>BIKE</span><span id="imHalfBikeTodayKm">0.0</span> / 90 km</div>
+        <div style="height:5px;background:rgba(0,230,118,0.1);border-radius:3px;overflow:hidden"><div id="imHalfBikeToday" style="height:100%;width:0%;background:var(--im-bike);border-radius:3px;transition:width 1.5s"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--im-mono);font-size:0.6rem;color:var(--im-run);margin-bottom:4px"><span>RUN</span><span id="imHalfRunTodayKm">0.0</span> / 21.1 km</div>
+        <div style="height:5px;background:rgba(252,76,2,0.1);border-radius:3px;overflow:hidden"><div id="imHalfRunToday" style="height:100%;width:0%;background:var(--im-run);border-radius:3px;transition:width 1.5s"></div></div>
+      </div>
+    </div>
+    <!-- Full -->
+    <div style="padding:24px;background:var(--im-glass);border:1px solid var(--im-border);border-radius:16px;backdrop-filter:blur(16px)" class="reveal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-family:var(--im-mono);font-size:0.65rem;font-weight:700;color:#fff;letter-spacing:2px">FULL 140.6</div>
+        <div id="imFullTodayPct" style="font-family:var(--im-mono);font-size:1.2rem;font-weight:700;color:var(--im-gold)">0%</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-family:var(--im-mono);font-size:0.6rem;color:var(--im-swim);margin-bottom:4px"><span>SWIM</span><span id="imFullSwimTodayKm">0.00</span> / 3.8 km</div>
+        <div style="height:5px;background:rgba(0,176,255,0.1);border-radius:3px;overflow:hidden"><div id="imFullSwimToday" style="height:100%;width:0%;background:var(--im-swim);border-radius:3px;transition:width 1.5s"></div></div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-family:var(--im-mono);font-size:0.6rem;color:var(--im-bike);margin-bottom:4px"><span>BIKE</span><span id="imFullBikeTodayKm">0.0</span> / 180 km</div>
+        <div style="height:5px;background:rgba(0,230,118,0.1);border-radius:3px;overflow:hidden"><div id="imFullBikeToday" style="height:100%;width:0%;background:var(--im-bike);border-radius:3px;transition:width 1.5s"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--im-mono);font-size:0.6rem;color:var(--im-run);margin-bottom:4px"><span>RUN</span><span id="imFullRunTodayKm">0.0</span> / 42.2 km</div>
+        <div style="height:5px;background:rgba(252,76,2,0.1);border-radius:3px;overflow:hidden"><div id="imFullRunToday" style="height:100%;width:0%;background:var(--im-run);border-radius:3px;transition:width 1.5s"></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:12px;font-family:var(--im-mono);font-size:0.6rem;color:var(--im-dim);letter-spacing:1px">Based on today's Strava activities · Updates live</div>
+</div>
+
 <!-- ═══ DISTANCE PROGRESS BARS ═══ -->
 <div class="im-container im-progress-section">
   <div class="im-label reveal">PROGRESS</div>
@@ -429,6 +476,26 @@
     el=document.getElementById('imTotalBike'); if(el) el.textContent=Math.round(totalBike);
     el=document.getElementById('imTotalRun'); if(el) el.textContent=Math.round(totalRun);
     el=document.getElementById('imTotalAll'); if(el) el.textContent=Math.round(totalSwim+totalBike+totalRun);
+  });
+
+  // Today's contribution — how much of an Ironman did today cover?
+  var ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+  var todayStr = ist.getFullYear()+'-'+String(ist.getMonth()+1).padStart(2,'0')+'-'+String(ist.getDate()).padStart(2,'0');
+  fetchSB('strava_activities','?start_date_local=gte.'+todayStr+'T00:00:00&start_date_local=lt.'+todayStr+'T23:59:59&select=type,distance&order=start_date_local.asc').then(function(acts){
+    var tSwim=0, tBike=0, tRun=0;
+    (acts||[]).forEach(function(a){ var km=(a.distance||0)/1000; if(a.type==='Swim')tSwim+=km; else if(a.type==='Ride')tBike+=km; else if(a.type==='Run'||a.type==='VirtualRun')tRun+=km; });
+    function setToday(prefix,swim,bike,run,sTarget,bTarget,rTarget){
+      var el;
+      el=document.getElementById(prefix+'SwimToday'); if(el) el.style.width=Math.min(100,Math.round(swim/sTarget*100))+'%';
+      el=document.getElementById(prefix+'BikeToday'); if(el) el.style.width=Math.min(100,Math.round(bike/bTarget*100))+'%';
+      el=document.getElementById(prefix+'RunToday'); if(el) el.style.width=Math.min(100,Math.round(run/rTarget*100))+'%';
+      el=document.getElementById(prefix+'SwimTodayKm'); if(el) el.textContent=swim.toFixed(2);
+      el=document.getElementById(prefix+'BikeTodayKm'); if(el) el.textContent=bike.toFixed(1);
+      el=document.getElementById(prefix+'RunTodayKm'); if(el) el.textContent=run.toFixed(1);
+      el=document.getElementById(prefix+'TodayPct'); if(el) el.textContent=Math.round((swim/sTarget+bike/bTarget+run/rTarget)/3*100)+'%';
+    }
+    setToday('imHalf',tSwim,tBike,tRun,1.9,90,21.1);
+    setToday('imFull',tSwim,tBike,tRun,3.8,180,42.2);
   });
 
   // GSAP — with fallback if it fails
