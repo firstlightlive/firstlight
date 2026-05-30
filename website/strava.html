@@ -1035,39 +1035,14 @@
       ]);
     }
 
-    // ═══ HOOK: Weekly gauge — check wake violations to adjust target ═══
+    // ═══ HOOK: Weekly 150km gauge ═══
     if (typeof window._drawGauge === 'function') {
       var weekRun = thisWeek.filter(function(a){return a.type==='Run';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekRide = thisWeek.filter(function(a){return a.type==='Ride';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekWalk = thisWeek.filter(function(a){return a.type==='Walk';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekSwim = thisWeek.filter(function(a){return a.type==='Swim';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekTotal = weekRun + weekRide + weekWalk + (weekSwim * 10);
-      // Check wake violations this week — wake >= 04:00 adds +20km to target
-      var ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
-      var dow = ist.getDay(); var monOff = dow === 0 ? 6 : dow - 1;
-      var mon = new Date(ist); mon.setDate(ist.getDate() - monOff);
-      var monStr = mon.getFullYear()+'-'+String(mon.getMonth()+1).padStart(2,'0')+'-'+String(mon.getDate()).padStart(2,'0');
-      var todStr = ist.getFullYear()+'-'+String(ist.getMonth()+1).padStart(2,'0')+'-'+String(ist.getDate()).padStart(2,'0');
-      fetch(FL.SUPABASE_URL+'/rest/v1/health_daily?select=date,wake_time&date=gte.'+monStr+'&date=lte.'+todStr+'&wake_time=not.is.null',
-        {headers:{'apikey':FL.SUPABASE_ANON_KEY,'Authorization':'Bearer '+FL.SUPABASE_ANON_KEY}})
-        .then(function(r){return r.json()}).then(function(wakeData){
-          var violations = 0;
-          (wakeData||[]).forEach(function(w){ if(w.wake_time && w.wake_time >= '04:00') violations++; });
-          window._weekTarget = 150 + (violations > 0 ? 20 : 0);
-          window._drawGauge(weekTotal, { run:weekRun, ride:weekRide, walk:weekWalk, swim:weekSwim });
-          // Show violation badge
-          if (violations > 0) {
-            var badge = document.getElementById('svWakeBadge');
-            if (!badge) {
-              badge = document.createElement('div');
-              badge.id = 'svWakeBadge';
-              badge.style.cssText = 'font-family:"IBM Plex Mono",monospace;font-size:0.65rem;color:#FF5252;font-weight:700;text-align:center;margin-top:8px;letter-spacing:0.5px';
-              var gaugeSection = document.getElementById('svGaugeDeficit');
-              if (gaugeSection && gaugeSection.parentNode) gaugeSection.parentNode.appendChild(badge);
-            }
-            badge.textContent = 'WAKE VIOLATION (' + violations + 'x) — TARGET +20 KM';
-          }
-        }).catch(function(){ window._drawGauge(weekTotal, { run:weekRun, ride:weekRide, walk:weekWalk, swim:weekSwim }); });
+      window._drawGauge(weekTotal, { run:weekRun, ride:weekRide, walk:weekWalk, swim:weekSwim });
     }
 
     // ═══ HOOK: Constellation monthly chart ═══
@@ -1269,10 +1244,9 @@
     if (totalEl) totalEl.textContent = sports.reduce(function(a,b){return a+b.count;},0);
   };
 
-  // Weekly gauge — with wake violation check
-  window._weekTarget = 150; // base, updated by wake check
+  // Weekly gauge
   window._drawGauge = function(km, breakdown) {
-    var target = window._weekTarget || 150;
+    var target = 150;
     var canvas = document.getElementById('svGaugeCanvas');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');

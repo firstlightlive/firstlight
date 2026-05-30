@@ -906,6 +906,69 @@
         </div>
       </div>
 
+      <!-- TODAY'S IRONMAN READINESS -->
+      <div style="margin-top:48px;padding:28px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;opacity:1;transform:none">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:4px;color:var(--text-dim);margin-bottom:16px">TODAY'S IRONMAN CONTRIBUTION</div>
+        <!-- Half Ironman -->
+        <div style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-family:var(--font-mono);font-size:0.7rem;font-weight:700;color:#fff;letter-spacing:2px">HALF IRONMAN 70.3</div>
+            <div id="imHalfTodayPct" style="font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:var(--gold)">0%</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <div style="text-align:center">
+              <div style="height:6px;background:rgba(0,176,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:6px"><div id="imHalfSwimToday" style="height:100%;width:0%;background:var(--swim-blue);border-radius:3px;transition:width 1s"></div></div>
+              <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--swim-blue)"><span id="imHalfSwimTodayKm">0</span> / 1.9 km</div>
+              <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text-dim)">SWIM</div>
+            </div>
+            <div style="text-align:center">
+              <div style="height:6px;background:rgba(0,230,118,0.1);border-radius:3px;overflow:hidden;margin-bottom:6px"><div id="imHalfBikeToday" style="height:100%;width:0%;background:var(--green);border-radius:3px;transition:width 1s"></div></div>
+              <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green)"><span id="imHalfBikeTodayKm">0</span> / 90 km</div>
+              <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text-dim)">BIKE</div>
+            </div>
+            <div style="text-align:center">
+              <div style="height:6px;background:rgba(252,76,2,0.1);border-radius:3px;overflow:hidden;margin-bottom:6px"><div id="imHalfRunToday" style="height:100%;width:0%;background:var(--strava);border-radius:3px;transition:width 1s"></div></div>
+              <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--strava)"><span id="imHalfRunTodayKm">0</span> / 21.1 km</div>
+              <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text-dim)">RUN</div>
+            </div>
+          </div>
+        </div>
+        <!-- Full Ironman -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-family:var(--font-mono);font-size:0.7rem;font-weight:700;color:#fff;letter-spacing:2px">FULL IRONMAN 140.6</div>
+            <div id="imFullTodayPct" style="font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:var(--gold)">0%</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <div style="text-align:center">
+              <div style="height:6px;background:rgba(0,176,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:6px"><div id="imFullSwimToday" style="height:100%;width:0%;background:var(--swim-blue);border-radius:3px;transition:width 1s"></div></div>
+              <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--swim-blue)"><span id="imFullSwimTodayKm">0</span> / 3.8 km</div>
+              <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text-dim)">SWIM</div>
+            </div>
+            <div style="text-align:center">
+              <div style="height:6px;background:rgba(0,230,118,0.1);border-radius:3px;overflow:hidden;margin-bottom:6px"><div id="imFullBikeToday" style="height:100%;width:0%;background:var(--green);border-radius:3px;transition:width 1s"></div></div>
+              <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green)"><span id="imFullBikeTodayKm">0</span> / 180 km</div>
+              <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text-dim)">BIKE</div>
+            </div>
+            <div style="text-align:center">
+              <div style="height:6px;background:rgba(252,76,2,0.1);border-radius:3px;overflow:hidden;margin-bottom:6px"><div id="imFullRunToday" style="height:100%;width:0%;background:var(--strava);border-radius:3px;transition:width 1s"></div></div>
+              <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--strava)"><span id="imFullRunTodayKm">0</span> / 42.2 km</div>
+              <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text-dim)">RUN</div>
+            </div>
+          </div>
+        </div>
+        <!-- Best ever -->
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.04)">
+          <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-dim);margin-bottom:8px">LIFETIME BEST SINGLE EFFORT</div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--swim-blue)">SWIM <span id="imBestSwim" style="color:#fff;font-weight:700">--</span> km</div>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green)">BIKE <span id="imBestBike" style="color:#fff;font-weight:700">--</span> km</div>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--strava)">RUN <span id="imBestRun" style="color:#fff;font-weight:700">--</span> km</div>
+          </div>
+        </div>
+        <a href="ironman.html" style="display:block;text-align:center;margin-top:14px;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:2px;color:var(--gold);text-decoration:none">VIEW FULL IRONMAN JOURNEY →</a>
+      </div>
+
       <!-- TODAY'S ACTIVITIES — dynamically populated from Strava -->
       <div class="section-eyebrow" style="margin-top:48px;opacity:1;transform:none">TODAY'S ACTIVITIES</div>
       <div id="todayActivities" style="display:grid;grid-template-columns:1fr;grid-auto-rows:auto;gap:16px;margin-top:16px">
@@ -939,9 +1002,9 @@
       </div>
       <a href="accountability.html" class="holo-cta">CLAIM IF I MISS</a>
       <div style="margin-top:20px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;line-height:1.8;max-width:360px;text-align:center">
-        WEEKLY: 150 km minimum (all sports). Wake violation = +20 km<br>
+        WEEKLY: 150 km minimum (all sports)<br>
         DEFICIT &gt; 50 km = ₹5,000 claimable + punishment km<br>
-        WAKE BEFORE 4 AM — NO SLEEP 4 AM TO 5 PM
+        SLIPS ARE IMMUTABLE — NO DELETE, NO EDIT
       </div>
     </div>
   </section>

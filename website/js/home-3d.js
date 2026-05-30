@@ -604,49 +604,25 @@
       // Store bars for animation
       window._weekBarData = dayBars;
 
-      // Weekly gauge — check wake violations to determine target (150 base, +20 per violation)
-      var baseTarget = 150;
-      fetchSB('health_daily', '?select=date,wake_time&date=gte.' + mondayStr + '&date=lte.' + todayStr + '&wake_time=not.is.null').then(function (wakeData) {
-        var wakeViolations = 0;
-        (wakeData || []).forEach(function (w) {
-          if (w.wake_time && w.wake_time >= '04:00') wakeViolations++;
-        });
-        var weekTarget = baseTarget + (wakeViolations > 0 ? 20 : 0);
-        var weekTotal = runKm + bikeKm + walkKm + (swimKm * 10);
-        var weekPct = Math.min(100, Math.round(weekTotal / weekTarget * 100));
-        var deficit = Math.max(0, weekTarget - weekTotal);
-        var circ = 2 * Math.PI * 52;
-        var el;
-        el = document.getElementById('weekGaugeArc'); if (el) el.setAttribute('stroke-dasharray', Math.round(weekPct / 100 * circ) + ' ' + circ);
-        el = document.getElementById('weekGaugePct'); if (el) el.textContent = weekPct + '%';
-        el = document.getElementById('weekGaugeKm'); if (el) el.innerHTML = Math.round(weekTotal) + ' <span style="font-size:0.6em;color:var(--text-dim)">/ ' + weekTarget + ' KM</span>';
-        el = document.getElementById('weekGaugeRun'); if (el) el.textContent = Math.round(runKm);
-        el = document.getElementById('weekGaugeRide'); if (el) el.textContent = Math.round(bikeKm);
-        el = document.getElementById('weekGaugeWalk'); if (el) el.textContent = Math.round(walkKm);
-        el = document.getElementById('weekGaugeSwim'); if (el) el.textContent = (swimKm * 10).toFixed(0);
-        // Wake violation badge
-        var targetLabel = document.querySelector('#weekGaugeKm + div + div + div + div + div');
-        if (wakeViolations > 0) {
-          var badge = document.getElementById('weekWakeBadge');
-          if (!badge) {
-            badge = document.createElement('div');
-            badge.id = 'weekWakeBadge';
-            badge.style.cssText = 'font-family:var(--font-mono);font-size:0.65rem;color:#FF5252;font-weight:700;margin-top:6px;letter-spacing:0.5px';
-            var gaugeParent = document.getElementById('weekGaugeDeficit');
-            if (gaugeParent && gaugeParent.parentNode) gaugeParent.parentNode.insertBefore(badge, document.getElementById('weekGaugeDeficit'));
-          }
-          badge.textContent = 'WAKE VIOLATION (' + wakeViolations + 'x) — TARGET +20 KM';
-        }
-        el = document.getElementById('weekGaugeDeficit');
-        if (el) {
-          if (deficit <= 0) { el.textContent = 'TARGET HIT'; el.style.color = '#00E676'; }
-          else if (deficit > 50) { el.textContent = 'DEFICIT: ' + Math.round(deficit) + ' km — PENALTY ZONE'; el.style.color = '#FF5252'; }
-          else { el.textContent = 'DEFICIT: ' + Math.round(deficit) + ' km — carries forward'; el.style.color = '#F5A623'; }
-        }
-        // Update the static label
-        var staticLabel = document.querySelector('[data-week-target-label]');
-        if (staticLabel) staticLabel.textContent = '/ ' + weekTarget + ' KM';
-      });
+      // Weekly 150km gauge
+      var weekTotal = runKm + bikeKm + walkKm + (swimKm * 10);
+      var weekPct = Math.min(100, Math.round(weekTotal / 150 * 100));
+      var deficit = Math.max(0, 150 - weekTotal);
+      var circ = 2 * Math.PI * 52;
+      var el;
+      el = document.getElementById('weekGaugeArc'); if (el) el.setAttribute('stroke-dasharray', Math.round(weekPct / 100 * circ) + ' ' + circ);
+      el = document.getElementById('weekGaugePct'); if (el) el.textContent = weekPct + '%';
+      el = document.getElementById('weekGaugeKm'); if (el) el.innerHTML = Math.round(weekTotal) + ' <span style="font-size:0.6em;color:var(--text-dim)">/ 150 KM</span>';
+      el = document.getElementById('weekGaugeRun'); if (el) el.textContent = Math.round(runKm);
+      el = document.getElementById('weekGaugeRide'); if (el) el.textContent = Math.round(bikeKm);
+      el = document.getElementById('weekGaugeWalk'); if (el) el.textContent = Math.round(walkKm);
+      el = document.getElementById('weekGaugeSwim'); if (el) el.textContent = (swimKm * 10).toFixed(0);
+      el = document.getElementById('weekGaugeDeficit');
+      if (el) {
+        if (deficit <= 0) { el.textContent = 'TARGET HIT'; el.style.color = '#00E676'; }
+        else if (deficit > 50) { el.textContent = 'DEFICIT: ' + Math.round(deficit) + ' km — PENALTY ZONE'; el.style.color = '#FF5252'; }
+        else { el.textContent = 'DEFICIT: ' + Math.round(deficit) + ' km — carries forward'; el.style.color = '#F5A623'; }
+      }
     });
 
     // Today's Strava — render ALL activities dynamically (include sport_type for Dance/Boxing/etc)
@@ -659,6 +635,61 @@
           if (a.average_heartrate) setVal('restHR', Math.round(a.average_heartrate), ' BPM');
         });
       }
+
+      // Ironman daily contribution — how much of an Ironman did today cover?
+      var todaySwim = 0, todayBike = 0, todayRun = 0;
+      (acts || []).forEach(function (a) {
+        var km = (a.distance || 0) / 1000;
+        var t = (a.type || '');
+        if (t === 'Swim') todaySwim += km;
+        else if (t === 'Ride') todayBike += km;
+        else if (t === 'Run' || t === 'VirtualRun') todayRun += km;
+      });
+
+      // Half Ironman: 1.9 swim + 90 bike + 21.1 run
+      var halfSwimPct = Math.min(100, Math.round(todaySwim / 1.9 * 100));
+      var halfBikePct = Math.min(100, Math.round(todayBike / 90 * 100));
+      var halfRunPct = Math.min(100, Math.round(todayRun / 21.1 * 100));
+      var halfAvgPct = Math.round((todaySwim / 1.9 + todayBike / 90 + todayRun / 21.1) / 3 * 100);
+
+      var el;
+      el = document.getElementById('imHalfSwimToday'); if (el) el.style.width = halfSwimPct + '%';
+      el = document.getElementById('imHalfBikeToday'); if (el) el.style.width = halfBikePct + '%';
+      el = document.getElementById('imHalfRunToday'); if (el) el.style.width = halfRunPct + '%';
+      el = document.getElementById('imHalfSwimTodayKm'); if (el) el.textContent = todaySwim.toFixed(2);
+      el = document.getElementById('imHalfBikeTodayKm'); if (el) el.textContent = todayBike.toFixed(1);
+      el = document.getElementById('imHalfRunTodayKm'); if (el) el.textContent = todayRun.toFixed(1);
+      el = document.getElementById('imHalfTodayPct'); if (el) el.textContent = halfAvgPct + '%';
+
+      // Full Ironman: 3.8 swim + 180 bike + 42.2 run
+      var fullSwimPct = Math.min(100, Math.round(todaySwim / 3.8 * 100));
+      var fullBikePct = Math.min(100, Math.round(todayBike / 180 * 100));
+      var fullRunPct = Math.min(100, Math.round(todayRun / 42.2 * 100));
+      var fullAvgPct = Math.round((todaySwim / 3.8 + todayBike / 180 + todayRun / 42.2) / 3 * 100);
+
+      el = document.getElementById('imFullSwimToday'); if (el) el.style.width = fullSwimPct + '%';
+      el = document.getElementById('imFullBikeToday'); if (el) el.style.width = fullBikePct + '%';
+      el = document.getElementById('imFullRunToday'); if (el) el.style.width = fullRunPct + '%';
+      el = document.getElementById('imFullSwimTodayKm'); if (el) el.textContent = todaySwim.toFixed(2);
+      el = document.getElementById('imFullBikeTodayKm'); if (el) el.textContent = todayBike.toFixed(1);
+      el = document.getElementById('imFullRunTodayKm'); if (el) el.textContent = todayRun.toFixed(1);
+      el = document.getElementById('imFullTodayPct'); if (el) el.textContent = fullAvgPct + '%';
+    });
+
+    // Ironman lifetime bests — for the readiness display
+    fetchSB('strava_activities', '?select=type,distance&order=distance.desc').then(function (acts) {
+      if (!acts || !acts.length) return;
+      var bestSwim = 0, bestBike = 0, bestRun = 0;
+      acts.forEach(function (a) {
+        var km = (a.distance || 0) / 1000;
+        if (a.type === 'Swim' && km > bestSwim) bestSwim = km;
+        if (a.type === 'Ride' && km > bestBike) bestBike = km;
+        if ((a.type === 'Run' || a.type === 'VirtualRun') && km > bestRun) bestRun = km;
+      });
+      var el;
+      el = document.getElementById('imBestSwim'); if (el) el.textContent = bestSwim.toFixed(2);
+      el = document.getElementById('imBestBike'); if (el) el.textContent = bestBike.toFixed(1);
+      el = document.getElementById('imBestRun'); if (el) el.textContent = bestRun.toFixed(1);
     });
 
     // Lifetime stats — include sport_type for Dance/Boxing/Pilates/Yoga breakdown
