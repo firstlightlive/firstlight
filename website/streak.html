@@ -269,8 +269,48 @@
       box-shadow: 0 0 10px var(--cc-strava), 0 0 20px rgba(252,76,2,0.5);
     }
 
+    /* Ring 5 — RED — thick, tight inner ring, fast pulse */
+    .hero-day-ring-5 {
+      position: absolute; top: 50%; left: 50%;
+      width: min(260px, 65vw); height: min(260px, 65vw);
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 3px solid rgba(255,82,82,0.2);
+      box-shadow: 0 0 20px rgba(255,82,82,0.08);
+      animation: ring-rotate 15s linear infinite, ring-pulse-red 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .hero-day-ring-5::before {
+      content: ''; position: absolute; bottom: -5px; left: 30%;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--cc-red);
+      box-shadow: 0 0 14px var(--cc-red), 0 0 28px rgba(255,82,82,0.6);
+    }
+
+    /* Ring 6 — PURPLE — thick outermost, majestic slow */
+    .hero-day-ring-6 {
+      position: absolute; top: 50%; left: 50%;
+      width: min(480px, 100vw); height: min(480px, 100vw);
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 3px solid rgba(156,39,176,0.12);
+      box-shadow: 0 0 30px rgba(156,39,176,0.06), inset 0 0 20px rgba(156,39,176,0.03);
+      animation: ring-rotate-reverse 45s linear infinite;
+      pointer-events: none;
+    }
+    .hero-day-ring-6::before {
+      content: ''; position: absolute; top: -5px; left: 40%;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #CE93D8;
+      box-shadow: 0 0 12px #CE93D8, 0 0 24px rgba(156,39,176,0.5);
+    }
+
     @keyframes ring-rotate { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
     @keyframes ring-rotate-reverse { from { transform: translate(-50%,-50%) rotate(360deg); } to { transform: translate(-50%,-50%) rotate(0deg); } }
+    @keyframes ring-pulse-red {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,82,82,0.08); border-color: rgba(255,82,82,0.2); }
+      50% { box-shadow: 0 0 35px rgba(255,82,82,0.16); border-color: rgba(255,82,82,0.35); }
+    }
     @keyframes ring-pulse-cyan {
       0%, 100% { box-shadow: 0 0 30px rgba(0,212,255,0.15), inset 0 0 30px rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.3); }
       50% { box-shadow: 0 0 50px rgba(0,212,255,0.25), inset 0 0 50px rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.5); }
@@ -1857,10 +1897,12 @@
       <div class="reveal-el" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-bottom:20px"><span id="heroStatDays">--</span> DAYS · <span id="heroStatPosts">--</span> POSTS · <span id="heroStatActivities">--</span> STRAVA ACTIVITIES</div>
       <div class="hero-wordmark reveal-el">FIRST LIGHT</div>
       <div class="hero-day-wrap reveal-el-scale">
+        <div class="hero-day-ring-6"></div>
         <div class="hero-day-ring-3"></div>
         <div class="hero-day-ring-2"></div>
         <div class="hero-day-ring-4"></div>
         <div class="hero-day-ring"></div>
+        <div class="hero-day-ring-5"></div>
         <div class="hero-day counter-animate">
           <span class="prefix">DAY</span><span data-day>—</span>
         </div>
