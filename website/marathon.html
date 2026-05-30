@@ -25,12 +25,54 @@
     body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.02;
       background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size:128px 128px; }
-    .race-hero { min-height:60vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:120px 24px 60px; position:relative; z-index:2; }
-    .race-hero::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:800px; height:800px; border-radius:50%;
-      background:radial-gradient(circle, rgba(0,212,255,0.05) 0%, rgba(252,76,2,0.03) 40%, transparent 65%); pointer-events:none; }
-    .race-hero h1 { font-family:'IBM Plex Mono',monospace; font-size:clamp(2.5rem,8vw,4.5rem); font-weight:700; letter-spacing:0.15em; color:#fff; margin-bottom:12px; line-height:0.95; }
-    .race-hero p { font-family:'Inter',sans-serif; color:#5A6B80; font-size:1rem; letter-spacing:0.04em; }
-    .race-hero-badge { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:6px; color:#FC4C02; padding:6px 16px; border:1px solid rgba(252,76,2,0.25); border-radius:4px; display:inline-block; margin-bottom:24px; }
+    .race-hero { min-height:70vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:120px 24px 60px; position:relative; z-index:2; overflow:hidden; }
+    /* Supernova core glow */
+    .race-hero::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:900px; height:900px; border-radius:50%;
+      background:radial-gradient(circle, rgba(252,76,2,0.1) 0%, rgba(0,212,255,0.06) 30%, rgba(245,166,35,0.03) 50%, transparent 65%);
+      animation: supernova-breathe 5s ease-in-out infinite; pointer-events:none; }
+    /* Supernova outer haze */
+    .race-hero::after { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:1200px; height:1200px; border-radius:50%;
+      background:radial-gradient(circle, rgba(252,76,2,0.04) 0%, rgba(255,107,53,0.02) 40%, transparent 60%);
+      animation: supernova-breathe 8s ease-in-out infinite reverse; pointer-events:none; z-index:0; }
+
+    @keyframes supernova-breathe {
+      0%, 100% { transform:translate(-50%,-50%) scale(1); opacity:0.7; }
+      50% { transform:translate(-50%,-50%) scale(1.15); opacity:1; }
+    }
+
+    /* Supernova rings */
+    .supernova-ring { position:absolute; top:50%; left:50%; border-radius:50%; pointer-events:none; }
+    .supernova-ring-1 { width:min(400px,85vw); height:min(400px,85vw); transform:translate(-50%,-50%);
+      border:2px solid rgba(252,76,2,0.2); box-shadow:0 0 30px rgba(252,76,2,0.1), inset 0 0 30px rgba(252,76,2,0.05);
+      animation: sn-rotate 20s linear infinite, sn-pulse-orange 4s ease-in-out infinite; }
+    .supernova-ring-1::before { content:''; position:absolute; top:-5px; left:50%; width:10px; height:10px; border-radius:50%;
+      background:#FC4C02; box-shadow:0 0 16px #FC4C02, 0 0 32px rgba(252,76,2,0.6); }
+    .supernova-ring-2 { width:min(500px,92vw); height:min(500px,92vw); transform:translate(-50%,-50%);
+      border:1px solid rgba(0,212,255,0.15); box-shadow:0 0 20px rgba(0,212,255,0.06);
+      animation: sn-rotate-rev 28s linear infinite; }
+    .supernova-ring-2::before { content:''; position:absolute; bottom:-4px; left:50%; width:8px; height:8px; border-radius:50%;
+      background:#00D4FF; box-shadow:0 0 12px #00D4FF, 0 0 24px rgba(0,212,255,0.5); }
+    .supernova-ring-3 { width:min(600px,98vw); height:min(600px,98vw); transform:translate(-50%,-50%);
+      border:1px solid rgba(245,166,35,0.1);
+      animation: sn-rotate 35s linear infinite; }
+    .supernova-ring-3::before { content:''; position:absolute; top:-3px; right:0; width:6px; height:6px; border-radius:50%;
+      background:#F5A623; box-shadow:0 0 10px #F5A623, 0 0 20px rgba(245,166,35,0.5); }
+    .supernova-ring-4 { width:min(450px,88vw); height:min(450px,88vw); transform:translate(-50%,-50%);
+      border:1px dashed rgba(255,107,53,0.12);
+      animation: sn-rotate-rev 14s linear infinite; }
+
+    @keyframes sn-rotate { from { transform:translate(-50%,-50%) rotate(0deg); } to { transform:translate(-50%,-50%) rotate(360deg); } }
+    @keyframes sn-rotate-rev { from { transform:translate(-50%,-50%) rotate(360deg); } to { transform:translate(-50%,-50%) rotate(0deg); } }
+    @keyframes sn-pulse-orange {
+      0%, 100% { box-shadow:0 0 30px rgba(252,76,2,0.1), inset 0 0 30px rgba(252,76,2,0.05); border-color:rgba(252,76,2,0.2); }
+      50% { box-shadow:0 0 50px rgba(252,76,2,0.2), inset 0 0 50px rgba(252,76,2,0.1); border-color:rgba(252,76,2,0.4); }
+    }
+
+    .race-hero h1 { font-family:'IBM Plex Mono',monospace; font-size:clamp(2.5rem,8vw,4.5rem); font-weight:700; letter-spacing:0.15em; color:#fff; margin-bottom:12px; line-height:0.95;
+      text-shadow:0 0 40px rgba(252,76,2,0.3), 0 0 80px rgba(252,76,2,0.1); position:relative; z-index:2; }
+    .race-hero p { font-family:'Inter',sans-serif; color:#7A8B9E; font-size:1rem; letter-spacing:0.05em; position:relative; z-index:2; }
+    .race-hero-badge { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:6px; color:#FC4C02; padding:6px 16px; border:1px solid rgba(252,76,2,0.3); border-radius:4px; display:inline-block; margin-bottom:24px;
+      background:rgba(252,76,2,0.06); box-shadow:0 0 15px rgba(252,76,2,0.08); position:relative; z-index:2; }
     .reveal { opacity:0; transform:translateY(25px); }
     .no-gsap .reveal { opacity:1; transform:none; }
     .page-content { position:relative; z-index:2; }
@@ -103,9 +145,13 @@
 
 <canvas id="raceParticles" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
 
-  <!-- PAGE HEADER -->
+  <!-- PAGE HEADER — SUPERNOVA -->
   <section class="race-hero">
-    <div>
+    <div class="supernova-ring supernova-ring-3"></div>
+    <div class="supernova-ring supernova-ring-2"></div>
+    <div class="supernova-ring supernova-ring-4"></div>
+    <div class="supernova-ring supernova-ring-1"></div>
+    <div style="position:relative;z-index:2">
       <div class="race-hero-badge reveal">RACE PORTFOLIO</div>
       <h1 class="reveal">EVERY<br>FINISH LINE</h1>
       <p class="reveal">The record. The proof. Every start line crossed.</p>
@@ -404,13 +450,13 @@
     } catch(e) { document.body.classList.add('no-gsap'); }
   } else { document.body.classList.add('no-gsap'); }
 
-  // Three.js particles — Strava orange + cyan
+  // Three.js particles — Supernova: Strava orange + cyan + gold, breathing + mouse parallax
   (function(){
     if (typeof THREE === 'undefined') return;
     var canvas = document.getElementById('raceParticles');
     if (!canvas) return;
     try {
-      var w = window.innerWidth, h = window.innerHeight;
+      var w = window.innerWidth, h = window.innerHeight, mx = 0, my = 0;
       canvas.width = w; canvas.height = h;
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
@@ -418,25 +464,48 @@
       var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
       renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setClearColor(0x000000, 0);
-      var count = w < 768 ? 1200 : 2500;
+
+      var count = w < 768 ? 1500 : 3500;
       var geo = new THREE.BufferGeometry();
-      var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
-      var c1 = new THREE.Color(0xFC4C02), c2 = new THREE.Color(0x00D4FF), c3 = new THREE.Color(0x333333);
+      var pos = new Float32Array(count*3), cols = new Float32Array(count*3), basePos = new Float32Array(count*3);
+      var c1 = new THREE.Color(0xFC4C02), c2 = new THREE.Color(0x00D4FF), c3 = new THREE.Color(0xF5A623), c4 = new THREE.Color(0x1a1a2e);
+
       for (var i=0;i<count;i++) {
-        pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
-        var rnd=Math.random(); var c = rnd<0.15?c1:rnd<0.3?c2:c3;
+        var x=(Math.random()-0.5)*20, y=(Math.random()-0.5)*20, z=(Math.random()-0.5)*14;
+        pos[i*3]=x; pos[i*3+1]=y; pos[i*3+2]=z;
+        basePos[i*3]=x; basePos[i*3+1]=y; basePos[i*3+2]=z;
+        var rnd=Math.random();
+        var c = rnd<0.18?c1:rnd<0.32?c2:rnd<0.40?c3:c4;
         cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
       }
       geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-      var mat = new THREE.PointsMaterial({size:1.2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.25, depthWrite:false});
+      var mat = new THREE.PointsMaterial({size:2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.32, depthWrite:false});
       var pts = new THREE.Points(geo, mat);
       scene.add(pts);
       var clock = new THREE.Clock();
-      function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.006; renderer.render(scene, camera); }
+
+      document.addEventListener('mousemove', function(e){ mx=(e.clientX/w-0.5)*2; my=(e.clientY/h-0.5)*2; });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        var t = clock.getElapsedTime();
+        var breath = Math.sin(t*0.35)*0.1;
+        var posArr = geo.attributes.position.array;
+        for(var i=0;i<count;i++){
+          posArr[i*3]=basePos[i*3]*(1+breath);
+          posArr[i*3+1]=basePos[i*3+1]*(1+breath);
+          posArr[i*3+2]=basePos[i*3+2]*(1+breath*0.5);
+        }
+        geo.attributes.position.needsUpdate=true;
+        pts.rotation.y = t*0.007 + mx*0.1;
+        pts.rotation.x = Math.sin(t*0.003)*0.05 + my*0.07;
+        mat.opacity = 0.26 + Math.sin(t*0.5)*0.08;
+        renderer.render(scene, camera);
+      }
       animate();
       window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
-      window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.08, 1 - (window.scrollY||0)/1200); });
+      window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.12, 1 - (window.scrollY||0)/1800); });
     } catch(e) { canvas.style.display='none'; }
   })();
   </script>
