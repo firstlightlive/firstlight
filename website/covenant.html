@@ -15,25 +15,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <!-- CDN Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
   <style>
-    /* THE IRON COVENANT — THE CODEX Redesign */
+    /* THE IRON COVENANT — 7D CODEX */
+
+    body { background:#030608 !important; }
+    #cvParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      pointer-events: none;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:128px 128px;
     }
     body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 9998;
-      pointer-events: none;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      content:''; position:fixed; inset:0; z-index:9998; pointer-events:none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,212,255,0.004) 4px, rgba(0,212,255,0.004) 8px);
     }
 
     @keyframes border-rotate { 0% { --border-angle:0deg; } 100% { --border-angle:360deg; } }
@@ -71,7 +70,7 @@
     .cv-pill-cmd:hover    { color:#AB47BC; border-color:#AB47BC; background:rgba(171,71,188,0.06); }
 
     /* Discipline sections */
-    .cv-section { position:relative; padding:clamp(56px,8vw,88px) 0; border-bottom:1px solid rgba(255,255,255,0.04); overflow:hidden; }
+    .cv-section { position:relative; z-index:2; padding:clamp(56px,8vw,88px) 0; border-bottom:1px solid rgba(255,255,255,0.04); overflow:hidden; }
     .cv-section:last-of-type { border-bottom:none; }
     .cv-accent { position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 2px 2px 0; }
     .cv-watermark { position:absolute; right:-15px; top:-20px; font-family:'Playfair Display',Georgia,serif; font-size:clamp(8rem,20vw,14rem); font-weight:900; line-height:1; color:#fff; opacity:0.03; pointer-events:none; user-select:none; }
@@ -156,19 +155,22 @@
 </head>
 <body>
 
-<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link active">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
-<div class="nav-mobile"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link active">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link active">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link active">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
 <script>
 (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
 </script>
 
+<!-- PARTICLE CANVAS -->
+<canvas id="cvParticles" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
+
 <!-- HERO -->
-<div class="cv-hero reveal">
+<div class="cv-hero reveal" style="position:relative;z-index:2">
   <div class="container">
     <div class="cv-hero-eyebrow">THE COVENANT · FIRST LIGHT · SINCE FEB 10, 2026</div>
     <h1>THE IRON<br>COVENANT</h1>
     <div class="cv-hero-rule"></div>
-    <div class="cv-hero-sub">4 DISCIPLINES · 20 RULES · ₹15,000 PER DAY AT STAKE</div>
+    <div class="cv-hero-sub">4 DISCIPLINES · 20 RULES · ₹<span data-stake-daily>5,000</span> PER DAY AT STAKE</div>
     <div class="cv-stats-bar">
       <div class="cv-stat-item">
         <div class="cv-stat-val" data-day>—</div>
@@ -221,6 +223,7 @@
       <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.4</span><span class="cv-rule-text">No smoking — lifetime prohibition</span></div>
       <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.5</span><span class="cv-rule-text">No cold drinks — no carbonated beverages of any kind</span></div>
       <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.6</span><span class="cv-rule-text">No junk food — processed, packaged, or fast food</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.7</span><span class="cv-rule-text"><strong style="color:#fff">No Biryani</strong> — all forms: Hyderabadi, Lucknowi, Dum, Chicken, Mutton, Egg. No exceptions. No "just one plate."</span></div>
     </div>
     <div class="cv-penalty">
       <div class="cv-penalty-label"><span class="cv-penalty-dot"></span>VIOLATION PENALTY</div>
@@ -242,10 +245,10 @@
     </div>
     <div class="cv-rules">
       <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.1</span><span class="cv-rule-text">Wake before 3:15 AM — Brahma Muhurta, the sacred pre-dawn window (3:00–5:30 AM)</span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.2</span><span class="cv-rule-text"><strong style="color:#fff">Run before 6:00 AM — EVERY DAY. ZERO REST DAYS. NO EXCEPTIONS.</strong> Rain, travel, pain — irrelevant.</span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.3</span><span class="cv-rule-text">Gym session mandatory — strength training. Max 1–2 rest days per week</span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.4</span><span class="cv-rule-text">All sessions complete before the world wakes</span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.5</span><span class="cv-rule-text">Apple Watch + Strava verified — GPS proof on every run, every gym session. <a href="strava.html" style="color:var(--cyan)">View live data →</a></span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.2</span><span class="cv-rule-text"><strong style="color:#fff">Train every day — Run, Ride, Swim, Walk, or Gym.</strong> Any Strava-logged activity counts. Zero activity = ₹5,000 penalty.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.3</span><span class="cv-rule-text"><strong style="color:#fff">Weekly target: 100 km minimum</strong> across all sports (Mon–Sun). Swim 1 km = 10 km equivalent. Deficit carries forward.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.4</span><span class="cv-rule-text"><strong style="color:var(--red)">Deficit &gt; 50 km = PENALTY:</strong> ₹5,000 claimable + deficit × 2 punishment km (immutable slip). First claim wins.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.5</span><span class="cv-rule-text">Apple Watch + Strava verified — GPS proof on every activity. <a href="strava.html" style="color:var(--cyan)">View live data →</a></span></div>
     </div>
     <div class="cv-clause">
       <div class="cv-clause-label" style="color:#FC4C02">RACE DAY CLAUSE</div>
@@ -314,11 +317,11 @@
     <div class="cv-decl-title">The First Light Declaration</div>
     <div class="cv-oath">
       <div class="cv-oath-line reveal"><span class="cv-oath-num">ONE</span><span class="cv-oath-text">I wake before the sun. Every day. No negotiation.</span></div>
-      <div class="cv-oath-line reveal"><span class="cv-oath-num">TWO</span><span class="cv-oath-text">I run before 6 AM. Rain, travel, pain — irrelevant.</span></div>
-      <div class="cv-oath-line reveal"><span class="cv-oath-num">THREE</span><span class="cv-oath-text">I train my body and mind. Every session earned, never skipped.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">TWO</span><span class="cv-oath-text">I train every day. Run. Ride. Swim. Walk. Gym. No zero days.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">THREE</span><span class="cv-oath-text">I hit 100 km every week. Deficit carries. Exceed 50 km and the penalty is real.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">FOUR</span><span class="cv-oath-text">I follow the food code. Six rules. Zero tolerance.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">FIVE</span><span class="cv-oath-text">I document everything. The Command Center tracks it. The <a href="accountability.html" style="color:var(--cyan)">Accountability Ledger</a> is public. Historical records are immutable — even I cannot change them.</span></div>
-      <div class="cv-oath-line reveal"><span class="cv-oath-num">SIX</span><span class="cv-oath-text">I stake ₹<span data-stake-daily>15,000</span> every single day. Miss once and a stranger collects. <span style="color:var(--gold)">₹<span data-unclaimed>—</span></span> unclaimed so far.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">SIX</span><span class="cv-oath-text">I stake ₹<span data-stake-daily>5,000</span> every single day. Miss once and a stranger collects. <span style="color:var(--gold)">₹<span data-unclaimed>—</span></span> unclaimed so far.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">SEVEN</span><span class="cv-oath-text">I control my devices. They do not control me.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">EIGHT</span><span class="cv-oath-text">I honour the spiritual disciplines. Japa. Nasya. Brahma Muhurta.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">NINE</span><span class="cv-oath-text">I am not trying to win. I am refusing to stop.</span></div>
@@ -360,7 +363,66 @@
 <footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
 
 <script src="js/config.js"></script>
-  <script src="app.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  // GSAP reveals
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal').forEach(function(el) {
+      gsap.to(el, { opacity:1, y:0, duration:0.8, ease:'power3.out',
+        scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
+    });
+    gsap.utils.toArray('.cv-rule').forEach(function(el, i) {
+      gsap.from(el, { opacity:0, x:-20, duration:0.4, delay:i*0.04, ease:'power2.out',
+        scrollTrigger: { trigger:el, start:'top 92%', toggleActions:'play none none none' } });
+    });
+    gsap.utils.toArray('.cv-oath-line').forEach(function(el, i) {
+      gsap.from(el, { opacity:0, y:15, duration:0.5, delay:i*0.08, ease:'power2.out',
+        scrollTrigger: { trigger:el, start:'top 90%', toggleActions:'play none none none' } });
+    });
+  } else {
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold:0.1 });
+    document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+  }
+
+  // THREE.JS PARTICLES — deep space with cyan + gold
+  if (typeof THREE === 'undefined') return;
+  var canvas = document.getElementById('cvParticles');
+  if (!canvas) return;
+  try {
+    var w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
+    camera.position.z = 6;
+    var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
+    renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setClearColor(0x000000, 0);
+    var count = w < 768 ? 1500 : 4000;
+    var geo = new THREE.BufferGeometry();
+    var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
+    var c1 = new THREE.Color(0x00D4FF), c2 = new THREE.Color(0xF5A623), c3 = new THREE.Color(0x555555);
+    for (var i=0;i<count;i++) {
+      pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
+      var rnd=Math.random(); var c = rnd<0.3?c1:rnd<0.5?c2:c3;
+      cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    var mat = new THREE.PointsMaterial({size:1.2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.35, depthWrite:false});
+    var pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    var clock = new THREE.Clock();
+    function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.01; pts.rotation.x=Math.sin(t*0.005)*0.02; renderer.render(scene, camera); }
+    animate();
+    window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
+    window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.1, 1 - (window.scrollY||0)/2000); });
+  } catch(e) { canvas.style.display='none'; }
+})();
+</script>
 </body>
 </html>
  

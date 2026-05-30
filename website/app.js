@@ -42,7 +42,7 @@ function initTheme() {
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
   STREAK_START: '2026-02-10',
-  STAKE_PER_DAY: 15000,
+  STAKE_PER_DAY: 5000,
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',
   INSTAGRAM_URL: 'https://www.instagram.com/firstlightlive',
@@ -225,8 +225,7 @@ function formatINRFull(num) {
 var STAKE_SCHEDULE = [
   { fromDay: 1, amount: 15000 },
   { fromDay: 101, amount: 20000 },
-  { fromDay: 201, amount: 25000 },
-  { fromDay: 366, amount: 30000 }
+  { fromDay: 111, amount: 5000 }
 ];
 
 function getCurrentStake(day) {

@@ -15,9 +15,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <!-- CDN Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
   <style>
-    .acc-header{text-align:center;padding:120px 0 40px;max-width:800px;margin:0 auto}
-    .acc-header h1{font-family:'IBM Plex Mono',monospace;font-size:clamp(1.8rem,5vw,3rem);font-weight:700;letter-spacing:0.08em;color:var(--red,#FF5252);margin-bottom:12px}
+    body { background:#030608 !important; }
+    #accParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.02;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:128px 128px; }
+
+    .acc-header{text-align:center;padding:140px 0 40px;max-width:800px;margin:0 auto;position:relative;z-index:2}
+    .acc-header h1{font-family:'IBM Plex Mono',monospace;font-size:clamp(2rem,6vw,3.5rem);font-weight:700;letter-spacing:0.12em;color:#fff;margin-bottom:12px;
+      text-shadow:0 0 60px rgba(255,82,82,0.2)}
     .acc-header p{font-family:'Inter',sans-serif;color:var(--text-dim,#8a9bb0);font-size:1rem;letter-spacing:0.04em;max-width:600px;margin:0 auto}
     .acc-quote{font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:var(--text-dim);font-style:italic;margin-top:20px;opacity:0.7}
 
@@ -29,10 +40,12 @@
     .acc-card .value.green{color:var(--green,#00E676)}
     .acc-card .value.gold{color:var(--gold,#F5A623)}
 
-    .acc-container{max-width:800px;margin:0 auto;padding:0 20px 60px}
+    .acc-container{max-width:800px;margin:0 auto;padding:0 20px 60px;position:relative;z-index:2}
 
-    .slip-entry{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:24px;margin-bottom:16px;transition:border-color 0.2s}
-    .slip-entry:hover{border-color:rgba(255,255,255,0.12)}
+    .slip-entry{background:rgba(10,14,24,0.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:24px;margin-bottom:16px;transition:all 0.3s;position:relative;overflow:hidden}
+    .slip-entry::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,82,82,0.2),transparent)}
+    .slip-entry:hover{border-color:rgba(255,255,255,0.1);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
     .slip-entry.pending{border-left:4px solid var(--red,#FF5252)}
     .slip-entry.cleared{border-left:4px solid var(--green,#00E676)}
 
@@ -80,18 +93,32 @@
 <body>
 
 <!-- NAV -->
-<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link active">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
-<div class="nav-mobile"><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link active">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link active">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link active">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
 <script>
 (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
 </script>
+
+<!-- PARTICLE CANVAS -->
+<canvas id="accParticles" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
 
 <!-- HEADER -->
 <section class="acc-header reveal">
   <h1>ACCOUNTABILITY LEDGER</h1>
   <p>Every slip. Every penalty. Every proof. Nothing hidden. Nothing faked. The internet is my witness.</p>
   <div class="acc-quote">"The credibility comes not from perfection — but from honesty and consequences completed."</div>
-  <div style="margin-top:24px;max-width:600px;margin-left:auto;margin-right:auto;padding:16px 20px;background:rgba(255,68,68,0.04);border:1px solid rgba(255,68,68,0.12);border-radius:8px;text-align:left">
+  <!-- CURRENT RULES -->
+  <div style="margin-top:24px;max-width:640px;margin-left:auto;margin-right:auto;padding:20px 24px;background:rgba(245,166,35,0.04);border:1px solid rgba(245,166,35,0.15);border-radius:12px;text-align:left">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:3px;color:var(--gold,#F5A623);font-weight:700;margin-bottom:12px">ACTIVE RULES — FROM DAY 111</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--text-dim,#8a9bb0);line-height:2">
+      <strong style="color:#fff">DAILY:</strong> Any Strava-logged activity = safe. Zero activity = ₹5,000 claimable.<br>
+      <strong style="color:#fff">WEEKLY:</strong> 100 km minimum across all sports (Mon–Sun). Swim 1 km = 10 km equivalent.<br>
+      <strong style="color:#fff">DEFICIT ≤ 50 km:</strong> Carries to next week (next week = 100 + deficit).<br>
+      <strong style="color:var(--red,#FF5252)">DEFICIT &gt; 50 km:</strong> ₹5,000 claimable + deficit × 2 punishment km (immutable).<br>
+      <strong style="color:#fff">CLAIM:</strong> First person to spot a miss → gets ₹5,000 via UPI within 24 hours.
+    </div>
+  </div>
+  <div style="margin-top:16px;max-width:640px;margin-left:auto;margin-right:auto;padding:16px 20px;background:rgba(255,68,68,0.04);border:1px solid rgba(255,68,68,0.12);border-radius:8px;text-align:left">
     <div style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:2px;color:var(--red,#FF5252);font-weight:700;margin-bottom:8px">IMMUTABLE BY DESIGN</div>
     <div style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--text-dim,#8a9bb0);line-height:1.8">
       This ledger cannot be tampered with — not even by the admin.<br>
@@ -584,6 +611,55 @@
   document.addEventListener('visibilitychange', function() {
     if (!document.hidden) loadSlips();
   });
+})();
+
+// GSAP reveals
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.utils.toArray('.reveal').forEach(function(el) {
+    gsap.to(el, { opacity:1, y:0, duration:0.8, ease:'power3.out',
+      scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
+  });
+  gsap.utils.toArray('.slip-entry').forEach(function(el, i) {
+    gsap.from(el, { opacity:0, x:-20, duration:0.4, delay:i*0.05, ease:'power2.out',
+      scrollTrigger: { trigger:el, start:'top 92%', toggleActions:'play none none none' } });
+  });
+}
+
+// THREE.JS PARTICLES — red-tinted for accountability
+(function(){
+  if (typeof THREE === 'undefined') return;
+  var canvas = document.getElementById('accParticles');
+  if (!canvas) return;
+  try {
+    var w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
+    camera.position.z = 6;
+    var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
+    renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setClearColor(0x000000, 0);
+    var count = w < 768 ? 1500 : 3000;
+    var geo = new THREE.BufferGeometry();
+    var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
+    var c1 = new THREE.Color(0xFF5252), c2 = new THREE.Color(0xF5A623), c3 = new THREE.Color(0x444444);
+    for (var i=0;i<count;i++) {
+      pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
+      var rnd=Math.random(); var c = rnd<0.2?c1:rnd<0.35?c2:c3;
+      cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    var mat = new THREE.PointsMaterial({size:1.2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.3, depthWrite:false});
+    var pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    var clock = new THREE.Clock();
+    function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.008; renderer.render(scene, camera); }
+    animate();
+    window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
+    window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.1, 1 - (window.scrollY||0)/1500); });
+  } catch(e) { canvas.style.display='none'; }
 })();
 </script>
 
