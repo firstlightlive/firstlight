@@ -1698,15 +1698,13 @@
       border: none;
     }
 
-    /* ── GSAP REVEAL CLASSES ── */
-    .reveal-el { opacity: 0; transform: translateY(25px); }
-    .reveal-el-left { opacity: 0; transform: translateX(-40px); }
-    .reveal-el-right { opacity: 0; transform: translateX(40px); }
-    .reveal-el-scale { opacity: 0; transform: scale(0.9); }
-    .no-gsap .reveal-el,
-    .no-gsap .reveal-el-left,
-    .no-gsap .reveal-el-right,
-    .no-gsap .reveal-el-scale { opacity: 1; transform: none; }
+    /* ── GSAP REVEAL CLASSES ──
+       Default: visible. GSAP sets initial opacity:0 via JS.
+       If GSAP fails/blocked, elements stay visible. ── */
+    .gsap-ready .reveal-el { opacity: 0; transform: translateY(25px); }
+    .gsap-ready .reveal-el-left { opacity: 0; transform: translateX(-40px); }
+    .gsap-ready .reveal-el-right { opacity: 0; transform: translateX(40px); }
+    .gsap-ready .reveal-el-scale { opacity: 0; transform: scale(0.9); }
   </style>
 </head>
 <body>
@@ -2784,6 +2782,8 @@
 if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
   try{
     gsap.registerPlugin(ScrollTrigger);
+    // Mark body so CSS hides elements ONLY when GSAP is confirmed ready
+    document.body.classList.add('gsap-ready');
 
     // ── HERO: Cinematic entrance sequence ──
     var heroTL = gsap.timeline({ delay: 0.3 });
@@ -2840,8 +2840,14 @@ if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
         scrollTrigger:{ trigger:claimBox, start:'top 88%', toggleActions:'play none none none' }});
     }
 
-  }catch(e){ document.body.classList.add('no-gsap'); }
+  }catch(e){ document.body.classList.remove('gsap-ready'); document.body.classList.add('no-gsap'); }
 }else{ document.body.classList.add('no-gsap'); }
+// Safety: if elements still hidden after 3s, force visible
+setTimeout(function(){
+  document.querySelectorAll('.reveal-el,.reveal-el-left,.reveal-el-right,.reveal-el-scale').forEach(function(el){
+    if(getComputedStyle(el).opacity==='0'){el.style.opacity='1';el.style.transform='none';}
+  });
+},3000);
 </script>
 
 <!-- Three.js particles — breathing field, green + cyan + gold (streak = alive) -->

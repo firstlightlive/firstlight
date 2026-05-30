@@ -27,10 +27,9 @@
       background-size:128px 128px;
     }
 
-    /* ── GSAP Reveal Classes ── */
-    .reveal-el { opacity:0; transform:translateY(25px); }
-    .reveal-el-scale { opacity:0; transform:scale(0.92); }
-    .no-gsap .reveal-el, .no-gsap .reveal-el-scale { opacity:1; transform:none; }
+    /* ── GSAP Reveal Classes — hidden only when GSAP confirmed ── */
+    .gsap-ready .reveal-el { opacity:0; transform:translateY(25px); }
+    .gsap-ready .reveal-el-scale { opacity:0; transform:scale(0.92); }
 
     /* ── Section Dividers ── */
     .section-divider {
@@ -367,6 +366,7 @@
 if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
   try{
     gsap.registerPlugin(ScrollTrigger);
+    document.body.classList.add('gsap-ready');
     // Hero entrance
     var heroTL=gsap.timeline({delay:0.3});
     document.querySelectorAll('.ig-header .reveal-el').forEach(function(el,i){
@@ -387,8 +387,9 @@ if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
       gsap.fromTo(el,{opacity:0,scale:0.92},{opacity:1,scale:1,duration:0.7,ease:'power3.out',
         scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}});
     });
-  }catch(e){document.body.classList.add('no-gsap')}
+  }catch(e){document.body.classList.remove('gsap-ready');document.body.classList.add('no-gsap')}
 }else{document.body.classList.add('no-gsap')}
+setTimeout(function(){document.querySelectorAll('.reveal-el,.reveal-el-scale').forEach(function(el){if(getComputedStyle(el).opacity==='0'){el.style.opacity='1';el.style.transform='none';}});},3000);
 </script>
 
 <!-- Three.js particles — Instagram gradient (purple + red + orange) -->
