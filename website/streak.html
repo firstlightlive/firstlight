@@ -1617,6 +1617,79 @@
       margin-top: 6px;
     }
 
+    /* ── STREAK BROKEN STATE ── */
+    .streak-broken-banner {
+      display: none;
+      position: relative;
+      margin: 24px auto 0;
+      max-width: 520px;
+      padding: 24px 28px;
+      background: rgba(255,40,40,0.06);
+      border: 2px solid rgba(255,82,82,0.5);
+      border-radius: 14px;
+      text-align: center;
+      animation: streak-broken-pulse 2s ease-in-out infinite;
+    }
+
+    .streak-broken-banner.active { display: block; }
+
+    @keyframes streak-broken-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,82,82,0.15), inset 0 0 20px rgba(255,82,82,0.03); border-color: rgba(255,82,82,0.5); }
+      50% { box-shadow: 0 0 40px rgba(255,82,82,0.3), inset 0 0 30px rgba(255,82,82,0.06); border-color: rgba(255,82,82,0.8); }
+    }
+
+    .streak-broken-banner__title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      font-weight: 700;
+      color: var(--cc-red);
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(255,82,82,0.4);
+    }
+
+    .streak-broken-banner__sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .streak-broken-banner__claim {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 700;
+      color: var(--cc-gold);
+      letter-spacing: 2px;
+      text-shadow: 0 0 16px rgba(245,166,35,0.3);
+      margin-bottom: 12px;
+    }
+
+    .streak-broken-banner__cta {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 10px 24px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--cc-red), #cc0000);
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .streak-broken-banner__cta:hover {
+      box-shadow: 0 0 20px rgba(255,82,82,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Streak hero — broken state overrides */
+    .streak-hero.broken { border-color: rgba(255,82,82,0.3); }
+    .streak-hero.broken .streak-pulse { background: var(--cc-red); box-shadow: 0 0 6px var(--cc-red); }
+    .streak-hero.broken .streak-alive { color: var(--cc-red); }
+
     /* ── SECTION DIVIDERS ── */
     .section-divider {
       height: 1px;
@@ -1688,6 +1761,14 @@
           <div style="text-align:center"><div style="font-size:clamp(1.5rem,4vw,2.5rem);font-weight:700;color:var(--text)" id="cdSecs">--</div><div style="font-size:8px;letter-spacing:2px;color:var(--text-dim)">SEC</div></div>
         </div>
         <div style="font-size:10px;color:var(--text-dim);margin-top:8px;letter-spacing:1px" id="countdownStatus"></div>
+      </div>
+
+      <!-- STREAK BROKEN BANNER — shown when deadline passes + no activities -->
+      <div class="streak-broken-banner" id="streakBrokenBanner">
+        <div class="streak-broken-banner__title">STREAK BROKEN</div>
+        <div class="streak-broken-banner__sub">No activity logged before deadline</div>
+        <div class="streak-broken-banner__claim" id="brokenClaimAmount">₹5,000 CLAIMABLE</div>
+        <a href="accountability.html" class="streak-broken-banner__cta">CLAIM NOW</a>
       </div>
     </div>
   </section>
@@ -1993,27 +2074,75 @@
         });
       }
 
-      // ── LIVE COUNTDOWN TO 6:00 AM DEADLINE ──
+      // ── LIVE COUNTDOWN + STREAK BREAK DETECTION ──
+      var _streakActivityCheck = { checked: false, hasActivity: false };
+
+      // Check if any activity exists for today
+      function checkTodayActivity() {
+        var _ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+        var todayStr = _ist.getFullYear() + '-' + String(_ist.getMonth()+1).padStart(2,'0') + '-' + String(_ist.getDate()).padStart(2,'0');
+
+        fetch(FL.SUPABASE_URL + '/rest/v1/strava_activities?start_date_local=gte.' + todayStr + 'T00:00:00&start_date_local=lt.' + todayStr + 'T23:59:59&select=id,type&limit=1', {
+          headers: { 'apikey': FL.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + FL.SUPABASE_ANON_KEY }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(acts) {
+          _streakActivityCheck.checked = true;
+          _streakActivityCheck.hasActivity = (acts && Array.isArray(acts) && acts.length > 0);
+          updateCountdown(); // re-render with activity status
+        })
+        .catch(function() {
+          _streakActivityCheck.checked = true;
+          _streakActivityCheck.hasActivity = false;
+        });
+      }
+
+      // Show streak broken state
+      function showStreakBroken() {
+        var banner = document.getElementById('streakBrokenBanner');
+        if (banner) banner.classList.add('active');
+
+        var stake = (typeof getCurrentStake === 'function') ? getCurrentStake().toLocaleString('en-IN') : '5,000';
+        var claimEl = document.getElementById('brokenClaimAmount');
+        if (claimEl) claimEl.textContent = '₹' + stake + ' CLAIMABLE';
+
+        // Update streak hero
+        var heroEl = document.querySelector('.streak-hero');
+        if (heroEl) heroEl.classList.add('broken');
+        var aliveEl = document.querySelector('.streak-alive');
+        if (aliveEl) aliveEl.textContent = 'STREAK BROKEN';
+
+        // Update beacon
+        var beacon = document.getElementById('proofBeacon');
+        var bLabel = document.getElementById('beaconLabel');
+        var bDetail = document.getElementById('beaconDetail');
+        if (beacon) beacon.className = 'proof-beacon proof-beacon--due reveal-el';
+        if (bLabel) bLabel.textContent = 'STREAK BROKEN — DAY ' + getDayNumber();
+        if (bDetail) bDetail.textContent = 'No activity logged. ₹' + stake + ' claimable.';
+      }
+
+      // Hide streak broken state
+      function hideStreakBroken() {
+        var banner = document.getElementById('streakBrokenBanner');
+        if (banner) banner.classList.remove('active');
+        var heroEl = document.querySelector('.streak-hero');
+        if (heroEl) heroEl.classList.remove('broken');
+        var aliveEl = document.querySelector('.streak-alive');
+        if (aliveEl) aliveEl.textContent = 'STREAK ALIVE';
+      }
+
       function updateCountdown() {
         var now = new Date();
         var currentHour = now.getHours();
         var deadline = new Date(now);
 
         // Deadline is always 6:00 AM
-        // Reset cycle: 1:00 AM → next 6:00 AM
-        // Before 1 AM = still counting to TODAY's 6 AM (already passed, show "proof posted")
-        // 1 AM - 6 AM = counting to THIS MORNING's 6 AM
-        // 6 AM onwards = show "proof posted" until 1 AM next day
-
         if (currentHour >= 1 && currentHour < 6) {
-          // 1 AM to 6 AM: countdown to today 6 AM
           deadline.setHours(6, 0, 0, 0);
         } else if (currentHour >= 6) {
-          // 6 AM to midnight: next deadline is tomorrow 6 AM
           deadline.setDate(deadline.getDate() + 1);
           deadline.setHours(6, 0, 0, 0);
         } else {
-          // midnight to 1 AM: still previous day's cycle, target today 6 AM
           deadline.setHours(6, 0, 0, 0);
         }
 
@@ -2032,33 +2161,62 @@
         if (cdM) cdM.textContent = String(mins).padStart(2, '0');
         if (cdS) cdS.textContent = String(secs).padStart(2, '0');
 
-        // Color phases based on time of day
+        var stake = (typeof getCurrentStake === 'function') ? getCurrentStake().toLocaleString('en-IN') : '5,000';
+
+        // After 6 AM: check if activity was logged
         if (currentHour >= 6 || currentHour < 1) {
-          // 6 AM to 1 AM: Green — today's proof should be done
-          if (cdH) cdH.style.color = 'var(--green)';
-          if (cdM) cdM.style.color = 'var(--green)';
-          if (cdS) cdS.style.color = 'var(--green)';
-          if (label) { label.textContent = 'STREAK STATUS'; label.style.color = 'var(--green)'; }
-          if (cdStatus) { cdStatus.textContent = 'Day ' + getDayNumber() + ' — Streak alive'; cdStatus.style.color = ''; }
+          if (_streakActivityCheck.checked && !_streakActivityCheck.hasActivity) {
+            // STREAK BROKEN — no activity found after deadline
+            if (cdH) cdH.style.color = 'var(--red)';
+            if (cdM) cdM.style.color = 'var(--red)';
+            if (cdS) cdS.style.color = 'var(--red)';
+            if (label) { label.textContent = 'STREAK BROKEN'; label.style.color = 'var(--red)'; }
+            if (cdStatus) { cdStatus.textContent = '₹' + stake + ' claimable — no activity logged'; cdStatus.style.color = 'var(--red)'; }
+            showStreakBroken();
+          } else if (_streakActivityCheck.checked && _streakActivityCheck.hasActivity) {
+            // STREAK ALIVE — activity confirmed
+            if (cdH) cdH.style.color = 'var(--green)';
+            if (cdM) cdM.style.color = 'var(--green)';
+            if (cdS) cdS.style.color = 'var(--green)';
+            if (label) { label.textContent = 'STREAK ALIVE'; label.style.color = 'var(--green)'; }
+            if (cdStatus) { cdStatus.textContent = 'Day ' + getDayNumber() + ' — Activity verified'; cdStatus.style.color = ''; }
+            hideStreakBroken();
+          } else {
+            // Still checking...
+            if (cdH) cdH.style.color = 'var(--gold)';
+            if (cdM) cdM.style.color = 'var(--gold)';
+            if (cdS) cdS.style.color = 'var(--gold)';
+            if (label) { label.textContent = 'CHECKING ACTIVITY...'; label.style.color = 'var(--gold)'; }
+            if (cdStatus) { cdStatus.textContent = 'Verifying Strava data...'; cdStatus.style.color = ''; }
+          }
         } else if (hours <= 2) {
           // Under 2 hours to 6 AM — RED urgent
           if (cdH) cdH.style.color = 'var(--red)';
           if (cdM) cdM.style.color = 'var(--red)';
           if (cdS) cdS.style.color = 'var(--red)';
           if (label) { label.textContent = 'ACTIVITY WINDOW CLOSING'; label.style.color = 'var(--red)'; }
-          if (cdStatus) { cdStatus.textContent = '₹' + (typeof getCurrentStake === 'function' ? getCurrentStake().toLocaleString('en-IN') : '5,000') + ' at risk'; cdStatus.style.color = 'var(--red)'; }
+          if (cdStatus) { cdStatus.textContent = '₹' + stake + ' at risk — log activity NOW'; cdStatus.style.color = 'var(--red)'; }
+          hideStreakBroken();
         } else {
           // 1 AM to 4 AM — GOLD warning
           if (cdH) cdH.style.color = 'var(--gold)';
           if (cdM) cdM.style.color = 'var(--gold)';
           if (cdS) cdS.style.color = 'var(--gold)';
-          if (label) { label.textContent = 'STREAK STATUS'; label.style.color = 'var(--gold)'; }
+          if (label) { label.textContent = 'COUNTDOWN TO DEADLINE'; label.style.color = 'var(--gold)'; }
           if (cdStatus) { cdStatus.textContent = 'Due at 6:00 AM — Day ' + getDayNumber(); cdStatus.style.color = ''; }
+          hideStreakBroken();
         }
       }
 
+      // Initial check + countdown
+      checkTodayActivity();
       updateCountdown();
       setInterval(updateCountdown, 1000);
+      // Re-check activity every 60 seconds (catches new Strava syncs)
+      setInterval(function() {
+        _streakActivityCheck.checked = false;
+        checkTodayActivity();
+      }, 60000);
 
     });
   </script>
