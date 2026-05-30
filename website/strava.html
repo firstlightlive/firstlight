@@ -144,8 +144,8 @@
     /* ═══ SPORT DNA — Circular Ring + Galaxy ═══ */
     .sv-dna-layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:center; margin-bottom:24px; }
     @media(max-width:600px) { .sv-dna-layout { grid-template-columns:1fr; } }
-    .sv-dna-ring-wrap { position:relative; width:280px; height:280px; margin:0 auto; }
-    @media(max-width:480px) { .sv-dna-ring-wrap { width:220px; height:220px; } }
+    .sv-dna-ring-wrap { position:relative; width:min(280px,80vw); height:min(280px,80vw); margin:0 auto; }
+    @media(max-width:480px) { .sv-dna-ring-wrap { width:min(220px,75vw); height:min(220px,75vw); } }
     #svDNARing { width:100%; height:100%; }
     .sv-dna-ring-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
     .sv-dna-ring-total { font-family:var(--s-mono); font-size:2.4rem; font-weight:700; color:#fff; }
@@ -323,8 +323,8 @@
     .sv-cta a:hover { background:rgba(252,76,2,0.08); border-color:var(--s-strava); color:#fff; box-shadow:0 0 30px rgba(252,76,2,0.1); }
 
     /* ═══ SUPERNOVA GALAXY ═══ */
-    .sv-orbit-wrap { position:relative; width:400px; height:400px; margin:0 auto 32px; }
-    @media(max-width:480px) { .sv-orbit-wrap { width:300px; height:300px; } }
+    .sv-orbit-wrap { position:relative; width:min(400px,85vw); height:min(400px,85vw); margin:0 auto 32px; }
+    @media(max-width:480px) { .sv-orbit-wrap { width:min(300px,80vw); height:min(300px,80vw); } }
     #svOrbitCanvas { width:100%; height:100%; }
     .sv-orbit-center {
       position:absolute; inset:0; display:flex; flex-direction:column;
