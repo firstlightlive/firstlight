@@ -378,6 +378,7 @@
 
     /* ═══ GSAP REVEALS ═══ */
     .reveal { opacity:0; transform:translateY(30px); transition:opacity 0.8s,transform 0.8s; }
+    .no-gsap .reveal, .reveal.visible { opacity:1; transform:translateY(0); }
     .reveal.visible { opacity:1; transform:translateY(0); }
   </style>
   <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
