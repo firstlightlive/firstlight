@@ -196,6 +196,8 @@
       position: relative;
       display: inline-block;
       margin-bottom: 16px;
+      /* Reserve space for the outermost ring (640px / 2 = 320px radius) */
+      padding: min(320px, 50vw) 0;
     }
 
     /* Ring 5 — RED — thick, innermost, fast pulse */
@@ -1890,12 +1892,15 @@
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-content">
+      <!-- ── ABOVE RINGS ── -->
       <div class="hero-system-status reveal-el">
         <span class="hero-system-dot"></span>
         SYSTEM: ACTIVE
       </div>
       <div class="reveal-el" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-bottom:20px"><span id="heroStatDays">--</span> DAYS · <span id="heroStatPosts">--</span> POSTS · <span id="heroStatActivities">--</span> STRAVA ACTIVITIES</div>
       <div class="hero-wordmark reveal-el">FIRST LIGHT</div>
+
+      <!-- ── RINGS + DAY NUMBER ── -->
       <div class="hero-day-wrap reveal-el-scale">
         <div class="hero-day-ring-6"></div>
         <div class="hero-day-ring-3"></div>
@@ -1907,6 +1912,8 @@
           <span class="prefix">DAY</span><span data-day>—</span>
         </div>
       </div>
+
+      <!-- ── BELOW RINGS ── -->
       <div class="hero-unclaimed reveal-el">₹<span data-unclaimed-plain>—</span> UNCLAIMED</div>
       <p class="hero-tagline reveal-el">No end date. No finish line. INFINITE.</p>
 
