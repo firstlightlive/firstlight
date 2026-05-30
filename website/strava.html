@@ -318,9 +318,9 @@
     }
     .sv-cta a:hover { background:rgba(252,76,2,0.08); border-color:var(--s-strava); color:#fff; box-shadow:0 0 30px rgba(252,76,2,0.1); }
 
-    /* ═══ ORBITAL SPORT RING ═══ */
-    .sv-orbit-wrap { position:relative; width:320px; height:320px; margin:0 auto 32px; }
-    @media(max-width:480px) { .sv-orbit-wrap { width:260px; height:260px; } }
+    /* ═══ SUPERNOVA GALAXY ═══ */
+    .sv-orbit-wrap { position:relative; width:400px; height:400px; margin:0 auto 32px; }
+    @media(max-width:480px) { .sv-orbit-wrap { width:300px; height:300px; } }
     #svOrbitCanvas { width:100%; height:100%; }
     .sv-orbit-center {
       position:absolute; inset:0; display:flex; flex-direction:column;
@@ -1094,7 +1094,7 @@
     document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
   }
 
-  // ═══ VISUALIZATION 1: ORBITAL SPORT RING ═══
+  // ═══ VISUALIZATION 1: SUPERNOVA GALAXY ═══
   (function(){
     var canvas = document.getElementById('svOrbitCanvas');
     if (!canvas) return;
@@ -1104,56 +1104,166 @@
     canvas.style.width = size + 'px'; canvas.style.height = size + 'px';
     ctx.scale(2, 2);
     var cx = size/2, cy = size/2;
-    var sports = [];
-    // Will be populated after data loads — store reference
-    window._orbitSports = sports;
+
+    window._orbitSports = [];
     window._orbitCanvas = { ctx:ctx, cx:cx, cy:cy, size:size };
+
+    // Particle system for each sport
+    var particles = [];
+    var novaReady = false;
+
+    function initParticles(sports) {
+      particles = [];
+      if (!sports || !sports.length) return;
+      var maxCount = Math.max.apply(null, sports.map(function(s){return s.count;})) || 1;
+      var totalCount = sports.reduce(function(a,b){return a+b.count;},0);
+
+      sports.forEach(function(s,i) {
+        var weight = s.count / maxCount; // 0-1
+        var pctOfTotal = s.count / totalCount;
+        // Position: spread in galaxy formation
+        var angle = (i / sports.length) * Math.PI * 2 - Math.PI/2;
+        var orbitR = size * 0.2 + weight * size * 0.15;
+        var starX = cx + Math.cos(angle) * orbitR;
+        var starY = cy + Math.sin(angle) * orbitR;
+        // Core size based on session count
+        var coreSize = 6 + weight * 18; // 6-24px
+        // Number of particles proportional to volume
+        var numParticles = Math.max(20, Math.round(pctOfTotal * 300));
+
+        // Store the star (central body)
+        s._x = starX; s._y = starY; s._core = coreSize; s._angle = angle; s._weight = weight;
+
+        // Generate particles around this star
+        for (var p = 0; p < numParticles; p++) {
+          var dist = Math.random() * coreSize * 3 + coreSize * 0.5;
+          var pAngle = Math.random() * Math.PI * 2;
+          var speed = 0.002 + Math.random() * 0.008;
+          var pSize = 0.5 + Math.random() * (1.5 + weight * 2);
+          var opacity = 0.1 + Math.random() * (0.4 + weight * 0.3);
+          particles.push({
+            star: i, dist: dist, angle: pAngle, speed: speed,
+            size: pSize, opacity: opacity, color: s.color,
+            drift: (Math.random() - 0.5) * 0.3 // radial drift
+          });
+        }
+      });
+      novaReady = true;
+    }
 
     var t = 0;
     function draw() {
       requestAnimationFrame(draw);
       var c = window._orbitCanvas;
       if (!c) return;
-      c.ctx.clearRect(0, 0, c.size, c.size);
       var sp = window._orbitSports;
-      if (!sp || !sp.length) return;
+      c.ctx.clearRect(0, 0, c.size, c.size);
 
-      // Draw orbit paths
-      sp.forEach(function(s) {
-        c.ctx.beginPath();
-        c.ctx.arc(c.cx, c.cy, s.radius, 0, Math.PI * 2);
-        c.ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-        c.ctx.lineWidth = 1;
-        c.ctx.stroke();
-      });
-
-      // Draw planets
-      t += 0.003;
-      sp.forEach(function(s) {
-        var angle = t * s.speed + s.offset;
-        var x = c.cx + Math.cos(angle) * s.radius;
-        var y = c.cy + Math.sin(angle) * s.radius;
-
-        // Glow
-        var grad = c.ctx.createRadialGradient(x, y, 0, x, y, s.dotSize * 3);
-        grad.addColorStop(0, s.color);
+      if (!novaReady || !sp || !sp.length) {
+        // Draw placeholder nebula
+        var grad = c.ctx.createRadialGradient(c.cx, c.cy, 0, c.cx, c.cy, c.size*0.4);
+        grad.addColorStop(0, 'rgba(252,76,2,0.04)');
+        grad.addColorStop(0.5, 'rgba(0,212,255,0.02)');
         grad.addColorStop(1, 'transparent');
         c.ctx.fillStyle = grad;
-        c.ctx.fillRect(x - s.dotSize * 3, y - s.dotSize * 3, s.dotSize * 6, s.dotSize * 6);
+        c.ctx.fillRect(0, 0, c.size, c.size);
+        return;
+      }
 
-        // Dot
+      t += 0.008;
+
+      // Draw connecting nebula threads between stars
+      c.ctx.save();
+      c.ctx.globalAlpha = 0.03;
+      sp.forEach(function(s1, i) {
+        sp.forEach(function(s2, j) {
+          if (j <= i) return;
+          c.ctx.beginPath();
+          c.ctx.moveTo(s1._x, s1._y);
+          var midX = (s1._x + s2._x)/2 + Math.sin(t + i) * 15;
+          var midY = (s1._y + s2._y)/2 + Math.cos(t + j) * 15;
+          c.ctx.quadraticCurveTo(midX, midY, s2._x, s2._y);
+          c.ctx.strokeStyle = s1.color;
+          c.ctx.lineWidth = 1;
+          c.ctx.stroke();
+        });
+      });
+      c.ctx.restore();
+
+      // Draw particles
+      particles.forEach(function(p) {
+        var star = sp[p.star];
+        if (!star) return;
+        p.angle += p.speed;
+        p.dist += p.drift * 0.05;
+        // Keep particles from drifting too far
+        if (p.dist > star._core * 4) p.drift = -Math.abs(p.drift);
+        if (p.dist < star._core * 0.3) p.drift = Math.abs(p.drift);
+
+        var px = star._x + Math.cos(p.angle) * p.dist;
+        var py = star._y + Math.sin(p.angle) * p.dist;
+
+        // Twinkle
+        var twinkle = 0.5 + 0.5 * Math.sin(t * 3 + p.angle * 5);
+
         c.ctx.beginPath();
-        c.ctx.arc(x, y, s.dotSize, 0, Math.PI * 2);
-        c.ctx.fillStyle = s.color;
+        c.ctx.arc(px, py, p.size, 0, Math.PI * 2);
+        c.ctx.fillStyle = p.color;
+        c.ctx.globalAlpha = p.opacity * twinkle;
+        c.ctx.fill();
+        c.ctx.globalAlpha = 1;
+      });
+
+      // Draw star cores (supernovae)
+      sp.forEach(function(s) {
+        // Outer glow — pulsing
+        var pulseScale = 1 + 0.15 * Math.sin(t * 2 + s._angle * 3);
+        var glowR = s._core * 2.5 * pulseScale;
+        var grad = c.ctx.createRadialGradient(s._x, s._y, 0, s._x, s._y, glowR);
+        grad.addColorStop(0, s.color);
+        grad.addColorStop(0.3, s.color.replace(')', ',0.3)').replace('rgb', 'rgba'));
+        grad.addColorStop(1, 'transparent');
+        c.ctx.fillStyle = grad;
+        c.ctx.beginPath();
+        c.ctx.arc(s._x, s._y, glowR, 0, Math.PI * 2);
+        c.ctx.fill();
+
+        // Core
+        c.ctx.beginPath();
+        c.ctx.arc(s._x, s._y, s._core * 0.6, 0, Math.PI * 2);
+        c.ctx.fillStyle = '#fff';
+        c.ctx.globalAlpha = 0.8 + 0.2 * Math.sin(t * 3);
+        c.ctx.fill();
+        c.ctx.globalAlpha = 1;
+
+        // Inner bright core
+        c.ctx.beginPath();
+        c.ctx.arc(s._x, s._y, s._core * 0.25, 0, Math.PI * 2);
+        c.ctx.fillStyle = '#fff';
         c.ctx.fill();
 
         // Label
-        c.ctx.font = '9px "IBM Plex Mono"';
-        c.ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        c.ctx.fillText(s.name, x + s.dotSize + 4, y + 3);
+        c.ctx.font = '700 10px "IBM Plex Mono"';
+        c.ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        c.ctx.textAlign = 'center';
+        c.ctx.fillText(s.name, s._x, s._y + s._core * 2.5 + 14);
+        c.ctx.font = '600 9px "IBM Plex Mono"';
+        c.ctx.fillStyle = s.color;
+        c.ctx.fillText(s.count + '', s._x, s._y + s._core * 2.5 + 26);
+        c.ctx.textAlign = 'left';
       });
+
+      // Center label
+      c.ctx.font = '700 11px "IBM Plex Mono"';
+      c.ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      c.ctx.textAlign = 'center';
+      c.ctx.fillText('SPORT DNA', c.cx, c.cy);
+      c.ctx.textAlign = 'left';
     }
     draw();
+
+    // Hook: populate with real data
+    window._initSupernova = initParticles;
   })();
 
   // ═══ VISUALIZATION 3: ECG HEART RATE ═══
@@ -1227,20 +1337,10 @@
   // These hook into the existing data pipeline via window globals
   // Orbital ring data
   window._populateOrbital = function(sports) {
-    var maxCount = Math.max.apply(null, sports.map(function(s){return s.count;})) || 1;
-    var size = window._orbitCanvas ? window._orbitCanvas.size : 300;
-    var minR = size * 0.18, maxR = size * 0.42;
-    window._orbitSports = sports.map(function(s, i) {
-      return {
-        name: s.name,
-        count: s.count,
-        color: s.color,
-        radius: minR + (s.count / maxCount) * (maxR - minR),
-        dotSize: 3 + (s.count / maxCount) * 6,
-        speed: 0.3 + (1 - s.count / maxCount) * 0.7,
-        offset: (i / sports.length) * Math.PI * 2
-      };
-    }).filter(function(s) { return s.count > 0; });
+    // Feed data to supernova galaxy
+    var filtered = sports.filter(function(s) { return s.count > 0; });
+    window._orbitSports = filtered;
+    if (typeof window._initSupernova === 'function') window._initSupernova(filtered);
     var totalEl = document.getElementById('svOrbitTotal');
     if (totalEl) totalEl.textContent = sports.reduce(function(a,b){return a+b.count;},0);
   };
