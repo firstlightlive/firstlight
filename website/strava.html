@@ -339,7 +339,7 @@
     #svECGCanvas { width:100%; height:60px; display:block; margin-top:16px; border-radius:8px; }
     #svConstellCanvas { width:100%; height:220px; display:block; border-radius:12px; }
 
-    /* ═══ WEEKLY 100KM GAUGE ═══ */
+    /* ═══ WEEKLY 150KM GAUGE ═══ */
     .sv-gauge-wrap {
       display:flex; align-items:center; justify-content:center; gap:40px;
       flex-wrap:wrap; margin-bottom:40px;
@@ -388,8 +388,8 @@
 <canvas id="sv-particles"></canvas>
 
 <!-- NAV -->
-<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">&#9670;</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>&mdash;</span></span></a><div class="nav-links"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link active">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
-<div class="nav-mobile"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link active">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">&#9670;</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>&mdash;</span></span></a><div class="nav-links"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link active">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link active">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
 <script>
 (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
 </script>
@@ -513,13 +513,13 @@
 <!-- ═══ WEEKLY TARGET ═══ -->
 <div class="sv-container reveal">
   <div class="sv-section-label">THIS WEEK</div>
-  <div class="sv-section-title">100 KM Target</div>
+  <div class="sv-section-title" id="svGaugeTitle">150 KM Target</div>
   <div class="sv-gauge-wrap">
     <div class="sv-gauge">
       <canvas id="svGaugeCanvas"></canvas>
       <div class="sv-gauge-center">
         <div class="sv-gauge-val" id="svGaugeVal">--</div>
-        <div class="sv-gauge-label">OF 100 KM</div>
+        <div class="sv-gauge-label" id="svGaugeLabel">OF 150 KM</div>
       </div>
     </div>
     <div class="sv-gauge-meta" id="svGaugeMeta">
@@ -661,6 +661,51 @@
 </div>
 
 </div><!-- /sv-page -->
+
+<!-- ═══ COMMUNITY COMMENTS ═══ -->
+<section style="max-width:900px;margin:0 auto;padding:60px 24px 0;position:relative;z-index:2">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:6px;color:#5A6B80;text-align:center;margin-bottom:8px">COMMUNITY</div>
+  <h2 style="font-family:'IBM Plex Mono',monospace;font-size:clamp(1.2rem,3vw,1.6rem);font-weight:700;letter-spacing:0.08em;color:#fff;text-align:center;margin-bottom:8px">The People Watching</h2>
+  <p style="font-family:'Inter',sans-serif;font-size:14px;color:#5A6B80;text-align:center;margin-bottom:24px">React. Comment. If the streak breaks — first commenter gets paid.</p>
+
+  <div class="cm-compose">
+    <div class="cm-compose-header">
+      <span class="cm-compose-icon">💬</span>
+      <span class="cm-compose-label">DROP A COMMENT</span>
+      <span class="cm-badge" id="cmBadge">0</span>
+    </div>
+    <textarea class="cm-textarea" id="cmInput" placeholder="Say something... cheer, challenge, or hold me accountable." maxlength="500" rows="3"></textarea>
+    <div id="cmImagePreview"></div>
+    <div class="cm-compose-footer">
+      <span class="cm-char-count" id="cmCharCount">0/500</span>
+      <button onclick="cmAttachImage()" style="background:transparent;border:1px solid rgba(0,212,255,0.15);color:#5A6B80;padding:8px 14px;border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:1px;transition:all 0.2s">📷 PHOTO</button>
+      <a class="cm-edit-profile" id="cmEditProfile" onclick="showIdentityModal();return false" style="display:none">EDIT PROFILE</a>
+      <button class="cm-post-btn" id="cmPostBtn" onclick="postComment()">POST COMMENT</button>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6B80;margin-top:8px;letter-spacing:0.5px">No sign-up needed. Post anonymously or <a onclick="showIdentityModal();return false" style="color:#00D4FF;cursor:pointer;text-decoration:underline">set your name</a>.</div>
+  </div>
+
+  <div class="cm-feed" id="cmFeed" style="max-height:none;overflow:visible">
+    <div id="cmMilestone"></div>
+    <div id="cmCommentList"></div>
+  </div>
+  <button class="cm-load-more" id="cmLoadMore" style="display:none" onclick="loadMoreComments()">LOAD MORE COMMENTS</button>
+</section>
+
+<!-- IDENTITY MODAL -->
+<div class="cm-modal" id="cmModal" style="display:none">
+  <div class="cm-modal-box">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:4px;color:#5A6B80;margin-bottom:16px">FIRST TIME HERE?</div>
+    <h3 style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:#fff;margin-bottom:8px">Join the Watch</h3>
+    <p style="font-family:'Inter',sans-serif;font-size:13px;color:#5A6B80;margin-bottom:16px">Your name appears publicly. Mobile & UPI stored privately — only used for stake payouts.</p>
+    <div style="margin-bottom:16px"><label class="form-label">DISPLAY NAME *</label><input type="text" class="form-input" id="cmName" placeholder="Your name" maxlength="30"></div>
+    <div style="margin-bottom:16px"><label class="form-label">MOBILE NUMBER</label><input type="tel" class="form-input" id="cmMobile" placeholder="+91 98765 43210" maxlength="15"></div>
+    <div style="margin-bottom:24px"><label class="form-label">UPI ID</label><input type="text" class="form-input" id="cmUPI" placeholder="name@upi" maxlength="50"></div>
+    <button class="btn btn-primary w-full" onclick="saveIdentity()">SAVE & CONTINUE</button>
+    <button class="btn btn-outline w-full" onclick="postAnonymous()" style="margin-top:8px">POST ANONYMOUSLY</button>
+    <button class="btn btn-outline w-full" onclick="closeIdentityModal()" style="margin-top:4px;border-color:rgba(255,255,255,0.1);color:#5A6B80">CANCEL</button>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">&#9670; FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> &middot; <span data-unclaimed></span> UNCLAIMED &middot; <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">&#9670; <span id="visitorCount">&mdash;</span> visitors since Day 1</div><div class="footer-copy">&copy; 2026 Anupam Kumar &middot; firstlight.live</div></div></div></footer>
@@ -990,14 +1035,39 @@
       ]);
     }
 
-    // ═══ HOOK: Weekly 100km gauge ═══
+    // ═══ HOOK: Weekly gauge — check wake violations to adjust target ═══
     if (typeof window._drawGauge === 'function') {
       var weekRun = thisWeek.filter(function(a){return a.type==='Run';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekRide = thisWeek.filter(function(a){return a.type==='Ride';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekWalk = thisWeek.filter(function(a){return a.type==='Walk';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekSwim = thisWeek.filter(function(a){return a.type==='Swim';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekTotal = weekRun + weekRide + weekWalk + (weekSwim * 10);
-      window._drawGauge(weekTotal, { run:weekRun, ride:weekRide, walk:weekWalk, swim:weekSwim });
+      // Check wake violations this week — wake >= 04:00 adds +20km to target
+      var ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+      var dow = ist.getDay(); var monOff = dow === 0 ? 6 : dow - 1;
+      var mon = new Date(ist); mon.setDate(ist.getDate() - monOff);
+      var monStr = mon.getFullYear()+'-'+String(mon.getMonth()+1).padStart(2,'0')+'-'+String(mon.getDate()).padStart(2,'0');
+      var todStr = ist.getFullYear()+'-'+String(ist.getMonth()+1).padStart(2,'0')+'-'+String(ist.getDate()).padStart(2,'0');
+      fetch(FL.SUPABASE_URL+'/rest/v1/health_daily?select=date,wake_time&date=gte.'+monStr+'&date=lte.'+todStr+'&wake_time=not.is.null',
+        {headers:{'apikey':FL.SUPABASE_ANON_KEY,'Authorization':'Bearer '+FL.SUPABASE_ANON_KEY}})
+        .then(function(r){return r.json()}).then(function(wakeData){
+          var violations = 0;
+          (wakeData||[]).forEach(function(w){ if(w.wake_time && w.wake_time >= '04:00') violations++; });
+          window._weekTarget = 150 + (violations > 0 ? 20 : 0);
+          window._drawGauge(weekTotal, { run:weekRun, ride:weekRide, walk:weekWalk, swim:weekSwim });
+          // Show violation badge
+          if (violations > 0) {
+            var badge = document.getElementById('svWakeBadge');
+            if (!badge) {
+              badge = document.createElement('div');
+              badge.id = 'svWakeBadge';
+              badge.style.cssText = 'font-family:"IBM Plex Mono",monospace;font-size:0.65rem;color:#FF5252;font-weight:700;text-align:center;margin-top:8px;letter-spacing:0.5px';
+              var gaugeSection = document.getElementById('svGaugeDeficit');
+              if (gaugeSection && gaugeSection.parentNode) gaugeSection.parentNode.appendChild(badge);
+            }
+            badge.textContent = 'WAKE VIOLATION (' + violations + 'x) — TARGET +20 KM';
+          }
+        }).catch(function(){ window._drawGauge(weekTotal, { run:weekRun, ride:weekRide, walk:weekWalk, swim:weekSwim }); });
     }
 
     // ═══ HOOK: Constellation monthly chart ═══
@@ -1199,8 +1269,10 @@
     if (totalEl) totalEl.textContent = sports.reduce(function(a,b){return a+b.count;},0);
   };
 
-  // Weekly gauge
+  // Weekly gauge — with wake violation check
+  window._weekTarget = 150; // base, updated by wake check
   window._drawGauge = function(km, breakdown) {
+    var target = window._weekTarget || 150;
     var canvas = document.getElementById('svGaugeCanvas');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
@@ -1209,7 +1281,7 @@
     canvas.style.width = size + 'px'; canvas.style.height = size + 'px';
     ctx.scale(2, 2);
     var cx = size/2, cy = size/2, r = size/2 - 12;
-    var pct = Math.min(km / 100, 1.5);
+    var pct = Math.min(km / target, 1.5);
 
     // Background ring
     ctx.beginPath();
@@ -1236,6 +1308,11 @@
     var valEl = document.getElementById('svGaugeVal');
     if (valEl) valEl.textContent = Math.round(km);
     if (valEl) valEl.style.color = color;
+    // Update gauge label with dynamic target
+    var labelEl = document.getElementById('svGaugeLabel');
+    if (labelEl) labelEl.textContent = 'OF ' + target + ' KM';
+    var titleEl = document.getElementById('svGaugeTitle');
+    if (titleEl) titleEl.textContent = target + ' KM Target';
 
     if (breakdown) {
       var el;
@@ -1243,7 +1320,7 @@
       el = document.getElementById('svGaugeRide'); if (el) el.textContent = Math.round(breakdown.ride);
       el = document.getElementById('svGaugeWalk'); if (el) el.textContent = Math.round(breakdown.walk);
       el = document.getElementById('svGaugeSwim'); if (el) el.textContent = (breakdown.swim * 10).toFixed(0);
-      var deficit = Math.max(0, 100 - km);
+      var deficit = Math.max(0, target - km);
       el = document.getElementById('svGaugeDeficit');
       if (el) { el.textContent = Math.round(deficit); el.style.color = deficit > 50 ? '#FF5252' : deficit > 0 ? '#F5A623' : '#00E676'; }
     }
@@ -1438,6 +1515,22 @@
     } catch(e) { canvas.style.display='none'; }
   })();
 })();
+
+// ── COMMENTS — page-specific source ──
+if (typeof setCommentPageSource === 'function') setCommentPageSource('strava');
+if (document.getElementById('cmFeed')) {
+  if (typeof loadComments === 'function') loadComments();
+  if (typeof checkMilestone === 'function') checkMilestone();
+  if (typeof getVisitorIdentity === 'function' && getVisitorIdentity()) {
+    var ep = document.getElementById('cmEditProfile');
+    if (ep) ep.style.display = 'inline';
+  }
+  var ci = document.getElementById('cmInput');
+  if (ci) ci.addEventListener('input', function() {
+    var cc = document.getElementById('cmCharCount');
+    if (cc) cc.textContent = this.value.length + '/500';
+  });
+}
 </script>
 
 </body>

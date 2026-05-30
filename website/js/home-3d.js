@@ -16,19 +16,23 @@
     SUPA = (window.FL && FL.SUPABASE_URL) || 'https://edgnudrbysybefbqyijq.supabase.co';
     KEY = (window.FL && FL.SUPABASE_ANON_KEY) || '';
 
-    populateDayNumbers();
-    initLenis();
-    initParticleHero();
-    initGSAPAnimations();
-    initHoloCard();
-    initECG();
-    initSleepWave();
-    initNavScroll();
-    loadLiveData();
-    loadMilestones();
-    // loadRaces(); — disabled, will be added later
-    renderWakeHeatmap();
-    renderTrainingHeatmap();
+    var steps = [
+      populateDayNumbers,
+      initLenis,
+      initParticleHero,
+      initGSAPAnimations,
+      initHoloCard,
+      initECG,
+      initSleepWave,
+      initNavScroll,
+      loadLiveData,
+      loadMilestones,
+      renderWakeHeatmap,
+      renderTrainingHeatmap
+    ];
+    steps.forEach(function (fn) {
+      try { fn(); } catch (e) { console.error('[home-3d] ' + fn.name + ' failed:', e); }
+    });
   }
 
   // ══════════════════════════════════
@@ -533,9 +537,15 @@
   //  LIVE DATA FROM SUPABASE
   // ══════════════════════════════════
   function fetchSB(table, query) {
-    return fetch(SUPA + '/rest/v1/' + table + (query || ''), {
+    var url = SUPA + '/rest/v1/' + table + (query || '');
+    return fetch(url, {
       headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
-    }).then(function (r) { return r.json(); }).catch(function () { return []; });
+    }).then(function (r) {
+      if (!r.ok) { console.warn('[fetchSB] ' + table + ' HTTP ' + r.status); return []; }
+      return r.json();
+    }).then(function (data) {
+      return Array.isArray(data) ? data : [];
+    }).catch(function (e) { console.error('[fetchSB] ' + table + ' error:', e); return []; });
   }
 
   function loadLiveData() {
@@ -565,7 +575,7 @@
     fetchSB('strava_activities', '?start_date_local=gte.' + mondayStr + 'T00:00:00&select=type,distance,moving_time,start_date_local&order=start_date_local.asc').then(function (acts) {
       if (!acts || !acts.length) return;
 
-      var totalSec = 0, runKm = 0, bikeKm = 0, swimKm = 0;
+      var totalSec = 0, runKm = 0, bikeKm = 0, swimKm = 0, walkKm = 0;
       var dayBars = [0, 0, 0, 0, 0, 0, 0]; // Mon-Sun
 
       acts.forEach(function (a) {
@@ -582,6 +592,7 @@
         if (t === 'Run' || t === 'VirtualRun') runKm += dist;
         else if (t === 'Ride') bikeKm += dist;
         else if (t === 'Swim') swimKm += dist;
+        else if (t === 'Walk' || t === 'Hike') walkKm += dist;
       });
 
       setVal('weekHours', (totalSec / 3600).toFixed(1), ' HRS');
@@ -592,12 +603,57 @@
 
       // Store bars for animation
       window._weekBarData = dayBars;
+
+      // Weekly gauge — check wake violations to determine target (150 base, +20 per violation)
+      var baseTarget = 150;
+      fetchSB('health_daily', '?select=date,wake_time&date=gte.' + mondayStr + '&date=lte.' + todayStr + '&wake_time=not.is.null').then(function (wakeData) {
+        var wakeViolations = 0;
+        (wakeData || []).forEach(function (w) {
+          if (w.wake_time && w.wake_time >= '04:00') wakeViolations++;
+        });
+        var weekTarget = baseTarget + (wakeViolations > 0 ? 20 : 0);
+        var weekTotal = runKm + bikeKm + walkKm + (swimKm * 10);
+        var weekPct = Math.min(100, Math.round(weekTotal / weekTarget * 100));
+        var deficit = Math.max(0, weekTarget - weekTotal);
+        var circ = 2 * Math.PI * 52;
+        var el;
+        el = document.getElementById('weekGaugeArc'); if (el) el.setAttribute('stroke-dasharray', Math.round(weekPct / 100 * circ) + ' ' + circ);
+        el = document.getElementById('weekGaugePct'); if (el) el.textContent = weekPct + '%';
+        el = document.getElementById('weekGaugeKm'); if (el) el.innerHTML = Math.round(weekTotal) + ' <span style="font-size:0.6em;color:var(--text-dim)">/ ' + weekTarget + ' KM</span>';
+        el = document.getElementById('weekGaugeRun'); if (el) el.textContent = Math.round(runKm);
+        el = document.getElementById('weekGaugeRide'); if (el) el.textContent = Math.round(bikeKm);
+        el = document.getElementById('weekGaugeWalk'); if (el) el.textContent = Math.round(walkKm);
+        el = document.getElementById('weekGaugeSwim'); if (el) el.textContent = (swimKm * 10).toFixed(0);
+        // Wake violation badge
+        var targetLabel = document.querySelector('#weekGaugeKm + div + div + div + div + div');
+        if (wakeViolations > 0) {
+          var badge = document.getElementById('weekWakeBadge');
+          if (!badge) {
+            badge = document.createElement('div');
+            badge.id = 'weekWakeBadge';
+            badge.style.cssText = 'font-family:var(--font-mono);font-size:0.65rem;color:#FF5252;font-weight:700;margin-top:6px;letter-spacing:0.5px';
+            var gaugeParent = document.getElementById('weekGaugeDeficit');
+            if (gaugeParent && gaugeParent.parentNode) gaugeParent.parentNode.insertBefore(badge, document.getElementById('weekGaugeDeficit'));
+          }
+          badge.textContent = 'WAKE VIOLATION (' + wakeViolations + 'x) — TARGET +20 KM';
+        }
+        el = document.getElementById('weekGaugeDeficit');
+        if (el) {
+          if (deficit <= 0) { el.textContent = 'TARGET HIT'; el.style.color = '#00E676'; }
+          else if (deficit > 50) { el.textContent = 'DEFICIT: ' + Math.round(deficit) + ' km — PENALTY ZONE'; el.style.color = '#FF5252'; }
+          else { el.textContent = 'DEFICIT: ' + Math.round(deficit) + ' km — carries forward'; el.style.color = '#F5A623'; }
+        }
+        // Update the static label
+        var staticLabel = document.querySelector('[data-week-target-label]');
+        if (staticLabel) staticLabel.textContent = '/ ' + weekTarget + ' KM';
+      });
     });
 
     // Today's Strava — render ALL activities dynamically (include sport_type for Dance/Boxing/etc)
+    console.log('[home] Fetching today activities for: ' + todayStr);
     fetchSB('strava_activities', '?start_date_local=gte.' + todayStr + 'T00:00:00&start_date_local=lt.' + todayStr + 'T23:59:59&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
+      console.log('[home] Today activities result:', acts.length, 'items', acts);
       renderTodayActivities(acts || []);
-      // Also update HR from any activity
       if (acts && acts.length) {
         acts.forEach(function (a) {
           if (a.average_heartrate) setVal('restHR', Math.round(a.average_heartrate), ' BPM');
@@ -605,23 +661,31 @@
       }
     });
 
-    // Lifetime stats
-    fetchSB('strava_activities', '?select=type,distance').then(function (acts) {
+    // Lifetime stats — include sport_type for Dance/Boxing/Pilates/Yoga breakdown
+    fetchSB('strava_activities', '?select=type,sport_type,distance').then(function (acts) {
       if (!acts || !acts.length) return;
-      var run = 0, bike = 0, swim = 0, gym = 0;
+      var run = 0, bike = 0, swim = 0, walk = 0, gym = 0, yoga = 0, dance = 0;
       acts.forEach(function (a) {
         var t = (a.type || '');
-        var tl = t.toLowerCase();
+        var st = (a.sport_type || t);
         var km = (a.distance || 0) / 1000;
         if (t === 'Run' || t === 'VirtualRun') run += km;
         else if (t === 'Ride') bike += km;
         else if (t === 'Swim') swim += km;
+        else if (t === 'Walk' || t === 'Hike') walk += km;
+        else if (st === 'Yoga' || st === 'Pilates') yoga++;
+        else if (st === 'Dance') dance++;
         else if (t === 'WeightTraining' || t === 'Workout') gym++;
+        else if (t === 'Yoga') yoga++;
+        else if (t === 'StairStepper') gym++;
       });
       setHTML('ltRun', Math.round(run).toLocaleString());
       setHTML('ltBike', Math.round(bike).toLocaleString());
       setHTML('ltSwim', swim.toFixed(1));
+      setHTML('ltWalk', Math.round(walk).toLocaleString());
       setHTML('ltGym', gym.toString());
+      setHTML('ltYoga', yoga.toString());
+      setHTML('ltDance', dance.toString());
       var day = getDayNum();
       var stake = getCumulativeUnclaimedHome(day);
       if (typeof formatINR === 'function') {
@@ -1085,7 +1149,7 @@
 
     if (!acts.length) {
       container.innerHTML =
-        '<div class="today-empty reveal-up">' +
+        '<div class="today-empty">' +
           '<div class="today-empty-icon">&#128694;</div>' +
           '<div class="today-empty-text">No activities logged yet today</div>' +
           '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:8px;opacity:0.5">Activities appear here as soon as they sync from Strava</div>' +
@@ -1128,43 +1192,39 @@
         pace = pm + ':' + String(ps).padStart(2, '0') + '/km';
       }
 
-      html += '<div class="act-card act-card--' + type + ' reveal-up">';
+      html += '<div class="act-card act-card--' + type + '" style="opacity:1;transform:none;visibility:visible">';
       html += '<div class="act-head">';
       var displayType = type.toUpperCase().replace('WEIGHTTRAINING', 'GYM').replace('VIRTUALRUN', 'RUN').replace('STAIRSTEPPER', 'STAIRS').replace('MARTIALARTS', 'MARTIAL ARTS');
       html += '<div class="act-type">' + (icons[type] || icons[a.type] || '&#127939;') + ' ' + displayType + '</div>';
       html += '<div class="act-time-badge">' + timeStr + '</div>';
       html += '</div>';
-      html += '<div class="act-metrics">';
+      html += '<div class="act-metrics" style="display:flex;gap:20px;flex-wrap:wrap">';
 
       if (km > 0.01) {
-        html += '<div class="act-metric"><div class="act-metric-val">' + km.toFixed(1) + '</div><div class="act-metric-label">KM</div></div>';
+        html += '<div class="act-metric"><div class="act-metric-val" style="color:#fff;font-size:1.6rem">' + km.toFixed(1) + '</div><div class="act-metric-label">KM</div></div>';
       }
-      html += '<div class="act-metric"><div class="act-metric-val">' + durStr + '</div><div class="act-metric-label">DURATION</div></div>';
+      html += '<div class="act-metric"><div class="act-metric-val" style="color:#fff;font-size:1.6rem">' + durStr + '</div><div class="act-metric-label">DURATION</div></div>';
       if (pace) {
-        html += '<div class="act-metric"><div class="act-metric-val">' + pace + '</div><div class="act-metric-label">PACE</div></div>';
+        html += '<div class="act-metric"><div class="act-metric-val" style="color:#fff;font-size:1.6rem">' + pace + '</div><div class="act-metric-label">PACE</div></div>';
       }
       if (hr) {
-        html += '<div class="act-metric"><div class="act-metric-val">' + hr + '</div><div class="act-metric-label">AVG HR</div></div>';
+        html += '<div class="act-metric"><div class="act-metric-val" style="color:#fff;font-size:1.6rem">' + hr + '</div><div class="act-metric-label">AVG HR</div></div>';
       }
       if (cal) {
-        html += '<div class="act-metric"><div class="act-metric-val">' + cal + '</div><div class="act-metric-label">CAL</div></div>';
+        html += '<div class="act-metric"><div class="act-metric-val" style="color:#fff;font-size:1.6rem">' + cal + '</div><div class="act-metric-label">CAL</div></div>';
       }
 
       html += '</div>';
-      if (a.name) html += '<div class="act-name">' + escHTML(a.name) + '</div>';
+      if (a.name) html += '<div class="act-name" style="color:#5A6B80;margin-top:12px">' + escHTML(a.name) + '</div>';
       html += '</div>';
     });
 
     container.innerHTML = html;
 
-    // GSAP animate
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    // GSAP animate — simple entrance, no ScrollTrigger (cards are dynamically injected)
+    if (typeof gsap !== 'undefined') {
       gsap.utils.toArray('#todayActivities .act-card').forEach(function (el, i) {
-        gsap.from(el, {
-          opacity: 0, y: 20, duration: 0.5, delay: i * 0.1,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' }
-        });
+        gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, delay: i * 0.1, ease: 'power2.out' });
       });
     }
   }

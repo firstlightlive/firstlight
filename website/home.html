@@ -630,7 +630,7 @@
        ============================================= */
     .stats-section { padding: 80px 0; }
     .stats-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
     }
     .stat-card {
       text-align: center; padding: 28px 12px;
@@ -643,10 +643,13 @@
       content:''; position:absolute; top:0; left:0; right:0; height:2px;
     }
     .stat-card:nth-child(1)::before { background: var(--strava); }
-    .stat-card:nth-child(2)::before { background: var(--green); }
-    .stat-card:nth-child(3)::before { background: var(--swim-blue); }
-    .stat-card:nth-child(4)::before { background: #AB47BC; }
-    .stat-card:nth-child(5)::before { background: var(--gold); }
+    .stat-card:nth-child(2)::before { background: var(--gold); }
+    .stat-card:nth-child(3)::before { background: var(--green); }
+    .stat-card:nth-child(4)::before { background: var(--swim-blue); }
+    .stat-card:nth-child(5)::before { background: #AB47BC; }
+    .stat-card:nth-child(6)::before { background: #26C6DA; }
+    .stat-card:nth-child(7)::before { background: #E040FB; }
+    .stat-card:nth-child(8)::before { background: var(--gold); }
     .stat-val {
       font-family: var(--font-mono); font-size: clamp(1.6rem, 4vw, 2.4rem);
       font-weight: 700; color: #fff; font-variant-numeric: tabular-nums;
@@ -656,7 +659,7 @@
       font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
       color: var(--text-dim);
     }
-    @media(max-width:768px) { .stats-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:768px) { .stats-grid { grid-template-columns: repeat(4,1fr); } }
     @media(max-width:480px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
 
     /* =============================================
@@ -790,6 +793,7 @@
       <a href="index.html">STREAK</a>
       <a href="strava.html">STRAVA</a>
       <a href="marathon.html">RACES</a>
+      <a href="ironman.html">IRONMAN</a>
       <a href="story.html">MY STORY</a>
       <a href="accountability.html">ACCOUNTABILITY</a>
       <span class="fl-nav-live"><span class="fl-nav-live-dot"></span> DAY <span id="navDay">--</span></span>
@@ -876,10 +880,36 @@
         </div>
       </div>
 
+      <!-- WEEKLY 150KM TARGET -->
+      <div style="margin-top:48px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;padding:28px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;opacity:1;transform:none">
+        <div style="position:relative;width:120px;height:120px">
+          <svg viewBox="0 0 120 120" style="width:120px;height:120px;transform:rotate(-90deg)">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+            <circle id="weekGaugeArc" cx="60" cy="60" r="52" fill="none" stroke="url(#weekGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 327" style="transition:stroke-dasharray 1.5s ease"/>
+            <defs><linearGradient id="weekGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FC4C02"/><stop offset="100%" stop-color="#00E676"/></linearGradient></defs>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div id="weekGaugePct" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:#fff">0%</div>
+            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim)">OF 150 KM</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:4px;color:var(--text-dim);margin-bottom:8px">WEEKLY TARGET</div>
+          <div id="weekGaugeKm" style="font-family:var(--font-mono);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:700;color:#fff">0 <span style="font-size:0.6em;color:var(--text-dim)">/ 150 KM</span></div>
+          <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--strava)"><span id="weekGaugeRun">0</span> km run</div>
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--green)"><span id="weekGaugeRide">0</span> km ride</div>
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold)"><span id="weekGaugeWalk">0</span> km walk</div>
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--swim-blue)"><span id="weekGaugeSwim">0</span> km swim (x10)</div>
+          </div>
+          <div style="margin-top:8px"><span id="weekGaugeDeficit" style="font-family:var(--font-mono);font-size:0.7rem;font-weight:700;color:var(--green)">On track</span></div>
+        </div>
+      </div>
+
       <!-- TODAY'S ACTIVITIES — dynamically populated from Strava -->
-      <div class="section-eyebrow reveal-up" style="margin-top:48px">TODAY'S ACTIVITIES</div>
-      <div id="todayActivities" class="bento-grid" style="margin-top:16px">
-        <div class="bento-card reveal-up" style="grid-column:1/-1;text-align:center;padding:32px">
+      <div class="section-eyebrow" style="margin-top:48px;opacity:1;transform:none">TODAY'S ACTIVITIES</div>
+      <div id="todayActivities" style="display:grid;grid-template-columns:1fr;grid-auto-rows:auto;gap:16px;margin-top:16px">
+        <div class="bento-card" style="grid-column:1/-1;text-align:center;padding:32px;opacity:1;transform:none">
           <div class="bento-sub">Loading today's Strava activities...</div>
         </div>
       </div>
@@ -909,9 +939,9 @@
       </div>
       <a href="accountability.html" class="holo-cta">CLAIM IF I MISS</a>
       <div style="margin-top:20px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;line-height:1.8;max-width:360px;text-align:center">
-        WEEKLY: 100 km minimum (all sports)<br>
+        WEEKLY: 150 km minimum (all sports). Wake violation = +20 km<br>
         DEFICIT &gt; 50 km = ₹5,000 claimable + punishment km<br>
-        SLIPS ARE IMMUTABLE — NO DELETE, NO EDIT
+        WAKE BEFORE 4 AM — NO SLEEP 4 AM TO 5 PM
       </div>
     </div>
   </section>
@@ -1005,9 +1035,12 @@
       <h2 class="section-heading reveal-up" style="text-align:center;margin-bottom:40px">The Numbers</h2>
       <div class="stats-grid">
         <div class="stat-card reveal-up"><div class="stat-val" id="ltRun">--</div><div class="stat-label">KM RUN</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltWalk">--</div><div class="stat-label">KM WALKED</div></div>
         <div class="stat-card reveal-up"><div class="stat-val" id="ltBike">--</div><div class="stat-label">KM CYCLED</div></div>
         <div class="stat-card reveal-up"><div class="stat-val" id="ltSwim">--</div><div class="stat-label">KM SWUM</div></div>
         <div class="stat-card reveal-up"><div class="stat-val" id="ltGym">--</div><div class="stat-label">GYM SESSIONS</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltYoga">--</div><div class="stat-label">YOGA / PILATES</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltDance">--</div><div class="stat-label">DANCE</div></div>
         <div class="stat-card reveal-up"><div class="stat-val" id="ltStake" style="color:var(--gold)">--</div><div class="stat-label">AT STAKE</div></div>
       </div>
     </div>
@@ -1035,7 +1068,7 @@
   <!-- Scripts -->
   <script src="js/config.js"></script>
   <script src="app.js"></script>
-  <script src="js/home-3d.js"></script>
+  <script src="js/home-3d.js?v=20260530"></script>
 
 </body>
 </html>

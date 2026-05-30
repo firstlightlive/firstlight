@@ -143,9 +143,9 @@
       text-decoration:none; transition:all 0.3s; backdrop-filter:blur(10px); }
     .im-cta a:hover { background:rgba(245,166,35,0.08); border-color:var(--im-gold); color:#fff; box-shadow:0 0 30px rgba(245,166,35,0.1); }
 
-    /* GSAP */
-    .reveal { opacity:0; transform:translateY(30px); transition:opacity 0.8s,transform 0.8s; }
-    .reveal.visible { opacity:1; transform:translateY(0); }
+    /* GSAP — fallback: if GSAP doesn't load, elements are visible */
+    .reveal { opacity:0; transform:translateY(25px); }
+    .reveal.visible, .no-gsap .reveal { opacity:1; transform:translateY(0); }
   </style>
   <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
 </head>
@@ -382,7 +382,10 @@
   var SUPA = FL.SUPABASE_URL, KEY = FL.SUPABASE_ANON_KEY;
 
   function fetchSB(table, q) {
-    return fetch(SUPA+'/rest/v1/'+table+(q||''),{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(function(r){return r.json()}).catch(function(){return[]});
+    return fetch(SUPA+'/rest/v1/'+table+(q||''),{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}})
+      .then(function(r){ if(!r.ok){console.warn('[ironman] fetch '+table+' HTTP '+r.status); return[];} return r.json(); })
+      .then(function(d){ return Array.isArray(d)?d:[]; })
+      .catch(function(e){ console.error('[ironman] fetch '+table+' error:',e); return[]; });
   }
 
   // Load all Strava data
@@ -428,25 +431,32 @@
     el=document.getElementById('imTotalAll'); if(el) el.textContent=Math.round(totalSwim+totalBike+totalRun);
   });
 
-  // GSAP
+  // GSAP — with fallback if it fails
   if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
-    gsap.registerPlugin(ScrollTrigger);
-    gsap.utils.toArray('.reveal').forEach(function(el){
-      gsap.to(el,{opacity:1,y:0,duration:0.8,ease:'power3.out',
-        scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}});
-    });
-    gsap.utils.toArray('.im-gauge-card').forEach(function(el,i){
-      gsap.from(el,{opacity:0,y:30,scale:0.95,duration:0.6,delay:i*0.15,ease:'back.out(1.4)',
-        scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'}});
-    });
-    gsap.utils.toArray('.im-year-card').forEach(function(el,i){
-      gsap.from(el,{opacity:0,y:20,duration:0.4,delay:i*0.08,ease:'power2.out',
-        scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}});
-    });
-    gsap.utils.toArray('.im-split-day').forEach(function(el,i){
-      gsap.from(el,{opacity:0,y:15,duration:0.3,delay:i*0.06,ease:'power2.out',
-        scrollTrigger:{trigger:el,start:'top 92%',toggleActions:'play none none none'}});
-    });
+    try {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.utils.toArray('.reveal').forEach(function(el){
+        gsap.to(el,{opacity:1,y:0,duration:0.8,ease:'power3.out',
+          scrollTrigger:{trigger:el,start:'top 92%',toggleActions:'play none none none'}});
+      });
+      gsap.utils.toArray('.im-gauge-card').forEach(function(el,i){
+        gsap.fromTo(el,{opacity:0,y:30,scale:0.95},{opacity:1,y:0,scale:1,duration:0.6,delay:i*0.15,ease:'back.out(1.4)',
+          scrollTrigger:{trigger:el,start:'top 92%',toggleActions:'play none none none'}});
+      });
+      gsap.utils.toArray('.im-year-card').forEach(function(el,i){
+        gsap.fromTo(el,{opacity:0,y:20},{opacity:1,y:0,duration:0.4,delay:i*0.08,ease:'power2.out',
+          scrollTrigger:{trigger:el,start:'top 92%',toggleActions:'play none none none'}});
+      });
+      gsap.utils.toArray('.im-split-day').forEach(function(el,i){
+        gsap.fromTo(el,{opacity:0,y:15},{opacity:1,y:0,duration:0.3,delay:i*0.06,ease:'power2.out',
+          scrollTrigger:{trigger:el,start:'top 92%',toggleActions:'play none none none'}});
+      });
+    } catch(e) {
+      console.error('[ironman] GSAP failed:', e);
+      document.body.classList.add('no-gsap');
+    }
+  } else {
+    document.body.classList.add('no-gsap');
   }
 
   // THREE.JS — tri-color particles (swim blue + bike green + run orange)
