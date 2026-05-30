@@ -182,8 +182,60 @@
 
 <!-- ═══ READINESS GAUGES ═══ -->
 <div class="im-container" style="padding-top:40px;padding-bottom:40px">
-  <div class="im-label reveal">READINESS</div>
-  <div class="im-heading reveal">How Close Am I?</div>
+  <!-- HALF IRONMAN 70.3 -->
+  <div class="im-label reveal">HALF IRONMAN 70.3</div>
+  <div class="im-heading reveal" style="margin-bottom:16px">1.9 km Swim + 90 km Bike + 21.1 km Run</div>
+  <div class="im-gauges" style="margin-bottom:60px">
+    <div class="im-gauge-card im-gauge-card--swim reveal">
+      <div class="im-gauge-ring im-gauge-ring--swim">
+        <svg viewBox="0 0 200 200">
+          <circle class="bg" cx="100" cy="100" r="85"/>
+          <circle class="progress" id="imHalfSwimArc" cx="100" cy="100" r="85" stroke-dasharray="0 534"/>
+        </svg>
+        <div class="im-gauge-center">
+          <div class="im-gauge-pct" id="imHalfSwimPct">--</div>
+          <div class="im-gauge-label">READY</div>
+        </div>
+      </div>
+      <div class="im-gauge-sport">SWIM</div>
+      <div class="im-gauge-best" id="imHalfSwimBest">-- km</div>
+      <div class="im-gauge-target">of 1.9 km target</div>
+    </div>
+    <div class="im-gauge-card im-gauge-card--bike reveal">
+      <div class="im-gauge-ring im-gauge-ring--bike">
+        <svg viewBox="0 0 200 200">
+          <circle class="bg" cx="100" cy="100" r="85"/>
+          <circle class="progress" id="imHalfBikeArc" cx="100" cy="100" r="85" stroke-dasharray="0 534"/>
+        </svg>
+        <div class="im-gauge-center">
+          <div class="im-gauge-pct" id="imHalfBikePct">--</div>
+          <div class="im-gauge-label">READY</div>
+        </div>
+      </div>
+      <div class="im-gauge-sport">BIKE</div>
+      <div class="im-gauge-best" id="imHalfBikeBest">-- km</div>
+      <div class="im-gauge-target">of 90 km target</div>
+    </div>
+    <div class="im-gauge-card im-gauge-card--run reveal">
+      <div class="im-gauge-ring im-gauge-ring--run">
+        <svg viewBox="0 0 200 200">
+          <circle class="bg" cx="100" cy="100" r="85"/>
+          <circle class="progress" id="imHalfRunArc" cx="100" cy="100" r="85" stroke-dasharray="0 534"/>
+        </svg>
+        <div class="im-gauge-center">
+          <div class="im-gauge-pct" id="imHalfRunPct">--</div>
+          <div class="im-gauge-label">READY</div>
+        </div>
+      </div>
+      <div class="im-gauge-sport">RUN</div>
+      <div class="im-gauge-best" id="imHalfRunBest">-- km</div>
+      <div class="im-gauge-target">of 21.1 km target</div>
+    </div>
+  </div>
+
+  <!-- FULL IRONMAN 140.6 -->
+  <div class="im-label reveal">FULL IRONMAN 140.6</div>
+  <div class="im-heading reveal" style="margin-bottom:16px">3.8 km Swim + 180 km Bike + 42.2 km Run</div>
   <div class="im-gauges">
     <div class="im-gauge-card im-gauge-card--swim reveal">
       <div class="im-gauge-ring im-gauge-ring--swim">
@@ -236,7 +288,24 @@
 <!-- ═══ DISTANCE PROGRESS BARS ═══ -->
 <div class="im-container im-progress-section">
   <div class="im-label reveal">PROGRESS</div>
-  <div class="im-heading reveal">Longest Effort vs Ironman Distance</div>
+  <div class="im-heading reveal">Longest Effort vs Race Distance</div>
+  <div style="font-family:var(--im-mono);font-size:10px;letter-spacing:3px;color:var(--im-dim);margin-bottom:16px" class="reveal">HALF IRONMAN 70.3</div>
+  <div class="im-progress-row reveal">
+    <div class="im-progress-sport" style="color:var(--im-swim)">SWIM</div>
+    <div class="im-progress-track"><div class="im-progress-fill im-progress-fill--swim" id="imHalfSwimBar" style="width:0%"></div></div>
+    <div class="im-progress-val" id="imHalfSwimVal">-- / 1.9 km</div>
+  </div>
+  <div class="im-progress-row reveal">
+    <div class="im-progress-sport" style="color:var(--im-bike)">BIKE</div>
+    <div class="im-progress-track"><div class="im-progress-fill im-progress-fill--bike" id="imHalfBikeBar" style="width:0%"></div></div>
+    <div class="im-progress-val" id="imHalfBikeVal">-- / 90 km</div>
+  </div>
+  <div class="im-progress-row reveal">
+    <div class="im-progress-sport" style="color:var(--im-run)">RUN</div>
+    <div class="im-progress-track"><div class="im-progress-fill im-progress-fill--run" id="imHalfRunBar" style="width:0%"></div></div>
+    <div class="im-progress-val" id="imHalfRunVal">-- / 21.1 km</div>
+  </div>
+  <div style="font-family:var(--im-mono);font-size:10px;letter-spacing:3px;color:var(--im-dim);margin:32px 0 16px" class="reveal">FULL IRONMAN 140.6</div>
   <div class="im-progress-row reveal">
     <div class="im-progress-sport" style="color:var(--im-swim)">SWIM</div>
     <div class="im-progress-track"><div class="im-progress-fill im-progress-fill--swim" id="imSwimBar" style="width:0%"></div></div>
@@ -328,38 +397,29 @@
       if(a.type==='Run'||a.type==='VirtualRun'){totalRun+=km; if(km>bestRun)bestRun=km;}
     });
 
-    var swimPct=Math.min(100,Math.round(bestSwim/3.8*100));
-    var bikePct=Math.min(100,Math.round(bestBike/180*100));
-    var runPct=Math.min(100,Math.round(bestRun/42.2*100));
     var circ=2*Math.PI*85; // ~534
 
-    // Gauges
-    var el;
-    el=document.getElementById('imSwimPct'); if(el) el.textContent=swimPct+'%';
-    el=document.getElementById('imBikePct'); if(el) el.textContent=bikePct+'%';
-    el=document.getElementById('imRunPct'); if(el) el.textContent=runPct+'%';
+    function setGauge(prefix, best, target, unit) {
+      var pct = Math.min(100, Math.round(best / target * 100));
+      var el;
+      el=document.getElementById(prefix+'Pct'); if(el) el.textContent=pct+'%';
+      el=document.getElementById(prefix+'Best'); if(el) el.textContent=(unit==='km2'?best.toFixed(2):best.toFixed(1))+' km';
+      setTimeout(function(){
+        el=document.getElementById(prefix+'Arc'); if(el) el.setAttribute('stroke-dasharray',Math.round(pct/100*circ)+' '+circ);
+        el=document.getElementById(prefix+'Bar'); if(el) el.style.width=pct+'%';
+      },500);
+      el=document.getElementById(prefix+'Val'); if(el) el.textContent=(unit==='km2'?best.toFixed(2):best.toFixed(1))+' / '+target+' km';
+    }
 
-    el=document.getElementById('imSwimBest'); if(el) el.textContent=bestSwim.toFixed(2)+' km';
-    el=document.getElementById('imBikeBest'); if(el) el.textContent=bestBike.toFixed(1)+' km';
-    el=document.getElementById('imRunBest'); if(el) el.textContent=bestRun.toFixed(1)+' km';
+    // HALF IRONMAN 70.3: 1.9 swim + 90 bike + 21.1 run
+    setGauge('imHalfSwim', bestSwim, 1.9, 'km2');
+    setGauge('imHalfBike', bestBike, 90, 'km1');
+    setGauge('imHalfRun', bestRun, 21.1, 'km1');
 
-    // Animate arcs
-    setTimeout(function(){
-      var s=document.getElementById('imSwimArc'); if(s) s.setAttribute('stroke-dasharray',Math.round(swimPct/100*circ)+' '+circ);
-      var b=document.getElementById('imBikeArc'); if(b) b.setAttribute('stroke-dasharray',Math.round(bikePct/100*circ)+' '+circ);
-      var r=document.getElementById('imRunArc'); if(r) r.setAttribute('stroke-dasharray',Math.round(runPct/100*circ)+' '+circ);
-    },500);
-
-    // Progress bars
-    setTimeout(function(){
-      var sb=document.getElementById('imSwimBar'); if(sb) sb.style.width=swimPct+'%';
-      var bb=document.getElementById('imBikeBar'); if(bb) bb.style.width=bikePct+'%';
-      var rb=document.getElementById('imRunBar'); if(rb) rb.style.width=runPct+'%';
-    },800);
-
-    el=document.getElementById('imSwimVal'); if(el) el.textContent=bestSwim.toFixed(2)+' / 3.8 km';
-    el=document.getElementById('imBikeVal'); if(el) el.textContent=bestBike.toFixed(1)+' / 180 km';
-    el=document.getElementById('imRunVal'); if(el) el.textContent=bestRun.toFixed(1)+' / 42.2 km';
+    // FULL IRONMAN 140.6: 3.8 swim + 180 bike + 42.2 run
+    setGauge('imSwim', bestSwim, 3.8, 'km2');
+    setGauge('imBike', bestBike, 180, 'km1');
+    setGauge('imRun', bestRun, 42.2, 'km1');
 
     // Lifetime
     el=document.getElementById('imTotalSwim'); if(el) el.textContent=totalSwim.toFixed(1);

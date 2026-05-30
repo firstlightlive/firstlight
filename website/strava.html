@@ -759,8 +759,13 @@
     var actUnit = document.getElementById('svTotalAct'); if (actUnit) actUnit.nextElementSibling.textContent = 'ACTIVITIES';
 
     var now = new Date();
-    var thisWeek = acts.filter(function(a) { var d = new Date(a.start_date_local); return (now - d) < 7*86400000; });
-    var lastWeek = acts.filter(function(a) { var d = new Date(a.start_date_local); var diff = now - d; return diff >= 7*86400000 && diff < 14*86400000; });
+    // Week = Monday to Sunday (IST)
+    var dayOfWeek = now.getDay(); // 0=Sun
+    var mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    var monday = new Date(now); monday.setDate(now.getDate() - mondayOffset); monday.setHours(0,0,0,0);
+    var lastMonday = new Date(monday); lastMonday.setDate(lastMonday.getDate() - 7);
+    var thisWeek = acts.filter(function(a) { var d = new Date(a.start_date_local); return d >= monday; });
+    var lastWeek = acts.filter(function(a) { var d = new Date(a.start_date_local); return d >= lastMonday && d < monday; });
     var twKm = thisWeek.reduce(function(s,a) { return s + parseFloat(a.distance||0)/1000; }, 0);
     var lwKm = lastWeek.reduce(function(s,a) { return s + parseFloat(a.distance||0)/1000; }, 0);
     if (lwKm > 0) {
