@@ -465,7 +465,7 @@
         <canvas id="svDNARing"></canvas>
         <div class="sv-dna-ring-center">
           <div class="sv-dna-ring-total" id="svDNARingTotal">--</div>
-          <div class="sv-dna-ring-label">SESSIONS</div>
+          <div class="sv-dna-ring-label" id="svDNARingLabel">TOTAL KM</div>
         </div>
       </div>
       <div class="sv-dna-legend" id="svDNALegend"></div>
@@ -1599,9 +1599,9 @@
     if (ringLabel) ringLabel.textContent = 'TOTAL KM';
 
     // Draw animated ring chart
-    drawDNARing(filtered, total);
+    drawDNARing(filtered);
     // Build legend
-    buildDNALegend(filtered, total);
+    buildDNALegend(filtered);
   };
 
   function drawDNARing(sports, totalIgnored) {
