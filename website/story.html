@@ -16,6 +16,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js"></script>
   <link rel="icon" type="image/png" href="icon-512.png">
   <link rel="apple-touch-icon" href="icon-512.png">
   <link rel="canonical" href="https://firstlight.live/story">
@@ -33,7 +37,12 @@
       background-size: 256px 256px;
     }
 
-    /* ===== ANIMATED PARTICLE BACKGROUND (CSS only) ===== */
+    /* ===== Three.js particle canvas ===== */
+    #storyParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .story-page { position:relative; z-index:2; }
+    .no-gsap .story-section > * { opacity:1 !important; transform:none !important; }
+
+    /* ===== ANIMATED PARTICLE BACKGROUND (CSS fallback) ===== */
     @keyframes particleDrift {
       0%   { background-position: 0% 0%, 100% 100%, 50% 50%; }
       50%  { background-position: 100% 20%, 0% 80%, 80% 20%; }
@@ -447,6 +456,8 @@
   (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
   </script>
 
+  <canvas id="storyParticles" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
+
   <div class="story-page">
 
     <!-- HERO -->
@@ -682,6 +693,97 @@
 
   <script src="js/config.js"></script>
   <script src="app.js"></script>
+
+  <!-- Lenis smooth scroll -->
+  <script>
+  if (typeof Lenis !== 'undefined') {
+    var lenis = new Lenis({ duration: 1.4, easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); } });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  }
+  </script>
+
+  <!-- GSAP reveals -->
+  <script>
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    try {
+      gsap.registerPlugin(ScrollTrigger);
+      // Section headings
+      gsap.utils.toArray('.story-h2').forEach(function(el) {
+        gsap.fromTo(el, {opacity:0, y:30}, {opacity:1, y:0, duration:0.8, ease:'power3.out',
+          scrollTrigger:{trigger:el, start:'top 88%', toggleActions:'play none none none'}});
+      });
+      // Paragraphs
+      gsap.utils.toArray('.story-p').forEach(function(el, i) {
+        gsap.fromTo(el, {opacity:0, y:20}, {opacity:1, y:0, duration:0.6, delay:0.05, ease:'power2.out',
+          scrollTrigger:{trigger:el, start:'top 90%', toggleActions:'play none none none'}});
+      });
+      // Pull quotes
+      gsap.utils.toArray('.story-pull').forEach(function(el) {
+        gsap.fromTo(el, {opacity:0, scale:0.96}, {opacity:1, scale:1, duration:0.7, ease:'back.out(1.3)',
+          scrollTrigger:{trigger:el, start:'top 85%', toggleActions:'play none none none'}});
+      });
+      // Section numbers
+      gsap.utils.toArray('.story-section-num').forEach(function(el) {
+        gsap.fromTo(el, {opacity:0, x:-30}, {opacity:0.06, x:0, duration:1, ease:'power3.out',
+          scrollTrigger:{trigger:el, start:'top 90%', toggleActions:'play none none none'}});
+      });
+      // Stats
+      gsap.utils.toArray('.story-stat').forEach(function(el, i) {
+        gsap.fromTo(el, {opacity:0, y:20, scale:0.95}, {opacity:1, y:0, scale:1, duration:0.5, delay:i*0.1, ease:'back.out(1.4)',
+          scrollTrigger:{trigger:el, start:'top 90%', toggleActions:'play none none none'}});
+      });
+      // Science sections
+      gsap.utils.toArray('.story-science-item').forEach(function(el, i) {
+        gsap.fromTo(el, {opacity:0, x:-20}, {opacity:1, x:0, duration:0.5, delay:i*0.1, ease:'power2.out',
+          scrollTrigger:{trigger:el, start:'top 90%', toggleActions:'play none none none'}});
+      });
+      // CTA
+      gsap.utils.toArray('.story-cta').forEach(function(el) {
+        gsap.fromTo(el, {opacity:0, scale:0.95}, {opacity:1, scale:1, duration:0.8, ease:'back.out(1.4)',
+          scrollTrigger:{trigger:el, start:'top 85%', toggleActions:'play none none none'}});
+      });
+    } catch(e) { document.body.classList.add('no-gsap'); }
+  } else { document.body.classList.add('no-gsap'); }
+  </script>
+
+  <!-- Three.js particles — warm gold + red (story = emotional) -->
+  <script>
+  (function(){
+    if (typeof THREE === 'undefined') return;
+    var canvas = document.getElementById('storyParticles');
+    if (!canvas) return;
+    try {
+      var w = window.innerWidth, h = window.innerHeight;
+      canvas.width = w; canvas.height = h;
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
+      camera.position.z = 6;
+      var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
+      renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setClearColor(0x000000, 0);
+      var count = w < 768 ? 1000 : 2000;
+      var geo = new THREE.BufferGeometry();
+      var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
+      var c1 = new THREE.Color(0xF5A623), c2 = new THREE.Color(0xFF5252), c3 = new THREE.Color(0x222222);
+      for (var i=0;i<count;i++) {
+        pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
+        var rnd=Math.random(); var c = rnd<0.12?c1:rnd<0.22?c2:c3;
+        cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
+      }
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+      var mat = new THREE.PointsMaterial({size:1.0, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.18, depthWrite:false});
+      var pts = new THREE.Points(geo, mat);
+      scene.add(pts);
+      var clock = new THREE.Clock();
+      function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.004; pts.rotation.x=Math.sin(t*0.002)*0.05; renderer.render(scene, camera); }
+      animate();
+      window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
+      window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.05, 1 - (window.scrollY||0)/1500); });
+    } catch(e) { canvas.style.display='none'; }
+  })();
+  </script>
   <script>
     // Init comments on story page
     if (document.getElementById('cmFeed')) {
