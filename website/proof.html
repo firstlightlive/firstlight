@@ -15,6 +15,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js"></script>
   <style>
     /* ── PROOF PAGE STYLES ── */
     .proof-header{text-align:center;padding:120px 0 40px;max-width:800px;margin:0 auto}
@@ -89,6 +93,9 @@
 (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
 </script>
 
+  <canvas id="proofParticles" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
+  <div style="position:relative;z-index:2">
+
   <!-- ═══ HEADER ═══ -->
   <section class="proof-header reveal">
     <h1>THE EVIDENCE</h1>
@@ -144,11 +151,10 @@
           <th>DAY</th>
           <th>DATE</th>
           <th>SLEEP</th>
-          <th>RUN KM</th>
-          <th>TIME</th>
-          <th>PACE</th>
+          <th>SPORTS</th>
+          <th>DISTANCE</th>
+          <th>DURATION</th>
           <th>HR</th>
-          <th>GYM</th>
           <th>FOOD</th>
           <th>₹ UNCLAIMED</th>
           <th>SOURCE</th>
@@ -296,46 +302,69 @@
       var streakData = data.filter(function(r) { return r.day_number && r.day_number > 0; });
 
       allRows = streakData.map(function(r) {
-        var runMin = r.run_time_sec ? Math.floor(r.run_time_sec / 60) : 0;
-        var runSec = r.run_time_sec ? r.run_time_sec % 60 : 0;
-        var km = r.run_km ? parseFloat(r.run_km) : 0;
-        var paceVal = (r.run_time_sec && km > 0) ? r.run_time_sec / 60 / km : null;
-        var paceStr = paceVal ? Math.floor(paceVal) + "'" + String(Math.round((paceVal % 1) * 60)).padStart(2,'0') + '"' : (r.run_pace || '—');
+        // Multi-sport: combine all distances
+        var runKm = r.run_km ? parseFloat(r.run_km) : 0;
+        var cycleKm = r.cycle_km ? parseFloat(r.cycle_km) : 0;
+        var swimKm = r.swim_km ? parseFloat(r.swim_km) : 0;
+        var totalKm = runKm + cycleKm + swimKm;
+
+        // Total duration
+        var totalSec = (r.run_time_sec || 0) + (r.cycle_time_sec || 0) + (r.swim_time_sec || 0);
+        var gymMin = r.gym_duration_min || (r.gym ? 60 : 0);
+        var totalMin = Math.round(totalSec / 60) + gymMin;
+        var durStr = totalMin > 0 ? (totalMin >= 60 ? Math.floor(totalMin/60) + 'h ' + (totalMin%60) + 'm' : totalMin + ' min') : '—';
+
+        // Sports done today
+        var sports = [];
+        if (runKm > 0) sports.push('Run');
+        if (cycleKm > 0) sports.push('Ride');
+        if (swimKm > 0) sports.push('Swim');
+        if (r.gym) sports.push('Gym');
+        var sportStr = sports.length ? sports.join('+') : '—';
+
+        // Distance display
+        var distStr = totalKm > 0 ? totalKm.toFixed(1) + ' km' : (r.gym ? 'Gym' : '—');
+
+        // Stake calculation using schedule
+        var stake = (typeof getCumulativeUnclaimed === 'function') ? getCumulativeUnclaimed(r.day_number) : r.day_number * 5000;
+
         return {
           day: r.day_number,
           date: r.date,
           sleep: r.sleep_hrs ? parseFloat(r.sleep_hrs).toFixed(1) : '—',
           sleepNum: r.sleep_hrs ? parseFloat(r.sleep_hrs) : null,
-          runKm: km > 0 ? km.toFixed(2) : '—',
-          runKmNum: km,
-          runTime: r.run_time_sec ? runMin + ':' + String(runSec).padStart(2,'0') : '—',
-          pace: paceStr,
-          paceNum: paceVal,
+          sports: sportStr,
+          distance: distStr,
+          distNum: totalKm,
+          duration: durStr,
+          durationMin: totalMin,
           hr: r.avg_hr ? Math.round(parseFloat(r.avg_hr)) : '—',
           hrNum: r.avg_hr ? parseFloat(r.avg_hr) : null,
-          gym: r.gym || false,
           food: r.food_clean !== false,
-          unclaimed: r.day_number * (FL.STAKE_PER_DAY || 15000),
-          source: r.run_source === 'strava' ? 'Strava ✓' : 'Apple Watch'
+          unclaimed: stake,
+          source: r.run_source === 'strava' ? 'Strava ✓' : 'Apple Watch',
+          // Keep for charts
+          runKmNum: runKm,
+          paceNum: (r.run_time_sec && runKm > 0) ? r.run_time_sec / 60 / runKm : null
         };
       });
       allRows.sort(function(a,b) { return b.day - a.day; });
       filteredRows = allRows;
 
       // Update summary cards
-      var totalKm = allRows.reduce(function(s,r) { return s + (parseFloat(r.runKm) || 0); }, 0);
+      var totalDist = allRows.reduce(function(s,r) { return s + (r.distNum || 0); }, 0);
       var sleepArr = allRows.filter(function(r) { return r.sleep !== '—'; });
       var avgSleep = sleepArr.length ? (sleepArr.reduce(function(s,r) { return s + parseFloat(r.sleep); }, 0) / sleepArr.length).toFixed(1) : '—';
-      var avgRun = allRows.filter(function(r) { return r.runKm !== '—'; });
-      var avgRunKm = avgRun.length ? (avgRun.reduce(function(s,r) { return s + parseFloat(r.runKm); }, 0) / avgRun.length).toFixed(1) : '—';
+      var activeDays = allRows.filter(function(r) { return r.sports !== '—'; });
+      var avgDist = activeDays.length ? (totalDist / activeDays.length).toFixed(1) : '—';
 
       // Update summary card values
       var tkEl = document.getElementById('proofTotalKm');
-      if (tkEl) tkEl.textContent = Math.round(totalKm) + ' km';
+      if (tkEl) tkEl.textContent = Math.round(totalDist) + ' km';
       var cards = document.querySelectorAll('.summary-card .value');
       if (cards.length >= 4) {
         cards[3].textContent = avgSleep + ' hrs';
-        cards[4].textContent = avgRunKm + ' km';
+        cards[4].textContent = avgDist + ' km';
       }
 
       renderTable();
@@ -345,7 +374,7 @@
     .catch(function(e) {
       console.error('[Proof]', e);
       var tbody = document.getElementById('proofBody');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;font-family:var(--font-mono);color:var(--red,#FF5252)">Failed to load evidence data. Please refresh the page.</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;font-family:var(--font-mono);color:var(--red,#FF5252)">Failed to load evidence data. Please refresh the page.</td></tr>';
     });
 
     function renderTable(){
@@ -365,15 +394,15 @@
       }
 
       tbody.innerHTML = page.map(function(r){
+        var sportColor = r.sports.includes('Run') ? '#FC4C02' : r.sports.includes('Ride') ? '#00D4FF' : r.sports.includes('Swim') ? '#00B0FF' : '#AB47BC';
         return '<tr>'+
           '<td>'+r.day+'</td>'+
           '<td>'+r.date+'</td>'+
-          '<td>'+r.sleep+' hrs</td>'+
-          '<td>'+r.runKm+'</td>'+
-          '<td>'+r.runTime+'</td>'+
-          '<td>'+(r.pace || '—')+'</td>'+
+          '<td style="color:'+(parseFloat(r.sleep)>=6?'var(--green)':'var(--red,#FF5252)')+'">'+r.sleep+'h</td>'+
+          '<td style="color:'+sportColor+';font-weight:700">'+r.sports+'</td>'+
+          '<td>'+r.distance+'</td>'+
+          '<td>'+r.duration+'</td>'+
           '<td>'+(r.hr || '—')+'</td>'+
-          '<td>'+(r.gym ? '<span class="check">✓</span>' : '<span class="miss">✗</span>')+'</td>'+
           '<td>'+(r.food ? '<span class="check">✓</span>' : '<span class="miss">✗</span>')+'</td>'+
           '<td>₹'+formatINR(r.unclaimed)+'</td>'+
           '<td style="color:'+(r.source==='Strava ✓'?'var(--green)':'var(--text-dim)')+'">'+r.source+'</td>'+
@@ -437,9 +466,9 @@
 
     /* ── CSV EXPORT ── */
     document.getElementById('exportCsv').addEventListener('click', function(){
-      var csv = 'DAY,DATE,SLEEP,RUN KM,RUN TIME,AVG HR,GYM,FOOD,UNCLAIMED,SOURCE\n';
+      var csv = 'DAY,DATE,SLEEP,SPORTS,DISTANCE,DURATION,AVG HR,FOOD,UNCLAIMED,SOURCE\n';
       allRows.forEach(function(r){
-        csv += r.day+','+r.date+','+r.sleep+','+r.runKm+','+r.runTime+','+r.hr+','+(r.gym?'YES':'NO')+','+(r.food?'YES':'NO')+','+r.unclaimed+','+r.source+'\n';
+        csv += r.day+','+r.date+','+r.sleep+','+r.sports+','+r.distance+','+r.duration+','+r.hr+','+(r.food?'YES':'NO')+','+r.unclaimed+','+r.source+'\n';
       });
       var blob = new Blob([csv], {type:'text/csv'});
       var a = document.createElement('a');
@@ -648,6 +677,21 @@
         cumCard(avgHrAll, 'BPM', 'AVG HEART RATE', '#FF5252');
     }
   }
+  </script>
+
+  </div><!-- z-index wrapper -->
+
+  <!-- Lenis -->
+  <script>if(typeof Lenis!=='undefined'){var l=new Lenis({duration:1.2,easing:function(t){return Math.min(1,1.001-Math.pow(2,-10*t))}});function r(t){l.raf(t);requestAnimationFrame(r)}requestAnimationFrame(r)}</script>
+
+  <!-- GSAP -->
+  <script>
+  if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){try{gsap.registerPlugin(ScrollTrigger);gsap.utils.toArray('.reveal').forEach(function(el){gsap.to(el,{opacity:1,y:0,duration:0.7,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}})});}catch(e){document.body.classList.add('no-gsap')}}else{document.body.classList.add('no-gsap')}
+  </script>
+
+  <!-- Three.js particles — cyan + green (evidence = verified) -->
+  <script>
+  (function(){if(typeof THREE==='undefined')return;var c=document.getElementById('proofParticles');if(!c)return;try{var w=innerWidth,h=innerHeight;c.width=w;c.height=h;var s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,w/h,0.1,1000);cam.position.z=6;var r=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:false});r.setSize(w,h);r.setPixelRatio(Math.min(devicePixelRatio,1.5));r.setClearColor(0,0);var n=w<768?1200:2500,g=new THREE.BufferGeometry(),p=new Float32Array(n*3),co=new Float32Array(n*3),c1=new THREE.Color(0x00D4FF),c2=new THREE.Color(0x00E676),c3=new THREE.Color(0x333333);for(var i=0;i<n;i++){p[i*3]=(Math.random()-0.5)*16;p[i*3+1]=(Math.random()-0.5)*16;p[i*3+2]=(Math.random()-0.5)*10;var rn=Math.random(),cl=rn<0.15?c1:rn<0.3?c2:c3;co[i*3]=cl.r;co[i*3+1]=cl.g;co[i*3+2]=cl.b}g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(co,3));var m=new THREE.PointsMaterial({size:1.2,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:0.2,depthWrite:false}),pts=new THREE.Points(g,m);s.add(pts);var cl=new THREE.Clock();function a(){requestAnimationFrame(a);var t=cl.getElapsedTime();pts.rotation.y=t*0.005;r.render(s,cam)}a();addEventListener('resize',function(){w=innerWidth;h=innerHeight;cam.aspect=w/h;cam.updateProjectionMatrix();r.setSize(w,h)});addEventListener('scroll',function(){c.style.opacity=Math.max(0.08,1-(scrollY||0)/1200)})}catch(e){c.style.display='none'}})();
   </script>
 
 </body>
