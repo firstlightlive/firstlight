@@ -1090,6 +1090,7 @@
 
     // ═══ HOOK: Multi-sport pace trends ═══
     (function() {
+      try {
       function fmtPace(p) { return Math.floor(p) + "'" + String(Math.round((p%1)*60)).padStart(2,'0') + '"'; }
       function fmtSpeed(kmh) { return kmh.toFixed(1) + ' km/h'; }
 
@@ -1127,6 +1128,7 @@
       });
 
       // Set per-sport stat cards
+      console.log('[strava] Pace data: run=' + sportPace.run.length + ' ride=' + sportPace.ride.length + ' swim=' + sportPace.swim.length);
       var el;
       if (sportPace.run.length) {
         var avgR = sportPace.run.reduce(function(a,b){return a+b},0)/sportPace.run.length;
@@ -1137,11 +1139,13 @@
         var avgB = sportPace.ride.reduce(function(a,b){return a+b},0)/sportPace.ride.length;
         el = document.getElementById('svBikeSpeedAvg'); if (el) el.textContent = fmtSpeed(avgB);
         el = document.getElementById('svBikeSpeedBest'); if (el) el.textContent = 'best: ' + fmtSpeed(sportBest.ride);
+        console.log('[strava] Bike avg speed: ' + fmtSpeed(avgB));
       }
       if (sportPace.swim.length) {
         var avgS = sportPace.swim.reduce(function(a,b){return a+b},0)/sportPace.swim.length;
         el = document.getElementById('svSwimPaceAvg'); if (el) el.textContent = fmtPace(avgS) + '/100m';
         el = document.getElementById('svSwimPaceBest'); if (el) el.textContent = 'best: ' + fmtPace(sportBest.swim) + '/100m';
+        console.log('[strava] Swim avg pace: ' + fmtPace(avgS) + '/100m');
       }
 
       // Store for tab switching
@@ -1213,6 +1217,7 @@
           window._drawPaceLine(avgValues, window._sportColors[sport], invert);
         }
       }
+      } catch(e) { console.error('[strava] Pace trends error:', e); }
     })();
 
     // ═══ HOOK: Training Plan (Ironman Base Building Week) ═══
