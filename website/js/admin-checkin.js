@@ -78,6 +78,7 @@ function renderCheckin() {
   // Auto-check for missed punishments on every panel open
   checkMissedSealPunishments();
   checkMissedRunPunishment();
+  checkMissedMorningCheckin();
 
   var date = getEffectiveToday();
   var locked = typeof isDateLocked === 'function' && isDateLocked(date);
@@ -497,6 +498,94 @@ async function checkMissedSealPunishments() {
 
   if (newSlips.length > 0) {
     alert('⚠ MISSED SEAL PENALTY\n\nYou did not seal the following day(s):\n' + newSlips.join(', ') + '\n\nPunishment per day: 25 KM WALK  OR  50 KM CYCLING\n\nThese slips are PERMANENT and cannot be deleted.\nServe every penalty before the streak continues.');
+  }
+}
+
+// ── AUTO-PUNISHMENT: Morning check-in not ticked ──
+// If app_updated was NOT marked true for a locked day → 20 km walk punishment.
+// Enforced from 2026-06-02 (next Monday) onward.
+var _morningCheckDone = false;
+async function checkMissedMorningCheckin() {
+  if (_morningCheckDone) return;
+  var today = getEffectiveToday();
+  var lastCheck = localStorage.getItem('fl_morning_check_date');
+  if (lastCheck === today) { _morningCheckDone = true; return; }
+  _morningCheckDone = true;
+
+  var ENFORCE_FROM = '2026-06-02'; // next Monday
+  var newSlips = [];
+
+  for (var i = 1; i <= 7; i++) {
+    var d = new Date(today + 'T12:00:00');
+    d.setDate(d.getDate() - i);
+    var dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+
+    // Only enforce from June 2 onward
+    if (dateStr < ENFORCE_FROM) continue;
+    // Only check locked days
+    if (!isDateLocked(dateStr)) continue;
+
+    var checkin = getCheckin(dateStr);
+    // If morning check-in was ticked → fine
+    if (checkin && checkin.app_updated === true) continue;
+    // If day was sealed (implies check-in was done) → fine
+    if (checkin && checkin.sealed === true) continue;
+    // If no checkin record at all for this day → skip (user didn't open app)
+    if (!checkin || Object.keys(checkin).length === 0) continue;
+
+    // Deterministic ID
+    var slipId = 'slip_morning_' + dateStr;
+
+    // Dedup: localStorage
+    var slips = [];
+    try { slips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) {}
+    var exists = slips.some(function(s) {
+      return s.id === slipId || (s.date === dateStr && s.rule === 'Missed Morning Check-in');
+    });
+    if (exists) continue;
+
+    // Dedup: Supabase
+    if (typeof sbFetch === 'function') {
+      try {
+        var remote = await sbFetch('slips', 'GET', null,
+          '?select=id&date=eq.' + dateStr + '&rule=eq.Missed Morning Check-in&limit=1');
+        if (remote && Array.isArray(remote) && remote.length > 0) continue;
+      } catch(_e) {}
+    }
+
+    var slip = {
+      id: slipId,
+      client_id: slipId,
+      date: dateStr,
+      rule: 'Missed Morning Check-in',
+      category: 'food_violation',
+      description: 'Morning check-in was not marked as completed on ' + dateStr + '.',
+      function_met: false,
+      upstream_gap: 'Did not tick "YES — UPDATED" in the morning check-in section.',
+      insight: 'The morning check-in ensures daily accountability. Missing it triggers an automatic 20 km walk punishment.',
+      penalty_type: '20km walk',
+      penalty_km: 20,
+      penalty_walk_km: 20,
+      penalty_cycling_km: 40,
+      penalty_status: 'pending',
+      proof_url: null,
+      created_at: new Date().toISOString(),
+      immutable: true
+    };
+
+    slips.push(slip);
+    localStorage.setItem('fl_slips', JSON.stringify(slips));
+
+    if (typeof syncSave === 'function') syncSave('slips', slip, 'id');
+    if (typeof sbFetch === 'function') sbFetch('slips', 'POST', slip, '?on_conflict=id');
+
+    newSlips.push(dateStr);
+  }
+
+  localStorage.setItem('fl_morning_check_date', today);
+
+  if (newSlips.length > 0) {
+    alert('⚠ MISSED MORNING CHECK-IN\n\nYou did not complete the morning check-in on:\n' + newSlips.join(', ') + '\n\nPunishment per day: 20 KM WALK or 40 KM CYCLING\n\nThese slips are PERMANENT. Enforced from June 2, 2026.');
   }
 }
 
