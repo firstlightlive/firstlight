@@ -2258,19 +2258,9 @@
         var todayProof = (data && data.length > 0) ? data[0] : null;
         var hasRun = todayProof && todayProof.run_km && parseFloat(todayProof.run_km) > 0;
 
-        // Run check: has a run been logged today?
-        var pastRunDeadline = false; // no run-specific deadline, just daily activity deadline at 11:59 PM
-        var runMissed = pastRunDeadline && !hasRun;
-
-        // Show/hide run missed banner
+        // No run-specific deadline — any activity before 11:59 PM counts
         var runBanner = document.getElementById('runMissedBanner');
-        if (runBanner) {
-          if (runMissed) {
-            runBanner.style.display = 'flex';
-          } else {
-            runBanner.style.display = 'none';
-          }
-        }
+        if (runBanner) runBanner.style.display = 'none';
 
         // Sleep — try proof_archive first, fallback to sleep_log table
         var sleepEl = document.querySelector('[data-sleep-hrs]');
@@ -2388,24 +2378,10 @@
         var sleepPctEl = document.getElementById('tsSleepPct'); if (sleepPctEl) sleepPctEl.textContent = sleepHrs > 0 ? sleepPct + '%' : '—';
         setTsBadge('tsSleepBadge', hasSleep, false, sleepHrs > 0 ? sleepPct + '%' : 'PENDING');
 
-        setTsBadge('tsRunBadge', hasRun, false, runMissed ? 'MISSED ⚠' : 'PENDING');
+        setTsBadge('tsRunBadge', hasRun, false, 'PENDING');
         var runSubEl = document.querySelector('[data-run-time]');
-        if (runSubEl) {
-          if (hasRun) { /* keep existing pace text */ }
-          else if (runMissed) {
-            runSubEl.textContent = '⚠ NOT COMPLETED YET — ACTIVITY REQUIRED BEFORE 11:59 PM';
-            runSubEl.style.color = 'var(--red, #FF5252)';
-          } else if (pastRunDeadline) {
-            runSubEl.textContent = 'Checking Strava sync...';
-          } else {
-            runSubEl.textContent = 'Must finish before 11:59 PM · Syncs every 3 hrs';
-          }
-        }
-        var runBadgeEl = document.getElementById('tsRunBadge');
-        if (runBadgeEl && runMissed) {
-          runBadgeEl.className = 'ts-card-badge ts-badge-rest';
-          runBadgeEl.style.color = 'var(--red,#FF5252)';
-          runBadgeEl.style.borderColor = 'rgba(255,82,82,0.3)';
+        if (runSubEl && !hasRun) {
+          runSubEl.textContent = 'Syncs every 3 hrs · Any activity counts';
         }
         setTsBadge('tsGymBadge', hasGym, !hasGym && hour >= 23, 'PENDING');
         setTsBadge('tsBikeBadge', hasBike, !hasBike && hour >= 23, 'PENDING');
@@ -2419,9 +2395,7 @@
           else { el.textContent = pendingLabel; el.className = 'ts-chip ts-chip-pending'; }
         }
         setTsChip('tsChipSleep', hasSleep, false, '💤 DONE', '💤 SYNCING');
-        setTsChip('tsChipRun', hasRun, false, '🏃 DONE', runMissed ? '🏃 MISSED ⚠' : '🏃 PENDING');
-        var chipRun = document.getElementById('tsChipRun');
-        if (chipRun && runMissed) { chipRun.style.color = 'var(--red,#FF5252)'; chipRun.style.borderColor = 'rgba(255,82,82,0.3)'; }
+        setTsChip('tsChipRun', hasRun, false, '🏃 DONE', '🏃 PENDING');
         setTsChip('tsChipGym', hasGym, !hasGym && hour >= 23, '🏋️ DONE', '🏋️ PENDING');
         setTsChip('tsChipBike', hasBike, !hasBike && hour >= 23, '🚴 DONE', '🚴 PENDING');
         setTsChip('tsChipSwim', hasSwim, !hasSwim && hour >= 23, '🏊 DONE', '🏊 PENDING');
