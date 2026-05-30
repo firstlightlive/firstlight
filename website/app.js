@@ -2440,8 +2440,22 @@ function trackVisitor() {
     var today = getEffectiveToday();
     sbFetch('site_visits', 'POST', { date: today, page: page.replace('.html', ''), visitor_id: vid });
 
-    // Update daily stats (upsert)
-    sbFetch('site_stats', 'POST', { date: today, total_visits: 1, unique_visitors: 1 }, '?on_conflict=date');
+    // Increment daily stats
+    (async function() {
+      try {
+        var existing = await sbFetch('site_stats', 'GET', null, '?date=eq.' + today + '&select=total_visits,unique_visitors');
+        if (existing && Array.isArray(existing) && existing.length > 0) {
+          var current = existing[0];
+          sbFetch('site_stats', 'PATCH', {
+            total_visits: (current.total_visits || 0) + 1
+          }, '?date=eq.' + today);
+        } else {
+          sbFetch('site_stats', 'POST', { date: today, total_visits: 1, unique_visitors: 1 });
+        }
+      } catch(e) {
+        sbFetch('site_stats', 'POST', { date: today, total_visits: 1, unique_visitors: 1 }, '?on_conflict=date');
+      }
+    })();
   }
 }
 

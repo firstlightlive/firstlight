@@ -294,32 +294,71 @@
       return allData;
     }
 
-    fetchAllProofData()
-    .then(function(data) {
+    // Fetch strava activities for enrichment (swim/walk/workout data missing from proof_archive)
+    async function fetchStravaByDate() {
+      var map = {};
+      try {
+        var resp = await fetch(SUPA + '/rest/v1/strava_activities?select=type,sport_type,distance,moving_time,start_date_local&order=start_date_local.desc', {
+          headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
+        });
+        var acts = await resp.json();
+        if (acts && Array.isArray(acts)) {
+          acts.forEach(function(a) {
+            var date = (a.start_date_local || '').substring(0, 10);
+            if (!date) return;
+            if (!map[date]) map[date] = { run:0, ride:0, swim:0, walk:0, gym:0, runSec:0, rideSec:0, swimSec:0, walkSec:0, gymSec:0, types:[] };
+            var km = (a.distance || 0) / 1000;
+            var sec = a.moving_time || 0;
+            var t = a.type || '';
+            if (t === 'Run' || t === 'VirtualRun') { map[date].run += km; map[date].runSec += sec; map[date].types.push('Run'); }
+            else if (t === 'Ride') { map[date].ride += km; map[date].rideSec += sec; map[date].types.push('Ride'); }
+            else if (t === 'Swim') { map[date].swim += km; map[date].swimSec += sec; map[date].types.push('Swim'); }
+            else if (t === 'Walk' || t === 'Hike') { map[date].walk += km; map[date].walkSec += sec; map[date].types.push('Walk'); }
+            else if (t === 'Workout' || t === 'WeightTraining') { map[date].gymSec += sec; map[date].types.push('Gym'); }
+            else if (a.sport_type === 'Dance' || a.sport_type === 'Pilates' || a.sport_type === 'Yoga') { map[date].gymSec += sec; map[date].types.push(a.sport_type); }
+          });
+        }
+      } catch(e) { console.warn('[proof] Strava enrichment failed:', e); }
+      return map;
+    }
+
+    Promise.all([fetchAllProofData(), fetchStravaByDate()])
+    .then(function(results) {
+      var data = results[0];
+      var stravaMap = results[1];
       if (!data || !data.length) return;
 
-      // Only keep streak days (day_number > 0) — filter out pre-streak 2025 data
       var streakData = data.filter(function(r) { return r.day_number && r.day_number > 0; });
 
       allRows = streakData.map(function(r) {
-        // Multi-sport: combine all distances
-        var runKm = r.run_km ? parseFloat(r.run_km) : 0;
-        var cycleKm = r.cycle_km ? parseFloat(r.cycle_km) : 0;
-        var swimKm = r.swim_km ? parseFloat(r.swim_km) : 0;
-        var totalKm = runKm + cycleKm + swimKm;
+        // Get Strava data for this date (more complete than proof_archive)
+        var strava = stravaMap[r.date] || {};
 
-        // Total duration
-        var totalSec = (r.run_time_sec || 0) + (r.cycle_time_sec || 0) + (r.swim_time_sec || 0);
+        // Use Strava data if available, fallback to proof_archive
+        var runKm = strava.run || (r.run_km ? parseFloat(r.run_km) : 0);
+        var cycleKm = strava.ride || (r.cycle_km ? parseFloat(r.cycle_km) : 0);
+        var swimKm = strava.swim || (r.swim_km ? parseFloat(r.swim_km) : 0);
+        var walkKm = strava.walk || 0;
+        var totalKm = runKm + cycleKm + swimKm + walkKm;
+
+        // Duration from Strava (more complete)
+        var totalSec = (strava.runSec || r.run_time_sec || 0) + (strava.rideSec || r.cycle_time_sec || 0) + (strava.swimSec || r.swim_time_sec || 0) + (strava.walkSec || 0) + (strava.gymSec || 0);
         var gymMin = r.gym_duration_min || (r.gym ? 60 : 0);
-        var totalMin = Math.round(totalSec / 60) + gymMin;
+        if (strava.gymSec > 0) gymMin = Math.round(strava.gymSec / 60);
+        var totalMin = Math.round(totalSec / 60);
         var durStr = totalMin > 0 ? (totalMin >= 60 ? Math.floor(totalMin/60) + 'h ' + (totalMin%60) + 'm' : totalMin + ' min') : '—';
 
-        // Sports done today
+        // Sports from Strava (deduplicated)
         var sports = [];
-        if (runKm > 0) sports.push('Run');
-        if (cycleKm > 0) sports.push('Ride');
-        if (swimKm > 0) sports.push('Swim');
-        if (r.gym) sports.push('Gym');
+        var seen = {};
+        (strava.types || []).forEach(function(t) { if (!seen[t]) { seen[t] = true; sports.push(t); } });
+        // Fallback if no Strava data
+        if (!sports.length) {
+          if (runKm > 0) sports.push('Run');
+          if (cycleKm > 0) sports.push('Ride');
+          if (swimKm > 0) sports.push('Swim');
+          if (r.gym) sports.push('Gym');
+        }
         var sportStr = sports.length ? sports.join('+') : '—';
 
         // Distance display

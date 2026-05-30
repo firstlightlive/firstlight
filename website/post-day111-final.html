@@ -18,29 +18,30 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
   background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,0.012) 48%,rgba(255,255,255,0.012) 52%,transparent 100%);filter:blur(20px)}
 
 /* The number */
-.num{font-family:'IBM Plex Mono',monospace;font-size:320px;font-weight:200;letter-spacing:-12px;line-height:0.75;
-  margin-top:-80px;
+.num{font-family:'IBM Plex Mono',monospace;font-size:240px;font-weight:200;letter-spacing:-10px;line-height:0.75;
+  margin-top:-220px;
   color:transparent;
-  background:linear-gradient(180deg,rgba(255,255,255,0.95) 0%,rgba(255,255,255,0.6) 25%,rgba(255,255,255,0.12) 55%,transparent 75%);
+  background:linear-gradient(180deg,rgba(255,255,255,0.85) 0%,rgba(255,255,255,0.5) 30%,rgba(255,255,255,0.15) 60%,transparent 80%);
   -webkit-background-clip:text;background-clip:text;
   filter:drop-shadow(0 0 60px rgba(255,255,255,0.06))}
 
 /* Reflection */
-.ref{font-family:'IBM Plex Mono',monospace;font-size:320px;font-weight:200;letter-spacing:-12px;line-height:0.75;
+.ref{font-family:'IBM Plex Mono',monospace;font-size:240px;font-weight:200;letter-spacing:-10px;line-height:0.75;
   color:transparent;
   background:linear-gradient(180deg,rgba(255,255,255,0.03) 0%,transparent 25%);
   -webkit-background-clip:text;background-clip:text;
   transform:scaleY(-0.25);transform-origin:top;filter:blur(2px);margin-top:4px}
 
 /* Message — the soul of the post */
-.msg{position:absolute;bottom:200px;text-align:center;padding:0 100px}
-.msg .line1{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:300;letter-spacing:5px;color:rgba(255,255,255,0.2);line-height:2.4}
-.msg .line2{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;letter-spacing:3px;color:rgba(255,255,255,0.6);margin-top:16px;line-height:1.8}
+.msg{position:absolute;bottom:310px;text-align:center;padding:0 80px}
+.msg .line1{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:700;letter-spacing:8px;
+  background:linear-gradient(90deg,#00B0FF,#00E676,#FC4C02);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:2}
+.msg .line2{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500;letter-spacing:2px;color:rgba(255,255,255,0.6);margin-top:20px;line-height:1.9}
 
 /* CTA */
-.cta{position:absolute;bottom:100px;text-align:center}
-.cta .arrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:6px;color:rgba(252,76,2,0.35);margin-bottom:8px}
-.cta .url{font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:8px;
+.cta{position:absolute;bottom:130px;text-align:center}
+.cta .arrow{font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:6px;color:rgba(252,76,2,0.6);margin-bottom:12px;font-weight:700}
+.cta .url{font-family:'IBM Plex Mono',monospace;font-size:24px;letter-spacing:6px;font-weight:600;
   background:linear-gradient(90deg,#00B0FF,#00E676,#FC4C02);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
 /* Dots */
@@ -62,12 +63,12 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
 
   <div class="msg">
     <div class="line1">THIS WAS JUST THE TRAILER</div>
-    <div class="line2">Now the real training begins.<br>Push harder. Test every limit.<br>Accept whatever comes.</div>
+    <div class="line2">Now the real training begins.<br>Push harder. Test my limits.<br>Accept whatever comes.</div>
   </div>
 
   <div class="cta">
-    <div class="arrow">THE FULL STORY ↓</div>
-    <div class="url">FIRSTLIGHT.LIVE</div>
+    <div class="arrow">CHECK THE WEBSITE</div>
+    <div class="url">WWW.FIRSTLIGHT.LIVE</div>
   </div>
   <div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
   <div class="grain"></div>

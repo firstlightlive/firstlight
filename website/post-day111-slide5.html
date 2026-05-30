@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=1080"><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1080px;background:#000;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px}
+.s::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,0.05) 0%,transparent 50%);filter:blur(40px)}
+.streak{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:12px;color:rgba(255,255,255,0.2);margin-bottom:40px}
+.alive{font-family:'IBM Plex Mono',monospace;font-size:110px;font-weight:700;letter-spacing:8px;color:transparent;background:linear-gradient(180deg,#00E676 0%,rgba(0,230,118,0.3) 100%);-webkit-background-clip:text;filter:drop-shadow(0 0 50px rgba(0,230,118,0.15));margin-bottom:50px}
+.msg{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:300;letter-spacing:3px;color:rgba(255,255,255,0.4);line-height:2.2}
+.msg em{color:rgba(255,255,255,0.85);font-style:normal;font-weight:600;font-size:30px}
+.dot{width:6px;height:6px;border-radius:50%;background:#00E676;box-shadow:0 0 16px rgba(0,230,118,0.5);margin-top:50px}
+.cta{position:absolute;bottom:130px;text-align:center}
+.cta .arrow{font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:6px;color:rgba(252,76,2,0.6);margin-bottom:12px;font-weight:700}
+.cta .url{font-family:'IBM Plex Mono',monospace;font-size:24px;letter-spacing:6px;font-weight:600;background:linear-gradient(90deg,#00B0FF,#00E676,#FC4C02);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.grain{position:absolute;inset:0;opacity:0.04;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+</style></head><body>
+<div class="s">
+<div class="streak">THE STREAK IS</div>
+<div class="alive">ALIVE.</div>
+<div class="msg">
+<em>Testing limits.</em><br>
+Not looking for comfort.<br>
+Not looking for rest.<br><br>
+<em>Looking for the edge.</em>
+</div>
+<div class="dot"></div>
+<div class="cta"><div class="arrow">CHECK THE WEBSITE</div><div class="url">WWW.FIRSTLIGHT.LIVE</div></div>
+<div class="grain"></div>
+</div>
+</body></html>
