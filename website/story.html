@@ -87,7 +87,7 @@
       position: relative;
     }
 
-    /* ===== HERO — CINEMATIC FULL VIEWPORT ===== */
+    /* ===== HERO — SUPERNOVA CINEMATIC ===== */
     .story-hero {
       text-align: center;
       margin-bottom: 80px;
@@ -100,29 +100,66 @@
       justify-content: center;
       overflow: hidden;
     }
+    /* Supernova core glow */
     .story-hero::before {
       content: '';
       position: absolute;
-      inset: -80px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 900px; height: 900px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, rgba(255,82,82,0.06) 30%, rgba(0,212,255,0.03) 50%, transparent 65%);
+      animation: sn-breathe 5s ease-in-out infinite;
       z-index: 0;
-      background:
-        radial-gradient(600px circle at 20% 40%, rgba(245,166,35,0.08), transparent 60%),
-        radial-gradient(500px circle at 80% 60%, rgba(255,82,82,0.06), transparent 60%),
-        radial-gradient(400px circle at 50% 80%, rgba(0,212,255,0.04), transparent 50%);
-      animation: particleDrift 16s ease-in-out infinite;
+      pointer-events: none;
     }
+    /* Supernova outer haze */
     .story-hero::after {
       content: '';
       position: absolute;
       top: 50%; left: 50%;
-      width: 600px; height: 600px;
       transform: translate(-50%, -50%);
+      width: 1200px; height: 1200px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(245,166,35,0.06) 0%, rgba(255,82,82,0.03) 40%, transparent 70%);
-      animation: heroGlow 5s ease-in-out infinite;
+      background: radial-gradient(circle, rgba(245,166,35,0.04) 0%, rgba(255,82,82,0.02) 40%, transparent 60%);
+      animation: sn-breathe 8s ease-in-out infinite reverse;
       z-index: 0;
+      pointer-events: none;
     }
-    .story-hero > * { position: relative; z-index: 1; }
+    .story-hero > *:not(.sn-ring) { position: relative; z-index: 2; }
+
+    @keyframes sn-breathe {
+      0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 0.7; }
+      50% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+    }
+
+    /* Supernova orbital rings */
+    .sn-ring { position: absolute; top: 50%; left: 50%; border-radius: 50%; pointer-events: none; z-index: 1; }
+    .sn-ring-1 { width: min(420px, 85vw); height: min(420px, 85vw); transform: translate(-50%,-50%);
+      border: 2px solid rgba(245,166,35,0.2); box-shadow: 0 0 30px rgba(245,166,35,0.1), inset 0 0 30px rgba(245,166,35,0.05);
+      animation: sn-rotate 18s linear infinite, sn-pulse-gold 4s ease-in-out infinite; }
+    .sn-ring-1::before { content:''; position:absolute; top:-5px; left:50%; width:10px; height:10px; border-radius:50%;
+      background:#F5A623; box-shadow:0 0 16px #F5A623, 0 0 32px rgba(245,166,35,0.6); }
+    .sn-ring-2 { width: min(520px, 92vw); height: min(520px, 92vw); transform: translate(-50%,-50%);
+      border: 1px solid rgba(255,82,82,0.15); box-shadow: 0 0 20px rgba(255,82,82,0.06);
+      animation: sn-rotate-rev 26s linear infinite; }
+    .sn-ring-2::before { content:''; position:absolute; bottom:-4px; left:50%; width:8px; height:8px; border-radius:50%;
+      background:#FF5252; box-shadow:0 0 12px #FF5252, 0 0 24px rgba(255,82,82,0.5); }
+    .sn-ring-3 { width: min(620px, 98vw); height: min(620px, 98vw); transform: translate(-50%,-50%);
+      border: 1px solid rgba(0,212,255,0.1);
+      animation: sn-rotate 35s linear infinite; }
+    .sn-ring-3::before { content:''; position:absolute; top:-3px; right:0; width:6px; height:6px; border-radius:50%;
+      background:#00D4FF; box-shadow:0 0 10px #00D4FF, 0 0 20px rgba(0,212,255,0.5); }
+    .sn-ring-4 { width: min(470px, 88vw); height: min(470px, 88vw); transform: translate(-50%,-50%);
+      border: 1px dashed rgba(245,166,35,0.12);
+      animation: sn-rotate-rev 13s linear infinite; }
+
+    @keyframes sn-rotate { from { transform:translate(-50%,-50%) rotate(0deg); } to { transform:translate(-50%,-50%) rotate(360deg); } }
+    @keyframes sn-rotate-rev { from { transform:translate(-50%,-50%) rotate(360deg); } to { transform:translate(-50%,-50%) rotate(0deg); } }
+    @keyframes sn-pulse-gold {
+      0%, 100% { box-shadow:0 0 30px rgba(245,166,35,0.1), inset 0 0 30px rgba(245,166,35,0.05); border-color:rgba(245,166,35,0.2); }
+      50% { box-shadow:0 0 50px rgba(245,166,35,0.2), inset 0 0 50px rgba(245,166,35,0.1); border-color:rgba(245,166,35,0.4); }
+    }
 
     .story-hero-label {
       font-family: var(--font-mono);
@@ -144,7 +181,7 @@
       letter-spacing: -0.02em;
       opacity: 0;
       animation: fadeInUp 1s ease 0.5s forwards;
-      text-shadow: 0 0 40px rgba(245,166,35,0.1);
+      text-shadow: 0 0 50px rgba(245,166,35,0.15), 0 0 100px rgba(245,166,35,0.05);
     }
     .story-hero-sub {
       font-family: var(--font-mono);
@@ -470,8 +507,12 @@
 
   <div class="story-page">
 
-    <!-- HERO -->
+    <!-- HERO — SUPERNOVA -->
     <div class="story-hero">
+      <div class="sn-ring sn-ring-3"></div>
+      <div class="sn-ring sn-ring-2"></div>
+      <div class="sn-ring sn-ring-4"></div>
+      <div class="sn-ring sn-ring-1"></div>
       <div class="story-hero-label">THE ORIGIN STORY</div>
       <h1 class="story-hero-title">Why I Failed for a Decade<br>And Why I Can't Fail Now</h1>
       <div class="story-hero-sub">
