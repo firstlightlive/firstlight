@@ -85,63 +85,7 @@
       background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.006) 2px, rgba(255,255,255,0.006) 4px);
     }
 
-    /* =============================================
-       NAVIGATION - Minimal floating
-       ============================================= */
-    .fl-nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      padding: 16px 32px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(6,8,16,0.85);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      transition: transform 0.3s ease;
-    }
-    .fl-nav.hidden { transform: translateY(-100%); }
-    .fl-nav-brand {
-      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
-      letter-spacing: 4px; color: var(--cyan);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .fl-nav-brand .diamond { font-size: 8px; }
-    .fl-nav-links {
-      display: flex; gap: 24px; align-items: center;
-    }
-    .fl-nav-links a {
-      font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
-      color: var(--text-dim); transition: color 0.3s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .fl-nav-links a:hover { color: var(--text); }
-    .fl-nav-links a.active { color: var(--cyan); }
-    .fl-nav-live {
-      display: flex; align-items: center; gap: 6px;
-      font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
-      color: var(--green);
-    }
-    .fl-nav-live-dot {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--green);
-      box-shadow: 0 0 8px var(--green);
-      animation: pulse-dot 2s ease-in-out infinite;
-    }
-    @keyframes pulse-dot {
-      0%,100% { opacity:1; transform:scale(1); }
-      50% { opacity:0.4; transform:scale(0.8); }
-    }
-
-    /* Mobile nav */
-    .fl-nav-toggle {
-      display: none; width:44px; height:44px; flex-direction:column;
-      align-items:center; justify-content:center; gap:5px;
-      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-    }
-    .fl-nav-toggle span {
-      width:20px; height:1.5px; background:var(--text-muted); transition:all 0.3s;
-    }
-    @media(max-width:768px) {
-      .fl-nav-links { display:none; }
-      .fl-nav-toggle { display:flex; }
-    }
+    /* Nav uses styles.css standard nav */
 
     /* =============================================
        SECTION: HERO - Particle Canvas
@@ -788,23 +732,11 @@
 <body>
 
   <!-- NAV -->
-  <nav class="fl-nav">
-    <a href="home.html" class="fl-nav-brand">
-      <span class="diamond">&#9670;</span> FIRST LIGHT
-    </a>
-    <div class="fl-nav-links">
-      <a href="index.html">STREAK</a>
-      <a href="strava.html">STRAVA</a>
-      <a href="marathon.html">RACES</a>
-      <a href="ironman.html">IRONMAN</a>
-      <a href="story.html">MY STORY</a>
-      <a href="accountability.html">ACCOUNTABILITY</a>
-      <span class="fl-nav-live"><span class="fl-nav-live-dot"></span> DAY <span id="navDay">--</span></span>
-    </div>
-    <button class="fl-nav-toggle" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
+  <nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">&#9670;</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>--</span></span></a><div class="nav-links"><a href="home.html" class="nav-link active">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+  <div class="nav-mobile"><a href="home.html" class="nav-link active">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+  <script>
+  (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
+  </script>
 
   <!-- ============================================
        HERO - Particle Universe
