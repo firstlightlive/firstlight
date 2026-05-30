@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>How It Works — FIRST LIGHT</title>
-  <meta name="description" content="50 database tables. 130+ daily checkpoints. 8 cloud syncs. Real-time cross-device sync. The engineering behind the infinite streak.">
+  <meta name="description" content="50 database tables. 130+ daily checkpoints. 6+ automated syncs via pg_cron. Real-time cross-device sync. The engineering behind the infinite streak.">
   <meta name="keywords" content="fitness system architecture, accountability technology, Strava integration, real-time sync, discipline engineering, personal OS">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://firstlight.live/system.html">
@@ -24,7 +24,7 @@
   <link rel="apple-touch-icon" href="icon-512.png">
   <link rel="manifest" href="manifest.json">
   <meta property="og:title" content="How It Works — FIRST LIGHT">
-  <meta property="og:description" content="50 tables. 130+ daily items. 8 cloud syncs. The engineering behind an infinite streak.">
+  <meta property="og:description" content="50 tables. 130+ daily items. 6+ automated syncs. The engineering behind an infinite streak.">
   <meta property="og:image" content="https://firstlight.live/icon-512.png">
   <meta property="og:url" content="https://firstlight.live/system.html">
   <meta property="og:type" content="website">
@@ -303,8 +303,8 @@
         <div class="stat-label">DAILY<br>CHECKPOINTS</div>
       </div>
       <div class="stat-item" style="border:1px solid rgba(245,166,35,0.12)">
-        <div class="stat-num" style="color:#F5A623">8</div>
-        <div class="stat-label">CLOUD SYNCS<br>PER DAY</div>
+        <div class="stat-num" style="color:#F5A623">6<span style="font-size:60%;opacity:0.6">+</span></div>
+        <div class="stat-label">AUTOMATED<br>SYNCS</div>
       </div>
       <div class="stat-item" style="border:1px solid rgba(224,64,251,0.12)">
         <div class="stat-num" style="color:#E040FB">&lt;1<span style="font-size:50%;opacity:0.6">s</span></div>
@@ -333,7 +333,7 @@
       <div class="flow-arrow">→</div>
       <div class="flow-node" style="background:rgba(252,76,2,0.06);border:1px solid rgba(252,76,2,0.15);color:#FC4C02">STRAVA<div style="font-size:8px;color:#5a6a7a;margin-top:4px">API v3</div></div>
       <div class="flow-arrow">→</div>
-      <div class="flow-node" style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);color:#F5A623">GOOGLE CLOUD<div style="font-size:8px;color:#5a6a7a;margin-top:4px">FUNCTIONS</div></div>
+      <div class="flow-node" style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);color:#F5A623">SUPABASE<div style="font-size:8px;color:#5a6a7a;margin-top:4px">EDGE FUNCTIONS</div></div>
       <div class="flow-arrow">→</div>
       <div class="flow-node" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.15);color:#00E676">DATABASE<div style="font-size:8px;color:#5a6a7a;margin-top:4px">50 TABLES</div></div>
     </div>
@@ -343,7 +343,7 @@
       <div class="flow-arrow">→</div>
       <div class="flow-node" style="background:rgba(225,48,108,0.06);border:1px solid rgba(225,48,108,0.15);color:#E1306C">INSTAGRAM<div style="font-size:8px;color:#5a6a7a;margin-top:4px">GRAPH API v21</div></div>
       <div class="flow-arrow">→</div>
-      <div class="flow-node" style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);color:#F5A623">GOOGLE CLOUD<div style="font-size:8px;color:#5a6a7a;margin-top:4px">STORAGE (GCS)</div></div>
+      <div class="flow-node" style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);color:#F5A623">SUPABASE<div style="font-size:8px;color:#5a6a7a;margin-top:4px">STORAGE</div></div>
       <div class="flow-arrow">→</div>
       <div class="flow-node" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.15);color:#00E676">PERMANENT<div style="font-size:8px;color:#5a6a7a;margin-top:4px">ARCHIVE</div></div>
     </div>
@@ -372,7 +372,7 @@
     <div class="layer" style="background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1)">
       <div class="layer-num" style="color:#00D4FF">5</div>
       <div class="layer-title" style="color:#00D4FF">PUBLIC EYES</div>
-      <div class="layer-desc">Anyone on the internet can verify and claim ₹<span data-stake-daily>15,000</span> if the 6 AM deadline is missed. The accountability is not private — it's global.</div>
+      <div class="layer-desc">Anyone on the internet can verify and claim ₹<span data-stake-daily>5,000</span> if the 6 AM deadline is missed. The accountability is not private — it's global.</div>
     </div>
     <div class="layer" style="background:rgba(245,166,35,0.04);border:1px solid rgba(245,166,35,0.1)">
       <div class="layer-num" style="color:#F5A623">4</div>
@@ -387,7 +387,7 @@
     <div class="layer" style="background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.1)">
       <div class="layer-num" style="color:#00E676">2</div>
       <div class="layer-title" style="color:#00E676">CLOUD AUTOMATION</div>
-      <div class="layer-desc">8 daily cloud syncs run on Google's servers. Carousel, reel, and stories publish directly to Instagram via API. Even if every device I own dies, the cloud still pulls, verifies, publishes, and stores.</div>
+      <div class="layer-desc">6+ automated syncs run via Supabase pg_cron. Carousel, reel, and stories publish directly to Instagram via API. Even if every device I own dies, the cloud still pulls, verifies, publishes, and stores.</div>
     </div>
     <div class="layer" style="background:rgba(224,64,251,0.04);border:1px solid rgba(224,64,251,0.1)">
       <div class="layer-num" style="color:#E040FB">1</div>
@@ -397,7 +397,7 @@
   </div>
 
   <div style="text-align:center;margin-top:36px;padding:20px 24px;max-width:600px;margin-left:auto;margin-right:auto;background:rgba(255,82,82,0.03);border:1px solid rgba(255,82,82,0.08);border-radius:10px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.8;font-style:italic">"To cheat, you'd need to hack Strava's satellite GPS, bypass PostgreSQL database triggers, override Google Cloud Functions, fake Instagram's API timestamps, and do it all before midnight — while the entire internet watches."</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.8;font-style:italic">"To cheat, you'd need to hack Strava's satellite GPS, bypass PostgreSQL database triggers, override Supabase Edge Functions, fake Instagram's API timestamps, and do it all before midnight — while the entire internet watches."</div>
   </div>
 </section>
 
@@ -488,7 +488,7 @@
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,82,82,0.06);border-left:3px solid #FF5252;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FF5252;font-weight:700;min-width:16px">01</span><span style="color:#8a9bb0">DELETE physically blocked by database trigger</span></div>
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(245,166,35,0.06);border-left:3px solid #F5A623;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#F5A623;font-weight:700;min-width:16px">02</span><span style="color:#8a9bb0">Core fields frozen after insert — immutable trigger</span></div>
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,212,255,0.06);border-left:3px solid #00D4FF;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#00D4FF;font-weight:700;min-width:16px">03</span><span style="color:#8a9bb0">GPS distance read from Strava DB — not browser</span></div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,230,118,0.06);border-left:3px solid #00E676;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#00E676;font-weight:700;min-width:16px">04</span><span style="color:#8a9bb0">Strava table write-locked — only Cloud Function syncs</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,230,118,0.06);border-left:3px solid #00E676;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#00E676;font-weight:700;min-width:16px">04</span><span style="color:#8a9bb0">Strava table write-locked — only Edge Function syncs</span></div>
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(224,64,251,0.06);border-left:3px solid #E040FB;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#E040FB;font-weight:700;min-width:16px">05</span><span style="color:#8a9bb0">Escalation computed server-side using server clock</span></div>
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(252,76,2,0.06);border-left:3px solid #FC4C02;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FC4C02;font-weight:700;min-width:16px">06</span><span style="color:#8a9bb0">Activity date must be after slip date — no old walks</span></div>
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border-left:3px solid #E8EDF2;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#E8EDF2;font-weight:700;min-width:16px">07</span><span style="color:#8a9bb0">Unique index — one activity per penalty, no reuse</span></div>
@@ -516,7 +516,7 @@
       </div>
 
       <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.8;margin-bottom:16px">
-        When the streak breaks, ₹<span data-stake-daily>15,000</span> is <span style="color:#00D4FF;font-weight:600">automatically deducted</span> from a dedicated Axis Bank account and sent directly to the first person who claims it. No manual transfer. No delay. No human in the loop. The system pays the penalty on its own — the moment a miss is verified.
+        When the streak breaks, ₹<span data-stake-daily>5,000</span> is <span style="color:#00D4FF;font-weight:600">automatically deducted</span> from a dedicated Axis Bank account and sent directly to the first person who claims it. No manual transfer. No delay. No human in the loop. The system pays the penalty on its own — the moment a miss is verified.
       </div>
 
       <!-- Progress indicators -->
@@ -577,7 +577,7 @@
     <div class="feat-card">
       <div class="feat-icon">🔄</div>
       <div class="feat-title">SELF-HEALING TOKENS</div>
-      <div class="feat-desc">Strava tokens expire every 6 hours. Instagram tokens expire every 60 days. The system auto-refreshes them via Google Cloud. No human touches a token. The machine maintains itself.</div>
+      <div class="feat-desc">Strava tokens expire every 6 hours. Instagram tokens expire every 60 days. The system auto-refreshes them via Supabase Edge Functions. No human touches a token. The machine maintains itself.</div>
     </div>
     <div class="feat-card">
       <div class="feat-icon">📤</div>
@@ -587,17 +587,17 @@
     <div class="feat-card">
       <div class="feat-icon">📈</div>
       <div class="feat-title">ESCALATING STAKES</div>
-      <div class="feat-desc">₹15,000/day for Days 1–100. ₹20,000 for Days 101–110. ₹5,000/day from Day 111 onward. Weekly 150 km minimum across all sports. Deficit &gt; 50 km = ₹5,000 claimable + punishment km. The system auto-computes stake and cumulative pool.</div>
+      <div class="feat-desc">₹5,000/day from Day 111 onward. Weekly 100 km target across all sports. Deficit triggers claimable stake + punishment km. The system auto-computes stake and cumulative pool.</div>
     </div>
     <div class="feat-card">
       <div class="feat-icon">💰</div>
-      <div class="feat-title">₹<span data-stake-daily>15,000</span> EVERY DAY</div>
+      <div class="feat-title">₹<span data-stake-daily>5,000</span> EVERY DAY</div>
       <div class="feat-desc">Not a one-time bet. Not a monthly thing. <span style="color:#FF5252">Every. Single. Day.</span> Miss once = someone gets paid within 24 hours. The money is real. The stakes are permanent.</div>
     </div>
     <div class="feat-card">
       <div class="feat-icon">🌍</div>
       <div class="feat-title">ANYONE CAN CLAIM</div>
-      <div class="feat-desc">This isn't private accountability. Anyone on the internet can check, verify, and claim ₹<span data-stake-daily>15,000</span> if the 6 AM deadline is missed. Comment on Instagram, DM, or message here — first claim wins.</div>
+      <div class="feat-desc">This isn't private accountability. Anyone on the internet can check, verify, and claim ₹<span data-stake-daily>5,000</span> if the 6 AM deadline is missed. Comment on Instagram, DM, or message here — first claim wins.</div>
     </div>
     <div class="feat-card">
       <div class="feat-icon">⚖️</div>
@@ -612,32 +612,32 @@
     <div class="feat-card">
       <div class="feat-icon">🏗️</div>
       <div class="feat-title">BUILT FOR 10 YEARS</div>
-      <div class="feat-desc">50 database tables. 8 daily cloud syncs. Auto-archival to cold storage. Self-renewing API tokens. Cross-device WebSocket sync. This system will outlive the devices that built it.</div>
+      <div class="feat-desc">50 database tables. 6+ automated syncs via pg_cron. Auto-archival to cold storage. Self-renewing API tokens. Cross-device WebSocket sync. This system will outlive the devices that built it.</div>
     </div>
   </div>
 
   <!-- STAKE ESCALATION SCHEDULE -->
   <div style="margin-top:48px;max-width:640px;margin-left:auto;margin-right:auto;padding:28px 28px 20px;background:rgba(0,0,0,0.5);border:1px solid rgba(245,166,35,0.15);border-radius:12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 0 40px rgba(245,166,35,0.03),inset 0 0 60px rgba(0,0,0,0.3)">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:3px;color:#F5A623;margin-bottom:20px;text-align:center">STAKE ESCALATION SCHEDULE</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:3px;color:#F5A623;margin-bottom:20px;text-align:center">STAKE V2 — CURRENT SYSTEM</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div style="padding:14px 16px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAY 1 — 100</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">₹15,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAILY STAKE</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">₹5,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
       </div>
       <div style="padding:14px 16px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAY 101 — 200</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">₹20,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">WEEKLY TARGET</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">100 km<span style="font-size:10px;color:#5a6a7a;font-weight:400">/week</span></div>
       </div>
       <div style="padding:14px 16px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAY 201 — 365</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">₹25,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">ACCUMULATED</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#F5A623">₹17L<span style="font-size:10px;color:#5a6a7a;font-weight:400">+</span></div>
       </div>
       <div style="padding:14px 16px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.12);border-radius:8px">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAY 366+</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#FF5252">₹30,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">/day</span></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DEFICIT PENALTY</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#FF5252">₹5,000<span style="font-size:10px;color:#5a6a7a;font-weight:400">+ km</span></div>
       </div>
     </div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;margin-top:16px;text-align:center;line-height:1.7;font-style:italic">The longer the streak, the more it costs to break. The system auto-computes the active stake.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;margin-top:16px;text-align:center;line-height:1.7;font-style:italic">₹5,000/day from Day 111. Weekly 100 km target. Deficit triggers stake + punishment km. The system auto-computes everything.</div>
   </div>
 </section>
 
@@ -662,7 +662,7 @@
     </div>
     <div class="tech-row">
       <div class="tech-label" style="color:#F5A623">STORAGE</div>
-      <div class="tech-val">Google Cloud Storage · Auto-archive to Coldline · Lifecycle policies</div>
+      <div class="tech-val">Supabase Storage · Auto-archive · Lifecycle policies</div>
     </div>
     <div class="tech-row">
       <div class="tech-label" style="color:#FC4C02">HOSTING</div>
@@ -678,7 +678,7 @@
     </div>
     <div class="tech-row">
       <div class="tech-label" style="color:#FF5252">AUTOMATION</div>
-      <div class="tech-val">Google Cloud Functions · Cloud Scheduler · 8 daily cron jobs · Zero human intervention</div>
+      <div class="tech-val">Supabase Edge Functions · pg_cron · 6+ automated daily syncs · Zero human intervention</div>
     </div>
     <div class="tech-row">
       <div class="tech-label" style="color:#F5A623">SECURITY</div>
@@ -707,7 +707,7 @@
   <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#8a9bb0;letter-spacing:4px;margin-top:12px">PER MONTH</div>
 
   <div style="margin-top:32px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6a7a;line-height:2;max-width:500px;margin-left:auto;margin-right:auto">
-    50 database tables. 8 daily cloud syncs.<br>
+    50 database tables. 6+ automated syncs.<br>
     Real-time WebSocket. Auto-archival.<br>
     Self-healing tokens. GPS verification.<br>
     <span style="color:#F5A623">Less than a cup of chai.</span>
