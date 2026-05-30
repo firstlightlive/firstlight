@@ -1291,7 +1291,7 @@
     /* ══════════════════════════════════
        GLOBAL REVEAL ANIMATION
        ══════════════════════════════════ */
-    .section.reveal {
+    .section {
       opacity: 1;
     }
 
@@ -1313,56 +1313,327 @@
       }
     }
 
-    /* ── TODAY'S STATUS ── */
-    .ts-mission-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 20px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px;flex-wrap:wrap;gap:10px}
-    .ts-mission-day{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--text-dim,#8a9bb0);letter-spacing:3px}
-    .ts-mission-day strong{color:#fff;font-weight:700}
-    .ts-status-chips{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-    .ts-chip{font-family:'IBM Plex Mono',monospace;font-size:0.5rem;letter-spacing:1px;font-weight:700;padding:3px 8px;border-radius:20px;transition:all 0.3s;white-space:nowrap}
-    .ts-chip-done{color:#66BB6A;background:rgba(102,187,106,0.12);border:1px solid rgba(102,187,106,0.25)}
-    .ts-chip-pending{color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)}
-    .ts-chip-rest{color:rgba(255,255,255,0.15);background:transparent;border:1px solid rgba(255,255,255,0.05)}
-    /* Row 1: SLEEP + RUN anchors */
-    .ts-grid-anchors{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
-    @media(max-width:600px){.ts-grid-anchors{grid-template-columns:1fr}}
-    /* Row 2: GYM + BIKE + SWIM compact */
-    .ts-grid-sports{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    @media(max-width:600px){.ts-grid-sports{grid-template-columns:1fr}}
-    @media(min-width:601px) and (max-width:800px){.ts-grid-sports{grid-template-columns:1fr 1fr}}
-    /* Cards */
-    .ts-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px 20px 18px;position:relative;overflow:hidden;transition:transform 0.3s,box-shadow 0.3s}
-    .ts-card:hover{transform:translateY(-2px)}
-    .ts-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:16px 16px 0 0}
-    .ts-card--compact{padding:16px 16px 14px}
-    .ts-card--sleep{border-color:rgba(0,212,255,0.12)}.ts-card--sleep::before{background:linear-gradient(90deg,#00D4FF,#0099CC)}
-    .ts-card--run{border-color:rgba(252,76,2,0.12)}.ts-card--run::before{background:linear-gradient(90deg,#FC4C02,#FF8A50)}
-    .ts-card--gym{border-color:rgba(171,71,188,0.12)}.ts-card--gym::before{background:linear-gradient(90deg,#AB47BC,#CE93D8)}
-    .ts-card--bike{border-color:rgba(0,230,118,0.12)}.ts-card--bike::before{background:linear-gradient(90deg,#00E676,#69F0AE)}
-    .ts-card--swim{border-color:rgba(0,176,255,0.12)}.ts-card--swim::before{background:linear-gradient(90deg,#00B0FF,#40C4FF)}
-    .ts-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    .ts-card--compact .ts-card-head{margin-bottom:12px}
-    .ts-card-sport{display:flex;align-items:center;gap:8px}
-    .ts-card-icon{font-size:16px;line-height:1}
-    .ts-card-label{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;letter-spacing:3px;font-weight:700}
-    .ts-card--sleep .ts-card-label{color:#00D4FF}
-    .ts-card--run .ts-card-label{color:#FC4C02}
-    .ts-card--gym .ts-card-label{color:#AB47BC}
-    .ts-card--bike .ts-card-label{color:#00E676}
-    .ts-card--swim .ts-card-label{color:#00B0FF}
-    .ts-card-badge{font-family:'IBM Plex Mono',monospace;font-size:0.5rem;letter-spacing:1px;font-weight:700;padding:3px 8px;border-radius:4px}
-    .ts-badge-done{color:#66BB6A;background:rgba(102,187,106,0.1);border:1px solid rgba(102,187,106,0.25)}
-    .ts-badge-pending{color:#F5A623;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2)}
-    .ts-badge-rest{color:rgba(255,255,255,0.2);background:transparent;border:1px solid rgba(255,255,255,0.07)}
-    .ts-card-value{font-family:'IBM Plex Mono',monospace;font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;color:#fff;line-height:1;margin-bottom:10px}
-    .ts-card--compact .ts-card-value{font-size:clamp(1.1rem,2.5vw,1.5rem);margin-bottom:6px}
-    .ts-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-    .ts-progress-track{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
-    .ts-progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#00D4FF,#00E676);transition:width 1s ease;width:0%}
-    .ts-progress-pct{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--text-dim,#8a9bb0);min-width:28px;text-align:right}
-    .ts-card-sub{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-dim,#8a9bb0);line-height:1.6;margin-top:4px}
-    .ts-card--compact .ts-card-sub{font-size:0.55rem}
-    .ts-verify{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:0.5rem;letter-spacing:1px;color:rgba(255,255,255,0.25)}
-    .ts-verify::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+    /* ══════════════════════════════════
+       TODAY'S MISSION — Activity Cards
+       ══════════════════════════════════ */
+    #todayMission {
+      padding: 60px 0 80px;
+      background: linear-gradient(180deg, var(--cc-bg) 0%, rgba(0,20,30,0.4) 50%, var(--cc-bg) 100%);
+      position: relative;
+    }
+
+    #todayMission .section-label {
+      color: var(--cc-cyan);
+      letter-spacing: 6px;
+      font-size: 10px;
+      margin-bottom: 8px;
+    }
+
+    #todayMission .section-title {
+      font-family: var(--cc-font-display);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    /* Mission status strip */
+    .mission-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+    }
+
+    .mission-strip-day {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.4);
+      margin-right: auto;
+    }
+
+    .mission-strip-day strong { color: #fff; }
+
+    .mission-chip {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .mission-chip--done {
+      color: #66BB6A;
+      background: rgba(102,187,106,0.1);
+      border: 1px solid rgba(102,187,106,0.25);
+    }
+
+    .mission-chip--pending {
+      color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Sleep anchor card */
+    .sleep-card {
+      background: var(--cc-glass);
+      border: 1px solid rgba(0,212,255,0.12);
+      border-radius: 14px;
+      padding: 22px 20px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sleep-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #00D4FF, #7C4DFF);
+    }
+
+    .sleep-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .sleep-card-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      font-weight: 700;
+      color: #00D4FF;
+    }
+
+    .sleep-card-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .sleep-progress {
+      height: 3px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .sleep-progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #00D4FF, #7C4DFF);
+      transition: width 1s ease;
+    }
+
+    .sleep-card-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 8px;
+    }
+
+    /* Activity cards grid */
+    .act-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .act-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 1024px) {
+      .act-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .act-card {
+      background: var(--cc-glass);
+      border: 1px solid var(--cc-glass-border);
+      border-radius: 14px;
+      padding: 20px 18px 16px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .act-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+    }
+
+    .act-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 14px 14px 0 0;
+    }
+
+    /* Sport-specific accent colors */
+    .act-card--Run::before { background: linear-gradient(90deg, #FC4C02, #FF8A50); }
+    .act-card--Run { border-color: rgba(252,76,2,0.12); }
+
+    .act-card--Ride::before { background: linear-gradient(90deg, #00E676, #69F0AE); }
+    .act-card--Ride { border-color: rgba(0,230,118,0.12); }
+
+    .act-card--Swim::before { background: linear-gradient(90deg, #00B0FF, #40C4FF); }
+    .act-card--Swim { border-color: rgba(0,176,255,0.12); }
+
+    .act-card--Walk::before { background: linear-gradient(90deg, #F5A623, #FFD54F); }
+    .act-card--Walk { border-color: rgba(245,166,35,0.12); }
+
+    .act-card--WeightTraining::before { background: linear-gradient(90deg, #AB47BC, #CE93D8); }
+    .act-card--WeightTraining { border-color: rgba(171,71,188,0.12); }
+
+    .act-card--Yoga::before { background: linear-gradient(90deg, #26C6DA, #4DD0E1); }
+    .act-card--Yoga { border-color: rgba(38,198,218,0.12); }
+
+    .act-card--Dance::before { background: linear-gradient(90deg, #E040FB, #EA80FC); }
+    .act-card--Dance { border-color: rgba(224,64,251,0.12); }
+
+    .act-card--Hike::before { background: linear-gradient(90deg, #8D6E63, #BCAAA4); }
+    .act-card--Hike { border-color: rgba(141,110,99,0.12); }
+
+    .act-card--HIIT::before { background: linear-gradient(90deg, #FF5252, #FF8A80); }
+    .act-card--HIIT { border-color: rgba(255,82,82,0.12); }
+
+    .act-card--default::before { background: linear-gradient(90deg, #78909C, #B0BEC5); }
+    .act-card--default { border-color: rgba(120,144,156,0.12); }
+
+    .act-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .act-card-sport {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .act-card-icon { font-size: 16px; line-height: 1; }
+
+    .act-card-type {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      font-weight: 700;
+    }
+
+    .act-card--Run .act-card-type { color: #FC4C02; }
+    .act-card--Ride .act-card-type { color: #00E676; }
+    .act-card--Swim .act-card-type { color: #00B0FF; }
+    .act-card--Walk .act-card-type { color: #F5A623; }
+    .act-card--WeightTraining .act-card-type { color: #AB47BC; }
+    .act-card--Yoga .act-card-type { color: #26C6DA; }
+    .act-card--Dance .act-card-type { color: #E040FB; }
+    .act-card--Hike .act-card-type { color: #8D6E63; }
+    .act-card--HIIT .act-card-type { color: #FF5252; }
+    .act-card--default .act-card-type { color: #78909C; }
+
+    .act-card-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+    }
+
+    .act-card-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .act-card-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .act-card-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .act-card-meta span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.5px;
+    }
+
+    /* Empty state */
+    .act-empty {
+      text-align: center;
+      padding: 48px 20px;
+      background: var(--cc-glass);
+      border: 1px solid var(--cc-glass-border);
+      border-radius: 14px;
+    }
+
+    .act-empty-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .act-empty-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+    }
+
+    .act-empty-sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+      margin-top: 6px;
+    }
+
+    /* ── SECTION DIVIDERS ── */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,212,255,0.15), rgba(245,166,35,0.1), transparent);
+      margin: 0;
+      border: none;
+    }
+
+    /* ── GSAP REVEAL CLASSES ── */
+    .reveal-el { opacity: 0; transform: translateY(25px); }
+    .reveal-el-left { opacity: 0; transform: translateX(-40px); }
+    .reveal-el-right { opacity: 0; transform: translateX(40px); }
+    .reveal-el-scale { opacity: 0; transform: scale(0.9); }
+    .no-gsap .reveal-el,
+    .no-gsap .reveal-el-left,
+    .no-gsap .reveal-el-right,
+    .no-gsap .reveal-el-scale { opacity: 1; transform: none; }
   </style>
 </head>
 <body>
@@ -1380,20 +1651,20 @@
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-content">
-      <div class="hero-system-status">
+      <div class="hero-system-status reveal-el">
         <span class="hero-system-dot"></span>
         SYSTEM: ACTIVE
       </div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-bottom:20px"><span id="heroStatDays">--</span> DAYS · <span id="heroStatPosts">--</span> POSTS · <span id="heroStatActivities">--</span> STRAVA ACTIVITIES</div>
-      <div class="hero-wordmark">FIRST LIGHT</div>
-      <div class="hero-day counter-animate">
+      <div class="reveal-el" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-bottom:20px"><span id="heroStatDays">--</span> DAYS · <span id="heroStatPosts">--</span> POSTS · <span id="heroStatActivities">--</span> STRAVA ACTIVITIES</div>
+      <div class="hero-wordmark reveal-el">FIRST LIGHT</div>
+      <div class="hero-day counter-animate reveal-el-scale">
         <span class="prefix">DAY</span><span data-day>—</span>
       </div>
-      <div class="hero-unclaimed">₹<span data-unclaimed-plain>—</span> UNCLAIMED</div>
-      <p class="hero-tagline">No end date. No finish line. INFINITE.</p>
+      <div class="hero-unclaimed reveal-el">₹<span data-unclaimed-plain>—</span> UNCLAIMED</div>
+      <p class="hero-tagline reveal-el">No end date. No finish line. INFINITE.</p>
 
       <!-- STATUS BEACON — Today's proof status -->
-      <div id="proofBeacon" class="proof-beacon proof-beacon--pending">
+      <div id="proofBeacon" class="proof-beacon proof-beacon--pending reveal-el">
         <div class="proof-beacon__dot"></div>
         <div class="proof-beacon__content">
           <div class="proof-beacon__label" id="beaconLabel">CHECKING STATUS...</div>
@@ -1402,12 +1673,12 @@
         <a id="beaconLink" class="proof-beacon__link" href="https://www.instagram.com/firstlightlive" target="_blank" style="display:none">VIEW POST</a>
       </div>
 
-      <div class="hero-ctas">
+      <div class="hero-ctas reveal-el">
         <a href="https://www.instagram.com/firstlightlive" target="_blank" rel="noopener" class="btn btn-primary" data-link="instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>FOLLOW ON INSTAGRAM</a>
         <a href="proof.html" class="btn btn-outline">SEE THE PROOF</a>
       </div>
       <!-- LIVE COUNTDOWN TO NEXT DEADLINE -->
-      <div id="heroCountdown" style="margin-top:16px;font-family:var(--font-mono);text-align:center">
+      <div id="heroCountdown" class="reveal-el" style="margin-top:16px;font-family:var(--font-mono);text-align:center">
         <div style="font-size:10px;letter-spacing:3px;color:var(--text-dim);margin-bottom:8px" id="countdownLabel">STREAK STATUS</div>
         <div style="display:flex;gap:12px;justify-content:center;align-items:center" id="countdownTimer">
           <div style="text-align:center"><div style="font-size:clamp(1.5rem,4vw,2.5rem);font-weight:700;color:var(--text)" id="cdHours">--</div><div style="font-size:8px;letter-spacing:2px;color:var(--text-dim)">HRS</div></div>
@@ -1421,23 +1692,64 @@
     </div>
   </section>
 
-  <!-- ═══ SECTION 2 — THE STAKES ═══ -->
-  <section class="section reveal" id="stakes">
+  <hr class="section-divider">
+
+  <!-- ═══ TODAY'S MISSION — All Sports ═══ -->
+  <section class="section" id="todayMission">
     <div class="container">
-      <div class="section-label">THE STAKES</div>
-      <h2 class="section-title">Real Money. Real Consequences.</h2>
+      <div class="section-label reveal-el">TODAY'S MISSION</div>
+      <h2 class="section-title reveal-el">Live Activity Feed</h2>
+
+      <!-- Mission status strip -->
+      <div class="mission-strip reveal-el" id="missionStrip">
+        <span class="mission-strip-day">DAY <strong data-day>--</strong></span>
+        <span id="missionChips"></span>
+      </div>
+
+      <!-- Sleep card -->
+      <div class="sleep-card reveal-el" id="sleepCard">
+        <div class="sleep-card-head">
+          <div class="act-card-sport">
+            <span class="act-card-icon">&#x1F4A4;</span>
+            <span class="sleep-card-label">SLEEP</span>
+          </div>
+          <span class="mission-chip mission-chip--pending" id="sleepBadge">SYNCING</span>
+        </div>
+        <div class="sleep-card-value" id="sleepValue">-- HRS</div>
+        <div class="sleep-progress"><div class="sleep-progress-fill" id="sleepBar" style="width:0%"></div></div>
+        <div class="sleep-card-sub" id="sleepSub">Target: 6h minimum</div>
+      </div>
+
+      <!-- Activity cards (populated by JS) -->
+      <div class="act-grid" id="actGrid">
+        <div class="act-empty" style="grid-column:1/-1">
+          <div class="act-empty-icon">&#x23F3;</div>
+          <div class="act-empty-text">LOADING ACTIVITIES...</div>
+          <div class="act-empty-sub">Syncing with Strava</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ═══ SECTION 2 — THE STAKES ═══ -->
+  <section class="section" id="stakes">
+    <div class="container">
+      <div class="section-label reveal-el">THE STAKES</div>
+      <h2 class="section-title reveal-el">Real Money. Real Consequences.</h2>
       <div class="stakes-timeline">
-        <div class="stake-step">
+        <div class="stake-step reveal-el-left">
           <div class="stake-num">01</div>
           <div class="stake-title">ZERO ACTIVITY DAY</div>
           <div class="stake-desc">No Strava-logged activity for the day. Run, ride, swim, walk, gym — any counts. Zero means penalty.</div>
         </div>
-        <div class="stake-step">
+        <div class="stake-step reveal-el-left">
           <div class="stake-num">02</div>
           <div class="stake-title">WEEKLY DEFICIT &gt; 50 KM</div>
           <div class="stake-desc">Weekly target: 150 km (run + ride + walk + swim&times;10). Deficit carries forward. Exceeds 50 km? Punishment triggered + ₹<span data-stake-daily>5,000</span> claimable.</div>
         </div>
-        <div class="stake-step">
+        <div class="stake-step reveal-el-left">
           <div class="stake-num">03</div>
           <div class="stake-title stake-amount">YOU GET ₹<span data-stake-daily>5,000</span> — DIRECT TRANSFER</div>
           <div class="stake-desc">First claim wins. UPI transfer within 24 hours. Plus: deficit &times; 2 punishment km added (immutable).</div>
@@ -1453,13 +1765,15 @@
     </div>
   </section>
 
+  <hr class="section-divider">
+
   <!-- ═══ SECTION 3 — THE STREAK (Unified: Calendar + Stats) ═══ -->
-  <section class="section reveal" id="streak">
+  <section class="section" id="streak">
     <div class="container">
-      <div class="section-label">THE STREAK <span class="streak-label-icon">&#x1F525;</span></div>
+      <div class="section-label reveal-el">THE STREAK <span class="streak-label-icon">&#x1F525;</span></div>
 
       <!-- STREAK HERO: Big number + status + key stat -->
-      <div class="streak-hero">
+      <div class="streak-hero reveal-el-scale">
         <div class="streak-hero-main">
           <div class="streak-day-big"><span class="streak-day-prefix">DAY</span><span data-day>—</span></div>
           <div class="streak-status-row">
@@ -1486,7 +1800,7 @@
       </div>
 
       <!-- CALENDAR GRID with month labels -->
-      <div class="streak-cal-wrapper">
+      <div class="streak-cal-wrapper reveal-el">
         <div id="streakMonthLabels" class="streak-month-labels"></div>
         <div class="streak-cal-rows">
           <div class="streak-day-labels">
@@ -1532,15 +1846,17 @@
     </div>
   </section>
 
+  <hr class="section-divider">
+
   <!-- ═══ SECTION 4 — THE COMMUNITY ═══ -->
-  <section class="section reveal" id="community">
+  <section class="section" id="community">
     <div class="container">
-      <div class="section-label">THE COMMUNITY</div>
-      <h2 class="section-title">The People Watching</h2>
+      <div class="section-label reveal-el">THE COMMUNITY</div>
+      <h2 class="section-title reveal-el">The People Watching</h2>
       <p class="text-muted" style="font-size:14px;margin-bottom:24px">React. Comment. If the streak breaks — first commenter gets paid.</p>
 
       <!-- COMMENT INPUT — TOP, prominent, always visible -->
-      <div class="cm-compose">
+      <div class="cm-compose reveal-el">
         <div class="cm-compose-header">
           <span class="cm-compose-icon">💬</span>
           <span class="cm-compose-label">DROP A COMMENT</span>
@@ -2008,6 +2324,228 @@
     // Auto-refresh every 60 seconds (catches new syncs)
     setInterval(loadDashboardData, 60000);
 
+    // ══════════════════════════════════
+    // TODAY'S MISSION — All Sports Feed
+    // ══════════════════════════════════
+    (function loadTodayActivities() {
+      var _ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+      var todayStr = _ist.getFullYear() + '-' + String(_ist.getMonth()+1).padStart(2,'0') + '-' + String(_ist.getDate()).padStart(2,'0');
+
+      // Sport icons & display names
+      var sportIcons = {
+        Run:'&#127939;', VirtualRun:'&#127939;', Ride:'&#128692;', Swim:'&#127946;',
+        Walk:'&#128694;', Hike:'&#9968;', WeightTraining:'&#127947;', Yoga:'&#129495;',
+        Dance:'&#128131;', Boxing:'&#129354;', HIIT:'&#128293;', Crossfit:'&#128293;',
+        Pilates:'&#129495;', Workout:'&#128170;', MartialArts:'&#129354;',
+        StairStepper:'&#128168;', Rowing:'&#128675;'
+      };
+      var sportLabels = {
+        Run:'RUN', VirtualRun:'VIRTUAL RUN', Ride:'RIDE', Swim:'SWIM',
+        Walk:'WALK', Hike:'HIKE', WeightTraining:'GYM', Yoga:'YOGA',
+        Dance:'DANCE', Boxing:'BOXING', HIIT:'HIIT', Crossfit:'CROSSFIT',
+        Pilates:'PILATES', Workout:'WORKOUT', MartialArts:'MARTIAL ARTS',
+        StairStepper:'STAIRS', Rowing:'ROW'
+      };
+      // Distance-based sports
+      var distanceSports = ['Run','VirtualRun','Ride','Swim','Walk','Hike','Rowing'];
+
+      // Fetch today's activities from strava_activities
+      fetch(SUPA + '/rest/v1/strava_activities?start_date_local=gte.' + todayStr + 'T00:00:00&start_date_local=lt.' + todayStr + 'T23:59:59&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc', {
+        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(acts) {
+        var grid = document.getElementById('actGrid');
+        var chipsEl = document.getElementById('missionChips');
+        if (!grid) return;
+
+        // Resolve sport type: prefer sport_type over type
+        function getSport(a) {
+          var st = a.sport_type || a.type || 'Workout';
+          // Normalize common mappings
+          if (st === 'VirtualRide') st = 'Ride';
+          return st;
+        }
+
+        // CSS class for card (known sports get colored, rest get default)
+        var knownSports = ['Run','VirtualRun','Ride','Swim','Walk','WeightTraining','Yoga','Dance','Hike','HIIT'];
+        function cardClass(sport) {
+          return knownSports.indexOf(sport) >= 0 ? sport : 'default';
+        }
+
+        // Format time of day
+        function fmtTime(dateStr) {
+          if (!dateStr) return '';
+          var d = new Date(dateStr);
+          var h = d.getHours(), m = d.getMinutes();
+          var period = h < 12 ? 'AM' : 'PM';
+          var h12 = h % 12 || 12;
+          return String(h12).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' ' + period;
+        }
+
+        // Format duration
+        function fmtDur(secs) {
+          if (!secs) return '';
+          var mins = Math.round(secs / 60);
+          var hrs = Math.floor(mins / 60);
+          return hrs > 0 ? hrs + 'h ' + (mins % 60) + 'm' : mins + ' min';
+        }
+
+        // Format pace (for runs)
+        function fmtPace(secs, km) {
+          if (!secs || !km || km < 0.1) return '';
+          var paceMin = (secs / 60) / km;
+          var pm = Math.floor(paceMin);
+          var ps = Math.round((paceMin - pm) * 60);
+          return pm + ':' + String(ps).padStart(2,'0') + '/km';
+        }
+
+        if (!acts || acts.length === 0) {
+          // No activities yet
+          var hour = _ist.getHours();
+          grid.innerHTML = '<div class="act-empty" style="grid-column:1/-1">' +
+            '<div class="act-empty-icon">&#x23F3;</div>' +
+            '<div class="act-empty-text">' + (hour < 6 ? 'AWAITING FIRST ACTIVITY' : 'NO ACTIVITIES SYNCED YET') + '</div>' +
+            '<div class="act-empty-sub">' + (hour < 6 ? 'Run starts at ~3:30 AM' : 'Strava syncs at 5:55, 6:15, 9:00 AM') + '</div>' +
+            '</div>';
+
+          // Chips — all pending
+          if (chipsEl) chipsEl.innerHTML = '<span class="mission-chip mission-chip--pending">AWAITING</span>';
+          return;
+        }
+
+        // Build activity cards
+        var html = '';
+        var sportsDone = {};
+
+        acts.forEach(function(a) {
+          var sport = getSport(a);
+          var cls = cardClass(sport);
+          var icon = sportIcons[sport] || '&#128170;';
+          var label = sportLabels[sport] || sport.toUpperCase();
+          var km = (a.distance || 0) / 1000;
+          var isDistance = distanceSports.indexOf(sport) >= 0;
+          var timeStr = fmtTime(a.start_date_local);
+          var durStr = fmtDur(a.moving_time);
+
+          // Value: distance for distance sports, duration for others
+          var valueStr = isDistance ? km.toFixed(km >= 10 ? 1 : 2) + ' KM' : durStr || '--';
+
+          // Meta items
+          var meta = '';
+          if (isDistance && durStr) meta += '<span>' + durStr + '</span>';
+          if ((sport === 'Run' || sport === 'VirtualRun') && km > 0) {
+            var pace = fmtPace(a.moving_time, km);
+            if (pace) meta += '<span>' + pace + '</span>';
+          }
+          if (a.average_heartrate) meta += '<span>' + Math.round(a.average_heartrate) + ' bpm</span>';
+          if (a.calories) meta += '<span>' + Math.round(a.calories) + ' cal</span>';
+
+          html += '<div class="act-card act-card--' + cls + ' reveal-el">';
+          html += '<div class="act-card-head">';
+          html += '<div class="act-card-sport"><span class="act-card-icon">' + icon + '</span><span class="act-card-type">' + label + '</span></div>';
+          html += '<span class="act-card-time">' + timeStr + '</span>';
+          html += '</div>';
+          if (a.name) html += '<div class="act-card-name">' + a.name + '</div>';
+          html += '<div class="act-card-value">' + valueStr + '</div>';
+          if (meta) html += '<div class="act-card-meta">' + meta + '</div>';
+          html += '</div>';
+
+          sportsDone[sport] = true;
+        });
+
+        grid.innerHTML = html;
+
+        // Build mission chips
+        if (chipsEl) {
+          var chipHtml = '';
+          var allTypes = ['Run','Ride','Swim','Walk','WeightTraining','Yoga','Dance'];
+          var chipIcons = { Run:'&#127939;', Ride:'&#128692;', Swim:'&#127946;', Walk:'&#128694;', WeightTraining:'&#127947;', Yoga:'&#129495;', Dance:'&#128131;' };
+          var chipLabels = { Run:'RUN', Ride:'RIDE', Swim:'SWIM', Walk:'WALK', WeightTraining:'GYM', Yoga:'YOGA', Dance:'DANCE' };
+
+          // Show chips for sports that were done + pending core ones
+          var coreTypes = ['Run','Ride','Swim','Walk','WeightTraining'];
+          var shown = {};
+
+          // Done sports first
+          Object.keys(sportsDone).forEach(function(s) {
+            var display = chipLabels[s] || s.toUpperCase();
+            var ic = chipIcons[s] || '';
+            chipHtml += '<span class="mission-chip mission-chip--done">' + (ic ? ic + ' ' : '') + display + '</span> ';
+            shown[s] = true;
+          });
+
+          // Pending core sports
+          coreTypes.forEach(function(s) {
+            if (!shown[s]) {
+              chipHtml += '<span class="mission-chip mission-chip--pending">' + (chipIcons[s] || '') + ' ' + chipLabels[s] + '</span> ';
+            }
+          });
+
+          chipsEl.innerHTML = chipHtml;
+        }
+
+        // GSAP animate new cards
+        if (typeof gsap !== 'undefined') {
+          gsap.utils.toArray('#actGrid .reveal-el').forEach(function(el, i) {
+            gsap.fromTo(el, { opacity:0, y:20 }, { opacity:1, y:0, duration:0.5, ease:'power3.out', delay: i * 0.08 });
+          });
+        }
+      })
+      .catch(function(e) { console.error('[TodayActivities]', e); });
+
+      // Sleep data — from proof_archive or sleep_log
+      fetch(SUPA + '/rest/v1/proof_archive?date=eq.' + todayStr + '&select=sleep_hrs&limit=1', {
+        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var sleepHrs = (data && data[0] && data[0].sleep_hrs) ? parseFloat(data[0].sleep_hrs) : 0;
+        if (sleepHrs > 0) {
+          setSleepDisplay(sleepHrs);
+        } else {
+          // Fallback to sleep_log
+          fetch(SUPA + '/rest/v1/sleep_log?date=eq.' + todayStr + '&select=sleep_hours,bedtime,wake_time&limit=1', {
+            headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
+          })
+          .then(function(r2) { return r2.json(); })
+          .then(function(sl) {
+            if (sl && sl[0] && sl[0].sleep_hours) {
+              setSleepDisplay(parseFloat(sl[0].sleep_hours), sl[0].bedtime, sl[0].wake_time);
+            } else {
+              var el = document.getElementById('sleepValue');
+              if (el) { el.textContent = 'AWAITING SYNC'; el.style.fontSize = '14px'; }
+            }
+          })
+          .catch(function() {});
+        }
+      })
+      .catch(function() {});
+
+      function setSleepDisplay(hrs, bedtime, wakeTime) {
+        var el = document.getElementById('sleepValue');
+        var bar = document.getElementById('sleepBar');
+        var badge = document.getElementById('sleepBadge');
+        var sub = document.getElementById('sleepSub');
+        if (el) el.textContent = hrs.toFixed(1) + ' HRS';
+        if (bar) bar.style.width = Math.min(100, Math.round(hrs / 6 * 100)) + '%';
+        if (badge) {
+          if (hrs >= 6) {
+            badge.textContent = 'DONE'; badge.className = 'mission-chip mission-chip--done';
+          } else {
+            badge.textContent = Math.round(hrs / 6 * 100) + '%'; badge.className = 'mission-chip mission-chip--pending';
+          }
+        }
+        var subParts = ['Target: 6h'];
+        if (bedtime) subParts.push('Bed: ' + bedtime);
+        if (wakeTime) subParts.push('Wake: ' + wakeTime);
+        if (sub) sub.textContent = subParts.join(' · ');
+      }
+
+      // Refresh activities every 60 seconds
+      setTimeout(loadTodayActivities, 60000);
+    })();
+
     // Load cycling distance from Strava
     fetch(SUPA + '/rest/v1/strava_activities?select=distance&type=eq.Ride', {
       headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
@@ -2104,22 +2642,164 @@
 <!-- Lenis -->
 <script>if(typeof Lenis!=='undefined'){var l=new Lenis({duration:1.2,easing:function(t){return Math.min(1,1.001-Math.pow(2,-10*t))}});function rf(t){l.raf(t);requestAnimationFrame(rf)}requestAnimationFrame(rf)}</script>
 
-<!-- GSAP reveals -->
+<!-- GSAP 7D per-element reveals -->
 <script>
 if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
   try{
     gsap.registerPlugin(ScrollTrigger);
-    gsap.utils.toArray('.reveal,.section.reveal').forEach(function(el){
-      gsap.fromTo(el,{opacity:0,y:30},{opacity:1,y:0,duration:0.7,ease:'power3.out',
-        scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}});
+
+    // ── HERO: Cinematic entrance sequence ──
+    var heroTL = gsap.timeline({ delay: 0.3 });
+    document.querySelectorAll('.hero-content .reveal-el').forEach(function(el, i) {
+      heroTL.fromTo(el, { opacity:0, y:25 }, { opacity:1, y:0, duration:0.6, ease:'power3.out' }, i * 0.12);
     });
-  }catch(e){document.body.classList.add('no-gsap')}
-}else{document.body.classList.add('no-gsap')}
+    document.querySelectorAll('.hero-content .reveal-el-scale').forEach(function(el) {
+      heroTL.fromTo(el, { opacity:0, scale:0.85 }, { opacity:1, scale:1, duration:0.8, ease:'back.out(1.4)' }, 0.15);
+    });
+
+    // ── TODAY'S MISSION: Scroll-triggered ──
+    document.querySelectorAll('#todayMission .reveal-el').forEach(function(el, i) {
+      gsap.fromTo(el, { opacity:0, y:25 }, { opacity:1, y:0, duration:0.6, ease:'power3.out', delay: i * 0.08,
+        scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }});
+    });
+
+    // ── STAKES: Step-by-step reveals on scroll ──
+    document.querySelectorAll('#stakes .reveal-el').forEach(function(el, i) {
+      gsap.fromTo(el, { opacity:0, y:30 }, { opacity:1, y:0, duration:0.6, ease:'power3.out', delay: i * 0.08,
+        scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }});
+    });
+    document.querySelectorAll('#stakes .reveal-el-left').forEach(function(el, i) {
+      gsap.fromTo(el, { opacity:0, x:-40 }, { opacity:1, x:0, duration:0.7, ease:'power3.out',
+        scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }});
+    });
+
+    // ── STREAK SECTION: Calendar + stats ──
+    document.querySelectorAll('#streak .reveal-el').forEach(function(el) {
+      gsap.fromTo(el, { opacity:0, y:25 }, { opacity:1, y:0, duration:0.6, ease:'power3.out',
+        scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }});
+    });
+    document.querySelectorAll('#streak .reveal-el-scale').forEach(function(el) {
+      gsap.fromTo(el, { opacity:0, scale:0.92 }, { opacity:1, scale:1, duration:0.7, ease:'power3.out',
+        scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }});
+    });
+
+    // Stats cards — staggered count-up entrance
+    gsap.utils.toArray('.streak-num-card').forEach(function(card, i) {
+      gsap.fromTo(card, { opacity:0, y:20, scale:0.95 },
+        { opacity:1, y:0, scale:1, duration:0.5, ease:'power3.out', delay: i * 0.08,
+          scrollTrigger:{ trigger:'.streak-numbers', start:'top 85%', toggleActions:'play none none none' }});
+    });
+
+    // ── COMMUNITY: Fade in ──
+    document.querySelectorAll('#community .reveal-el').forEach(function(el, i) {
+      gsap.fromTo(el, { opacity:0, y:25 }, { opacity:1, y:0, duration:0.6, ease:'power3.out', delay: i * 0.1,
+        scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }});
+    });
+
+    // ── HOW TO CLAIM box ──
+    var claimBox = document.querySelector('#stakes [style*="rgba(245,166,35"]');
+    if (claimBox) {
+      gsap.fromTo(claimBox, { opacity:0, y:20 }, { opacity:1, y:0, duration:0.6, ease:'power3.out',
+        scrollTrigger:{ trigger:claimBox, start:'top 88%', toggleActions:'play none none none' }});
+    }
+
+  }catch(e){ document.body.classList.add('no-gsap'); }
+}else{ document.body.classList.add('no-gsap'); }
 </script>
 
-<!-- Three.js particles — green + cyan (streak = alive) -->
+<!-- Three.js particles — breathing field, green + cyan + gold (streak = alive) -->
 <script>
-(function(){if(typeof THREE==='undefined')return;var c=document.getElementById('streakParticles');if(!c)return;try{var w=innerWidth,h=innerHeight;c.width=w;c.height=h;var s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,w/h,0.1,1000);cam.position.z=6;var r=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:false});r.setSize(w,h);r.setPixelRatio(Math.min(devicePixelRatio,1.5));r.setClearColor(0,0);var n=w<768?1200:2500,g=new THREE.BufferGeometry(),p=new Float32Array(n*3),co=new Float32Array(n*3),c1=new THREE.Color(0x00E676),c2=new THREE.Color(0x00D4FF),c3=new THREE.Color(0x333333);for(var i=0;i<n;i++){p[i*3]=(Math.random()-0.5)*16;p[i*3+1]=(Math.random()-0.5)*16;p[i*3+2]=(Math.random()-0.5)*10;var rn=Math.random(),cl=rn<0.15?c1:rn<0.28?c2:c3;co[i*3]=cl.r;co[i*3+1]=cl.g;co[i*3+2]=cl.b}g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(co,3));var m=new THREE.PointsMaterial({size:1.2,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:0.2,depthWrite:false}),pts=new THREE.Points(g,m);s.add(pts);var cl2=new THREE.Clock();function a(){requestAnimationFrame(a);var t=cl2.getElapsedTime();pts.rotation.y=t*0.005;pts.rotation.x=Math.sin(t*0.002)*0.05;r.render(s,cam)}a();addEventListener('resize',function(){w=innerWidth;h=innerHeight;cam.aspect=w/h;cam.updateProjectionMatrix();r.setSize(w,h)});addEventListener('scroll',function(){c.style.opacity=Math.max(0.06,1-(scrollY||0)/1200)})}catch(e){c.style.display='none'}})();
+(function(){
+  if(typeof THREE==='undefined')return;
+  var c=document.getElementById('streakParticles');
+  if(!c)return;
+  try{
+    var w=innerWidth, h=innerHeight, mx=0, my=0;
+    c.width=w; c.height=h;
+    var scene=new THREE.Scene();
+    var cam=new THREE.PerspectiveCamera(60,w/h,0.1,1000);
+    cam.position.z=6;
+    var renderer=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:false});
+    renderer.setSize(w,h);
+    renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+    renderer.setClearColor(0,0);
+
+    var n=w<768?1200:2800;
+    var geo=new THREE.BufferGeometry();
+    var pos=new Float32Array(n*3);
+    var col=new Float32Array(n*3);
+    var basePos=new Float32Array(n*3);
+    var sizes=new Float32Array(n);
+    var c1=new THREE.Color(0x00E676);
+    var c2=new THREE.Color(0x00D4FF);
+    var c3=new THREE.Color(0xF5A623);
+    var c4=new THREE.Color(0x222222);
+
+    for(var i=0;i<n;i++){
+      var x=(Math.random()-0.5)*18;
+      var y=(Math.random()-0.5)*18;
+      var z=(Math.random()-0.5)*12;
+      pos[i*3]=x; pos[i*3+1]=y; pos[i*3+2]=z;
+      basePos[i*3]=x; basePos[i*3+1]=y; basePos[i*3+2]=z;
+      sizes[i]=0.8+Math.random()*1.8;
+      var rn=Math.random();
+      var cl=rn<0.12?c1:rn<0.22?c2:rn<0.26?c3:c4;
+      col[i*3]=cl.r; col[i*3+1]=cl.g; col[i*3+2]=cl.b;
+    }
+
+    geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+
+    var mat=new THREE.PointsMaterial({
+      size:1.3, sizeAttenuation:false, vertexColors:true,
+      transparent:true, opacity:0.18, depthWrite:false
+    });
+    var pts=new THREE.Points(geo,mat);
+    scene.add(pts);
+
+    var clock=new THREE.Clock();
+
+    // Mouse parallax
+    document.addEventListener('mousemove',function(e){
+      mx=(e.clientX/w-0.5)*2;
+      my=(e.clientY/h-0.5)*2;
+    });
+
+    function animate(){
+      requestAnimationFrame(animate);
+      var t=clock.getElapsedTime();
+
+      // Breathing: particles gently expand/contract
+      var breath=Math.sin(t*0.4)*0.08;
+      var posArr=geo.attributes.position.array;
+      for(var i=0;i<n;i++){
+        posArr[i*3]  =basePos[i*3]  *(1+breath);
+        posArr[i*3+1]=basePos[i*3+1]*(1+breath);
+        posArr[i*3+2]=basePos[i*3+2]*(1+breath*0.5);
+      }
+      geo.attributes.position.needsUpdate=true;
+
+      // Slow rotation + mouse parallax
+      pts.rotation.y=t*0.006+mx*0.08;
+      pts.rotation.x=Math.sin(t*0.003)*0.04+my*0.05;
+
+      // Pulse opacity
+      mat.opacity=0.14+Math.sin(t*0.5)*0.04;
+
+      renderer.render(scene,cam);
+    }
+    animate();
+
+    addEventListener('resize',function(){
+      w=innerWidth; h=innerHeight;
+      cam.aspect=w/h; cam.updateProjectionMatrix();
+      renderer.setSize(w,h);
+    });
+    addEventListener('scroll',function(){
+      c.style.opacity=Math.max(0.04,1-(scrollY||0)/1400);
+    });
+  }catch(e){c.style.display='none'}
+})();
 </script>
 
 </body>

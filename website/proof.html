@@ -20,17 +20,42 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js"></script>
   <style>
+    /* ── Film Grain Overlay ── */
+    body::before {
+      content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.03;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:128px 128px;
+    }
+
+    /* ── GSAP Reveal Classes ── */
+    .reveal-el { opacity:0; transform:translateY(25px); }
+    .reveal-el-scale { opacity:0; transform:scale(0.92); }
+    .no-gsap .reveal-el, .no-gsap .reveal-el-scale { opacity:1; transform:none; }
+
+    /* ── Section Dividers ── */
+    .section-divider {
+      height:1px; border:none; margin:0;
+      background:linear-gradient(90deg, transparent, rgba(0,212,255,0.15), rgba(0,230,118,0.1), transparent);
+    }
+
     /* ── PROOF PAGE STYLES ── */
-    .proof-header{text-align:center;padding:120px 0 40px;max-width:800px;margin:0 auto}
-    .proof-header h1{font-family:'IBM Plex Mono',monospace;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;letter-spacing:0.08em;color:var(--cyan,#00E5FF);margin-bottom:12px}
+    .proof-header{text-align:center;padding:120px 0 40px;max-width:800px;margin:0 auto;position:relative}
+    .proof-header::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.04) 0%,transparent 60%);pointer-events:none}
+    .proof-header h1{font-family:'IBM Plex Mono',monospace;font-size:clamp(2.5rem,6vw,4rem);font-weight:700;letter-spacing:0.12em;color:#fff;margin-bottom:12px;text-shadow:0 0 40px rgba(0,212,255,0.2)}
     .proof-header p{font-family:'Inter',sans-serif;color:var(--text-dim,#8a9bb0);font-size:1rem;letter-spacing:0.04em}
 
     .summary-cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;padding:0 20px 40px;max-width:1000px;margin:0 auto}
-    .summary-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:20px 28px;text-align:center;flex:1;min-width:140px}
-    .summary-card .label{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;color:var(--text-dim,#8a9bb0);text-transform:uppercase;margin-bottom:8px}
-    .summary-card .value{font-family:'IBM Plex Mono',monospace;font-size:clamp(1rem,3vw,1.6rem);font-weight:700;color:#fff;word-break:break-word;overflow-wrap:break-word}
+    .summary-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:22px 28px;text-align:center;flex:1;min-width:100px;flex:1 1 120px;position:relative;overflow:hidden;transition:all 0.3s}
+    .summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+    .summary-card:nth-child(1)::before{background:linear-gradient(90deg,#00D4FF,#00E5FF)}
+    .summary-card:nth-child(2)::before{background:linear-gradient(90deg,#00E676,#69F0AE)}
+    .summary-card:nth-child(3)::before{background:linear-gradient(90deg,#F5A623,#FFD54F)}
+    .summary-card:nth-child(4)::before{background:linear-gradient(90deg,#70AEFF,#90CAF9)}
+    .summary-card:nth-child(5)::before{background:linear-gradient(90deg,#FC4C02,#FF8A50)}
+    .summary-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.12);box-shadow:0 6px 24px rgba(0,0,0,0.3)}
+    .summary-card .label{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--text-dim,#8a9bb0);text-transform:uppercase;margin-bottom:8px}
+    .summary-card .value{font-family:'IBM Plex Mono',monospace;font-size:clamp(1rem,3vw,1.6rem);font-weight:700;color:#fff;word-break:break-word;overflow-wrap:break-word;font-variant-numeric:tabular-nums}
     .summary-card .value.gold{color:var(--gold,#F5A623)}
-    .summary-card{min-width:100px;flex:1 1 120px}
 
     .filter-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto 24px;padding:0 20px}
     .filter-bar input{flex:1;max-width:500px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:#fff;outline:none;transition:border-color 0.2s}
@@ -40,13 +65,13 @@
     .btn-outline:hover{background:var(--cyan,#00E5FF);color:#0a0e17}
     .btn-sm{padding:8px 16px;font-size:0.7rem}
 
-    .table-wrap{max-width:1100px;margin:0 auto;padding:0 20px 40px;overflow-x:auto}
+    .table-wrap{max-width:1100px;margin:0 auto;padding:0 20px 40px;overflow-x:auto;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
     .proof-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:0.78rem}
-    .proof-table thead th{color:var(--cyan,#00E5FF);font-weight:700;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;padding:12px 10px;border-bottom:1px solid rgba(0,229,255,0.15);text-align:left;white-space:nowrap}
-    .proof-table tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s}
-    .proof-table tbody tr:nth-child(even){background:rgba(255,255,255,0.02)}
-    .proof-table tbody tr:hover{background:rgba(0,229,255,0.04)}
-    .proof-table tbody td{padding:10px 10px;color:rgba(255,255,255,0.8);white-space:nowrap}
+    .proof-table thead th{color:var(--cyan,#00E5FF);font-weight:700;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:14px 10px;border-bottom:2px solid rgba(0,229,255,0.12);text-align:left;white-space:nowrap}
+    .proof-table tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);transition:all 0.2s}
+    .proof-table tbody tr:nth-child(even){background:rgba(255,255,255,0.015)}
+    .proof-table tbody tr:hover{background:rgba(0,229,255,0.05);transform:translateX(2px)}
+    .proof-table tbody td{padding:10px 10px;color:rgba(255,255,255,0.8);white-space:nowrap;font-variant-numeric:tabular-nums}
     .check{color:#00E676;font-weight:700}
     .miss{color:#FF5252;font-weight:700}
 
@@ -97,10 +122,11 @@
   <div style="position:relative;z-index:2">
 
   <!-- ═══ HEADER ═══ -->
-  <section class="proof-header reveal">
-    <h1>THE EVIDENCE</h1>
-    <p><span data-day>—</span> days. Zero excuses. Every number verified by Strava + Apple Watch.</p>
-    <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
+  <section class="proof-header">
+    <div class="reveal-el" style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:rgba(0,212,255,0.6);margin-bottom:16px;display:inline-block;padding:5px 14px;border:1px solid rgba(0,212,255,0.15);border-radius:4px">EVIDENCE ARCHIVE</div>
+    <h1 class="reveal-el">THE EVIDENCE</h1>
+    <p class="reveal-el"><span data-day>—</span> days. Zero excuses. Every number verified by Strava + Apple Watch.</p>
+    <div class="reveal-el" style="display:flex;gap:12px;justify-content:center;margin-top:16px">
       <a href="https://www.instagram.com/firstlightlive" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:0.7rem;font-weight:700;letter-spacing:1px;text-decoration:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
         @FIRSTLIGHTLIVE
@@ -112,8 +138,9 @@
     </div>
   </section>
 
+  <hr class="section-divider">
   <!-- ═══ SUMMARY CARDS ═══ -->
-  <div class="summary-cards reveal">
+  <div class="summary-cards">
     <div class="summary-card">
       <div class="label">Total Days</div>
       <div class="value"><span data-day>—</span></div>
@@ -128,23 +155,23 @@
     </div>
     <div class="summary-card">
       <div class="label">Avg Sleep</div>
-      <div class="value">6.8 hrs</div>
+      <div class="value" id="proofAvgSleepCard">— hrs</div>
     </div>
     <div class="summary-card">
-      <div class="label">Avg Run</div>
-      <div class="value">5.1 km</div>
+      <div class="label">Avg Daily KM</div>
+      <div class="value" id="proofAvgDistCard">— km</div>
     </div>
   </div>
 
   <!-- ═══ FILTER BAR ═══ -->
-  <div class="filter-bar reveal">
+  <div class="filter-bar reveal-el">
     <label for="proofSearch" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search proof archive</label>
     <input type="text" id="proofSearch" placeholder="Search by day, date, or notes...">
     <button class="btn-outline btn-sm" id="exportCsv">EXPORT CSV</button>
   </div>
 
   <!-- ═══ TABLE ═══ -->
-  <div class="table-wrap reveal">
+  <div class="table-wrap reveal-el">
     <table class="proof-table">
       <thead>
         <tr>
@@ -176,10 +203,12 @@
     <button id="showAllBtn" class="btn-outline btn-sm" style="font-size:0.65rem;padding:6px 16px">SHOW ALL ROWS</button>
   </div>
 
+  <hr class="section-divider" style="max-width:1100px;margin:40px auto">
   <!-- ═══ YEAR ANALYTICS ═══ -->
   <div style="max-width:1100px;margin:0 auto;padding:0 20px 60px">
-    <div style="text-align:center;margin-bottom:40px">
-      <h2 style="font-family:'IBM Plex Mono',monospace;font-size:clamp(1.2rem,3vw,1.6rem);font-weight:700;letter-spacing:0.08em;color:var(--cyan,#00E5FF);margin-bottom:8px">YEAR IN DATA</h2>
+    <div class="reveal-el" style="text-align:center;margin-bottom:40px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:rgba(0,230,118,0.5);margin-bottom:12px">ANALYTICS</div>
+      <h2 style="font-family:'IBM Plex Mono',monospace;font-size:clamp(1.4rem,3.5vw,2rem);font-weight:700;letter-spacing:0.1em;color:#fff;margin-bottom:8px">YEAR IN DATA</h2>
       <p style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--text-dim)">365-day rolling view. Every metric. Real data from Strava + Apple Watch.</p>
     </div>
 
@@ -222,15 +251,21 @@
       </div>
     </div>
 
-    <!-- DISTANCE — Bar chart with cumulative line -->
+    <!-- DISTANCE — Bar chart: ALL SPORTS -->
     <div style="margin-bottom:48px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div><span style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:3px;color:#00E676;font-weight:700">RUN — DISTANCE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-left:8px">KM PER DAY</span></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:3px;color:#00E676;font-weight:700">ALL SPORTS — DISTANCE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-left:8px">KM PER DAY (RUN + RIDE + SWIM + WALK)</span></div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:#fff" id="proofAvgDist">—</div>
       </div>
       <div style="position:relative;height:160px;background:rgba(0,230,118,0.03);border:1px solid rgba(0,230,118,0.08);border-radius:8px;padding:8px 4px 24px;overflow:hidden">
         <div id="proofDistChart" style="display:flex;align-items:flex-end;height:100%;gap:0;position:relative"></div>
         <div id="proofDistLabels" style="position:absolute;bottom:2px;left:4px;right:4px;display:flex;justify-content:space-between"></div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;justify-content:center">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:#FC4C02;letter-spacing:1px">&#9632; RUN</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:#00E676;letter-spacing:1px">&#9632; RIDE</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:#00B0FF;letter-spacing:1px">&#9632; SWIM</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:#F5A623;letter-spacing:1px">&#9632; WALK</span>
       </div>
     </div>
 
@@ -310,12 +345,15 @@
             var km = (a.distance || 0) / 1000;
             var sec = a.moving_time || 0;
             var t = a.type || '';
+            var st = a.sport_type || '';
             if (t === 'Run' || t === 'VirtualRun') { map[date].run += km; map[date].runSec += sec; map[date].types.push('Run'); }
-            else if (t === 'Ride') { map[date].ride += km; map[date].rideSec += sec; map[date].types.push('Ride'); }
+            else if (t === 'Ride' || t === 'VirtualRide') { map[date].ride += km; map[date].rideSec += sec; map[date].types.push('Ride'); }
             else if (t === 'Swim') { map[date].swim += km; map[date].swimSec += sec; map[date].types.push('Swim'); }
             else if (t === 'Walk' || t === 'Hike') { map[date].walk += km; map[date].walkSec += sec; map[date].types.push('Walk'); }
+            else if (t === 'Rowing') { map[date].swim += km; map[date].swimSec += sec; map[date].types.push('Row'); }
             else if (t === 'Workout' || t === 'WeightTraining') { map[date].gymSec += sec; map[date].types.push('Gym'); }
-            else if (a.sport_type === 'Dance' || a.sport_type === 'Pilates' || a.sport_type === 'Yoga') { map[date].gymSec += sec; map[date].types.push(a.sport_type); }
+            else if (st === 'Dance' || st === 'Pilates' || st === 'Yoga' || st === 'HIIT' || st === 'Boxing' || st === 'MartialArts' || st === 'Crossfit') { map[date].gymSec += sec; map[date].types.push(st); }
+            else if (km > 0) { map[date].walk += km; map[date].walkSec += sec; map[date].types.push(st || t); }
           });
         }
       } catch(e) { console.warn('[proof] Strava enrichment failed:', e); }
@@ -382,8 +420,11 @@
           food: r.food_clean !== false,
           unclaimed: stake,
           source: r.run_source === 'strava' ? 'Strava ✓' : 'Apple Watch',
-          // Keep for charts
+          // Keep for charts — per-sport + total
           runKmNum: runKm,
+          rideKmNum: cycleKm,
+          swimKmNum: swimKm,
+          walkKmNum: walkKm,
           paceNum: (r.run_time_sec && runKm > 0) ? r.run_time_sec / 60 / runKm : null
         };
       });
@@ -400,11 +441,10 @@
       // Update summary card values
       var tkEl = document.getElementById('proofTotalKm');
       if (tkEl) tkEl.textContent = Math.round(totalDist) + ' km';
-      var cards = document.querySelectorAll('.summary-card .value');
-      if (cards.length >= 4) {
-        cards[3].textContent = avgSleep + ' hrs';
-        cards[4].textContent = avgDist + ' km';
-      }
+      var sleepCardEl = document.getElementById('proofAvgSleepCard');
+      if (sleepCardEl) sleepCardEl.textContent = avgSleep + ' hrs';
+      var distCardEl = document.getElementById('proofAvgDistCard');
+      if (distCardEl) distCardEl.textContent = avgDist + ' km';
 
       renderTable();
       // Render analytics charts
@@ -432,18 +472,39 @@
         page = filteredRows.slice(start, end);
       }
 
+      var sportColors = {
+        'Run':'#FC4C02','Ride':'#00E676','Swim':'#00B0FF','Walk':'#F5A623',
+        'Gym':'#AB47BC','Yoga':'#26C6DA','Dance':'#E040FB','Hike':'#8D6E63',
+        'HIIT':'#FF5252','Boxing':'#FF5252','Pilates':'#26C6DA','Crossfit':'#FF5252',
+        'Row':'#00B0FF','MartialArts':'#FF5252'
+      };
+      var sportIcons = {
+        'Run':'&#127939;','Ride':'&#128692;','Swim':'&#127946;','Walk':'&#128694;',
+        'Gym':'&#127947;','Yoga':'&#129495;','Dance':'&#128131;','Hike':'&#9968;',
+        'HIIT':'&#128293;','Boxing':'&#129354;','Pilates':'&#129495;','Crossfit':'&#128293;',
+        'Row':'&#128675;','MartialArts':'&#129354;'
+      };
+      function colorSports(sportsStr) {
+        if (sportsStr === '—') return '<span style="color:var(--text-dim)">—</span>';
+        return sportsStr.split('+').map(function(s) {
+          var st = s.trim();
+          var color = sportColors[st] || '#78909C';
+          var icon = sportIcons[st] || '';
+          return '<span style="color:' + color + ';font-weight:700;font-size:0.7rem">' + (icon ? icon + ' ' : '') + st + '</span>';
+        }).join('<span style="color:rgba(255,255,255,0.2);margin:0 3px">+</span>');
+      }
+
       tbody.innerHTML = page.map(function(r){
-        var sportColor = r.sports.includes('Run') ? '#FC4C02' : r.sports.includes('Ride') ? '#00D4FF' : r.sports.includes('Swim') ? '#00B0FF' : '#AB47BC';
         return '<tr>'+
-          '<td>'+r.day+'</td>'+
+          '<td style="font-weight:700;color:var(--cyan)">'+r.day+'</td>'+
           '<td>'+r.date+'</td>'+
           '<td style="color:'+(parseFloat(r.sleep)>=6?'var(--green)':'var(--red,#FF5252)')+'">'+r.sleep+'h</td>'+
-          '<td style="color:'+sportColor+';font-weight:700">'+r.sports+'</td>'+
+          '<td>'+colorSports(r.sports)+'</td>'+
           '<td>'+r.distance+'</td>'+
           '<td>'+r.duration+'</td>'+
           '<td>'+(r.hr || '—')+'</td>'+
           '<td>'+(r.food ? '<span class="check">✓</span>' : '<span class="miss">✗</span>')+'</td>'+
-          '<td>₹'+formatINR(r.unclaimed)+'</td>'+
+          '<td style="color:var(--gold)">₹'+formatINR(r.unclaimed)+'</td>'+
           '<td style="color:'+(r.source==='Strava ✓'?'var(--green)':'var(--text-dim)')+'">'+r.source+'</td>'+
         '</tr>';
       }).join('');
@@ -546,7 +607,11 @@
         sleep: r ? r.sleepNum : null,
         hr: r ? r.hrNum : null,
         pace: r ? r.paceNum : null,
-        dist: r ? (r.runKmNum > 0 ? r.runKmNum : null) : null,
+        runDist: r ? (r.runKmNum > 0 ? r.runKmNum : null) : null,
+        dist: r ? (r.distNum > 0 ? r.distNum : null) : null,
+        rideDist: r ? (r.rideKmNum > 0 ? r.rideKmNum : null) : null,
+        swimDist: r ? (r.swimKmNum > 0 ? r.swimKmNum : null) : null,
+        walkDist: r ? (r.walkKmNum > 0 ? r.walkKmNum : null) : null,
         hasData: !!r
       });
     }
@@ -662,7 +727,61 @@
     buildYearChart('proofSleepChart', 'proofSleepLabels', 'sleep', '#70AEFF', 10, 'proofAvgSleep', 'hrs');
     buildYearChart('proofHRChart', 'proofHRLabels', 'hr', '#FF5252', 200, 'proofAvgHR', 'bpm');
     buildYearChart('proofPaceChart', 'proofPaceLabels', 'pace', '#FC4C02', 12, 'proofAvgPace', 'min/km');
-    buildYearChart('proofDistChart', 'proofDistLabels', 'dist', '#00E676', 10, 'proofAvgDist', 'km');
+    // Distance chart — uses total dist, color-coded by dominant sport
+    (function(){
+      var el = document.getElementById('proofDistChart');
+      if (!el) return;
+      var vals = timeline.map(function(t) { return t.dist; });
+      var nonNull = vals.filter(function(v) { return v !== null; });
+      var maxV = Math.max.apply(null, nonNull.concat([1]));
+      // Cap at reasonable max for display
+      if (maxV > 100) maxV = Math.max.apply(null, nonNull.filter(function(v){ return v < 200; }).concat([50]));
+      var avgVal = nonNull.length ? nonNull.reduce(function(s,v){return s+v;},0) / nonNull.length : 0;
+
+      var html = '';
+      var lastM = -1;
+      timeline.forEach(function(t, i) {
+        var v = vals[i];
+        var sep = '';
+        if (t.month !== lastM && lastM !== -1) sep = 'border-left:1px solid rgba(255,255,255,0.06);';
+        lastM = t.month;
+
+        if (v === null) {
+          html += '<div style="flex:1;min-width:0;' + sep + '" title="Day ' + t.day + ' — No data"></div>';
+        } else {
+          var h = Math.max(2, Math.round(Math.min(v, maxV) / maxV * 100));
+          // Color by dominant sport
+          var barColor = '#00E676';
+          if (t.runDist && t.runDist >= (t.rideDist||0) && t.runDist >= (t.swimDist||0) && t.runDist >= (t.walkDist||0)) barColor = '#FC4C02';
+          else if (t.rideDist && t.rideDist >= (t.runDist||0)) barColor = '#00E676';
+          else if (t.swimDist && t.swimDist >= (t.runDist||0)) barColor = '#00B0FF';
+          else if (t.walkDist && t.walkDist >= (t.runDist||0)) barColor = '#F5A623';
+          html += '<div style="flex:1;min-width:0;height:' + h + '%;background:' + barColor + ';opacity:0.7;border-radius:1px 1px 0 0;' + sep + '" title="Day ' + t.day + ' · ' + t.date + ' · ' + v.toFixed(1) + ' km"></div>';
+        }
+      });
+
+      // AVG / MIN / MAX lines
+      if (nonNull.length) {
+        var minVal = Math.min.apply(null, nonNull);
+        var maxValActual = Math.max.apply(null, nonNull);
+        var avgH = Math.round(avgVal / maxV * 100);
+        var maxH = Math.min(100, Math.round(maxValActual / maxV * 100));
+        var minH = Math.round(minVal / maxV * 100);
+        html += '<div style="position:absolute;left:0;right:0;bottom:' + maxH + '%;height:1px;background:rgba(0,230,118,0.25);pointer-events:none;border-top:1px dashed rgba(0,230,118,0.2)"></div>';
+        html += '<div style="position:absolute;left:4px;bottom:calc(' + maxH + '% + 2px);font-family:\'IBM Plex Mono\',monospace;font-size:0.5rem;color:rgba(0,230,118,0.5);pointer-events:none">MAX ' + maxValActual.toFixed(1) + '</div>';
+        html += '<div style="position:absolute;left:0;right:0;bottom:' + avgH + '%;height:1px;background:rgba(255,255,255,0.25);pointer-events:none"></div>';
+        html += '<div style="position:absolute;right:4px;bottom:calc(' + avgH + '% + 2px);font-family:\'IBM Plex Mono\',monospace;font-size:0.5rem;color:rgba(255,255,255,0.45);pointer-events:none">AVG ' + avgVal.toFixed(1) + '</div>';
+        if (minH > 3) {
+          html += '<div style="position:absolute;left:0;right:0;bottom:' + minH + '%;height:1px;background:rgba(255,82,82,0.25);pointer-events:none;border-top:1px dashed rgba(255,82,82,0.2)"></div>';
+          html += '<div style="position:absolute;left:4px;bottom:calc(' + minH + '% + 2px);font-family:\'IBM Plex Mono\',monospace;font-size:0.5rem;color:rgba(255,82,82,0.5);pointer-events:none">MIN ' + minVal.toFixed(1) + '</div>';
+        }
+      }
+
+      el.innerHTML = html;
+      buildMonthLabels('proofDistLabels', timeline);
+      var statEl = document.getElementById('proofAvgDist');
+      if (statEl && nonNull.length) statEl.textContent = 'MIN ' + Math.min.apply(null,nonNull).toFixed(1) + ' · AVG ' + avgVal.toFixed(1) + ' · MAX ' + Math.max.apply(null,nonNull).toFixed(1) + ' km';
+    })();
 
     // Monthly summary cards
     var monthCards = document.getElementById('proofMonthCards');
@@ -670,8 +789,12 @@
       var months = {};
       timeline.forEach(function(t) {
         var mk = t.date.substring(0, 7);
-        if (!months[mk]) months[mk] = { runs: 0, km: 0, sleepDays: 0, sleepTotal: 0, hrTotal: 0, hrDays: 0 };
-        if (t.dist) { months[mk].runs++; months[mk].km += t.dist; }
+        if (!months[mk]) months[mk] = { activities: 0, km: 0, runKm: 0, rideKm: 0, swimKm: 0, walkKm: 0, sleepDays: 0, sleepTotal: 0, hrTotal: 0, hrDays: 0 };
+        if (t.dist) { months[mk].activities++; months[mk].km += t.dist; }
+        if (t.runDist) months[mk].runKm += t.runDist;
+        if (t.rideDist) months[mk].rideKm += t.rideDist;
+        if (t.swimDist) months[mk].swimKm += t.swimDist;
+        if (t.walkDist) months[mk].walkKm += t.walkDist;
         if (t.sleep) { months[mk].sleepDays++; months[mk].sleepTotal += t.sleep; }
         if (t.hr) { months[mk].hrDays++; months[mk].hrTotal += t.hr; }
       });
@@ -684,10 +807,11 @@
         mHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px 12px;text-align:center">';
         mHtml += '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.65rem;letter-spacing:2px;color:var(--cyan);font-weight:700;margin-bottom:8px">' + mLabel + '</div>';
         mHtml += '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:1.1rem;font-weight:700;color:#fff">' + m.km.toFixed(0) + ' <span style="font-size:0.6rem;color:var(--text-dim)">km</span></div>';
-        mHtml += '<div style="display:flex;justify-content:center;gap:8px;margin-top:6px;font-family:\'IBM Plex Mono\',monospace;font-size:0.55rem;color:var(--text-dim)">';
-        mHtml += '<span>' + m.runs + ' runs</span>';
-        mHtml += '<span>💤' + avgSlp + 'h</span>';
-        mHtml += '<span>❤' + avgHr + '</span>';
+        mHtml += '<div style="display:flex;justify-content:center;gap:6px;margin-top:6px;font-family:\'IBM Plex Mono\',monospace;font-size:0.5rem;color:var(--text-dim);flex-wrap:wrap">';
+        mHtml += '<span>' + m.activities + ' days</span>';
+        if (m.runKm > 0) mHtml += '<span style="color:#FC4C02">' + Math.round(m.runKm) + 'r</span>';
+        if (m.rideKm > 0) mHtml += '<span style="color:#00E676">' + Math.round(m.rideKm) + 'b</span>';
+        if (m.swimKm > 0) mHtml += '<span style="color:#00B0FF">' + m.swimKm.toFixed(1) + 's</span>';
         mHtml += '</div></div>';
       });
       monthCards.innerHTML = mHtml;
@@ -697,7 +821,11 @@
     var totalsEl = document.getElementById('proofCumulativeTotals');
     if (totalsEl) {
       var totalKm = timeline.reduce(function(s,t) { return s + (t.dist || 0); }, 0);
-      var totalRuns = timeline.filter(function(t) { return t.dist; }).length;
+      var totalRunKm = timeline.reduce(function(s,t) { return s + (t.runDist || 0); }, 0);
+      var totalRideKm = timeline.reduce(function(s,t) { return s + (t.rideDist || 0); }, 0);
+      var totalSwimKm = timeline.reduce(function(s,t) { return s + (t.swimDist || 0); }, 0);
+      var totalWalkKm = timeline.reduce(function(s,t) { return s + (t.walkDist || 0); }, 0);
+      var activeDaysCount = timeline.filter(function(t) { return t.dist; }).length;
       var totalSleep = timeline.filter(function(t) { return t.sleep; });
       var avgSleepAll = totalSleep.length ? totalSleep.reduce(function(s,t){return s+t.sleep;},0) / totalSleep.length : 0;
       var totalHr = timeline.filter(function(t) { return t.hr; });
@@ -709,11 +837,17 @@
           '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.6rem;color:' + color + ';opacity:0.7;margin-top:2px">' + unit + '</div>' +
           '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.55rem;letter-spacing:1px;color:var(--text-dim);margin-top:6px">' + label + '</div></div>';
       }
+      // Responsive grid: 4 cols desktop, 2 cols mobile
+      totalsEl.style.gridTemplateColumns = 'repeat(auto-fit, minmax(120px, 1fr))';
       totalsEl.innerHTML =
         cumCard(Math.round(totalKm), 'KM', 'TOTAL DISTANCE', 'var(--cyan)') +
-        cumCard(totalRuns, 'RUNS', 'TOTAL RUNS', '#FC4C02') +
+        cumCard(Math.round(totalRunKm), 'KM', 'RUN', '#FC4C02') +
+        cumCard(Math.round(totalRideKm), 'KM', 'RIDE', '#00E676') +
+        cumCard(totalSwimKm.toFixed(1), 'KM', 'SWIM', '#00B0FF') +
+        cumCard(Math.round(totalWalkKm), 'KM', 'WALK', '#F5A623') +
+        cumCard(activeDaysCount, 'DAYS', 'ACTIVE DAYS', '#AB47BC') +
         cumCard(avgSleepAll.toFixed(1), 'HRS', 'AVG SLEEP', '#70AEFF') +
-        cumCard(avgHrAll, 'BPM', 'AVG HEART RATE', '#FF5252');
+        cumCard(avgHrAll, 'BPM', 'AVG HR', '#FF5252');
     }
   }
   </script>
@@ -723,14 +857,91 @@
   <!-- Lenis -->
   <script>if(typeof Lenis!=='undefined'){var l=new Lenis({duration:1.2,easing:function(t){return Math.min(1,1.001-Math.pow(2,-10*t))}});function r(t){l.raf(t);requestAnimationFrame(r)}requestAnimationFrame(r)}</script>
 
-  <!-- GSAP -->
+  <!-- GSAP 7D per-element reveals -->
   <script>
-  if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){try{gsap.registerPlugin(ScrollTrigger);gsap.utils.toArray('.reveal').forEach(function(el){gsap.to(el,{opacity:1,y:0,duration:0.7,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}})});}catch(e){document.body.classList.add('no-gsap')}}else{document.body.classList.add('no-gsap')}
+  if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
+    try{
+      gsap.registerPlugin(ScrollTrigger);
+      // Hero entrance sequence
+      var heroTL=gsap.timeline({delay:0.3});
+      document.querySelectorAll('.proof-header .reveal-el').forEach(function(el,i){
+        heroTL.fromTo(el,{opacity:0,y:25},{opacity:1,y:0,duration:0.6,ease:'power3.out'},i*0.12);
+      });
+      // Summary cards — staggered
+      document.querySelectorAll('.summary-card').forEach(function(el,i){
+        gsap.fromTo(el,{opacity:0,y:20,scale:0.95},{opacity:1,y:0,scale:1,duration:0.5,ease:'power3.out',delay:i*0.08,
+          scrollTrigger:{trigger:'.summary-cards',start:'top 88%',toggleActions:'play none none none'}});
+      });
+      // Scroll-triggered reveals
+      document.querySelectorAll('.reveal-el').forEach(function(el){
+        if(el.closest('.proof-header'))return; // already handled
+        gsap.fromTo(el,{opacity:0,y:25},{opacity:1,y:0,duration:0.6,ease:'power3.out',
+          scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}});
+      });
+      document.querySelectorAll('.reveal-el-scale').forEach(function(el){
+        gsap.fromTo(el,{opacity:0,scale:0.92},{opacity:1,scale:1,duration:0.7,ease:'power3.out',
+          scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}});
+      });
+    }catch(e){document.body.classList.add('no-gsap')}
+  }else{document.body.classList.add('no-gsap')}
   </script>
 
-  <!-- Three.js particles — cyan + green (evidence = verified) -->
+  <!-- Three.js particles — breathing field, cyan + green + Strava orange (evidence = verified + multi-sport) -->
   <script>
-  (function(){if(typeof THREE==='undefined')return;var c=document.getElementById('proofParticles');if(!c)return;try{var w=innerWidth,h=innerHeight;c.width=w;c.height=h;var s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,w/h,0.1,1000);cam.position.z=6;var r=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:false});r.setSize(w,h);r.setPixelRatio(Math.min(devicePixelRatio,1.5));r.setClearColor(0,0);var n=w<768?1200:2500,g=new THREE.BufferGeometry(),p=new Float32Array(n*3),co=new Float32Array(n*3),c1=new THREE.Color(0x00D4FF),c2=new THREE.Color(0x00E676),c3=new THREE.Color(0x333333);for(var i=0;i<n;i++){p[i*3]=(Math.random()-0.5)*16;p[i*3+1]=(Math.random()-0.5)*16;p[i*3+2]=(Math.random()-0.5)*10;var rn=Math.random(),cl=rn<0.15?c1:rn<0.3?c2:c3;co[i*3]=cl.r;co[i*3+1]=cl.g;co[i*3+2]=cl.b}g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(co,3));var m=new THREE.PointsMaterial({size:1.2,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:0.2,depthWrite:false}),pts=new THREE.Points(g,m);s.add(pts);var cl=new THREE.Clock();function a(){requestAnimationFrame(a);var t=cl.getElapsedTime();pts.rotation.y=t*0.005;r.render(s,cam)}a();addEventListener('resize',function(){w=innerWidth;h=innerHeight;cam.aspect=w/h;cam.updateProjectionMatrix();r.setSize(w,h)});addEventListener('scroll',function(){c.style.opacity=Math.max(0.08,1-(scrollY||0)/1200)})}catch(e){c.style.display='none'}})();
+  (function(){
+    if(typeof THREE==='undefined')return;
+    var c=document.getElementById('proofParticles');if(!c)return;
+    try{
+      var w=innerWidth,h=innerHeight,mx=0,my=0;
+      c.width=w;c.height=h;
+      var scene=new THREE.Scene();
+      var cam=new THREE.PerspectiveCamera(60,w/h,0.1,1000);cam.position.z=6;
+      var renderer=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:false});
+      renderer.setSize(w,h);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setClearColor(0,0);
+
+      var n=w<768?1200:2800;
+      var geo=new THREE.BufferGeometry();
+      var pos=new Float32Array(n*3),col=new Float32Array(n*3),basePos=new Float32Array(n*3);
+      var c1=new THREE.Color(0x00D4FF),c2=new THREE.Color(0x00E676),c3=new THREE.Color(0xFC4C02),c4=new THREE.Color(0x222222);
+
+      for(var i=0;i<n;i++){
+        var x=(Math.random()-0.5)*18,y=(Math.random()-0.5)*18,z=(Math.random()-0.5)*12;
+        pos[i*3]=x;pos[i*3+1]=y;pos[i*3+2]=z;
+        basePos[i*3]=x;basePos[i*3+1]=y;basePos[i*3+2]=z;
+        var rn=Math.random(),cl=rn<0.12?c1:rn<0.22?c2:rn<0.26?c3:c4;
+        col[i*3]=cl.r;col[i*3+1]=cl.g;col[i*3+2]=cl.b;
+      }
+      geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+      geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+
+      var mat=new THREE.PointsMaterial({size:1.3,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:0.16,depthWrite:false});
+      var pts=new THREE.Points(geo,mat);scene.add(pts);
+      var clock=new THREE.Clock();
+
+      document.addEventListener('mousemove',function(e){mx=(e.clientX/w-0.5)*2;my=(e.clientY/h-0.5)*2});
+
+      function animate(){
+        requestAnimationFrame(animate);
+        var t=clock.getElapsedTime();
+        var breath=Math.sin(t*0.4)*0.07;
+        var posArr=geo.attributes.position.array;
+        for(var i=0;i<n;i++){
+          posArr[i*3]=basePos[i*3]*(1+breath);
+          posArr[i*3+1]=basePos[i*3+1]*(1+breath);
+          posArr[i*3+2]=basePos[i*3+2]*(1+breath*0.5);
+        }
+        geo.attributes.position.needsUpdate=true;
+        pts.rotation.y=t*0.005+mx*0.08;
+        pts.rotation.x=Math.sin(t*0.003)*0.04+my*0.05;
+        mat.opacity=0.12+Math.sin(t*0.5)*0.04;
+        renderer.render(scene,cam);
+      }
+      animate();
+
+      addEventListener('resize',function(){w=innerWidth;h=innerHeight;cam.aspect=w/h;cam.updateProjectionMatrix();renderer.setSize(w,h)});
+      addEventListener('scroll',function(){c.style.opacity=Math.max(0.04,1-(scrollY||0)/1400)});
+    }catch(e){c.style.display='none'}
+  })();
   </script>
 
 </body>
