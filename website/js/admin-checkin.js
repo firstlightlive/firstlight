@@ -147,7 +147,7 @@ function renderCheckin() {
   if (!appUpdated) {
     html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--red, #FF3B5C);letter-spacing:1px;line-height:1.6">';
     html += '⚠ PENALTY IF NOT COMPLETED BY END OF DAY:<br>';
-    html += '20 KM WALK or 40 KM CYCLING — NO EXCEPTIONS';
+    html += '10 KM WALK or 20 KM CYCLING — NO EXCEPTIONS';
     html += '</div>';
   } else {
     html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--green);letter-spacing:1px">✓ Marked as updated. No penalty.</div>';
@@ -562,11 +562,11 @@ async function checkMissedMorningCheckin() {
       description: 'Morning check-in was not marked as completed on ' + dateStr + '.',
       function_met: false,
       upstream_gap: 'Did not tick "YES — UPDATED" in the morning check-in section.',
-      insight: 'The morning check-in ensures daily accountability. Missing it triggers an automatic 20 km walk punishment.',
-      penalty_type: '20km walk',
-      penalty_km: 20,
-      penalty_walk_km: 20,
-      penalty_cycling_km: 40,
+      insight: 'The morning check-in ensures daily accountability. Missing it triggers an automatic 10 km walk punishment.',
+      penalty_type: '10km walk',
+      penalty_km: 10,
+      penalty_walk_km: 10,
+      penalty_cycling_km: 20,
       penalty_status: 'pending',
       proof_url: null,
       created_at: new Date().toISOString(),
@@ -585,7 +585,7 @@ async function checkMissedMorningCheckin() {
   localStorage.setItem('fl_morning_check_date', today);
 
   if (newSlips.length > 0) {
-    alert('⚠ MISSED MORNING CHECK-IN\n\nYou did not complete the morning check-in on:\n' + newSlips.join(', ') + '\n\nPunishment per day: 20 KM WALK or 40 KM CYCLING\n\nThese slips are PERMANENT. Enforced from June 2, 2026.');
+    alert('⚠ MISSED MORNING CHECK-IN\n\nYou did not complete the morning check-in on:\n' + newSlips.join(', ') + '\n\nPunishment per day: 10 KM WALK or 20 KM CYCLING\n\nThese slips are PERMANENT. Enforced from June 2, 2026.');
   }
 }
 

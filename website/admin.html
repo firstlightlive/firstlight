@@ -745,14 +745,9 @@
           <div class="cc-item" data-panel="finance-analytics"><span class="cc-icon">▦</span> Analytics</div>
           <div class="cc-item" data-panel="finance-manage"><span class="cc-icon">≡</span> Manage</div>
           <div class="cc-item" data-panel="finance-invest"><span class="cc-icon">▲</span> Investments</div>
-        </div>
-      </div>
-
-      <div class="cc-group" data-group="fire">
-        <div class="cc-group-header"><span class="cc-arrow">▶</span> 🔥 FIRE & NET WORTH</div>
-        <div class="cc-group-items">
-          <div class="cc-item" data-panel="fire"><span class="cc-icon">◈</span> FIRE Calculator</div>
-          <div class="cc-item" data-panel="networth"><span class="cc-icon">▦</span> Net Worth</div>
+          <div style="height:1px;background:rgba(255,255,255,0.05);margin:4px 20px"></div>
+          <div class="cc-item" data-panel="fire"><span class="cc-icon">🔥</span> FIRE Calculator</div>
+          <div class="cc-item" data-panel="networth"><span class="cc-icon">📊</span> Net Worth</div>
         </div>
       </div>
 
@@ -1206,52 +1201,6 @@
       <!-- ════════════════════════════════════════════════
            PANEL: DAILY LOG (SEAL THE DAY)
            ════════════════════════════════════════════════ -->
-      <div class="cc-panel" id="p-dailylog">
-        <div class="cc-panel-header">
-          <div class="cc-panel-title">SEAL THE DAY</div>
-          <div class="cc-panel-desc">Daily log — record everything</div>
-        </div>
-
-        <div class="panel-section">
-          <div class="panel-section-title">SEAL TODAY'S LOG</div>
-          <form id="dailyLogForm">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">DATE</label><input type="date" class="form-input" id="logDate"></div>
-              <div class="form-group"><label class="form-label">WAKE TIME</label><input type="time" class="form-input" id="logWakeTime"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">SLEEP HOURS</label><input type="number" step="0.1" class="form-input" id="logSleepHrs" placeholder="e.g. 7.2"></div>
-              <div class="form-group"><label class="form-label">RUN KM</label><input type="number" step="0.01" class="form-input" id="logRunKm" placeholder="e.g. 5.12"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">RUN START</label><input type="time" class="form-input" id="logRunStart"></div>
-              <div class="form-group"><label class="form-label">RUN PACE</label><input type="text" class="form-input" id="logRunPace" placeholder="e.g. 5'30&quot;"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">GYM</label><label class="toggle"><input type="checkbox" id="logGym"><div class="toggle-track"></div><span>YES</span></label></div>
-              <div class="form-group"><label class="form-label">MUSCLE GROUP</label><input type="text" class="form-input" id="logMuscle" placeholder="e.g. Chest & Triceps"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">FOOD CODE CLEAN</label><label class="toggle"><input type="checkbox" id="logFood" checked><div class="toggle-track"></div><span>YES</span></label></div>
-              <div class="form-group" id="violationGroup" style="display:none"><label class="form-label">VIOLATION NOTES</label><input type="text" class="form-input" id="logViolation" placeholder="What happened"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">BRAHMA MUHURTA</label><label class="toggle"><input type="checkbox" id="logBrahma"><div class="toggle-track"></div><span>YES</span></label></div>
-              <div class="form-group"><label class="form-label">JAPA DONE</label><label class="toggle"><input type="checkbox" id="logJapa"><div class="toggle-track"></div><span>YES</span></label></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">NASYA DONE</label><label class="toggle"><input type="checkbox" id="logNasya"><div class="toggle-track"></div><span>YES</span></label></div>
-              <div class="form-group"><label class="form-label">COVENANT BREACH</label><label class="toggle"><input type="checkbox" id="logBreach"><div class="toggle-track"></div><span>NO</span></label></div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">MOOD <span id="moodVal" style="color:var(--cyan)">7</span>/10</label>
-              <div class="range-wrap"><input type="range" min="1" max="10" value="7" id="logMood"></div>
-            </div>
-            <div class="form-group"><label class="form-label">NOTES</label><textarea class="form-input" id="logNotes" rows="3" placeholder="How was today..."></textarea></div>
-            <button type="submit" class="btn btn-primary w-full">SEAL THE DAY</button>
-          </form>
-        </div>
-      </div>
 
       <!-- ════════════════════════════════════════════════
            PANEL: REFLECTION
@@ -3152,8 +3101,6 @@
       <div class="cc-panel" id="p-finance-analytics"></div>
       <div class="cc-panel" id="p-finance-manage"></div>
       <div class="cc-panel" id="p-finance-invest"></div>
-      <div class="cc-panel" id="p-finance-timeline"></div>
-      <div class="cc-panel" id="p-finance-budgets"></div>
 
       <!-- ════════════════════════════════════════════════
            PANEL: FIRE CALCULATOR
