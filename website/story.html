@@ -41,6 +41,7 @@
     #storyParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
     .story-page { position:relative; z-index:2; }
     .no-gsap .story-section > * { opacity:1 !important; transform:none !important; }
+    .no-gsap .story-hero-label, .no-gsap .story-hero-title, .no-gsap .story-hero-sub { opacity:1 !important; transform:none !important; }
 
     /* ===== ANIMATED PARTICLE BACKGROUND (CSS fallback) ===== */
     @keyframes particleDrift {
@@ -102,23 +103,23 @@
     .story-hero::before {
       content: '';
       position: absolute;
-      inset: -60px;
+      inset: -80px;
       z-index: 0;
       background:
-        radial-gradient(600px circle at 20% 40%, rgba(0,212,255,0.06), transparent 60%),
-        radial-gradient(500px circle at 80% 60%, rgba(245,166,35,0.04), transparent 60%),
-        radial-gradient(300px circle at 50% 80%, rgba(0,230,118,0.03), transparent 50%);
-      animation: particleDrift 20s ease-in-out infinite;
+        radial-gradient(600px circle at 20% 40%, rgba(245,166,35,0.08), transparent 60%),
+        radial-gradient(500px circle at 80% 60%, rgba(255,82,82,0.06), transparent 60%),
+        radial-gradient(400px circle at 50% 80%, rgba(0,212,255,0.04), transparent 50%);
+      animation: particleDrift 16s ease-in-out infinite;
     }
     .story-hero::after {
       content: '';
       position: absolute;
       top: 50%; left: 50%;
-      width: 500px; height: 500px;
+      width: 600px; height: 600px;
       transform: translate(-50%, -50%);
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,212,255,0.05) 0%, transparent 70%);
-      animation: heroGlow 6s ease-in-out infinite;
+      background: radial-gradient(circle, rgba(245,166,35,0.06) 0%, rgba(255,82,82,0.03) 40%, transparent 70%);
+      animation: heroGlow 5s ease-in-out infinite;
       z-index: 0;
     }
     .story-hero > * { position: relative; z-index: 1; }
@@ -143,6 +144,7 @@
       letter-spacing: -0.02em;
       opacity: 0;
       animation: fadeInUp 1s ease 0.5s forwards;
+      text-shadow: 0 0 40px rgba(245,166,35,0.1);
     }
     .story-hero-sub {
       font-family: var(--font-mono);
@@ -167,7 +169,7 @@
       font-size: clamp(140px, 20vw, 220px);
       font-weight: 900;
       color: var(--text, #fff);
-      opacity: 0.04;
+      opacity: 0.06;
       position: absolute;
       top: -60px;
       left: -20px;
@@ -217,10 +219,12 @@
       margin: 56px -20px;
       line-height: 1.6;
       position: relative;
-      background: rgba(245,166,35,0.03);
+      background: rgba(245,166,35,0.04);
       border-radius: 16px;
       border: none;
       isolation: isolate;
+      text-shadow: 0 0 20px rgba(245,166,35,0.15);
+      box-shadow: 0 0 40px rgba(245,166,35,0.04), 0 8px 32px rgba(0,0,0,0.2);
     }
     .story-pull::before {
       content: '';
@@ -247,17 +251,19 @@
     .story-stat {
       text-align: center;
       padding: 32px 20px;
-      background: rgba(0,212,255,0.03);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(0,212,255,0.1);
+      background: rgba(0,212,255,0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,212,255,0.15);
       border-radius: 16px;
       animation: statPulse 4s ease-in-out infinite;
       transition: transform 0.3s ease, border-color 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05);
     }
     .story-stat:hover {
       transform: translateY(-4px);
-      border-color: rgba(0,212,255,0.25);
+      border-color: rgba(0,212,255,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 20px rgba(0,212,255,0.08);
     }
     .story-stat-val {
       font-family: var(--font-mono);
@@ -290,10 +296,12 @@
     .story-divider::before {
       content: '';
       display: block;
-      height: 1px;
-      width: 120px;
-      background: linear-gradient(90deg, transparent, var(--cyan, #00D4FF), transparent);
-      animation: drawLine 2s ease forwards;
+      height: 2px;
+      width: 180px;
+      background: linear-gradient(90deg, transparent, rgba(245,166,35,0.5), rgba(0,212,255,0.4), transparent);
+      background-size: 200% 100%;
+      animation: drawLine 2s ease forwards, borderGlow 6s ease infinite;
+      box-shadow: 0 0 12px rgba(245,166,35,0.1);
     }
     .story-divider::after {
       content: '';
@@ -311,13 +319,14 @@
     /* ===== SCIENCE SECTION — DARK GLASS CARD ===== */
     .story-science {
       padding: 36px 32px;
-      background: rgba(0,212,255,0.02);
+      background: rgba(0,212,255,0.03);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.12);
       border-radius: 20px;
       margin: 40px 0;
       position: relative;
+      box-shadow: 0 0 30px rgba(0,212,255,0.04), 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
     }
     .story-science::before {
       content: '';
@@ -371,11 +380,12 @@
       text-align: center;
       padding: 64px 36px;
       margin-top: 80px;
-      background: linear-gradient(160deg, rgba(245,166,35,0.06) 0%, rgba(10,12,16,0.95) 40%, rgba(0,212,255,0.04) 100%);
-      border: 1px solid rgba(245,166,35,0.12);
+      background: linear-gradient(160deg, rgba(245,166,35,0.08) 0%, rgba(10,12,16,0.95) 40%, rgba(0,212,255,0.05) 100%);
+      border: 1px solid rgba(245,166,35,0.18);
       border-radius: 24px;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 0 40px rgba(245,166,35,0.05), 0 16px 48px rgba(0,0,0,0.3);
     }
     .story-cta::before {
       content: '';
@@ -747,14 +757,14 @@
   } else { document.body.classList.add('no-gsap'); }
   </script>
 
-  <!-- Three.js particles — warm gold + red (story = emotional) -->
+  <!-- Three.js particles — warm gold + red, breathing, mouse parallax (story = emotional) -->
   <script>
   (function(){
     if (typeof THREE === 'undefined') return;
     var canvas = document.getElementById('storyParticles');
     if (!canvas) return;
     try {
-      var w = window.innerWidth, h = window.innerHeight;
+      var w = window.innerWidth, h = window.innerHeight, mx = 0, my = 0;
       canvas.width = w; canvas.height = h;
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
@@ -762,25 +772,48 @@
       var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
       renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setClearColor(0x000000, 0);
-      var count = w < 768 ? 1000 : 2000;
+
+      var count = w < 768 ? 1500 : 3000;
       var geo = new THREE.BufferGeometry();
-      var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
-      var c1 = new THREE.Color(0xF5A623), c2 = new THREE.Color(0xFF5252), c3 = new THREE.Color(0x222222);
+      var pos = new Float32Array(count*3), cols = new Float32Array(count*3), basePos = new Float32Array(count*3);
+      var c1 = new THREE.Color(0xF5A623), c2 = new THREE.Color(0xFF5252), c3 = new THREE.Color(0x00D4FF), c4 = new THREE.Color(0x1a1a2e);
+
       for (var i=0;i<count;i++) {
-        pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
-        var rnd=Math.random(); var c = rnd<0.12?c1:rnd<0.22?c2:c3;
+        var x=(Math.random()-0.5)*20, y=(Math.random()-0.5)*20, z=(Math.random()-0.5)*14;
+        pos[i*3]=x; pos[i*3+1]=y; pos[i*3+2]=z;
+        basePos[i*3]=x; basePos[i*3+1]=y; basePos[i*3+2]=z;
+        var rnd=Math.random();
+        var c = rnd<0.15?c1:rnd<0.28?c2:rnd<0.33?c3:c4;
         cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
       }
       geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-      var mat = new THREE.PointsMaterial({size:1.0, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.18, depthWrite:false});
+      var mat = new THREE.PointsMaterial({size:2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.3, depthWrite:false});
       var pts = new THREE.Points(geo, mat);
       scene.add(pts);
       var clock = new THREE.Clock();
-      function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.004; pts.rotation.x=Math.sin(t*0.002)*0.05; renderer.render(scene, camera); }
+
+      document.addEventListener('mousemove', function(e){ mx=(e.clientX/w-0.5)*2; my=(e.clientY/h-0.5)*2; });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        var t = clock.getElapsedTime();
+        var breath = Math.sin(t*0.35)*0.1;
+        var posArr = geo.attributes.position.array;
+        for(var i=0;i<count;i++){
+          posArr[i*3]=basePos[i*3]*(1+breath);
+          posArr[i*3+1]=basePos[i*3+1]*(1+breath);
+          posArr[i*3+2]=basePos[i*3+2]*(1+breath*0.5);
+        }
+        geo.attributes.position.needsUpdate=true;
+        pts.rotation.y = t*0.006 + mx*0.08;
+        pts.rotation.x = Math.sin(t*0.003)*0.05 + my*0.06;
+        mat.opacity = 0.24 + Math.sin(t*0.5)*0.08;
+        renderer.render(scene, camera);
+      }
       animate();
       window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
-      window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.05, 1 - (window.scrollY||0)/1500); });
+      window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.12, 1 - (window.scrollY||0)/2000); });
     } catch(e) { canvas.style.display='none'; }
   })();
   </script>
