@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#030608">
+  <title>FIRST LIGHT — Ironman Journey</title>
+  <meta name="description" content="Training for Ironman 140.6. 3.8km swim + 180km bike + 42.2km run. Real data. Real progress. Every year.">
+  <link rel="canonical" href="https://firstlight.live/ironman.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <meta property="og:title" content="FIRST LIGHT — Ironman Journey">
+  <meta property="og:description" content="3.8km swim. 180km bike. 42.2km run. One day. Every year. The dream.">
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --im-bg:#030608; --im-mono:'IBM Plex Mono',monospace; --im-body:'Inter',sans-serif;
+      --im-swim:#00B0FF; --im-bike:#00E676; --im-run:#FC4C02;
+      --im-gold:#F5A623; --im-cyan:#00D4FF; --im-dim:rgba(255,255,255,0.3);
+      --im-glass:rgba(10,14,24,0.65); --im-border:rgba(255,255,255,0.05);
+    }
+    body { background:var(--im-bg)!important; overflow-x:hidden; }
+    #imParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.02;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:128px 128px; }
+    .im-page { position:relative; z-index:2; }
+    .im-container { max-width:960px; margin:0 auto; padding:0 24px; }
+
+    /* ═══ HERO ═══ */
+    .im-hero { min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:100px 20px 60px; position:relative; }
+    .im-hero::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:1000px; height:1000px;
+      background:radial-gradient(circle, rgba(0,176,255,0.04) 0%, rgba(0,230,118,0.03) 30%, rgba(252,76,2,0.02) 60%, transparent 80%);
+      pointer-events:none; animation:im-pulse 12s ease-in-out infinite; }
+    @keyframes im-pulse { 0%,100%{opacity:0.4;transform:translateX(-50%) scale(1)} 50%{opacity:0.7;transform:translateX(-50%) scale(1.1)} }
+    .im-badge { display:inline-block; font-family:var(--im-mono); font-size:10px; letter-spacing:5px; color:var(--im-gold);
+      padding:6px 16px; border:1px solid rgba(245,166,35,0.2); border-radius:4px; margin-bottom:24px; }
+    .im-hero-title { font-family:var(--im-mono); font-size:clamp(3rem,10vw,6rem); font-weight:700; color:#fff; letter-spacing:0.15em;
+      line-height:0.9; margin-bottom:16px; text-shadow:0 0 80px rgba(252,76,2,0.15); }
+    .im-hero-dist { font-family:var(--im-mono); font-size:clamp(1rem,3vw,1.4rem); font-weight:300; color:var(--im-dim); letter-spacing:4px; margin-bottom:8px; }
+    .im-hero-dist span { font-weight:700; }
+    .im-hero-dist .swim { color:var(--im-swim); }
+    .im-hero-dist .bike { color:var(--im-bike); }
+    .im-hero-dist .run { color:var(--im-run); }
+    .im-hero-dream { font-family:var(--im-body); font-size:clamp(0.9rem,2vw,1.2rem); color:rgba(255,255,255,0.4); margin-top:20px;
+      font-style:italic; max-width:500px; margin-left:auto; margin-right:auto; }
+    .im-scroll-cue { position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
+      font-family:var(--im-mono); font-size:10px; letter-spacing:4px; color:rgba(255,255,255,0.15);
+      animation:im-float 2s ease-in-out infinite; }
+    @keyframes im-float { 0%,100%{transform:translateX(-50%) translateY(0);opacity:0.3} 50%{transform:translateX(-50%) translateY(8px);opacity:0.6} }
+
+    /* ═══ READINESS GAUGES ═══ */
+    .im-gauges { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:80px; }
+    @media(max-width:600px) { .im-gauges { grid-template-columns:1fr; gap:20px; } }
+    .im-gauge-card { text-align:center; padding:40px 20px; background:var(--im-glass); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      border:1px solid var(--im-border); border-radius:20px; position:relative; overflow:hidden; transition:all 0.4s; }
+    .im-gauge-card:hover { transform:translateY(-4px); box-shadow:0 16px 50px rgba(0,0,0,0.4); }
+    .im-gauge-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .im-gauge-card--swim::before { background:linear-gradient(90deg,transparent,var(--im-swim),transparent); }
+    .im-gauge-card--bike::before { background:linear-gradient(90deg,transparent,var(--im-bike),transparent); }
+    .im-gauge-card--run::before { background:linear-gradient(90deg,transparent,var(--im-run),transparent); }
+    .im-gauge-ring { position:relative; width:180px; height:180px; margin:0 auto 20px; }
+    .im-gauge-ring svg { width:100%; height:100%; transform:rotate(-90deg); }
+    .im-gauge-ring .bg { fill:none; stroke:rgba(255,255,255,0.04); stroke-width:6; }
+    .im-gauge-ring .progress { fill:none; stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 2s ease; }
+    .im-gauge-ring--swim .progress { stroke:var(--im-swim); filter:drop-shadow(0 0 8px rgba(0,176,255,0.4)); }
+    .im-gauge-ring--bike .progress { stroke:var(--im-bike); filter:drop-shadow(0 0 8px rgba(0,230,118,0.4)); }
+    .im-gauge-ring--run .progress { stroke:var(--im-run); filter:drop-shadow(0 0 8px rgba(252,76,2,0.4)); }
+    .im-gauge-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .im-gauge-pct { font-family:var(--im-mono); font-size:2.4rem; font-weight:700; color:#fff; }
+    .im-gauge-label { font-family:var(--im-mono); font-size:9px; letter-spacing:3px; color:var(--im-dim); margin-top:2px; }
+    .im-gauge-sport { font-family:var(--im-mono); font-size:12px; letter-spacing:4px; font-weight:700; margin-bottom:8px; }
+    .im-gauge-card--swim .im-gauge-sport { color:var(--im-swim); }
+    .im-gauge-card--bike .im-gauge-sport { color:var(--im-bike); }
+    .im-gauge-card--run .im-gauge-sport { color:var(--im-run); }
+    .im-gauge-best { font-family:var(--im-mono); font-size:20px; font-weight:700; color:#fff; }
+    .im-gauge-target { font-family:var(--im-mono); font-size:10px; color:var(--im-dim); margin-top:4px; }
+
+    /* ═══ SECTION LABELS ═══ */
+    .im-label { font-family:var(--im-mono); font-size:10px; letter-spacing:6px; color:var(--im-gold); font-weight:600; margin-bottom:8px; }
+    .im-heading { font-family:var(--im-mono); font-size:clamp(1.3rem,3vw,1.8rem); font-weight:700; color:#fff; margin-bottom:40px; }
+
+    /* ═══ YEARLY VISION ═══ */
+    .im-vision { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin-bottom:80px; }
+    .im-year-card { padding:28px 18px; background:var(--im-glass); border:1px solid var(--im-border);
+      border-radius:16px; text-align:center; position:relative; overflow:hidden; transition:all 0.3s; }
+    .im-year-card:hover { transform:translateY(-3px); border-color:rgba(245,166,35,0.15); }
+    .im-year-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,transparent,var(--im-gold),transparent); opacity:0.4; }
+    .im-year-card.current { border-color:rgba(245,166,35,0.2); box-shadow:0 0 30px rgba(245,166,35,0.05); }
+    .im-year-num { font-family:var(--im-mono); font-size:1.8rem; font-weight:700; color:var(--im-gold); margin-bottom:4px; }
+    .im-year-label { font-family:var(--im-mono); font-size:9px; letter-spacing:2px; color:var(--im-dim); }
+    .im-year-status { font-family:var(--im-mono); font-size:9px; letter-spacing:2px; font-weight:700; margin-top:10px; padding:3px 10px;
+      border-radius:4px; display:inline-block; }
+    .im-year-status--prep { color:var(--im-gold); background:rgba(245,166,35,0.08); border:1px solid rgba(245,166,35,0.15); }
+    .im-year-status--target { color:var(--im-cyan); background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.15); }
+    .im-year-status--future { color:var(--im-dim); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
+
+    /* ═══ PROGRESS BARS ═══ */
+    .im-progress-section { margin-bottom:80px; }
+    .im-progress-row { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+    .im-progress-sport { font-family:var(--im-mono); font-size:11px; letter-spacing:3px; font-weight:700; min-width:60px; }
+    .im-progress-track { flex:1; height:24px; background:rgba(255,255,255,0.02); border-radius:12px; overflow:hidden; position:relative; }
+    .im-progress-fill { height:100%; border-radius:12px; transition:width 2s ease; position:relative; }
+    .im-progress-fill::after { content:attr(data-label); position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      font-family:var(--im-mono); font-size:10px; font-weight:700; color:rgba(0,0,0,0.7); }
+    .im-progress-fill--swim { background:linear-gradient(90deg,var(--im-swim),rgba(0,176,255,0.5)); }
+    .im-progress-fill--bike { background:linear-gradient(90deg,var(--im-bike),rgba(0,230,118,0.5)); }
+    .im-progress-fill--run { background:linear-gradient(90deg,var(--im-run),rgba(252,76,2,0.5)); }
+    .im-progress-val { font-family:var(--im-mono); font-size:12px; color:#fff; font-weight:700; min-width:90px; text-align:right; }
+
+    /* ═══ LIFETIME STATS ═══ */
+    .im-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:80px; }
+    @media(max-width:600px) { .im-stats { grid-template-columns:repeat(2,1fr); } }
+    .im-stat { text-align:center; padding:24px 12px; background:var(--im-glass); border:1px solid var(--im-border); border-radius:14px; }
+    .im-stat-val { font-family:var(--im-mono); font-size:clamp(1.4rem,4vw,2rem); font-weight:700; color:#fff; }
+    .im-stat-label { font-family:var(--im-mono); font-size:9px; letter-spacing:2px; color:var(--im-dim); margin-top:4px; }
+
+    /* ═══ TRAINING SPLIT ═══ */
+    .im-split { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:80px; }
+    @media(max-width:768px) { .im-split { grid-template-columns:repeat(4,1fr); } }
+    @media(max-width:480px) { .im-split { grid-template-columns:repeat(2,1fr); } }
+    .im-split-day { padding:16px 10px; background:var(--im-glass); border:1px solid var(--im-border);
+      border-radius:12px; text-align:center; transition:all 0.3s; }
+    .im-split-day:hover { transform:translateY(-3px); }
+    .im-split-name { font-family:var(--im-mono); font-size:10px; letter-spacing:2px; color:var(--im-dim); font-weight:600; margin-bottom:8px; }
+    .im-split-icon { font-size:20px; margin-bottom:6px; }
+    .im-split-type { font-family:var(--im-mono); font-size:10px; font-weight:700; }
+    .im-split-dist { font-family:var(--im-mono); font-size:9px; color:var(--im-dim); margin-top:4px; }
+
+    /* ═══ FOOTER CTA ═══ */
+    .im-cta { text-align:center; padding:40px 0 80px; }
+    .im-cta-text { font-family:var(--im-mono); font-size:14px; color:var(--im-dim); letter-spacing:2px; margin-bottom:20px; }
+    .im-cta a { display:inline-block; font-family:var(--im-mono); font-size:11px; letter-spacing:4px; font-weight:700;
+      padding:14px 40px; border:1px solid rgba(245,166,35,0.3); border-radius:10px; color:var(--im-gold);
+      text-decoration:none; transition:all 0.3s; backdrop-filter:blur(10px); }
+    .im-cta a:hover { background:rgba(245,166,35,0.08); border-color:var(--im-gold); color:#fff; box-shadow:0 0 30px rgba(245,166,35,0.1); }
+
+    /* GSAP */
+    .reveal { opacity:0; transform:translateY(30px); transition:opacity 0.8s,transform 0.8s; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+  </style>
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+</head>
+<body>
+
+<canvas id="imParticles"></canvas>
+
+<!-- NAV -->
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">&#9670;</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>&mdash;</span></span></a><div class="nav-links"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="ironman.html" class="nav-link active">IRONMAN</a><a href="marathon.html" class="nav-link">RACES</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="home.html" class="nav-link">HOME</a><a href="index.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="strava.html" class="nav-link">STRAVA</a><a href="ironman.html" class="nav-link active">IRONMAN</a><a href="marathon.html" class="nav-link">RACES</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a></div>
+<script>
+(function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
+</script>
+
+<div class="im-page">
+
+<!-- ═══ HERO ═══ -->
+<section class="im-hero">
+  <div>
+    <div class="im-badge">THE DREAM</div>
+    <h1 class="im-hero-title">IRONMAN</h1>
+    <div class="im-hero-dist">
+      <span class="swim">3.8 KM</span> SWIM &middot;
+      <span class="bike">180 KM</span> BIKE &middot;
+      <span class="run">42.2 KM</span> RUN
+    </div>
+    <div class="im-hero-dist" style="font-size:clamp(0.8rem,2vw,1rem);margin-top:4px">
+      226 KM &middot; ONE DAY &middot; <span style="color:var(--im-gold)">EVERY YEAR</span>
+    </div>
+    <p class="im-hero-dream">"Not once. Every year. This is not a bucket list item. This is who I become."</p>
+  </div>
+  <div class="im-scroll-cue">SCROLL TO SEE PROGRESS &#x25BC;</div>
+</section>
+
+<!-- ═══ READINESS GAUGES ═══ -->
+<div class="im-container" style="padding-top:40px;padding-bottom:40px">
+  <div class="im-label reveal">READINESS</div>
+  <div class="im-heading reveal">How Close Am I?</div>
+  <div class="im-gauges">
+    <div class="im-gauge-card im-gauge-card--swim reveal">
+      <div class="im-gauge-ring im-gauge-ring--swim">
+        <svg viewBox="0 0 200 200">
+          <circle class="bg" cx="100" cy="100" r="85"/>
+          <circle class="progress" id="imSwimArc" cx="100" cy="100" r="85" stroke-dasharray="0 534"/>
+        </svg>
+        <div class="im-gauge-center">
+          <div class="im-gauge-pct" id="imSwimPct">--</div>
+          <div class="im-gauge-label">READY</div>
+        </div>
+      </div>
+      <div class="im-gauge-sport">SWIM</div>
+      <div class="im-gauge-best" id="imSwimBest">-- km</div>
+      <div class="im-gauge-target">of 3.8 km target</div>
+    </div>
+    <div class="im-gauge-card im-gauge-card--bike reveal">
+      <div class="im-gauge-ring im-gauge-ring--bike">
+        <svg viewBox="0 0 200 200">
+          <circle class="bg" cx="100" cy="100" r="85"/>
+          <circle class="progress" id="imBikeArc" cx="100" cy="100" r="85" stroke-dasharray="0 534"/>
+        </svg>
+        <div class="im-gauge-center">
+          <div class="im-gauge-pct" id="imBikePct">--</div>
+          <div class="im-gauge-label">READY</div>
+        </div>
+      </div>
+      <div class="im-gauge-sport">BIKE</div>
+      <div class="im-gauge-best" id="imBikeBest">-- km</div>
+      <div class="im-gauge-target">of 180 km target</div>
+    </div>
+    <div class="im-gauge-card im-gauge-card--run reveal">
+      <div class="im-gauge-ring im-gauge-ring--run">
+        <svg viewBox="0 0 200 200">
+          <circle class="bg" cx="100" cy="100" r="85"/>
+          <circle class="progress" id="imRunArc" cx="100" cy="100" r="85" stroke-dasharray="0 534"/>
+        </svg>
+        <div class="im-gauge-center">
+          <div class="im-gauge-pct" id="imRunPct">--</div>
+          <div class="im-gauge-label">READY</div>
+        </div>
+      </div>
+      <div class="im-gauge-sport">RUN</div>
+      <div class="im-gauge-best" id="imRunBest">-- km</div>
+      <div class="im-gauge-target">of 42.2 km target</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DISTANCE PROGRESS BARS ═══ -->
+<div class="im-container im-progress-section">
+  <div class="im-label reveal">PROGRESS</div>
+  <div class="im-heading reveal">Longest Effort vs Ironman Distance</div>
+  <div class="im-progress-row reveal">
+    <div class="im-progress-sport" style="color:var(--im-swim)">SWIM</div>
+    <div class="im-progress-track"><div class="im-progress-fill im-progress-fill--swim" id="imSwimBar" style="width:0%"></div></div>
+    <div class="im-progress-val" id="imSwimVal">-- / 3.8 km</div>
+  </div>
+  <div class="im-progress-row reveal">
+    <div class="im-progress-sport" style="color:var(--im-bike)">BIKE</div>
+    <div class="im-progress-track"><div class="im-progress-fill im-progress-fill--bike" id="imBikeBar" style="width:0%"></div></div>
+    <div class="im-progress-val" id="imBikeVal">-- / 180 km</div>
+  </div>
+  <div class="im-progress-row reveal">
+    <div class="im-progress-sport" style="color:var(--im-run)">RUN</div>
+    <div class="im-progress-track"><div class="im-progress-fill im-progress-fill--run" id="imRunBar" style="width:0%"></div></div>
+    <div class="im-progress-val" id="imRunVal">-- / 42.2 km</div>
+  </div>
+</div>
+
+<!-- ═══ LIFETIME STATS ═══ -->
+<div class="im-container">
+  <div class="im-label reveal">LIFETIME</div>
+  <div class="im-heading reveal">Total Distance Logged</div>
+  <div class="im-stats reveal">
+    <div class="im-stat"><div class="im-stat-val" style="color:var(--im-swim)" id="imTotalSwim">--</div><div class="im-stat-label">KM SWUM</div></div>
+    <div class="im-stat"><div class="im-stat-val" style="color:var(--im-bike)" id="imTotalBike">--</div><div class="im-stat-label">KM CYCLED</div></div>
+    <div class="im-stat"><div class="im-stat-val" style="color:var(--im-run)" id="imTotalRun">--</div><div class="im-stat-label">KM RUN</div></div>
+    <div class="im-stat"><div class="im-stat-val" style="color:var(--im-gold)" id="imTotalAll">--</div><div class="im-stat-label">TOTAL KM</div></div>
+  </div>
+</div>
+
+<!-- ═══ WEEKLY TRAINING SPLIT ═══ -->
+<div class="im-container">
+  <div class="im-label reveal">TRAINING PLAN</div>
+  <div class="im-heading reveal">Ironman Base Building Week</div>
+  <div class="im-split reveal">
+    <div class="im-split-day"><div class="im-split-name">MON</div><div class="im-split-icon">&#127939;</div><div class="im-split-type" style="color:var(--im-run)">EASY RUN</div><div class="im-split-dist">8-10 km Zone 2</div></div>
+    <div class="im-split-day"><div class="im-split-name">TUE</div><div class="im-split-icon">&#128692;</div><div class="im-split-type" style="color:var(--im-bike)">LONG RIDE</div><div class="im-split-dist">60-100 km</div></div>
+    <div class="im-split-day"><div class="im-split-name">WED</div><div class="im-split-icon">&#127946;</div><div class="im-split-type" style="color:var(--im-swim)">SWIM + GYM</div><div class="im-split-dist">1.5 km + core</div></div>
+    <div class="im-split-day"><div class="im-split-name">THU</div><div class="im-split-icon">&#127939;</div><div class="im-split-type" style="color:var(--im-run)">TEMPO RUN</div><div class="im-split-dist">10-12 km Zone 3</div></div>
+    <div class="im-split-day"><div class="im-split-name">FRI</div><div class="im-split-icon">&#129354;</div><div class="im-split-type" style="color:#FF1744">BOXING / GYM</div><div class="im-split-dist">60 min</div></div>
+    <div class="im-split-day"><div class="im-split-name">SAT</div><div class="im-split-icon">&#127939;</div><div class="im-split-type" style="color:var(--im-run)">LONG RUN</div><div class="im-split-dist">15-21 km</div></div>
+    <div class="im-split-day"><div class="im-split-name">SUN</div><div class="im-split-icon">&#127946;</div><div class="im-split-type" style="color:var(--im-swim)">SWIM / WALK</div><div class="im-split-dist">Recovery</div></div>
+  </div>
+</div>
+
+<!-- ═══ YEARLY VISION ═══ -->
+<div class="im-container">
+  <div class="im-label reveal">THE VISION</div>
+  <div class="im-heading reveal">One Ironman. Every Year. For Life.</div>
+  <div class="im-vision reveal">
+    <div class="im-year-card current"><div class="im-year-num">2027</div><div class="im-year-label">FIRST IRONMAN</div><span class="im-year-status im-year-status--prep">PREPARING</span></div>
+    <div class="im-year-card"><div class="im-year-num">2028</div><div class="im-year-label">IRONMAN #2</div><span class="im-year-status im-year-status--target">TARGET</span></div>
+    <div class="im-year-card"><div class="im-year-num">2029</div><div class="im-year-label">IRONMAN #3</div><span class="im-year-status im-year-status--future">FUTURE</span></div>
+    <div class="im-year-card"><div class="im-year-num">2030</div><div class="im-year-label">IRONMAN #4</div><span class="im-year-status im-year-status--future">FUTURE</span></div>
+    <div class="im-year-card"><div class="im-year-num">2031</div><div class="im-year-label">IRONMAN #5</div><span class="im-year-status im-year-status--future">FUTURE</span></div>
+    <div class="im-year-card"><div class="im-year-num">2035</div><div class="im-year-label">IRONMAN #9</div><span class="im-year-status im-year-status--future">DECADE</span></div>
+  </div>
+</div>
+
+<!-- ═══ CTA ═══ -->
+<div class="im-cta">
+  <div class="im-cta-text">226 km. One day. The rest of my life.</div>
+  <a href="strava.html">VIEW TRAINING DATA</a>
+</div>
+
+</div><!-- /im-page -->
+
+<!-- FOOTER -->
+<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">&#9670; FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank">INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank">STRAVA</a><a href="about.html" class="footer-link">ABOUT</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> &middot; <span data-unclaimed></span> UNCLAIMED &middot; <span style="color:var(--green)">STREAK ALIVE</span></div><div class="footer-copy">&copy; 2026 Anupam Kumar</div></div></div></footer>
+
+<script src="js/config.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  var SUPA = FL.SUPABASE_URL, KEY = FL.SUPABASE_ANON_KEY;
+
+  function fetchSB(table, q) {
+    return fetch(SUPA+'/rest/v1/'+table+(q||''),{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(function(r){return r.json()}).catch(function(){return[]});
+  }
+
+  // Load all Strava data
+  fetchSB('strava_activities','?select=type,distance&order=distance.desc').then(function(acts){
+    if (!acts||!acts.length) return;
+
+    var bestSwim=0,bestBike=0,bestRun=0,totalSwim=0,totalBike=0,totalRun=0;
+    acts.forEach(function(a){
+      var km=(a.distance||0)/1000;
+      if(a.type==='Swim'){totalSwim+=km; if(km>bestSwim)bestSwim=km;}
+      if(a.type==='Ride'){totalBike+=km; if(km>bestBike)bestBike=km;}
+      if(a.type==='Run'||a.type==='VirtualRun'){totalRun+=km; if(km>bestRun)bestRun=km;}
+    });
+
+    var swimPct=Math.min(100,Math.round(bestSwim/3.8*100));
+    var bikePct=Math.min(100,Math.round(bestBike/180*100));
+    var runPct=Math.min(100,Math.round(bestRun/42.2*100));
+    var circ=2*Math.PI*85; // ~534
+
+    // Gauges
+    var el;
+    el=document.getElementById('imSwimPct'); if(el) el.textContent=swimPct+'%';
+    el=document.getElementById('imBikePct'); if(el) el.textContent=bikePct+'%';
+    el=document.getElementById('imRunPct'); if(el) el.textContent=runPct+'%';
+
+    el=document.getElementById('imSwimBest'); if(el) el.textContent=bestSwim.toFixed(2)+' km';
+    el=document.getElementById('imBikeBest'); if(el) el.textContent=bestBike.toFixed(1)+' km';
+    el=document.getElementById('imRunBest'); if(el) el.textContent=bestRun.toFixed(1)+' km';
+
+    // Animate arcs
+    setTimeout(function(){
+      var s=document.getElementById('imSwimArc'); if(s) s.setAttribute('stroke-dasharray',Math.round(swimPct/100*circ)+' '+circ);
+      var b=document.getElementById('imBikeArc'); if(b) b.setAttribute('stroke-dasharray',Math.round(bikePct/100*circ)+' '+circ);
+      var r=document.getElementById('imRunArc'); if(r) r.setAttribute('stroke-dasharray',Math.round(runPct/100*circ)+' '+circ);
+    },500);
+
+    // Progress bars
+    setTimeout(function(){
+      var sb=document.getElementById('imSwimBar'); if(sb) sb.style.width=swimPct+'%';
+      var bb=document.getElementById('imBikeBar'); if(bb) bb.style.width=bikePct+'%';
+      var rb=document.getElementById('imRunBar'); if(rb) rb.style.width=runPct+'%';
+    },800);
+
+    el=document.getElementById('imSwimVal'); if(el) el.textContent=bestSwim.toFixed(2)+' / 3.8 km';
+    el=document.getElementById('imBikeVal'); if(el) el.textContent=bestBike.toFixed(1)+' / 180 km';
+    el=document.getElementById('imRunVal'); if(el) el.textContent=bestRun.toFixed(1)+' / 42.2 km';
+
+    // Lifetime
+    el=document.getElementById('imTotalSwim'); if(el) el.textContent=totalSwim.toFixed(1);
+    el=document.getElementById('imTotalBike'); if(el) el.textContent=Math.round(totalBike);
+    el=document.getElementById('imTotalRun'); if(el) el.textContent=Math.round(totalRun);
+    el=document.getElementById('imTotalAll'); if(el) el.textContent=Math.round(totalSwim+totalBike+totalRun);
+  });
+
+  // GSAP
+  if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal').forEach(function(el){
+      gsap.to(el,{opacity:1,y:0,duration:0.8,ease:'power3.out',
+        scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}});
+    });
+    gsap.utils.toArray('.im-gauge-card').forEach(function(el,i){
+      gsap.from(el,{opacity:0,y:30,scale:0.95,duration:0.6,delay:i*0.15,ease:'back.out(1.4)',
+        scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'}});
+    });
+    gsap.utils.toArray('.im-year-card').forEach(function(el,i){
+      gsap.from(el,{opacity:0,y:20,duration:0.4,delay:i*0.08,ease:'power2.out',
+        scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}});
+    });
+    gsap.utils.toArray('.im-split-day').forEach(function(el,i){
+      gsap.from(el,{opacity:0,y:15,duration:0.3,delay:i*0.06,ease:'power2.out',
+        scrollTrigger:{trigger:el,start:'top 92%',toggleActions:'play none none none'}});
+    });
+  }
+
+  // THREE.JS — tri-color particles (swim blue + bike green + run orange)
+  if(typeof THREE==='undefined')return;
+  var canvas=document.getElementById('imParticles');
+  if(!canvas)return;
+  try{
+    var w=innerWidth,h=innerHeight;
+    canvas.width=w;canvas.height=h;
+    var scene=new THREE.Scene();
+    var camera=new THREE.PerspectiveCamera(60,w/h,0.1,1000);
+    camera.position.z=6;
+    var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:false});
+    renderer.setSize(w,h);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+    renderer.setClearColor(0x000000,0);
+    var count=w<768?2000:5000;
+    var geo=new THREE.BufferGeometry();
+    var pos=new Float32Array(count*3),cols=new Float32Array(count*3);
+    var c1=new THREE.Color(0x00B0FF),c2=new THREE.Color(0x00E676),c3=new THREE.Color(0xFC4C02),c4=new THREE.Color(0x555555);
+    for(var i=0;i<count;i++){
+      pos[i*3]=(Math.random()-0.5)*16;pos[i*3+1]=(Math.random()-0.5)*16;pos[i*3+2]=(Math.random()-0.5)*10;
+      var rnd=Math.random();var c=rnd<0.2?c1:rnd<0.4?c2:rnd<0.55?c3:c4;
+      cols[i*3]=c.r;cols[i*3+1]=c.g;cols[i*3+2]=c.b;
+    }
+    geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    geo.setAttribute('color',new THREE.BufferAttribute(cols,3));
+    var mat=new THREE.PointsMaterial({size:1.3,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:0.35,depthWrite:false});
+    var pts=new THREE.Points(geo,mat);
+    scene.add(pts);
+    var clock=new THREE.Clock();
+    function animate(){requestAnimationFrame(animate);var t=clock.getElapsedTime();pts.rotation.y=t*0.01;pts.rotation.x=Math.sin(t*0.005)*0.03;renderer.render(scene,camera);}
+    animate();
+    addEventListener('resize',function(){w=innerWidth;h=innerHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);});
+    addEventListener('scroll',function(){canvas.style.opacity=Math.max(0.1,1-(scrollY||0)/2000);});
+  }catch(e){canvas.style.display='none';}
+})();
+</script>
+
+</body>
+</html>
