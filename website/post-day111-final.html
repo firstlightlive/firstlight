@@ -1,0 +1,79 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=1080"><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1080px;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
+
+/* Deep space background */
+.s::before{content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 45%, rgba(0,176,255,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 30% 70%, rgba(0,230,118,0.025) 0%, transparent 40%),
+    radial-gradient(circle at 70% 30%, rgba(252,76,2,0.025) 0%, transparent 40%)}
+
+/* Horizon line */
+.horizon{position:absolute;top:52%;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,
+    transparent 5%,
+    rgba(0,176,255,0.15) 20%,
+    rgba(0,230,118,0.2) 40%,
+    rgba(255,255,255,0.25) 50%,
+    rgba(0,230,118,0.2) 60%,
+    rgba(252,76,2,0.15) 80%,
+    transparent 95%)}
+/* Horizon glow */
+.horizon-glow{position:absolute;top:48%;left:15%;right:15%;height:80px;
+  background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,0.015) 48%,rgba(255,255,255,0.015) 52%,transparent 100%);
+  filter:blur(20px)}
+
+/* The number — massive, ethereal */
+.num{font-family:'IBM Plex Mono',monospace;font-size:380px;font-weight:200;
+  letter-spacing:-15px;line-height:0.75;position:relative;
+  color:transparent;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,0.95) 0%,
+    rgba(255,255,255,0.7) 30%,
+    rgba(255,255,255,0.15) 60%,
+    transparent 80%);
+  -webkit-background-clip:text;background-clip:text;
+  filter:drop-shadow(0 0 60px rgba(255,255,255,0.08))}
+
+/* Subtle reflection below horizon */
+.reflection{position:absolute;top:56%;font-family:'IBM Plex Mono',monospace;font-size:380px;font-weight:200;
+  letter-spacing:-15px;line-height:0.75;
+  color:transparent;
+  background:linear-gradient(180deg,rgba(255,255,255,0.04) 0%,transparent 30%);
+  -webkit-background-clip:text;background-clip:text;
+  transform:scaleY(-0.3);transform-origin:top;filter:blur(2px)}
+
+/* URL — understated */
+.url{position:absolute;bottom:90px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  letter-spacing:8px;font-weight:300;color:rgba(255,255,255,0.12)}
+
+/* Tri dots — swim bike run identity */
+.dots{position:absolute;bottom:55px;display:flex;gap:12px}
+.dots span{width:4px;height:4px;border-radius:50%}
+.d1{background:#00B0FF;box-shadow:0 0 6px rgba(0,176,255,0.5)}
+.d2{background:#00E676;box-shadow:0 0 6px rgba(0,230,118,0.5)}
+.d3{background:#FC4C02;box-shadow:0 0 6px rgba(252,76,2,0.5)}
+
+/* Film grain */
+.grain{position:absolute;inset:0;opacity:0.04;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:128px 128px}
+
+/* Scan line — cinematic */
+.scan{position:absolute;inset:0;pointer-events:none;opacity:0.015;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.5) 2px,transparent 4px)}
+</style></head><body>
+<div class="s">
+  <div class="horizon-glow"></div>
+  <div class="horizon"></div>
+  <div class="num">111</div>
+  <div class="reflection">111</div>
+  <div class="url">FIRSTLIGHT.LIVE</div>
+  <div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+  <div class="grain"></div>
+  <div class="scan"></div>
+</div>
+</body></html>

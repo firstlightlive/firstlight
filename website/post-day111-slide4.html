@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=1080"><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#030608;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1080px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;text-align:center;padding:100px;
+  background:linear-gradient(180deg,#030608 0%,#060a12 50%,#030608 100%)}
+.s::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,230,118,0.04) 0%,transparent 50%);filter:blur(40px)}
+.s::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,#00B0FF 25%,#00E676 50%,#FC4C02 75%,transparent);opacity:0.4}
+.diamonds{font-size:14px;color:rgba(255,255,255,0.06);margin-bottom:60px;letter-spacing:24px}
+.text{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:300;letter-spacing:3px;line-height:2.4}
+.text .dim{color:rgba(255,255,255,0.3)}
+.text .bright{color:#fff;font-weight:600}
+.text .swim{color:#00B0FF;font-weight:600}
+.text .green{color:#00E676;font-weight:600}
+.text .fire{color:#FC4C02;font-weight:600}
+.url{position:absolute;bottom:70px;font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:8px;
+  background:linear-gradient(90deg,#00B0FF,#00E676,#FC4C02);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+</style></head><body>
+<div class="s">
+  <div class="diamonds">◆ ◆ ◆</div>
+  <div class="text">
+    <span class="bright">No announcements.</span><br>
+    <span class="dim">Just proof.</span><br><br>
+    <span class="bright">No motivation.</span><br>
+    <span class="dim">Just systems.</span><br><br>
+    <span class="bright">No finish line.</span><br>
+    <span class="fire">Just forward.</span>
+  </div>
+  <div class="url">FIRSTLIGHT.LIVE</div>
+</div>
+</body></html>
