@@ -1074,12 +1074,17 @@
 
     // ═══ HOOK: Populate orbital sport ring ═══
     if (typeof window._populateOrbital === 'function') {
+      var runKmTotal = runs.reduce(function(s,a){return s+parseFloat(a.distance||0)/1000},0);
+      var rideKmTotal = rides.reduce(function(s,a){return s+parseFloat(a.distance||0)/1000},0);
+      var walkKmTotal = walks.reduce(function(s,a){return s+parseFloat(a.distance||0)/1000},0);
+      var swimKmTotal = swims.reduce(function(s,a){return s+parseFloat(a.distance||0)/1000},0);
+      var gymHrsTotal = workouts.reduce(function(s,a){return s+parseFloat(a.moving_time||0)/3600},0);
       window._populateOrbital([
-        { name:'RUN', count:runs.length, color:'#FC4C02' },
-        { name:'RIDE', count:rides.length, color:'#00D4FF' },
-        { name:'WALK', count:walks.length, color:'#00E676' },
-        { name:'SWIM', count:swims.length, color:'#00B0FF' },
-        { name:'GYM', count:workouts.length, color:'#AB47BC' }
+        { name:'RUN', count:runs.length, value:Math.round(runKmTotal), unit:'km', color:'#FC4C02' },
+        { name:'RIDE', count:rides.length, value:Math.round(rideKmTotal), unit:'km', color:'#00D4FF' },
+        { name:'WALK', count:walks.length, value:Math.round(walkKmTotal), unit:'km', color:'#00E676' },
+        { name:'SWIM', count:swims.length, value:parseFloat(swimKmTotal.toFixed(1)), unit:'km', color:'#00B0FF' },
+        { name:'GYM', count:workouts.length, value:Math.round(gymHrsTotal), unit:'hrs', color:'#AB47BC' }
       ]);
     }
 
@@ -1584,11 +1589,14 @@
     var filtered = sports.filter(function(s) { return s.count > 0; });
     window._orbitSports = filtered;
     if (typeof window._initSupernova === 'function') window._initSupernova(filtered);
-    var total = sports.reduce(function(a,b){return a+b.count;},0);
+    var totalSessions = sports.reduce(function(a,b){return a+b.count;},0);
+    var totalKm = sports.reduce(function(a,b){return a+(b.unit==='km'?b.value:0);},0);
     var totalEl = document.getElementById('svOrbitTotal');
-    if (totalEl) totalEl.textContent = total;
+    if (totalEl) totalEl.textContent = totalSessions;
     var ringTotal = document.getElementById('svDNARingTotal');
-    if (ringTotal) ringTotal.textContent = total;
+    if (ringTotal) ringTotal.textContent = Math.round(totalKm).toLocaleString();
+    var ringLabel = document.getElementById('svDNARingLabel');
+    if (ringLabel) ringLabel.textContent = 'TOTAL KM';
 
     // Draw animated ring chart
     drawDNARing(filtered, total);
@@ -1596,7 +1604,8 @@
     buildDNALegend(filtered, total);
   };
 
-  function drawDNARing(sports, total) {
+  function drawDNARing(sports, totalIgnored) {
+    var total = sports.reduce(function(a,b){return a+b.value;},0) || 1;
     var canvas = document.getElementById('svDNARing');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
@@ -1636,7 +1645,7 @@
 
       var angle = startAngle;
       sports.forEach(function(s) {
-        var pct = s.count / total;
+        var pct = s.value / total;
         var sweep = (Math.PI * 2 - gap * sports.length) * pct * ease;
         if (sweep < 0.01) { angle += sweep + gap; return; }
 
@@ -1686,19 +1695,21 @@
     animate();
   }
 
-  function buildDNALegend(sports, total) {
+  function buildDNALegend(sports) {
     var el = document.getElementById('svDNALegend');
     if (!el) return;
-    var maxCount = Math.max.apply(null, sports.map(function(s){return s.count})) || 1;
+    var totalVal = sports.reduce(function(a,b){return a+b.value;},0) || 1;
+    var maxVal = Math.max.apply(null, sports.map(function(s){return s.value})) || 1;
     var html = '';
     sports.forEach(function(s) {
-      var pct = Math.round(s.count / total * 100);
-      var barW = Math.round(s.count / maxCount * 100);
+      var pct = Math.round(s.value / totalVal * 100);
+      var barW = Math.round(s.value / maxVal * 100);
+      var displayVal = s.value + ' ' + s.unit;
       html += '<div class="sv-dna-legend-item">';
       html += '<div class="sv-dna-legend-dot" style="background:'+s.color+';box-shadow:0 0 8px '+s.color+'"></div>';
-      html += '<div class="sv-dna-legend-name">'+s.name+'</div>';
+      html += '<div class="sv-dna-legend-name">'+s.name+' <span style="font-size:9px;color:var(--s-dim);font-weight:400">'+s.count+' sessions</span></div>';
       html += '<div class="sv-dna-legend-bar"><div class="sv-dna-legend-fill" style="width:'+barW+'%;background:'+s.color+'"></div></div>';
-      html += '<div class="sv-dna-legend-count">'+s.count+'</div>';
+      html += '<div class="sv-dna-legend-count">'+displayVal+'</div>';
       html += '<div class="sv-dna-legend-pct" style="color:'+s.color+'">'+pct+'%</div>';
       html += '</div>';
     });
