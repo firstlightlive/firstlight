@@ -584,18 +584,60 @@
   </div>
 </div>
 
-<!-- ═══ PACE TREND ═══ -->
+<!-- ═══ MULTI-SPORT PACE TRENDS ═══ -->
 <div class="sv-section-pace">
 <div class="sv-container reveal">
   <div class="sv-section-label">PACE</div>
-  <div class="sv-section-title">Weekly Trend</div>
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-    <span style="font-family:var(--s-mono);font-size:1.8rem;font-weight:700;color:#fff" id="svAvgPace">--</span>
-    <span style="font-family:var(--s-mono);font-size:12px;color:var(--s-strava)">/km avg</span>
+  <div class="sv-section-title">Multi-Sport Trends</div>
+  <!-- Sport tabs -->
+  <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap" id="svPaceTabs">
+    <button class="sv-pace-tab active" data-sport="run" style="font-family:var(--s-mono);font-size:10px;letter-spacing:1.5px;font-weight:700;padding:6px 16px;border-radius:20px;border:1px solid rgba(252,76,2,0.3);background:rgba(252,76,2,0.1);color:#FC4C02;cursor:pointer">RUN</button>
+    <button class="sv-pace-tab" data-sport="ride" style="font-family:var(--s-mono);font-size:10px;letter-spacing:1.5px;font-weight:700;padding:6px 16px;border-radius:20px;border:1px solid rgba(0,212,255,0.15);background:transparent;color:var(--s-dim);cursor:pointer">BIKE</button>
+    <button class="sv-pace-tab" data-sport="swim" style="font-family:var(--s-mono);font-size:10px;letter-spacing:1.5px;font-weight:700;padding:6px 16px;border-radius:20px;border:1px solid rgba(0,176,255,0.15);background:transparent;color:var(--s-dim);cursor:pointer">SWIM</button>
   </div>
+  <!-- Pace display -->
+  <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:16px">
+    <span style="font-family:var(--s-mono);font-size:1.8rem;font-weight:700;color:#fff" id="svAvgPace">--</span>
+    <span style="font-family:var(--s-mono);font-size:12px;color:var(--s-strava)" id="svPaceUnit">/km avg</span>
+    <span style="font-family:var(--s-mono);font-size:10px;color:var(--s-dim)" id="svPaceDelta"></span>
+  </div>
+  <!-- Canvas chart -->
   <canvas id="svPaceCanvas"></canvas>
   <div class="sv-pace-chart" id="svPaceChart" style="display:none"></div>
+  <!-- Per-sport stats -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px" id="svPaceStats">
+    <div style="text-align:center;padding:12px;background:rgba(252,76,2,0.04);border:1px solid rgba(252,76,2,0.1);border-radius:10px">
+      <div style="font-family:var(--s-mono);font-size:8px;letter-spacing:1.5px;color:#FC4C02">RUN PACE</div>
+      <div style="font-family:var(--s-mono);font-size:1.1rem;font-weight:700;color:#fff" id="svRunPaceAvg">--</div>
+      <div style="font-family:var(--s-mono);font-size:8px;color:var(--s-dim)" id="svRunPaceBest">best: --</div>
+    </div>
+    <div style="text-align:center;padding:12px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:10px">
+      <div style="font-family:var(--s-mono);font-size:8px;letter-spacing:1.5px;color:#00D4FF">BIKE SPEED</div>
+      <div style="font-family:var(--s-mono);font-size:1.1rem;font-weight:700;color:#fff" id="svBikeSpeedAvg">--</div>
+      <div style="font-family:var(--s-mono);font-size:8px;color:var(--s-dim)" id="svBikeSpeedBest">best: --</div>
+    </div>
+    <div style="text-align:center;padding:12px;background:rgba(0,176,255,0.04);border:1px solid rgba(0,176,255,0.1);border-radius:10px">
+      <div style="font-family:var(--s-mono);font-size:8px;letter-spacing:1.5px;color:#00B0FF">SWIM PACE</div>
+      <div style="font-family:var(--s-mono);font-size:1.1rem;font-weight:700;color:#fff" id="svSwimPaceAvg">--</div>
+      <div style="font-family:var(--s-mono);font-size:8px;color:var(--s-dim)" id="svSwimPaceBest">best: --</div>
+    </div>
+  </div>
 </div>
+</div>
+
+<!-- ═══ IRONMAN TRAINING PLAN ═══ -->
+<div class="sv-container reveal" style="margin-top:40px">
+  <div class="sv-section-label">TRAINING PLAN</div>
+  <div class="sv-section-title">Ironman Base Building Week</div>
+  <div style="font-family:var(--s-mono);font-size:0.65rem;color:var(--s-dim);text-align:center;margin-bottom:20px" id="svPlanWeekLabel">This week's plan vs actual</div>
+  <div id="svTrainingPlan" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
+    <!-- Populated by JS -->
+  </div>
+  <div style="display:flex;justify-content:center;gap:16px;margin-top:16px;font-family:var(--s-mono);font-size:0.6rem;color:var(--s-dim)">
+    <span><span style="display:inline-block;width:8px;height:8px;background:#00E676;border-radius:2px;margin-right:4px"></span>DONE</span>
+    <span><span style="display:inline-block;width:8px;height:8px;background:rgba(255,255,255,0.06);border-radius:2px;border:1px solid rgba(255,255,255,0.1);margin-right:4px"></span>PENDING</span>
+    <span><span style="display:inline-block;width:8px;height:8px;background:rgba(255,82,82,0.3);border-radius:2px;margin-right:4px"></span>MISSED</span>
+  </div>
 </div>
 
 <!-- ═══ HEART RATE ═══ -->
@@ -1035,6 +1077,202 @@
         { name:'GYM', count:workouts.length, color:'#AB47BC' }
       ]);
     }
+
+    // ═══ HOOK: Multi-sport pace trends ═══
+    (function() {
+      function fmtPace(p) { return Math.floor(p) + "'" + String(Math.round((p%1)*60)).padStart(2,'0') + '"'; }
+      function fmtSpeed(kmh) { return kmh.toFixed(1) + ' km/h'; }
+
+      // Compute pace data per sport
+      var sportPace = { run: [], ride: [], swim: [] };
+      var sportWeekly = { run: {}, ride: {}, swim: {} };
+      var sportBest = { run: 999, ride: 0, swim: 999 };
+
+      acts.forEach(function(a) {
+        var km = (a.distance||0)/1000;
+        var sec = a.moving_time||0;
+        if (km < 0.1 || sec < 60) return;
+        var d = new Date(a.start_date_local);
+        var wk = d.getFullYear()+'-W'+String(Math.ceil((d.getDate()+new Date(d.getFullYear(),d.getMonth(),1).getDay())/7)).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0');
+
+        if (a.type === 'Run' || a.type === 'VirtualRun') {
+          var pace = sec/60/km; // min/km
+          sportPace.run.push(pace);
+          if (!sportWeekly.run[wk]) sportWeekly.run[wk] = [];
+          sportWeekly.run[wk].push(pace);
+          if (pace < sportBest.run) sportBest.run = pace;
+        } else if (a.type === 'Ride') {
+          var speed = km/(sec/3600); // km/h
+          sportPace.ride.push(speed);
+          if (!sportWeekly.ride[wk]) sportWeekly.ride[wk] = [];
+          sportWeekly.ride[wk].push(speed);
+          if (speed > sportBest.ride) sportBest.ride = speed;
+        } else if (a.type === 'Swim') {
+          var swimPace = sec/60/(km*10); // min/100m
+          sportPace.swim.push(swimPace);
+          if (!sportWeekly.swim[wk]) sportWeekly.swim[wk] = [];
+          sportWeekly.swim[wk].push(swimPace);
+          if (swimPace < sportBest.swim) sportBest.swim = swimPace;
+        }
+      });
+
+      // Set per-sport stat cards
+      var el;
+      if (sportPace.run.length) {
+        var avgR = sportPace.run.reduce(function(a,b){return a+b},0)/sportPace.run.length;
+        el = document.getElementById('svRunPaceAvg'); if (el) el.textContent = fmtPace(avgR) + '/km';
+        el = document.getElementById('svRunPaceBest'); if (el) el.textContent = 'best: ' + fmtPace(sportBest.run) + '/km';
+      }
+      if (sportPace.ride.length) {
+        var avgB = sportPace.ride.reduce(function(a,b){return a+b},0)/sportPace.ride.length;
+        el = document.getElementById('svBikeSpeedAvg'); if (el) el.textContent = fmtSpeed(avgB);
+        el = document.getElementById('svBikeSpeedBest'); if (el) el.textContent = 'best: ' + fmtSpeed(sportBest.ride);
+      }
+      if (sportPace.swim.length) {
+        var avgS = sportPace.swim.reduce(function(a,b){return a+b},0)/sportPace.swim.length;
+        el = document.getElementById('svSwimPaceAvg'); if (el) el.textContent = fmtPace(avgS) + '/100m';
+        el = document.getElementById('svSwimPaceBest'); if (el) el.textContent = 'best: ' + fmtPace(sportBest.swim) + '/100m';
+      }
+
+      // Store for tab switching
+      window._sportWeekly = sportWeekly;
+      window._sportBest = sportBest;
+      window._sportColors = { run:'#FC4C02', ride:'#00D4FF', swim:'#00B0FF' };
+      window._sportUnits = { run:'/km', ride:' km/h', swim:'/100m' };
+      window._sportInvert = { run:true, ride:false, swim:true }; // lower=better for run/swim
+
+      // Draw initial tab (run)
+      drawSportPace('run');
+
+      // Tab click handlers
+      document.querySelectorAll('.sv-pace-tab').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.sv-pace-tab').forEach(function(b) {
+            b.classList.remove('active');
+            b.style.background = 'transparent';
+            b.style.color = 'var(--s-dim)';
+          });
+          btn.classList.add('active');
+          var sport = btn.dataset.sport;
+          var color = window._sportColors[sport];
+          btn.style.background = color.replace(')', ',0.1)').replace('#', 'rgba(').replace(/([0-9A-F]{2})/gi, function(m){return parseInt(m,16)+','});
+          // Simpler: just set opacity
+          btn.style.background = 'rgba(255,255,255,0.06)';
+          btn.style.color = color;
+          btn.style.borderColor = color;
+          drawSportPace(sport);
+        });
+      });
+
+      function drawSportPace(sport) {
+        var weekly = window._sportWeekly[sport] || {};
+        var wks = Object.keys(weekly).sort().slice(-12);
+        if (!wks.length) {
+          document.getElementById('svAvgPace').textContent = '--';
+          document.getElementById('svPaceUnit').textContent = sport === 'ride' ? 'km/h avg' : (sport === 'swim' ? '/100m avg' : '/km avg');
+          return;
+        }
+        var avgValues = wks.map(function(w) { var v=weekly[w]; return v.reduce(function(a,b){return a+b},0)/v.length; });
+        var overall = avgValues.reduce(function(a,b){return a+b},0)/avgValues.length;
+        var invert = window._sportInvert[sport];
+
+        // Update display
+        var paceEl = document.getElementById('svAvgPace');
+        var unitEl = document.getElementById('svPaceUnit');
+        var deltaEl = document.getElementById('svPaceDelta');
+        if (sport === 'ride') {
+          if (paceEl) paceEl.textContent = fmtSpeed(overall);
+          if (unitEl) unitEl.textContent = 'avg speed';
+        } else {
+          if (paceEl) paceEl.textContent = fmtPace(overall);
+          if (unitEl) unitEl.textContent = (sport === 'swim' ? '/100m avg' : '/km avg');
+        }
+
+        // Delta (last week vs avg)
+        if (avgValues.length >= 2 && deltaEl) {
+          var last = avgValues[avgValues.length-1];
+          var diff = last - overall;
+          var better = invert ? diff < 0 : diff > 0;
+          var diffStr = sport === 'ride' ? Math.abs(diff).toFixed(1) + ' km/h' : Math.abs(diff*60).toFixed(0) + 's';
+          deltaEl.textContent = (better ? 'improving' : 'declining') + ' (' + (better?'+':'-') + diffStr + ')';
+          deltaEl.style.color = better ? '#00E676' : '#FF5252';
+        }
+
+        // Draw canvas pace line
+        if (typeof window._drawPaceLine === 'function') {
+          window._drawPaceLine(avgValues, window._sportColors[sport], invert);
+        }
+      }
+    })();
+
+    // ═══ HOOK: Training Plan (Ironman Base Building Week) ═══
+    (function() {
+      var planEl = document.getElementById('svTrainingPlan');
+      if (!planEl) return;
+
+      var plan = [
+        { day:'MON', type:'Run', icon:'&#127939;', target:'Run 5km', sport:'Run' },
+        { day:'TUE', type:'Swim', icon:'&#127946;', target:'Swim 1km', sport:'Swim' },
+        { day:'WED', type:'Run+Gym', icon:'&#127939;', target:'Run 5km + Gym', sport:'Run' },
+        { day:'THU', type:'Swim', icon:'&#127946;', target:'Swim 1km', sport:'Swim' },
+        { day:'FRI', type:'Run+Gym', icon:'&#127939;', target:'Run 5km + Gym', sport:'Run' },
+        { day:'SAT', type:'Long Ride', icon:'&#128692;', target:'Ride 60-100km', sport:'Ride' },
+        { day:'SUN', type:'Long Run', icon:'&#127939;', target:'Run 15-21km', sport:'Run' }
+      ];
+
+      // Get this week's activities by day
+      var dayTypes = {};
+      thisWeek.forEach(function(a) {
+        var d = new Date(a.start_date_local);
+        var dayIdx = d.getDay(); // 0=Sun
+        var idx = dayIdx === 0 ? 6 : dayIdx - 1; // Mon=0
+        if (!dayTypes[idx]) dayTypes[idx] = [];
+        dayTypes[idx].push(a.type);
+      });
+
+      var now = new Date();
+      var todayIdx = now.getDay() === 0 ? 6 : now.getDay() - 1;
+      var completedDays = 0;
+
+      var html = '';
+      plan.forEach(function(p, i) {
+        var done = false;
+        var types = dayTypes[i] || [];
+        // Check if the required sport was done
+        if (p.sport === 'Run' && types.some(function(t){return t==='Run'||t==='VirtualRun';})) done = true;
+        if (p.sport === 'Swim' && types.indexOf('Swim') >= 0) done = true;
+        if (p.sport === 'Ride' && types.indexOf('Ride') >= 0) done = true;
+        if (p.type === 'Run+Gym' && done && types.some(function(t){return t==='Workout'||t==='WeightTraining';})) done = true;
+        else if (p.type === 'Run+Gym' && types.some(function(t){return t==='Run'||t==='VirtualRun';})) done = true; // run alone counts
+
+        var isPast = i < todayIdx;
+        var isToday = i === todayIdx;
+        var isFuture = i > todayIdx;
+        var missed = isPast && !done;
+
+        if (done) completedDays++;
+
+        var bg = done ? 'rgba(0,230,118,0.08)' : missed ? 'rgba(255,82,82,0.06)' : 'rgba(255,255,255,0.02)';
+        var border = done ? 'rgba(0,230,118,0.2)' : missed ? 'rgba(255,82,82,0.15)' : isToday ? 'rgba(245,166,35,0.3)' : 'rgba(255,255,255,0.05)';
+        var dayColor = done ? '#00E676' : missed ? '#FF5252' : isToday ? '#F5A623' : '#5A6B80';
+
+        html += '<div style="padding:14px 8px;background:'+bg+';border:1px solid '+border+';border-radius:12px;text-align:center;position:relative'+(isToday?';box-shadow:0 0 20px rgba(245,166,35,0.1)':'')+'">';
+        html += '<div style="font-family:var(--s-mono);font-size:9px;font-weight:700;letter-spacing:2px;color:'+dayColor+'">'+p.day+'</div>';
+        html += '<div style="font-size:20px;margin:8px 0">'+p.icon+'</div>';
+        html += '<div style="font-family:var(--s-mono);font-size:8px;color:#fff;font-weight:600;letter-spacing:0.5px">'+p.type+'</div>';
+        html += '<div style="font-family:var(--s-mono);font-size:7px;color:var(--s-dim);margin-top:4px">'+p.target+'</div>';
+        // Status badge
+        if (done) html += '<div style="font-family:var(--s-mono);font-size:7px;color:#00E676;margin-top:6px;font-weight:700">DONE &#10003;</div>';
+        else if (missed) html += '<div style="font-family:var(--s-mono);font-size:7px;color:#FF5252;margin-top:6px;font-weight:700">MISSED</div>';
+        else if (isToday) html += '<div style="font-family:var(--s-mono);font-size:7px;color:#F5A623;margin-top:6px;font-weight:700">TODAY</div>';
+        html += '</div>';
+      });
+
+      planEl.innerHTML = html;
+
+      var labelEl = document.getElementById('svPlanWeekLabel');
+      if (labelEl) labelEl.textContent = completedDays + '/7 days completed this week';
+    })();
 
     // ═══ HOOK: Weekly 150km gauge ═══
     if (typeof window._drawGauge === 'function') {
@@ -1483,7 +1721,8 @@
   };
 
   // Pace canvas
-  window._drawPaceLine = function(weekPaces) {
+  window._drawPaceLine = function(weekPaces, color, invert) {
+    color = color || '#FC4C02';
     var canvas = document.getElementById('svPaceCanvas');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
@@ -1492,17 +1731,30 @@
     canvas.style.width = w + 'px'; canvas.style.height = '180px';
     ctx.scale(2, 2);
 
-    if (weekPaces.length < 2) return;
+    if (weekPaces.length < 2) {
+      ctx.font = '11px "IBM Plex Mono"';
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.textAlign = 'center';
+      ctx.fillText('Not enough data for trend', w/2, 90);
+      ctx.textAlign = 'left';
+      return;
+    }
     var minP = Math.min.apply(null, weekPaces);
     var maxP = Math.max.apply(null, weekPaces);
     var range = maxP - minP || 1;
     var pad = 30, chartW = w - pad * 2, chartH = 140;
     var points = weekPaces.map(function(p, i) {
+      var yNorm = (p - minP) / range;
       return {
         x: pad + (i / (weekPaces.length - 1)) * chartW,
-        y: pad + ((p - minP) / range) * chartH
+        y: pad + (invert ? yNorm : (1 - yNorm)) * chartH // invert: lower value at top for pace
       };
     });
+
+    // Parse color for rgba
+    var r=252,g=76,b=2;
+    var m = color.match(/#([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})/i);
+    if (m) { r=parseInt(m[1],16); g=parseInt(m[2],16); b=parseInt(m[3],16); }
 
     // Fill gradient under curve
     ctx.beginPath();
@@ -1511,47 +1763,45 @@
     ctx.lineTo(points[points.length-1].x, pad + chartH);
     ctx.closePath();
     var grad = ctx.createLinearGradient(0, pad, 0, pad + chartH);
-    grad.addColorStop(0, 'rgba(252,76,2,0.15)');
-    grad.addColorStop(1, 'rgba(252,76,2,0)');
+    grad.addColorStop(0, 'rgba('+r+','+g+','+b+',0.15)');
+    grad.addColorStop(1, 'rgba('+r+','+g+','+b+',0)');
     ctx.fillStyle = grad;
     ctx.fill();
 
     // Line
     ctx.beginPath();
     points.forEach(function(p, i) { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
-    ctx.strokeStyle = '#FC4C02';
+    ctx.strokeStyle = color;
     ctx.lineWidth = 2.5;
-    ctx.shadowColor = 'rgba(252,76,2,0.5)';
+    ctx.shadowColor = 'rgba('+r+','+g+','+b+',0.5)';
     ctx.shadowBlur = 10;
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    // Dots
+    // Dots + labels
     points.forEach(function(p, i) {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#FC4C02';
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-      ctx.fillStyle = '#fff';
-      ctx.fill();
-
-      // Label
-      var pace = weekPaces[i];
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
+      var val = weekPaces[i];
       ctx.font = '9px "IBM Plex Mono"';
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
       ctx.textAlign = 'center';
-      ctx.fillText(Math.floor(pace) + "'" + String(Math.round((pace%1)*60)).padStart(2,'0') + '"', p.x, p.y - 10);
+      if (invert) { // pace: min'sec"
+        ctx.fillText(Math.floor(val) + "'" + String(Math.round((val%1)*60)).padStart(2,'0') + '"', p.x, p.y - 10);
+      } else { // speed: km/h
+        ctx.fillText(val.toFixed(1), p.x, p.y - 10);
+      }
       ctx.fillText('W' + (i+1), p.x, pad + chartH + 14);
       ctx.textAlign = 'left';
     });
 
-    // Y-axis label (faster at top, slower at bottom — inverted because lower pace = faster)
+    // Y-axis labels
     ctx.font = '8px "IBM Plex Mono"';
     ctx.fillStyle = 'rgba(255,255,255,0.25)';
-    ctx.fillText('FASTER', 2, pad + 8);
-    ctx.fillText('SLOWER', 2, pad + chartH - 2);
+    var topLabel = invert ? 'FASTER' : 'HIGHER';
+    var botLabel = invert ? 'SLOWER' : 'LOWER';
+    ctx.fillText(topLabel, 2, pad + 8);
+    ctx.fillText(botLabel, 2, pad + chartH - 2);
   };
 
   // THREE.JS PARTICLES
