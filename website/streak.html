@@ -2039,7 +2039,7 @@
           var todayStr=ist.getFullYear()+'-'+String(ist.getMonth()+1).padStart(2,'0')+'-'+String(ist.getDate()).padStart(2,'0');
           var hour=ist.getHours();
 
-          // Only show sync banner after 9 AM IST — gives Cloud Function time to sync (jobs at 5:55, 6:15, 9 AM)
+          // Show sync banner after 9 AM IST if no data (syncs at 6, 9, 12, 3, 6, 9, 11, 11:50)
           if(hour>=9){
             // Check if today's Strava activity exists
             var strava=await sbFetch('strava_activities','GET',null,'?select=id&start_date_local=gte.'+todayStr+'T00:00:00&limit=1');
@@ -2055,7 +2055,7 @@
               banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px 20px;text-align:center;font-family:var(--font-mono);font-size:11px;letter-spacing:1px;transition:opacity 0.3s';
               banner.style.background='linear-gradient(135deg,rgba(245,166,35,0.95),rgba(200,130,20,0.95))';
               banner.style.color='#fff';
-              banner.innerHTML='\u23F3 Today\'s data not synced yet — auto-syncs at next scheduled run or force sync from Command Center. <span onclick="this.parentElement.style.display=\'none\'" style="cursor:pointer;margin-left:8px;opacity:0.7">\u2715</span>';
+              banner.innerHTML='\u23F3 Today\'s data not synced yet — auto-syncs at 6, 9, 12, 3, 6, 9, 11 PM or force sync from Command Center. <span onclick="this.parentElement.style.display=\'none\'" style="cursor:pointer;margin-left:8px;opacity:0.7">\u2715</span>';
               if(!document.getElementById('syncBanner'))document.body.prepend(banner);
             }
           }
@@ -2134,19 +2134,25 @@
       function updateCountdown() {
         var now = new Date();
         var currentHour = now.getHours();
+        var currentMin = now.getMinutes();
         var deadline = new Date(now);
 
-        // Deadline is always 6:00 AM
-        if (currentHour >= 1 && currentHour < 6) {
-          deadline.setHours(6, 0, 0, 0);
-        } else if (currentHour >= 6) {
-          deadline.setDate(deadline.getDate() + 1);
-          deadline.setHours(6, 0, 0, 0);
+        // Deadline is 11:59 PM (23:59) every day
+        // After 11:59 PM (midnight-12:59 AM) = check yesterday's activity
+        // 12:00 AM - 12:59 AM = grace period, still checking previous day
+        // 1:00 AM onwards = new day, countdown to tonight 11:59 PM
+
+        if (currentHour === 0) {
+          // Midnight to 12:59 AM — grace period, deadline was 11:59 PM today (just passed)
+          deadline.setHours(23, 59, 0, 0); // already passed, diff will be negative
         } else {
-          deadline.setHours(6, 0, 0, 0);
+          // 1 AM to 11:59 PM — countdown to today 11:59 PM
+          deadline.setHours(23, 59, 0, 0);
         }
 
         var diff = deadline - now;
+        if (diff < 0) diff = 0; // deadline passed
+
         var hours = Math.floor(diff / 3600000);
         var mins = Math.floor((diff % 3600000) / 60000);
         var secs = Math.floor((diff % 60000) / 1000);
@@ -2163,47 +2169,58 @@
 
         var stake = (typeof getCurrentStake === 'function') ? getCurrentStake().toLocaleString('en-IN') : '5,000';
 
-        // After 6 AM: check if activity was logged
-        if (currentHour >= 6 || currentHour < 1) {
+        // Activity already logged today — STREAK ALIVE (green, any time)
+        if (_streakActivityCheck.checked && _streakActivityCheck.hasActivity) {
+          if (cdH) cdH.style.color = 'var(--green)';
+          if (cdM) cdM.style.color = 'var(--green)';
+          if (cdS) cdS.style.color = 'var(--green)';
+          if (label) { label.textContent = 'STREAK ALIVE'; label.style.color = 'var(--green)'; }
+          if (cdStatus) { cdStatus.textContent = 'Day ' + getDayNumber() + ' — Activity verified'; cdStatus.style.color = ''; }
+          hideStreakBroken();
+        }
+        // Deadline passed (00:00-00:59 grace) + no activity = BROKEN
+        else if (diff === 0 || currentHour === 0) {
           if (_streakActivityCheck.checked && !_streakActivityCheck.hasActivity) {
-            // STREAK BROKEN — no activity found after deadline
             if (cdH) cdH.style.color = 'var(--red)';
             if (cdM) cdM.style.color = 'var(--red)';
             if (cdS) cdS.style.color = 'var(--red)';
             if (label) { label.textContent = 'STREAK BROKEN'; label.style.color = 'var(--red)'; }
             if (cdStatus) { cdStatus.textContent = '₹' + stake + ' claimable — no activity logged'; cdStatus.style.color = 'var(--red)'; }
             showStreakBroken();
-          } else if (_streakActivityCheck.checked && _streakActivityCheck.hasActivity) {
-            // STREAK ALIVE — activity confirmed
-            if (cdH) cdH.style.color = 'var(--green)';
-            if (cdM) cdM.style.color = 'var(--green)';
-            if (cdS) cdS.style.color = 'var(--green)';
-            if (label) { label.textContent = 'STREAK ALIVE'; label.style.color = 'var(--green)'; }
-            if (cdStatus) { cdStatus.textContent = 'Day ' + getDayNumber() + ' — Activity verified'; cdStatus.style.color = ''; }
-            hideStreakBroken();
           } else {
-            // Still checking...
+            // Still checking after deadline
             if (cdH) cdH.style.color = 'var(--gold)';
             if (cdM) cdM.style.color = 'var(--gold)';
             if (cdS) cdS.style.color = 'var(--gold)';
             if (label) { label.textContent = 'CHECKING ACTIVITY...'; label.style.color = 'var(--gold)'; }
             if (cdStatus) { cdStatus.textContent = 'Verifying Strava data...'; cdStatus.style.color = ''; }
           }
-        } else if (hours <= 2) {
-          // Under 2 hours to 6 AM — RED urgent
+        }
+        // Under 2 hours to deadline (10 PM - 11:59 PM) + no activity = RED urgent
+        else if (hours < 2 && !_streakActivityCheck.hasActivity) {
           if (cdH) cdH.style.color = 'var(--red)';
           if (cdM) cdM.style.color = 'var(--red)';
           if (cdS) cdS.style.color = 'var(--red)';
           if (label) { label.textContent = 'ACTIVITY WINDOW CLOSING'; label.style.color = 'var(--red)'; }
           if (cdStatus) { cdStatus.textContent = '₹' + stake + ' at risk — log activity NOW'; cdStatus.style.color = 'var(--red)'; }
           hideStreakBroken();
-        } else {
-          // 1 AM to 4 AM — GOLD warning
+        }
+        // Under 6 hours (6 PM - 10 PM) + no activity = GOLD warning
+        else if (hours < 6 && !_streakActivityCheck.hasActivity) {
           if (cdH) cdH.style.color = 'var(--gold)';
           if (cdM) cdM.style.color = 'var(--gold)';
           if (cdS) cdS.style.color = 'var(--gold)';
-          if (label) { label.textContent = 'COUNTDOWN TO DEADLINE'; label.style.color = 'var(--gold)'; }
-          if (cdStatus) { cdStatus.textContent = 'Due at 6:00 AM — Day ' + getDayNumber(); cdStatus.style.color = ''; }
+          if (label) { label.textContent = 'DEADLINE APPROACHING'; label.style.color = 'var(--gold)'; }
+          if (cdStatus) { cdStatus.textContent = 'Due at 11:59 PM — Day ' + getDayNumber(); cdStatus.style.color = ''; }
+          hideStreakBroken();
+        }
+        // Normal countdown (activity not yet logged, plenty of time)
+        else {
+          if (cdH) cdH.style.color = 'var(--text)';
+          if (cdM) cdM.style.color = 'var(--text)';
+          if (cdS) cdS.style.color = 'var(--text)';
+          if (label) { label.textContent = 'COUNTDOWN TO DEADLINE'; label.style.color = 'var(--cyan)'; }
+          if (cdStatus) { cdStatus.textContent = 'Due at 11:59 PM — Day ' + getDayNumber(); cdStatus.style.color = ''; }
           hideStreakBroken();
         }
       }
@@ -2241,8 +2258,8 @@
         var todayProof = (data && data.length > 0) ? data[0] : null;
         var hasRun = todayProof && todayProof.run_km && parseFloat(todayProof.run_km) > 0;
 
-        // Run deadline: must complete before 6:15 AM IST
-        var pastRunDeadline = (hour > 6) || (hour === 6 && minute >= 15);
+        // Run check: has a run been logged today?
+        var pastRunDeadline = false; // no run-specific deadline, just daily activity deadline at 11:59 PM
         var runMissed = pastRunDeadline && !hasRun;
 
         // Show/hide run missed banner
@@ -2292,7 +2309,7 @@
           } else {
             runEl.textContent = 'AWAITING SYNC';
             runEl.style.fontSize = '14px';
-            if (runTimeEl) runTimeEl.textContent = 'Syncs at 5:50 · 5:55 · 5:59 AM via Strava';
+            if (runTimeEl) runTimeEl.textContent = 'Syncs at 6, 9, 12, 3, 6, 9, 11 PM via Strava';
           }
         }
 
@@ -2376,12 +2393,12 @@
         if (runSubEl) {
           if (hasRun) { /* keep existing pace text */ }
           else if (runMissed) {
-            runSubEl.textContent = '⚠ NOT COMPLETED BEFORE 6:15 AM — PENALTY ACTIVE';
+            runSubEl.textContent = '⚠ NOT COMPLETED YET — ACTIVITY REQUIRED BEFORE 11:59 PM';
             runSubEl.style.color = 'var(--red, #FF5252)';
           } else if (pastRunDeadline) {
             runSubEl.textContent = 'Checking Strava sync...';
           } else {
-            runSubEl.textContent = 'Must finish before 6:15 AM IST · Syncs at 5:55 AM';
+            runSubEl.textContent = 'Must finish before 11:59 PM · Syncs every 3 hrs';
           }
         }
         var runBadgeEl = document.getElementById('tsRunBadge');
@@ -2427,23 +2444,11 @@
             if (todayProof.sleep_hrs) parts.push(parseFloat(todayProof.sleep_hrs).toFixed(1) + 'h sleep');
             if (bDetail) bDetail.textContent = parts.join(' · ') || 'Run verified via Strava';
             if (bLink) bLink.style.display = 'inline-block';
-          } else if (hour >= 1 && hour < 6) {
-            // 1 AM - 6 AM: AWAITING SYNC — post submitted, waiting for cloud sync
-            beacon.className = 'proof-beacon proof-beacon--pending';
-            if (bLabel) bLabel.textContent = 'AWAITING SYNC — DAY ' + dayNum;
-            if (bDetail) bDetail.textContent = 'Post submitted. Cloud syncs at 5:55, 6:15, 9:00 AM';
-            if (bLink) bLink.style.display = 'none';
-          } else if (hour >= 6) {
-            // After 6 AM, no data yet — still syncing
-            beacon.className = 'proof-beacon proof-beacon--pending';
-            if (bLabel) bLabel.textContent = 'AWAITING SYNC — DAY ' + dayNum;
-            if (bDetail) bDetail.textContent = 'Sync in progress. Updates at 6:15, 9:00 AM';
-            if (bLink) bLink.style.display = 'none';
           } else {
-            // Before 1 AM — previous day done, next cycle hasn't started
-            beacon.className = 'proof-beacon proof-beacon--verified';
-            if (bLabel) bLabel.textContent = 'DAY ' + dayNum + ' COMPLETE';
-            if (bDetail) bDetail.textContent = 'Next proof cycle begins at 1:00 AM';
+            // No activity synced yet — awaiting
+            beacon.className = 'proof-beacon proof-beacon--pending';
+            if (bLabel) bLabel.textContent = 'AWAITING ACTIVITY — DAY ' + dayNum;
+            if (bDetail) bDetail.textContent = 'Syncs at 6, 9, 12, 3, 6, 9, 11 PM · Deadline 11:59 PM';
             if (bLink) bLink.style.display = 'none';
           }
         }
@@ -2563,8 +2568,8 @@
           var hour = _ist.getHours();
           grid.innerHTML = '<div class="act-empty" style="grid-column:1/-1">' +
             '<div class="act-empty-icon">&#x23F3;</div>' +
-            '<div class="act-empty-text">' + (hour < 6 ? 'AWAITING FIRST ACTIVITY' : 'NO ACTIVITIES SYNCED YET') + '</div>' +
-            '<div class="act-empty-sub">' + (hour < 6 ? 'Run starts at ~3:30 AM' : 'Strava syncs at 5:55, 6:15, 9:00 AM') + '</div>' +
+            '<div class="act-empty-text">NO ACTIVITIES SYNCED YET</div>' +
+            '<div class="act-empty-sub">Log any activity before 11:59 PM · Syncs at 6, 9, 12, 3, 6, 9, 11 PM</div>' +
             '</div>';
 
           // Chips — all pending
