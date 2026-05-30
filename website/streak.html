@@ -15,6 +15,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js"></script>
   <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
   <link rel="icon" type="image/png" href="icon-512.png">
   <link rel="apple-touch-icon" href="icon-512.png">
@@ -1370,6 +1374,8 @@
 (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
 </script>
 
+  <canvas id="streakParticles" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
+
   <!-- ═══ SECTION 1 — HERO ═══ -->
   <section class="hero">
     <div class="hero-bg"></div>
@@ -2094,6 +2100,27 @@
     })();
   </script>
 
+
+<!-- Lenis -->
+<script>if(typeof Lenis!=='undefined'){var l=new Lenis({duration:1.2,easing:function(t){return Math.min(1,1.001-Math.pow(2,-10*t))}});function rf(t){l.raf(t);requestAnimationFrame(rf)}requestAnimationFrame(rf)}</script>
+
+<!-- GSAP reveals -->
+<script>
+if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){
+  try{
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal,.section.reveal').forEach(function(el){
+      gsap.fromTo(el,{opacity:0,y:30},{opacity:1,y:0,duration:0.7,ease:'power3.out',
+        scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}});
+    });
+  }catch(e){document.body.classList.add('no-gsap')}
+}else{document.body.classList.add('no-gsap')}
+</script>
+
+<!-- Three.js particles — green + cyan (streak = alive) -->
+<script>
+(function(){if(typeof THREE==='undefined')return;var c=document.getElementById('streakParticles');if(!c)return;try{var w=innerWidth,h=innerHeight;c.width=w;c.height=h;var s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,w/h,0.1,1000);cam.position.z=6;var r=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:false});r.setSize(w,h);r.setPixelRatio(Math.min(devicePixelRatio,1.5));r.setClearColor(0,0);var n=w<768?1200:2500,g=new THREE.BufferGeometry(),p=new Float32Array(n*3),co=new Float32Array(n*3),c1=new THREE.Color(0x00E676),c2=new THREE.Color(0x00D4FF),c3=new THREE.Color(0x333333);for(var i=0;i<n;i++){p[i*3]=(Math.random()-0.5)*16;p[i*3+1]=(Math.random()-0.5)*16;p[i*3+2]=(Math.random()-0.5)*10;var rn=Math.random(),cl=rn<0.15?c1:rn<0.28?c2:c3;co[i*3]=cl.r;co[i*3+1]=cl.g;co[i*3+2]=cl.b}g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(co,3));var m=new THREE.PointsMaterial({size:1.2,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:0.2,depthWrite:false}),pts=new THREE.Points(g,m);s.add(pts);var cl2=new THREE.Clock();function a(){requestAnimationFrame(a);var t=cl2.getElapsedTime();pts.rotation.y=t*0.005;pts.rotation.x=Math.sin(t*0.002)*0.05;r.render(s,cam)}a();addEventListener('resize',function(){w=innerWidth;h=innerHeight;cam.aspect=w/h;cam.updateProjectionMatrix();r.setSize(w,h)});addEventListener('scroll',function(){c.style.opacity=Math.max(0.06,1-(scrollY||0)/1200)})}catch(e){c.style.display='none'}})();
+</script>
 
 </body>
 </html>
