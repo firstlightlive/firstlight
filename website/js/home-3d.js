@@ -629,13 +629,20 @@
     console.log('[home] Fetching today activities for: ' + todayStr);
     fetchSB('strava_activities', '?start_date_local=gte.' + todayStr + 'T00:00:00&start_date_local=lt.' + todayStr + 'T23:59:59&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
       console.log('[home] Today activities result:', acts.length, 'items', acts);
-      renderTodayActivities(acts || []);
+      renderActivityCards(acts || [], 'todayActivities', 'No activities logged yet today', 'Activities appear here as soon as they sync from Strava');
       if (acts && acts.length) {
         acts.forEach(function (a) {
           if (a.average_heartrate) setVal('restHR', Math.round(a.average_heartrate), ' BPM');
         });
       }
+    });
 
+    // Yesterday's Strava activities
+    var yesterday = new Date(ist);
+    yesterday.setDate(ist.getDate() - 1);
+    var yesterdayStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0');
+    fetchSB('strava_activities', '?start_date_local=gte.' + yesterdayStr + 'T00:00:00&start_date_local=lt.' + yesterdayStr + 'T23:59:59&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
+      renderActivityCards(acts || [], 'yesterdayActivities', 'No activities logged yesterday', 'Rest day or data not yet synced');
     });
 
     // Lifetime stats — include sport_type for Dance/Boxing/Pilates/Yoga breakdown
@@ -1120,16 +1127,16 @@
   // ══════════════════════════════════
   //  TODAY'S ACTIVITIES — Dynamic Cards
   // ══════════════════════════════════
-  function renderTodayActivities(acts) {
-    var container = document.getElementById('todayActivities');
+  function renderActivityCards(acts, containerId, emptyTitle, emptySubtitle) {
+    var container = document.getElementById(containerId || 'todayActivities');
     if (!container) return;
 
     if (!acts.length) {
       container.innerHTML =
         '<div class="today-empty">' +
           '<div class="today-empty-icon">&#128694;</div>' +
-          '<div class="today-empty-text">No activities logged yet today</div>' +
-          '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:8px;opacity:0.5">Activities appear here as soon as they sync from Strava</div>' +
+          '<div class="today-empty-text">' + (emptyTitle || 'No activities logged') + '</div>' +
+          '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:8px;opacity:0.5">' + (emptySubtitle || '') + '</div>' +
         '</div>';
       return;
     }
@@ -1200,7 +1207,7 @@
 
     // GSAP animate — simple entrance, no ScrollTrigger (cards are dynamically injected)
     if (typeof gsap !== 'undefined') {
-      gsap.utils.toArray('#todayActivities .act-card').forEach(function (el, i) {
+      gsap.utils.toArray('#' + containerId + ' .act-card').forEach(function (el, i) {
         gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, delay: i * 0.1, ease: 'power2.out' });
       });
     }

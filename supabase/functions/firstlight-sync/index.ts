@@ -254,65 +254,74 @@ async function syncProofArchive(log: string[]) {
   const stravaToken = await getSecret('strava_access')
   if (!stravaToken) return
 
-  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
   const streakStart = new Date('2026-02-10')
-  const dayNum = Math.floor((new Date(today).getTime() - streakStart.getTime()) / 86400000) + 1
 
-  // Get today's activities from Supabase (already synced by syncStrava)
-  const { data: todayActivities } = await supaAdmin.from('strava_activities')
+  // Build list of dates to sync: today + last 2 days (backfill missed days)
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
+  const datesToSync: string[] = []
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(today + 'T12:00:00Z')
+    d.setUTCDate(d.getUTCDate() - i)
+    const ds = d.toISOString().substring(0, 10)
+    // Only include dates on or after streak start
+    if (ds >= '2026-02-10') datesToSync.push(ds)
+  }
+
+  for (const targetDate of datesToSync) {
+    try {
+      await syncProofForDate(targetDate, streakStart, log)
+    } catch (e) {
+      log.push(`Proof: ${targetDate} error — ${(e as Error).message}`)
+    }
+  }
+}
+
+async function syncProofForDate(targetDate: string, streakStart: Date, log: string[]) {
+  const dayNum = Math.floor((new Date(targetDate).getTime() - streakStart.getTime()) / 86400000) + 1
+
+  // Get activities for this date from Supabase (already synced by syncStrava)
+  const { data: dayActivities } = await supaAdmin.from('strava_activities')
     .select('*')
-    .gte('start_date_local', today + 'T00:00:00')
-    .lt('start_date_local', today + 'T23:59:59')
+    .gte('start_date_local', targetDate + 'T00:00:00')
+    .lt('start_date_local', targetDate + 'T23:59:59')
 
-  if (!todayActivities?.length) return
+  // Check existing proof_archive row
+  const { data: existing } = await supaAdmin.from('proof_archive')
+    .select('sleep_hrs,food_clean,gym,run_km,cycle_km,swim_km')
+    .eq('date', targetDate).maybeSingle()
 
-  const run = todayActivities.find((a: Record<string, unknown>) => a.type === 'Run')
-  const ride = todayActivities.find((a: Record<string, unknown>) => a.type === 'Ride')
-  const swim = todayActivities.find((a: Record<string, unknown>) => a.type === 'Swim')
-  const gym = todayActivities.find((a: Record<string, unknown>) => a.type === 'Workout' || a.type === 'WeightTraining')
+  // Skip if no activities AND row already exists with data
+  if ((!dayActivities || !dayActivities.length) && existing) return
+  // Skip if no activities at all and no existing row — nothing to write
+  if (!dayActivities || !dayActivities.length) return
+
+  const run = dayActivities.find((a: Record<string, unknown>) => a.type === 'Run' || a.type === 'VirtualRun')
+  const ride = dayActivities.find((a: Record<string, unknown>) => a.type === 'Ride' || a.type === 'VirtualRide')
+  const swim = dayActivities.find((a: Record<string, unknown>) => a.type === 'Swim')
+  const gym = dayActivities.find((a: Record<string, unknown>) => a.type === 'Workout' || a.type === 'WeightTraining')
 
   if (!run && !ride && !swim && !gym) return
 
-  // Parse sleep from latest IG caption
-  let sleep: number | null = null
-  const igToken = await getSecret('ig_access')
-  if (igToken) {
-    try {
-      const latest = await fetch(
-        `https://graph.facebook.com/v21.0/${IG_ACCOUNT_ID}/media?fields=caption&limit=1&access_token=${igToken}`
-      ).then(r => r.json())
-      const caption = latest?.data?.[0]?.caption || ''
-      const sleepMatch = caption.match(/(\d+\.?\d*)\s*h\s*sleep/i) || caption.match(/Fuel:\s*(\d+\.?\d*)\s*h/i)
-      if (sleepMatch) sleep = parseFloat(sleepMatch[1])
-    } catch (_e) { /* ignore */ }
-  }
-
-  // Check existing row
-  const { data: existing } = await supaAdmin.from('proof_archive')
-    .select('sleep_hrs,food_clean,gym,run_km,cycle_km,swim_km')
-    .eq('date', today).single()
-
-  let bestSleep = sleep
-  if (!bestSleep && existing?.sleep_hrs) bestSleep = existing.sleep_hrs
-  // Check health_daily for Apple Watch sleep
+  // Get best sleep value from multiple sources
+  let bestSleep: number | null = existing?.sleep_hrs || null
   if (!bestSleep) {
-    const { data: hd } = await supaAdmin.from('health_daily').select('sleep_hours').eq('date', today).single()
+    const { data: hd } = await supaAdmin.from('health_daily').select('sleep_hours').eq('date', targetDate).maybeSingle()
     if (hd?.sleep_hours) bestSleep = hd.sleep_hours
   }
   if (!bestSleep) {
-    const { data: sl } = await supaAdmin.from('sleep_log').select('sleep_hours').eq('date', today).single()
+    const { data: sl } = await supaAdmin.from('sleep_log').select('sleep_hours').eq('date', targetDate).maybeSingle()
     if (sl?.sleep_hours) bestSleep = sl.sleep_hours
   }
 
   const runDist = run ? (run.distance / 1000).toFixed(2) : null
   const runSpeed = run?.average_speed || 0
   const row: Record<string, unknown> = {
-    date: today, day_number: dayNum,
+    date: targetDate, day_number: dayNum,
     run_km: runDist || (existing?.run_km ?? null),
     run_time_sec: run ? run.moving_time : null,
     run_pace: run && runSpeed > 0 ? `${Math.floor(1000 / runSpeed / 60)}:${String(Math.round(((1000 / runSpeed / 60) % 1) * 60)).padStart(2, '0')}` : null,
-    avg_hr: run ? (run.average_heartrate || null) : null,
-    max_hr: run ? (run.max_heartrate || null) : null,
+    avg_hr: run ? (run.average_heartrate || null) : (swim ? (swim.average_heartrate || null) : null),
+    max_hr: run ? (run.max_heartrate || null) : (swim ? (swim.max_heartrate || null) : null),
     calories: ((run ? run.calories : 0) + (ride ? ride.calories : 0) + (swim ? swim.calories : 0)) || null,
     elevation: run ? (run.total_elevation_gain || null) : null,
     cycle_km: ride ? (ride.distance / 1000).toFixed(2) : (existing?.cycle_km ?? null),
@@ -323,7 +332,7 @@ async function syncProofArchive(log: string[]) {
     gym_duration_min: gym ? Math.round(gym.moving_time / 60) : null,
     food_clean: existing?.food_clean ?? true,
     run_source: 'strava',
-    strava_id: run ? run.id : (ride ? ride.id : null)
+    strava_id: run ? run.id : (ride ? ride.id : (swim ? swim.id : null))
   }
 
   // CRITICAL: Only include sleep if we have a value
@@ -333,7 +342,9 @@ async function syncProofArchive(log: string[]) {
   const parts = []
   if (row.run_km) parts.push(row.run_km + 'km run')
   if (row.cycle_km) parts.push(row.cycle_km + 'km ride')
-  log.push(`Proof: Day ${dayNum} synced — ${parts.join(' + ') || 'gym only'}`)
+  if (row.swim_km) parts.push(row.swim_km + 'km swim')
+  if (row.gym) parts.push('gym')
+  log.push(`Proof: Day ${dayNum} (${targetDate}) synced — ${parts.join(' + ') || 'activity'}`)
 }
 
 // ═══════════════════════════════════════════
