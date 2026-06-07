@@ -225,12 +225,11 @@
     return Math.ceil((diff / 86400000 + start.getDay() + 1) / 7);
   }
 
-  function getDayNumber() {
-    var startDate = new Date('2026-02-10T00:00:00');
-    var now = new Date();
-    now.setHours(12, 0, 0, 0);
-    startDate.setHours(12, 0, 0, 0);
-    return Math.floor((now - startDate) / 86400000) + 1;
+  function getDayNumber(forDate) {
+    var startDate = new Date('2026-02-10T12:00:00');
+    var d = forDate ? new Date(forDate) : new Date();
+    d.setHours(12, 0, 0, 0);
+    return Math.floor((d - startDate) / 86400000) + 1;
   }
 
   // ── Draw Film Grain ──
@@ -341,7 +340,7 @@
     ctx.textAlign = 'right';
     ctx.font = '600 13px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.accent;
-    ctx.fillText('DAY ' + getDayNumber(), ringX - 60, ringY - 10);
+    ctx.fillText('DAY ' + getDayNumber(weekRange.end), ringX - 60, ringY - 10);
 
     ctx.font = '400 11px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
@@ -547,7 +546,7 @@
     y += 90;
     ctx.font = '200 80px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.text;
-    ctx.fillText(getDayNumber(), W / 2, y);
+    ctx.fillText(getDayNumber(weekRange.end), W / 2, y);
 
     // ── Divider line ──
     y += 55;
