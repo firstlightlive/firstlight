@@ -771,6 +771,12 @@
   var SUPA = FL.SUPABASE_URL;
   var KEY = FL.SUPABASE_ANON_KEY;
 
+  // Parse start_date_local as local time (strip timezone offset from Supabase)
+  function parseLocal(dateStr) {
+    if (!dateStr) return new Date();
+    return new Date(dateStr.replace(/[+-]\d{2}:\d{2}$/, ''));
+  }
+
   var showRealMaps = true;
   var _configReady = fetch(SUPA + '/rest/v1/site_config?key=eq.show_route_maps&select=value', {
     headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
@@ -863,8 +869,8 @@
     var mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     var monday = new Date(now); monday.setDate(now.getDate() - mondayOffset); monday.setHours(0,0,0,0);
     var lastMonday = new Date(monday); lastMonday.setDate(lastMonday.getDate() - 7);
-    var thisWeek = acts.filter(function(a) { var d = new Date(a.start_date_local); return d >= monday; });
-    var lastWeek = acts.filter(function(a) { var d = new Date(a.start_date_local); return d >= lastMonday && d < monday; });
+    var thisWeek = acts.filter(function(a) { var d = parseLocal(a.start_date_local); return d >= monday; });
+    var lastWeek = acts.filter(function(a) { var d = parseLocal(a.start_date_local); return d >= lastMonday && d < monday; });
     var twKm = thisWeek.reduce(function(s,a) { return s + parseFloat(a.distance||0)/1000; }, 0);
     var lwKm = lastWeek.reduce(function(s,a) { return s + parseFloat(a.distance||0)/1000; }, 0);
     if (lwKm > 0) {
@@ -988,7 +994,7 @@
 
     var paceChart = document.getElementById('svPaceChart');
     if (paceChart && runs.length) {
-      var weekPaces = {}; runs.forEach(function(r) { var d = new Date(r.start_date_local); var wk = d.getFullYear() + '-W' + String(Math.ceil((d.getDate() + new Date(d.getFullYear(),d.getMonth(),1).getDay()) / 7)).padStart(2,'0') + '-' + String(d.getMonth()+1).padStart(2,'0'); var km = parseFloat(r.distance||0)/1000; if (km > 0.5) { if (!weekPaces[wk]) weekPaces[wk] = []; weekPaces[wk].push(r.moving_time / 60 / km); } });
+      var weekPaces = {}; runs.forEach(function(r) { var d = parseLocal(r.start_date_local); var wk = d.getFullYear() + '-W' + String(Math.ceil((d.getDate() + new Date(d.getFullYear(),d.getMonth(),1).getDay()) / 7)).padStart(2,'0') + '-' + String(d.getMonth()+1).padStart(2,'0'); var km = parseFloat(r.distance||0)/1000; if (km > 0.5) { if (!weekPaces[wk]) weekPaces[wk] = []; weekPaces[wk].push(r.moving_time / 60 / km); } });
       var wks = Object.keys(weekPaces).sort().slice(-12);
       var avgPaces = wks.map(function(w) { var p = weekPaces[w]; return p.reduce(function(a,b){return a+b},0)/p.length; });
       var minP = Math.min.apply(null, avgPaces), maxP = Math.max.apply(null, avgPaces);
@@ -1013,7 +1019,7 @@
       if (latest.summary_polyline && showRealMaps) { mapHtml = polylineToMapbox(latest.summary_polyline, 600, 280); }
       else if (latest.summary_polyline) { mapHtml = polylineToSVG(latest.summary_polyline, 600, 280, '#FC4C02'); }
       var dayNum = typeof getDayNumber === 'function' ? getDayNumber() : '';
-      var dateStr = latest.start_date_local ? new Date(latest.start_date_local).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short',year:'numeric'}) : '';
+      var dateStr = latest.start_date_local ? parseLocal(latest.start_date_local).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short',year:'numeric'}) : '';
       var elev = latest.total_elevation_gain ? Math.round(latest.total_elevation_gain) + 'm elev' : '';
       var fHtml = '<div class="sv-featured-map">' + mapHtml + '<div class="sv-type-badge" style="position:absolute;top:12px;left:12px;z-index:4;background:rgba(0,0,0,0.8);padding:4px 12px;border-radius:4px;font-family:var(--s-mono);font-size:9px;color:var(--s-strava);font-weight:700;letter-spacing:2px">' + (latest.type || 'ACTIVITY') + '</div></div>';
       fHtml += '<div class="sv-featured-body"><div style="font-family:var(--s-mono);font-size:10px;color:var(--s-dim);letter-spacing:1px">' + dateStr + '</div>';
@@ -1034,7 +1040,7 @@
       recent.forEach(function(a) {
         var km = (parseFloat(a.distance||0)/1000).toFixed(2); var mins = Math.round((a.moving_time||0)/60);
         var hr = a.average_heartrate ? Math.round(a.average_heartrate) + ' bpm' : '';
-        var dateStr = a.start_date_local ? new Date(a.start_date_local).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : '';
+        var dateStr = a.start_date_local ? parseLocal(a.start_date_local).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : '';
         var mapContent = '';
         if (a.summary_polyline && showRealMaps) { mapContent = polylineToMapbox(a.summary_polyline, 280, 110); }
         else if (a.summary_polyline) { mapContent = polylineToSVG(a.summary_polyline, 280, 110, typeColors[a.type] || '#FC4C02'); }
@@ -1088,7 +1094,7 @@
         var km = (a.distance||0)/1000;
         var sec = a.moving_time||0;
         if (km < 0.1 || sec < 60) return;
-        var d = new Date(a.start_date_local);
+        var d = parseLocal(a.start_date_local);
         var wk = d.getFullYear()+'-W'+String(Math.ceil((d.getDate()+new Date(d.getFullYear(),d.getMonth(),1).getDay())/7)).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0');
 
         if (a.type === 'Run' || a.type === 'VirtualRun') {
@@ -1223,7 +1229,7 @@
       // Build detailed activity data per day
       var dayData = {};
       thisWeek.forEach(function(a) {
-        var d = new Date(a.start_date_local);
+        var d = parseLocal(a.start_date_local);
         var dayIdx = d.getDay();
         var idx = dayIdx === 0 ? 6 : dayIdx - 1; // Mon=0
         if (!dayData[idx]) dayData[idx] = { types:[], totalKm:0, totalMin:0, activities:[] };
@@ -1265,14 +1271,8 @@
       var html = '';
       plan.forEach(function(p, i) {
         var dd = dayData[i] || { types:[], totalKm:0, totalMin:0, activities:[] };
-        var done = false;
-        var types = dd.types;
-
-        if (p.sport === 'Run' && types.some(function(t){return t==='Run'||t==='VirtualRun';})) done = true;
-        if (p.sport === 'Swim' && types.indexOf('Swim') >= 0) done = true;
-        if (p.sport === 'Ride' && types.indexOf('Ride') >= 0) done = true;
-        if (p.type === 'Run+Gym' && done && types.some(function(t){return t==='Workout'||t==='WeightTraining';})) done = true;
-        else if (p.type === 'Run+Gym' && types.some(function(t){return t==='Run'||t==='VirtualRun';})) done = true;
+        // DONE = any activity was logged that day (not just planned sport)
+        var done = dd.activities.length > 0;
 
         var isPast = i < todayIdx;
         var isToday = i === todayIdx;
@@ -1385,7 +1385,7 @@
     // ═══ HOOK: Canvas pace line ═══
     if (typeof window._drawPaceLine === 'function' && runs.length) {
       var wpData = {}; runs.forEach(function(r) {
-        var d = new Date(r.start_date_local);
+        var d = parseLocal(r.start_date_local);
         var wk = d.getFullYear()+'-W'+String(Math.ceil((d.getDate()+new Date(d.getFullYear(),d.getMonth(),1).getDay())/7)).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0');
         var km = parseFloat(r.distance||0)/1000;
         if (km > 0.5) { if (!wpData[wk]) wpData[wk] = []; wpData[wk].push(r.moving_time/60/km); }
