@@ -538,18 +538,18 @@
     ctx.fillText(fmtDate(weekRange.start) + '  —  ' + fmtDate(weekRange.end), W / 2, y);
 
     // ── DAY number ──
-    y += 55;
+    y += 70;
     ctx.font = '300 16px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
     ctx.fillText('D A Y', W / 2, y);
 
-    y += 60;
+    y += 90;
     ctx.font = '200 80px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.text;
     ctx.fillText(getDayNumber(), W / 2, y);
 
     // ── Divider line ──
-    y += 40;
+    y += 55;
     ctx.strokeStyle = T.cardBorder;
     ctx.lineWidth = 0.5;
     ctx.beginPath();
