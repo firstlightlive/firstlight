@@ -284,22 +284,27 @@
     // ════════════════════════════════════════
     // SECTION 1: IDENTITY (who + when)
     // ════════════════════════════════════════
-    var y = 48;
+    var y = 65;
 
     // Brand mark
-    ctx.font = '700 10px "IBM Plex Mono", monospace';
+    ctx.font = '700 11px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.accent;
     ctx.fillText('F I R S T  L I G H T', W / 2, y);
 
-    y += 28;
+    y += 30;
     ctx.font = '600 18px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.text;
     ctx.fillText('WEEKLY TRAINING REPORT', W / 2, y);
 
-    y += 28;
+    y += 30;
     ctx.font = '400 13px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
-    ctx.fillText('WEEK ' + getWeekNumber(weekRange.start) + '  ·  ' + fmtDate(weekRange.start) + ' — ' + fmtDate(weekRange.end) + '  ·  DAY ' + dayNum, W / 2, y);
+    ctx.fillText('WEEK ' + getWeekNumber(weekRange.start) + '  ·  ' + fmtDate(weekRange.start) + ' — ' + fmtDate(weekRange.end), W / 2, y);
+
+    y += 28;
+    ctx.font = '600 20px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.accent;
+    ctx.fillText('DAY  ' + dayNum, W / 2, y);
 
     // Thin line
     y += 20;
@@ -397,13 +402,13 @@
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(100, achY); ctx.lineTo(W - 100, achY); ctx.stroke();
 
-    achY += 30;
-    ctx.font = '400 10px "IBM Plex Mono", monospace';
+    achY += 35;
+    ctx.font = '400 11px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
     ctx.fillText('W E E K L Y  T O T A L', W / 2, achY);
 
     // Big KM number
-    achY += 65;
+    achY += 75;
     ctx.font = '200 90px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.text;
     ctx.fillText(Math.round(stats.totalKm) + ' km', W / 2, achY);
@@ -495,33 +500,33 @@
     // ════════════════════════════════════════
     // SECTION 1: IDENTITY (lots of top space)
     // ════════════════════════════════════════
-    var y = 160;
+    var y = 200;
 
-    ctx.font = '700 14px "IBM Plex Mono", monospace';
+    ctx.font = '700 16px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.accent;
     ctx.fillText('F I R S T  L I G H T', W / 2, y);
 
-    y += 45;
-    ctx.font = '600 26px "IBM Plex Mono", monospace';
+    y += 50;
+    ctx.font = '600 30px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.text;
     ctx.fillText('WEEKLY TRAINING', W / 2, y);
 
-    y += 35;
-    ctx.font = '600 26px "IBM Plex Mono", monospace';
+    y += 40;
+    ctx.font = '600 30px "IBM Plex Mono", monospace';
     ctx.fillText('REPORT', W / 2, y);
 
-    y += 40;
-    ctx.font = '400 16px "IBM Plex Mono", monospace';
+    y += 45;
+    ctx.font = '400 18px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
     ctx.fillText('WEEK ' + getWeekNumber(weekRange.start) + '  ·  ' + fmtDate(weekRange.start) + ' — ' + fmtDate(weekRange.end), W / 2, y);
 
-    y += 28;
-    ctx.font = '500 18px "IBM Plex Mono", monospace';
+    y += 35;
+    ctx.font = '600 24px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.accent;
-    ctx.fillText('DAY ' + dayNum, W / 2, y);
+    ctx.fillText('DAY  ' + dayNum, W / 2, y);
 
     // Thin line
-    y += 35;
+    y += 40;
     ctx.strokeStyle = T.cardBorder;
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(150, y); ctx.lineTo(W - 150, y); ctx.stroke();
@@ -604,14 +609,14 @@
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(150, achY); ctx.lineTo(W - 150, achY); ctx.stroke();
 
-    achY += 40;
-    ctx.font = '400 13px "IBM Plex Mono", monospace';
+    achY += 45;
+    ctx.font = '400 14px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
     ctx.fillText('W E E K L Y  T O T A L', W / 2, achY);
 
     // Big KM
-    achY += 80;
-    ctx.font = '200 120px "IBM Plex Mono", monospace';
+    achY += 90;
+    ctx.font = '200 130px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.text;
     ctx.fillText(Math.round(stats.totalKm) + ' km', W / 2, achY);
 
