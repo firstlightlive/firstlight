@@ -1250,12 +1250,22 @@
         </div>
 
         <!-- Controls -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px">
           <div>
             <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">MODE</label>
             <select id="recapMode" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)">
               <option value="weekly">WEEKLY RECAP</option>
               <option value="monthly">MONTHLY RECAP</option>
+            </select>
+          </div>
+          <div>
+            <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">PERIOD</label>
+            <select id="recapPeriod" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)">
+              <option value="0">THIS WEEK</option>
+              <option value="-1" selected>LAST WEEK</option>
+              <option value="-2">2 WEEKS AGO</option>
+              <option value="-3">3 WEEKS AGO</option>
+              <option value="-4">4 WEEKS AGO</option>
             </select>
           </div>
           <div>
@@ -3265,7 +3275,7 @@
   <script src="js/admin-daily.js"></script>
   <script src="js/admin-journal.js"></script>
   <script src="js/admin-content.js"></script>
-  <script src="js/admin-recap.js"></script>
+  <script src="js/admin-recap.js?v=20260608"></script>
   <script src="js/admin-weekly.js"></script>
   <script src="js/admin-analytics.js"></script>
   <script src="js/admin-races.js"></script>
