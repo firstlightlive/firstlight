@@ -408,7 +408,7 @@
     ctx.fillText('W E E K L Y  T O T A L', W / 2, achY);
 
     // Big KM number
-    achY += 75;
+    achY += 95;
     ctx.font = '200 90px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.text;
     ctx.fillText(Math.round(stats.totalKm) + ' km', W / 2, achY);
@@ -615,7 +615,7 @@
     ctx.fillText('W E E K L Y  T O T A L', W / 2, achY);
 
     // Big KM
-    achY += 90;
+    achY += 110;
     ctx.font = '200 130px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.text;
     ctx.fillText(Math.round(stats.totalKm) + ' km', W / 2, achY);
