@@ -80,6 +80,76 @@
       cardBorder: 'rgba(252,76,2,0.2)',
       grain: true,
       scanlines: false
+    },
+    arctic: {
+      name: 'ARCTIC',
+      bg: '#0A1628',
+      text: '#E8EDF5',
+      dim: '#3B5998',
+      accent: '#93C5FD',
+      accent2: '#60A5FA',
+      bar: '#93C5FD',
+      barBg: 'rgba(147,197,253,0.08)',
+      cardBg: 'rgba(147,197,253,0.04)',
+      cardBorder: 'rgba(147,197,253,0.12)',
+      grain: false,
+      scanlines: false
+    },
+    infrared: {
+      name: 'INFRARED',
+      bg: '#0A0000',
+      text: '#FFFFFF',
+      dim: '#4A1010',
+      accent: '#FF1744',
+      accent2: '#FF5252',
+      bar: '#FF1744',
+      barBg: 'rgba(255,23,68,0.1)',
+      cardBg: 'rgba(255,23,68,0.05)',
+      cardBorder: 'rgba(255,23,68,0.15)',
+      grain: true,
+      scanlines: false
+    },
+    gold: {
+      name: 'GOLD',
+      bg: '#080808',
+      text: '#FFFFFF',
+      dim: '#6B5B00',
+      accent: '#F5A623',
+      accent2: '#D4A017',
+      bar: '#F5A623',
+      barBg: 'rgba(245,166,35,0.08)',
+      cardBg: 'rgba(245,166,35,0.04)',
+      cardBorder: 'rgba(245,166,35,0.12)',
+      grain: true,
+      scanlines: false
+    },
+    neon: {
+      name: 'NEON',
+      bg: '#0A0A14',
+      text: '#FFFFFF',
+      dim: '#4A148C',
+      accent: '#E040FB',
+      accent2: '#00E5FF',
+      bar: '#E040FB',
+      barBg: 'rgba(224,64,251,0.08)',
+      cardBg: 'rgba(224,64,251,0.04)',
+      cardBorder: 'rgba(224,64,251,0.12)',
+      grain: false,
+      scanlines: true
+    },
+    earth: {
+      name: 'EARTH',
+      bg: '#1A1410',
+      text: '#E8DCC8',
+      dim: '#4E342E',
+      accent: '#8D6E63',
+      accent2: '#558B2F',
+      bar: '#8D6E63',
+      barBg: 'rgba(141,110,99,0.1)',
+      cardBg: 'rgba(141,110,99,0.05)',
+      cardBorder: 'rgba(141,110,99,0.12)',
+      grain: true,
+      scanlines: false
     }
   };
 
