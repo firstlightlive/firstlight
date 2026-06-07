@@ -279,12 +279,7 @@ function updateCounters() {
     // Always apply calendar day immediately (no blank page)
     applyCounters(calendarDay);
 
-    if (isPublicPage) {
-      // Then check if proof exists — update to verified day if different
-      getVerifiedDayNumber(function(verifiedDay) {
-        if (verifiedDay !== calendarDay) applyCounters(verifiedDay);
-      });
-    }
+    // Always show calendar day — no downgrade to verified day
     // Streak status text
     var streakText = '';
     if (calendarDay >= 1000) streakText = calendarDay + ' DAYS — LEGENDARY';
