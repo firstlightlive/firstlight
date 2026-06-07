@@ -1321,18 +1321,18 @@
 
         <!-- Theme Preview Swatches -->
         <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04)">
-          <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:12px">THEME LIBRARY (10 THEMES)</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <div style="width:40px;height:40px;background:#000;border:2px solid #fff;border-radius:6px" title="NOIR"></div>
-            <div style="width:40px;height:40px;background:#0A0C10;border:2px solid #FC4C02;border-radius:6px" title="HEAT MAP"></div>
-            <div style="width:40px;height:40px;background:#0A0F0A;border:2px solid #00E676;border-radius:6px" title="TERMINAL"></div>
-            <div style="width:40px;height:40px;background:#0A0C1A;border:2px solid #00D4FF;border-radius:6px" title="GRADIENT"></div>
-            <div style="width:40px;height:40px;background:#000;border:2px solid #FC4C02;border-radius:6px" title="STRAVA"></div>
-            <div style="width:40px;height:40px;background:#0A1628;border:2px solid #93C5FD;border-radius:6px" title="ARCTIC"></div>
-            <div style="width:40px;height:40px;background:#0A0000;border:2px solid #FF1744;border-radius:6px" title="INFRARED"></div>
-            <div style="width:40px;height:40px;background:#080808;border:2px solid #F5A623;border-radius:6px" title="GOLD"></div>
-            <div style="width:40px;height:40px;background:#0A0A14;border:2px solid #E040FB;border-radius:6px" title="NEON"></div>
-            <div style="width:40px;height:40px;background:#1A1410;border:2px solid #8D6E63;border-radius:6px" title="EARTH"></div>
+          <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:12px">THEME LIBRARY — click to select</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap" id="recapThemeSwatches">
+            <div data-swatch="noir" style="width:48px;height:48px;background:#000;border:2px solid #fff;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#fff;transition:all 0.2s" title="NOIR">NOIR</div>
+            <div data-swatch="heatmap" style="width:48px;height:48px;background:#0A0C10;border:2px solid #FC4C02;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#FC4C02;transition:all 0.2s" title="HEAT MAP">HEAT</div>
+            <div data-swatch="terminal" style="width:48px;height:48px;background:#0A0F0A;border:2px solid #00E676;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#00E676;transition:all 0.2s" title="TERMINAL">TERM</div>
+            <div data-swatch="gradient" style="width:48px;height:48px;background:#0A0C1A;border:2px solid #00D4FF;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#00D4FF;transition:all 0.2s" title="GRADIENT">GRAD</div>
+            <div data-swatch="strava" style="width:48px;height:48px;background:#000;border:2px solid #FC4C02;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#FC4C02;transition:all 0.2s" title="STRAVA">STRV</div>
+            <div data-swatch="arctic" style="width:48px;height:48px;background:#0A1628;border:2px solid #93C5FD;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#93C5FD;transition:all 0.2s" title="ARCTIC">ARCT</div>
+            <div data-swatch="infrared" style="width:48px;height:48px;background:#0A0000;border:2px solid #FF1744;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#FF1744;transition:all 0.2s" title="INFRARED">INFR</div>
+            <div data-swatch="gold" style="width:48px;height:48px;background:#080808;border:2px solid #F5A623;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#F5A623;transition:all 0.2s" title="GOLD">GOLD</div>
+            <div data-swatch="neon" style="width:48px;height:48px;background:#0A0A14;border:2px solid #E040FB;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#E040FB;transition:all 0.2s" title="NEON">NEON</div>
+            <div data-swatch="earth" style="width:48px;height:48px;background:#1A1410;border:2px solid #8D6E63;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#8D6E63;transition:all 0.2s" title="EARTH">ERTH</div>
           </div>
         </div>
       </div>
@@ -3284,7 +3284,7 @@
   <script src="js/admin-daily.js"></script>
   <script src="js/admin-journal.js"></script>
   <script src="js/admin-content.js"></script>
-  <script src="js/admin-recap.js?v=20260608q"></script>
+  <script src="js/admin-recap.js?v=20260608r"></script>
   <script src="js/admin-weekly.js"></script>
   <script src="js/admin-analytics.js"></script>
   <script src="js/admin-races.js"></script>
