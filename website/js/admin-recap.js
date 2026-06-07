@@ -278,13 +278,13 @@
 
     // ── Header: Week + Day ──
     ctx.textAlign = 'center';
+    ctx.font = '600 18px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.accent;
+    ctx.fillText('W E E K  ' + getWeekNumber(weekRange.start), W / 2, 55);
+
     ctx.font = '400 12px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
-    ctx.fillText('W E E K  ' + getWeekNumber(weekRange.start), W / 2, 50);
-
-    ctx.font = '400 11px "IBM Plex Mono", monospace';
-    ctx.fillStyle = T.dim;
-    ctx.fillText(fmtDate(weekRange.start) + '  —  ' + fmtDate(weekRange.end), W / 2, 70);
+    ctx.fillText(fmtDate(weekRange.start) + '  —  ' + fmtDate(weekRange.end), W / 2, 78);
 
     // ── HERO: Giant KM Number ──
     ctx.font = '200 140px "IBM Plex Mono", monospace';
@@ -528,18 +528,19 @@
     ctx.textAlign = 'center';
 
     // ── Week label ──
-    var y = 100;
-    ctx.font = '400 14px "IBM Plex Mono", monospace';
-    ctx.fillStyle = T.dim;
+    var y = 130;
+    ctx.font = '600 18px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.accent;
     ctx.fillText('W E E K  ' + getWeekNumber(weekRange.start), W / 2, y);
 
-    y += 22;
-    ctx.font = '400 12px "IBM Plex Mono", monospace';
+    y += 26;
+    ctx.font = '400 13px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.dim;
     ctx.fillText(fmtDate(weekRange.start) + '  —  ' + fmtDate(weekRange.end), W / 2, y);
 
     // ── DAY number ──
-    y += 70;
-    ctx.font = '300 16px "IBM Plex Mono", monospace';
+    y += 75;
+    ctx.font = '300 24px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
     ctx.fillText('D A Y', W / 2, y);
 
