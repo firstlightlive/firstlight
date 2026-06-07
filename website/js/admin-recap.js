@@ -1005,6 +1005,143 @@
       });
     });
 
+    // ── Instagram Publish ──
+    var SYNC_URL = SUPA + '/functions/v1/firstlight-sync';
+    var ADMIN_KEY = ['b8464678b573c885', 'c449958a9ea760c0', '8b01279d01d3a1f9', '96fc92b7364f10b7'].join('');
+    var IG_ACCOUNT = '17841466893616231';
+
+    function uploadCanvasToStorage(canvas, filename) {
+      return new Promise(function(resolve, reject) {
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        var base64 = dataUrl.split(',')[1];
+        var binary = atob(base64);
+        var arr = new Uint8Array(binary.length);
+        for (var i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+
+        var path = 'instagram/' + filename;
+        fetch(SUPA + '/storage/v1/object/media/' + path, {
+          method: 'POST',
+          headers: {
+            'apikey': KEY,
+            'Authorization': 'Bearer ' + KEY,
+            'Content-Type': 'image/jpeg',
+            'x-upsert': 'true'
+          },
+          body: arr
+        }).then(function(r) {
+          if (!r.ok) throw new Error('Upload failed: ' + r.status);
+          resolve(SUPA + '/storage/v1/object/public/media/' + path);
+        }).catch(reject);
+      });
+    }
+
+    function igProxy(endpoint, params) {
+      return fetch(SYNC_URL + '?action=ig-proxy&admin_key=' + ADMIN_KEY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + KEY },
+        body: JSON.stringify({ endpoint: endpoint, params: params })
+      }).then(function(r) { return r.json(); });
+    }
+
+    function publishToIG(canvas, caption, type) {
+      var filename = type + '_' + Date.now() + '.jpg';
+      statusEl.textContent = 'Uploading image...';
+
+      return uploadCanvasToStorage(canvas, filename)
+        .then(function(publicUrl) {
+          statusEl.textContent = 'Creating Instagram container...';
+          return igProxy(IG_ACCOUNT + '/media', {
+            image_url: publicUrl,
+            caption: caption,
+            media_type: 'IMAGE'
+          });
+        })
+        .then(function(container) {
+          if (!container || !container.id) throw new Error('Container creation failed: ' + JSON.stringify(container));
+          statusEl.textContent = 'Publishing to Instagram...';
+          // Wait for processing
+          return new Promise(function(resolve) { setTimeout(function() { resolve(container.id); }, 4000); });
+        })
+        .then(function(containerId) {
+          return igProxy(IG_ACCOUNT + '/media_publish', { creation_id: containerId });
+        })
+        .then(function(pub) {
+          if (!pub || !pub.id) throw new Error('Publish failed: ' + JSON.stringify(pub));
+          return pub.id;
+        });
+    }
+
+    var publishPostBtn = panel.querySelector('#recapPublishPost');
+    var publishStoryBtn = panel.querySelector('#recapPublishStory');
+
+    if (publishPostBtn) {
+      publishPostBtn.addEventListener('click', function() {
+        if (!previewPost.width) { statusEl.textContent = 'Generate first!'; return; }
+        publishPostBtn.disabled = true;
+        publishPostBtn.textContent = 'PUBLISHING...';
+        var caption = captionEl.value || '';
+
+        publishToIG(previewPost, caption, 'weekly_recap')
+          .then(function(mediaId) {
+            statusEl.textContent = 'Published to Instagram! Media ID: ' + mediaId;
+            publishPostBtn.textContent = 'PUBLISHED!';
+            publishPostBtn.style.background = 'linear-gradient(135deg,#00E676,#00C853)';
+            setTimeout(function() {
+              publishPostBtn.textContent = 'PUBLISH POST TO IG';
+              publishPostBtn.style.background = '';
+              publishPostBtn.disabled = false;
+            }, 5000);
+          })
+          .catch(function(err) {
+            statusEl.textContent = 'Publish failed: ' + err.message;
+            publishPostBtn.textContent = 'PUBLISH POST TO IG';
+            publishPostBtn.disabled = false;
+          });
+      });
+    }
+
+    if (publishStoryBtn) {
+      publishStoryBtn.addEventListener('click', function() {
+        if (!previewStory.width) { statusEl.textContent = 'Generate first!'; return; }
+        publishStoryBtn.disabled = true;
+        publishStoryBtn.textContent = 'PUBLISHING...';
+
+        var storyFilename = 'weekly_story_' + Date.now() + '.jpg';
+        uploadCanvasToStorage(previewStory, storyFilename)
+          .then(function(publicUrl) {
+            statusEl.textContent = 'Creating story container...';
+            return igProxy(IG_ACCOUNT + '/media', {
+              image_url: publicUrl,
+              media_type: 'STORIES'
+            });
+          })
+          .then(function(container) {
+            if (!container || !container.id) throw new Error('Story container failed: ' + JSON.stringify(container));
+            statusEl.textContent = 'Publishing story...';
+            return new Promise(function(resolve) { setTimeout(function() { resolve(container.id); }, 4000); });
+          })
+          .then(function(containerId) {
+            return igProxy(IG_ACCOUNT + '/media_publish', { creation_id: containerId });
+          })
+          .then(function(pub) {
+            if (!pub || !pub.id) throw new Error('Story publish failed');
+            statusEl.textContent = 'Story published! Media ID: ' + pub.id;
+            publishStoryBtn.textContent = 'PUBLISHED!';
+            publishStoryBtn.style.background = 'linear-gradient(135deg,#00E676,#00C853)';
+            setTimeout(function() {
+              publishStoryBtn.textContent = 'PUBLISH STORY TO IG';
+              publishStoryBtn.style.background = '';
+              publishStoryBtn.disabled = false;
+            }, 5000);
+          })
+          .catch(function(err) {
+            statusEl.textContent = 'Story publish failed: ' + err.message;
+            publishStoryBtn.textContent = 'PUBLISH STORY TO IG';
+            publishStoryBtn.disabled = false;
+          });
+      });
+    }
+
     // Update period options when mode changes
     var periodSelect = panel.querySelector('#recapPeriod');
     if (modeSelect && periodSelect) {
