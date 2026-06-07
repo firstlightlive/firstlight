@@ -754,6 +754,7 @@
       <div class="cc-group" data-group="content">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 📸 CONTENT ENGINE</div>
         <div class="cc-group-items">
+          <div class="cc-item" data-panel="recap"><span class="cc-icon">📊</span> Weekly/Monthly Recap</div>
           <div class="cc-item" data-panel="generators"><span class="cc-icon">🎨</span> Generators</div>
           <div class="cc-item" data-panel="schedule"><span class="cc-icon">📅</span> Posting Schedule</div>
           <div class="cc-item" data-panel="hashtags"><span class="cc-icon">#</span> Hashtags</div>
@@ -1236,6 +1237,84 @@
           </div>
           <div class="form-group"><label class="form-label">FREE THOUGHTS</label><textarea class="form-input" id="jThoughts" rows="5" placeholder="Anything on your mind..."></textarea></div>
           <button class="btn btn-primary w-full" onclick="saveJournal()">SAVE REFLECTION</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
+           PANEL: WEEKLY/MONTHLY RECAP GENERATOR
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-recap">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">WEEKLY / MONTHLY RECAP</div>
+          <div class="cc-panel-sub">Generate Instagram-ready training summaries</div>
+        </div>
+
+        <!-- Controls -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+          <div>
+            <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">MODE</label>
+            <select id="recapMode" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)">
+              <option value="weekly">WEEKLY RECAP</option>
+              <option value="monthly">MONTHLY RECAP</option>
+            </select>
+          </div>
+          <div>
+            <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">THEME</label>
+            <select id="recapTheme" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)">
+              <option value="noir">NOIR (Black & White)</option>
+              <option value="heatmap">HEAT MAP (Orange)</option>
+              <option value="terminal">TERMINAL (Green)</option>
+              <option value="gradient">GRADIENT (Cyan/Purple)</option>
+              <option value="strava">STRAVA (Orange)</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button id="recapGenerate" style="width:100%;padding:10px 12px;background:linear-gradient(135deg,#00D4FF,#0088CC);border:none;border-radius:8px;color:#0A0C10;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer;transition:opacity 0.2s">GENERATE</button>
+          </div>
+        </div>
+
+        <div id="recapStatus" style="font:500 11px var(--font-mono);color:var(--text-muted);margin-bottom:16px;min-height:16px"></div>
+
+        <!-- Preview -->
+        <div style="display:grid;grid-template-columns:1fr 0.56fr;gap:16px;margin-bottom:20px;align-items:start">
+          <div>
+            <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:8px">POST (1080x1080)</div>
+            <canvas id="recapPreviewPost" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#000"></canvas>
+          </div>
+          <div>
+            <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:8px">STORY (1080x1920)</div>
+            <canvas id="recapPreviewStory" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#000"></canvas>
+          </div>
+        </div>
+
+        <!-- Caption -->
+        <div style="margin-bottom:16px">
+          <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:8px">CAPTION</div>
+          <textarea id="recapCaption" style="width:100%;height:80px;padding:12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:400 12px var(--font-mono);resize:vertical" placeholder="Caption will appear here..."></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button id="recapDownloadPost" style="display:none;padding:12px 20px;background:linear-gradient(135deg,#00E676,#00C853);border:none;border-radius:8px;color:#0A0C10;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer">DOWNLOAD POST</button>
+          <button id="recapDownloadStory" style="display:none;padding:12px 20px;background:linear-gradient(135deg,#E040FB,#833AB4);border:none;border-radius:8px;color:#fff;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer">DOWNLOAD STORY</button>
+          <button id="recapCopyCaption" style="display:none;padding:12px 20px;background:var(--bg2);border:1px solid rgba(0,212,255,0.2);border-radius:8px;color:var(--cyan);font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer">COPY CAPTION</button>
+        </div>
+
+        <!-- Theme Preview Swatches -->
+        <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04)">
+          <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:12px">THEME LIBRARY (5 now · 10 planned)</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="width:40px;height:40px;background:#000;border:2px solid #fff;border-radius:6px" title="NOIR"></div>
+            <div style="width:40px;height:40px;background:#0A0C10;border:2px solid #FC4C02;border-radius:6px" title="HEAT MAP"></div>
+            <div style="width:40px;height:40px;background:#0A0F0A;border:2px solid #00E676;border-radius:6px" title="TERMINAL"></div>
+            <div style="width:40px;height:40px;background:#0A0C1A;border:2px solid #00D4FF;border-radius:6px" title="GRADIENT"></div>
+            <div style="width:40px;height:40px;background:#000;border:2px solid #FC4C02;border-radius:6px" title="STRAVA"></div>
+            <div style="width:40px;height:40px;background:#222;border:2px dashed #444;border-radius:6px;opacity:0.4" title="Coming soon"></div>
+            <div style="width:40px;height:40px;background:#222;border:2px dashed #444;border-radius:6px;opacity:0.4" title="Coming soon"></div>
+            <div style="width:40px;height:40px;background:#222;border:2px dashed #444;border-radius:6px;opacity:0.4" title="Coming soon"></div>
+            <div style="width:40px;height:40px;background:#222;border:2px dashed #444;border-radius:6px;opacity:0.4" title="Coming soon"></div>
+            <div style="width:40px;height:40px;background:#222;border:2px dashed #444;border-radius:6px;opacity:0.4" title="Coming soon"></div>
+          </div>
         </div>
       </div>
 
@@ -3186,6 +3265,7 @@
   <script src="js/admin-daily.js"></script>
   <script src="js/admin-journal.js"></script>
   <script src="js/admin-content.js"></script>
+  <script src="js/admin-recap.js"></script>
   <script src="js/admin-weekly.js"></script>
   <script src="js/admin-analytics.js"></script>
   <script src="js/admin-races.js"></script>
