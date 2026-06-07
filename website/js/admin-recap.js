@@ -254,7 +254,7 @@
   }
 
   // ══════════════════════════════════════════
-  // RENDER: WEEKLY POST (1080x1080) — 10D DESIGN
+  // RENDER: WEEKLY POST (1080x1080) — STORYTELLING DESIGN
   // ══════════════════════════════════════════
   function renderWeeklyPost(canvas, stats, weekRange, theme) {
     var T = THEMES[theme] || THEMES.noir;
@@ -267,135 +267,75 @@
     ctx.fillStyle = T.bg;
     ctx.fillRect(0, 0, W, H);
 
-    // Multiple dramatic glows
-    var g1 = ctx.createRadialGradient(W / 2, 180, 0, W / 2, 180, 350);
-    g1.addColorStop(0, T.accent + '12');
-    g1.addColorStop(0.4, T.accent + '06');
+    // Subtle glow behind heat strip area
+    var g1 = ctx.createRadialGradient(W / 2, 520, 0, W / 2, 520, 400);
+    g1.addColorStop(0, T.accent + '08');
     g1.addColorStop(1, 'transparent');
     ctx.fillStyle = g1;
     ctx.fillRect(0, 0, W, H);
-
-    var g2 = ctx.createRadialGradient(W / 2, 650, 0, W / 2, 650, 300);
-    g2.addColorStop(0, T.accent + '06');
-    g2.addColorStop(1, 'transparent');
-    ctx.fillStyle = g2;
-    ctx.fillRect(0, 0, W, 1080);
 
     ctx.textAlign = 'center';
     var dayNum = getDayNumber(weekRange.end);
     var pctRaw = stats.totalKm / 150;
     var pctClamped = Math.min(pctRaw, 1);
     var targetHit = stats.totalKm >= 150;
-
-    // ── STREAK RING — Day Number as Centerpiece ──
-    var ringX = W / 2, ringY = 155, ringR = 85;
-
-    // Outer glow
-    var rGlow = ctx.createRadialGradient(ringX, ringY, ringR - 10, ringX, ringY, ringR + 30);
-    rGlow.addColorStop(0, T.accent + '15');
-    rGlow.addColorStop(1, 'transparent');
-    ctx.fillStyle = rGlow;
-    ctx.beginPath();
-    ctx.arc(ringX, ringY, ringR + 30, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Ring track
-    ctx.beginPath();
-    ctx.arc(ringX, ringY, ringR, 0, Math.PI * 2);
-    ctx.strokeStyle = T.barBg;
-    ctx.lineWidth = 8;
-    ctx.stroke();
-
-    // Ring progress (streak %)
-    ctx.beginPath();
-    ctx.arc(ringX, ringY, ringR, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(dayNum / 365, 1));
-    ctx.strokeStyle = T.accent;
-    ctx.lineWidth = 8;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-    ctx.lineCap = 'butt';
-
-    // Day number inside ring
-    ctx.font = '200 64px "IBM Plex Mono", monospace';
-    ctx.fillStyle = T.accent;
-    ctx.fillText(dayNum, ringX, ringY + 12);
-
-    // "DAYS ALIVE" below number
-    ctx.font = '400 9px "IBM Plex Mono", monospace';
-    ctx.fillStyle = T.dim;
-    ctx.fillText('D A Y S  A L I V E', ringX, ringY + 32);
-
-    // Week label above ring
-    ctx.font = '600 16px "IBM Plex Mono", monospace';
-    ctx.fillStyle = T.text;
-    ctx.fillText('WEEK ' + getWeekNumber(weekRange.start), ringX, ringY - ringR - 28);
-
-    ctx.font = '400 11px "IBM Plex Mono", monospace';
-    ctx.fillStyle = T.dim;
-    ctx.fillText(fmtDate(weekRange.start) + '  —  ' + fmtDate(weekRange.end), ringX, ringY - ringR - 12);
-
-    // ── HERO KM — Massive ──
-    var heroY = 310;
-    ctx.font = '200 130px "IBM Plex Mono", monospace';
-    ctx.fillStyle = T.text;
-    ctx.fillText(Math.round(stats.totalKm), W / 2, heroY);
-
-    // Subtle glow behind number
-    ctx.save();
-    ctx.shadowColor = T.accent + '40';
-    ctx.shadowBlur = 60;
-    ctx.font = '200 130px "IBM Plex Mono", monospace';
-    ctx.fillStyle = 'transparent';
-    ctx.fillText(Math.round(stats.totalKm), W / 2, heroY);
-    ctx.restore();
-
-    ctx.font = '300 16px "IBM Plex Mono", monospace';
-    ctx.fillStyle = T.dim;
-    ctx.fillText('K I L O M E T E R S', W / 2, heroY + 28);
-
-    // ── TARGET STATUS ──
-    var targetY = heroY + 65;
-    // Mini progress bar
-    var tBarX = 280, tBarW = W - 560, tBarH = 4;
-    ctx.fillStyle = T.barBg;
-    ctx.beginPath(); ctx.roundRect(tBarX, targetY, tBarW, tBarH, 2); ctx.fill();
-    ctx.fillStyle = targetHit ? '#00E676' : T.bar;
-    ctx.beginPath(); ctx.roundRect(tBarX, targetY, tBarW * pctClamped, tBarH, 2); ctx.fill();
-
-    targetY += 20;
-    if (targetHit) {
-      ctx.font = '700 14px "IBM Plex Mono", monospace';
-      ctx.fillStyle = '#00E676';
-      ctx.fillText('TARGET HIT  ·  ' + Math.round(pctRaw * 100) + '%  ·  ' + Math.round(stats.totalKm) + ' / 150 KM', W / 2, targetY);
-    } else {
-      ctx.font = '400 12px "IBM Plex Mono", monospace';
-      ctx.fillStyle = T.dim;
-      ctx.fillText(Math.round(stats.totalKm) + ' / 150 KM  ·  ' + Math.round(150 - stats.totalKm) + ' km to go', W / 2, targetY);
-    }
-
-    // ── HEAT STRIP — 7 Vertical Bars ──
-    var heatY = targetY + 40;
-    var heatH = 140; // max bar height
-    var barW = 100, barGap = 18;
-    var heatX = (W - (7 * barW + 6 * barGap)) / 2;
-    var maxDayKm = Math.max.apply(null, [0].concat(Object.keys(stats.dayData).map(function(k) { return stats.dayData[k].km; }))) || 1;
     var days = stats.days;
+
+    // ════════════════════════════════════════
+    // SECTION 1: IDENTITY (who + when)
+    // ════════════════════════════════════════
+    var y = 48;
+
+    // Brand mark
+    ctx.font = '700 10px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.accent;
+    ctx.fillText('F I R S T  L I G H T', W / 2, y);
+
+    y += 28;
+    ctx.font = '600 18px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.text;
+    ctx.fillText('WEEKLY TRAINING REPORT', W / 2, y);
+
+    y += 28;
+    ctx.font = '400 13px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.dim;
+    ctx.fillText('WEEK ' + getWeekNumber(weekRange.start) + '  ·  ' + fmtDate(weekRange.start) + ' — ' + fmtDate(weekRange.end) + '  ·  DAY ' + dayNum, W / 2, y);
+
+    // Thin line
+    y += 20;
+    ctx.strokeStyle = T.cardBorder;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(100, y); ctx.lineTo(W - 100, y); ctx.stroke();
+
+    // ════════════════════════════════════════
+    // SECTION 2: THE STORY (what happened each day)
+    // ════════════════════════════════════════
+    y += 30;
+    ctx.font = '400 10px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.dim;
+    ctx.fillText('T H I S  W E E K', W / 2, y);
+
+    // Heat strip — 7 vertical bars showing daily intensity
+    y += 25;
+    var heatH = 200;
+    var barW = 105, barGap = 16;
+    var heatX = (W - (7 * barW + 6 * barGap)) / 2;
+    var maxDayKm = Math.max.apply(null, [1].concat(Object.keys(stats.dayData).map(function(k) { return stats.dayData[k].km; })));
 
     for (var i = 0; i < 7; i++) {
       var bx = heatX + i * (barW + barGap);
       var dd = stats.dayData[i];
       var hasDone = dd.activities.length > 0;
-      var barHeight = hasDone ? Math.max(20, (dd.km / maxDayKm) * heatH) : 8;
-      var by = heatY + heatH - barHeight;
+      var barHeight = hasDone ? Math.max(24, (dd.km / maxDayKm) * heatH) : 10;
+      var by = y + heatH - barHeight;
 
-      // Bar
       if (hasDone) {
         var mainSport = dd.activities[0].type;
         var sColor = sportColors[mainSport] || T.accent;
-        // Gradient bar
-        var bGrad = ctx.createLinearGradient(0, by, 0, heatY + heatH);
-        bGrad.addColorStop(0, sColor + 'DD');
-        bGrad.addColorStop(1, sColor + '40');
+        var bGrad = ctx.createLinearGradient(0, by, 0, y + heatH);
+        bGrad.addColorStop(0, sColor + 'EE');
+        bGrad.addColorStop(0.7, sColor + '80');
+        bGrad.addColorStop(1, sColor + '20');
         ctx.fillStyle = bGrad;
       } else {
         ctx.fillStyle = 'rgba(255,255,255,0.03)';
@@ -404,96 +344,121 @@
       ctx.roundRect(bx, by, barW, barHeight, 6);
       ctx.fill();
 
-      // KM on bar (if done)
+      // KM inside/above bar
       if (hasDone) {
-        ctx.font = '700 16px "IBM Plex Mono", monospace';
-        ctx.fillStyle = T.text;
-        ctx.fillText(dd.km.toFixed(1), bx + barW / 2, by - 8);
+        if (barHeight > 50) {
+          // KM inside bar
+          ctx.font = '700 20px "IBM Plex Mono", monospace';
+          ctx.fillStyle = '#fff';
+          ctx.fillText(dd.km.toFixed(1), bx + barW / 2, by + 28);
+          ctx.font = '400 8px "IBM Plex Mono", monospace';
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.fillText('km', bx + barW / 2, by + 42);
+          // Duration inside bar
+          ctx.font = '400 9px "IBM Plex Mono", monospace';
+          ctx.fillStyle = 'rgba(255,255,255,0.6)';
+          ctx.fillText(fmtDur(dd.min), bx + barW / 2, by + barHeight - 12);
+        } else {
+          // KM above bar
+          ctx.font = '700 14px "IBM Plex Mono", monospace';
+          ctx.fillStyle = T.text;
+          ctx.fillText(dd.km.toFixed(1), bx + barW / 2, by - 6);
+        }
       }
 
-      // Day label below
-      ctx.font = hasDone ? '700 11px "IBM Plex Mono", monospace' : '400 11px "IBM Plex Mono", monospace';
+      // Day label below bars
+      ctx.font = hasDone ? '700 12px "IBM Plex Mono", monospace' : '400 12px "IBM Plex Mono", monospace';
       ctx.fillStyle = hasDone ? T.text : T.dim;
-      ctx.fillText(days[i], bx + barW / 2, heatY + heatH + 18);
+      ctx.fillText(days[i], bx + barW / 2, y + heatH + 20);
 
-      // Sport label below day
+      // Sport tag below day
       if (hasDone) {
         var ms = dd.activities[0].type;
-        ctx.font = '500 8px "IBM Plex Mono", monospace';
+        ctx.font = '600 8px "IBM Plex Mono", monospace';
         ctx.fillStyle = sportColors[ms] || T.accent;
-        ctx.fillText(sportIcons[ms] || ms, bx + barW / 2, heatY + heatH + 32);
+        ctx.fillText(sportIcons[ms] || ms, bx + barW / 2, y + heatH + 34);
+
+        // Multiple sessions indicator
+        if (dd.activities.length > 1) {
+          ctx.font = '400 7px "IBM Plex Mono", monospace';
+          ctx.fillStyle = T.dim;
+          ctx.fillText('+' + (dd.activities.length - 1) + ' more', bx + barW / 2, y + heatH + 46);
+        }
       }
     }
 
-    // ── SPORT DOTS ──
-    var dotY = heatY + heatH + 70;
+    // ════════════════════════════════════════
+    // SECTION 3: THE ACHIEVEMENT (weekly total)
+    // ════════════════════════════════════════
+    var achY = y + heatH + 75;
+
+    // Thin line
+    ctx.strokeStyle = T.cardBorder;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(100, achY); ctx.lineTo(W - 100, achY); ctx.stroke();
+
+    achY += 30;
+    ctx.font = '400 10px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.dim;
+    ctx.fillText('W E E K L Y  T O T A L', W / 2, achY);
+
+    // Big KM number
+    achY += 65;
+    ctx.font = '200 90px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.text;
+    ctx.fillText(Math.round(stats.totalKm) + ' km', W / 2, achY);
+
+    // Glow behind
+    ctx.save();
+    ctx.shadowColor = T.accent + '30';
+    ctx.shadowBlur = 50;
+    ctx.fillStyle = 'transparent';
+    ctx.fillText(Math.round(stats.totalKm) + ' km', W / 2, achY);
+    ctx.restore();
+
+    // Target status
+    achY += 30;
+    // Progress bar
+    var tBarX = 250, tBarW = W - 500, tBarH = 5;
+    ctx.fillStyle = T.barBg;
+    ctx.beginPath(); ctx.roundRect(tBarX, achY, tBarW, tBarH, 2); ctx.fill();
+    ctx.fillStyle = targetHit ? '#00E676' : T.bar;
+    ctx.beginPath(); ctx.roundRect(tBarX, achY, tBarW * pctClamped, tBarH, 2); ctx.fill();
+
+    achY += 22;
+    if (targetHit) {
+      ctx.font = '700 13px "IBM Plex Mono", monospace';
+      ctx.fillStyle = '#00E676';
+      ctx.fillText('TARGET HIT  ·  ' + Math.round(pctRaw * 100) + '%  ·  ' + Math.round(stats.totalKm) + ' / 150 km', W / 2, achY);
+    } else {
+      ctx.font = '400 12px "IBM Plex Mono", monospace';
+      ctx.fillStyle = T.dim;
+      ctx.fillText(Math.round(stats.totalKm) + ' / 150 km  ·  ' + Math.round(150 - stats.totalKm) + ' km remaining', W / 2, achY);
+    }
+
+    // ── Sport split (inline) ──
+    achY += 35;
     var sports = Object.keys(stats.sportTotals);
-    var dotSpacing = Math.min(220, (W - 160) / sports.length);
-    var dotStartX = W / 2 - ((sports.length - 1) * dotSpacing) / 2;
-
-    sports.forEach(function(sport, si) {
+    var sportLine = sports.map(function(sport) {
       var s = stats.sportTotals[sport];
-      var label = sportIcons[sport] || sport.toUpperCase();
-      var color = sportColors[sport] || T.accent;
-      var dx = dotStartX + si * dotSpacing;
+      var label = sportIcons[sport] || sport;
+      return label + ' ' + s.km.toFixed(1) + 'km';
+    }).join('   ·   ');
 
-      // Glowing dot
-      var dGlow = ctx.createRadialGradient(dx, dotY, 0, dx, dotY, 22);
-      dGlow.addColorStop(0, color + '50');
-      dGlow.addColorStop(1, 'transparent');
-      ctx.fillStyle = dGlow;
-      ctx.beginPath();
-      ctx.arc(dx, dotY, 22, 0, Math.PI * 2);
-      ctx.fill();
+    ctx.font = '500 12px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.accent;
+    ctx.fillText(sportLine, W / 2, achY);
 
-      // Dot
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(dx, dotY, 10, 0, Math.PI * 2);
-      ctx.fill();
+    // ── Footer stats ──
+    achY += 40;
+    ctx.font = '400 12px "IBM Plex Mono", monospace';
+    ctx.fillStyle = T.dim;
+    ctx.fillText(stats.totalSessions + ' sessions  ·  ' + fmtDur(stats.totalMin) + '  ·  ' + stats.completedDays + '/7 days active', W / 2, achY);
 
-      // KM below dot
-      ctx.font = '700 18px "IBM Plex Mono", monospace';
-      ctx.fillStyle = T.text;
-      ctx.fillText(s.km.toFixed(1), dx, dotY + 32);
-
-      // Sport label
-      ctx.font = '600 9px "IBM Plex Mono", monospace';
-      ctx.fillStyle = color;
-      ctx.fillText(label, dx, dotY + 48);
-
-      // Count
-      ctx.font = '400 8px "IBM Plex Mono", monospace';
-      ctx.fillStyle = T.dim;
-      ctx.fillText(s.count + 'x · ' + fmtDur(s.min), dx, dotY + 62);
-    });
-
-    // ── FOOTER STATS ──
-    var footerY = H - 80;
-
-    var statItems = [
-      { val: String(stats.totalSessions), label: 'SESSIONS' },
-      { val: fmtDur(stats.totalMin), label: 'DURATION' },
-      { val: stats.completedDays + '/7', label: 'DAYS' },
-      { val: Math.round(pctRaw * 100) + '%', label: 'TARGET' }
-    ];
-    var statSpacing = 180;
-    var statStartX = W / 2 - ((statItems.length - 1) * statSpacing) / 2;
-
-    statItems.forEach(function(item, si) {
-      var sx = statStartX + si * statSpacing;
-      ctx.font = '700 22px "IBM Plex Mono", monospace';
-      ctx.fillStyle = T.text;
-      ctx.fillText(item.val, sx, footerY);
-      ctx.font = '400 8px "IBM Plex Mono", monospace';
-      ctx.fillStyle = T.dim;
-      ctx.fillText(item.label, sx, footerY + 16);
-    });
-
-    // CTA
+    // ── CTA ──
     ctx.font = '500 10px "IBM Plex Mono", monospace';
     ctx.fillStyle = T.dim;
-    ctx.fillText('F I R S T L I G H T . L I V E', W / 2, H - 28);
+    ctx.fillText('F I R S T L I G H T . L I V E', W / 2, H - 30);
 
     // ── Effects ──
     if (T.grain) drawGrain(ctx, W, H);
