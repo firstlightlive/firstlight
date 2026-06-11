@@ -58,7 +58,7 @@ const FL_DEFAULTS = {
   MEDIA_BASE_URL: '',           // S3/GCP bucket base URL
   SUPABASE_URL: (window.FL && window.FL.SUPABASE_URL) || '',
   SUPABASE_ANON_KEY: (window.FL && window.FL.SUPABASE_ANON_KEY) || '',
-  VERIFICATION_SOURCE: 'Apple Watch + Strava',
+  VERIFICATION_SOURCE: 'Garmin + Strava',
   MARATHON_TARGET: 'Standard Chartered Singapore Marathon',
   MARATHON_DATE: '2026-12-06',
   MARATHON_TIME: 'Sub 4:30:00',
@@ -125,7 +125,7 @@ function applyConfig() {
   });
 
   // Verification source — "Tracked via X" / "Verified by X"
-  const vs = FL.VERIFICATION_SOURCE || 'Apple Watch + Strava';
+  const vs = FL.VERIFICATION_SOURCE || 'Garmin + Strava';
   document.querySelectorAll('[data-verify-tracked]').forEach(el => { el.textContent = 'Tracked via ' + vs; });
   document.querySelectorAll('[data-verify-by]').forEach(el => { el.textContent = 'Verified by ' + vs; });
   document.querySelectorAll('[data-verify-source]').forEach(el => { el.textContent = vs; });

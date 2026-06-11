@@ -84,7 +84,7 @@ document.getElementById('metricsForm').addEventListener('submit', function(e) {
   if (document.getElementById('cfgMarathonDate')) document.getElementById('cfgMarathonDate').value = c.MARATHON_DATE || '';
   if (document.getElementById('cfgMarathonTime')) document.getElementById('cfgMarathonTime').value = c.MARATHON_TIME || '';
   if (document.getElementById('cfgMediaUrl')) document.getElementById('cfgMediaUrl').value = c.MEDIA_BASE_URL || '';
-  if (document.getElementById('cfgVerifySource')) document.getElementById('cfgVerifySource').value = c.VERIFICATION_SOURCE || 'Apple Watch + Strava';
+  if (document.getElementById('cfgVerifySource')) document.getElementById('cfgVerifySource').value = c.VERIFICATION_SOURCE || 'Garmin + Strava';
   // Legacy bio
   try { var s = JSON.parse(localStorage.getItem('fl_settings') || '{}');
     if (document.getElementById('cfgBio')) document.getElementById('cfgBio').value = s.bio || '';
