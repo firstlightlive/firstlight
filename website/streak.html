@@ -7,8 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>FIRST LIGHT — Infinite Streak</title>
-  <meta name="description" content="No end date. No finish line. INFINITE. Multi-sport fitness accountability with ₹5,000 on the line every single day. Run. Ride. Swim. Walk.">
-  <meta name="keywords" content="fitness accountability, daily streak, multi-sport training, ironman journey, discipline challenge, ₹5000 stakes, Strava verified, Bangalore runner, infinite streak">
+  <meta name="description" content="No end date. No finish line. INFINITE. Multi-sport fitness accountability with ₹15,000 on the line every single day. Run. Ride. Swim. Walk.">
+  <meta name="keywords" content="fitness accountability, daily streak, multi-sport training, ironman journey, discipline challenge, ₹15000 stakes, Strava verified, Bangalore runner, infinite streak">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://firstlight.live/streak.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,13 +24,13 @@
   <link rel="apple-touch-icon" href="icon-512.png">
   <link rel="manifest" href="manifest.json">
   <meta property="og:title" content="FIRST LIGHT — Infinite Streak">
-  <meta property="og:description" content="No end date. No finish line. ₹5,000 on the line every single day. Zero misses.">
+  <meta property="og:description" content="No end date. No finish line. ₹15,000 on the line every single day. Zero misses.">
   <meta property="og:image" content="https://firstlight.live/icon-512.png">
   <meta property="og:url" content="https://firstlight.live/">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="FIRST LIGHT — Infinite Streak">
-  <meta name="twitter:description" content="No end date. No finish line. ₹5,000 on the line every single day. Zero misses.">
+  <meta name="twitter:description" content="No end date. No finish line. ₹15,000 on the line every single day. Zero misses.">
   <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
   <script type="application/ld+json">
   {
@@ -38,7 +38,7 @@
     "@type": "WebSite",
     "name": "First Light",
     "url": "https://firstlight.live",
-    "description": "Multi-sport fitness accountability with ₹5,000 daily stakes. No end date. No finish line. Infinite streak.",
+    "description": "Multi-sport fitness accountability with ₹15,000 daily stakes. No end date. No finish line. Infinite streak.",
     "author": {
       "@type": "Person",
       "name": "Anupam Kumar",
@@ -1944,12 +1944,80 @@
         <div style="font-size:10px;color:var(--text-dim);margin-top:8px;letter-spacing:1px" id="countdownStatus"></div>
       </div>
 
-      <!-- STREAK BROKEN BANNER — shown when deadline passes + no activities -->
+      <!-- DAY MISSED BANNER — streak continues, stake paid, public can claim -->
       <div class="streak-broken-banner" id="streakBrokenBanner">
-        <div class="streak-broken-banner__title">STREAK BROKEN</div>
-        <div class="streak-broken-banner__sub">No activity logged before deadline</div>
-        <div class="streak-broken-banner__claim" id="brokenClaimAmount">₹5,000 CLAIMABLE</div>
+        <div class="streak-broken-banner__title">DAY MISSED · STREAK CONTINUES</div>
+        <div class="streak-broken-banner__sub">No activity logged before deadline. Stake is in the pool.</div>
+        <div class="streak-broken-banner__claim" id="brokenClaimAmount">₹15,000 CLAIMABLE</div>
         <a href="accountability.html" class="streak-broken-banner__cta">CLAIM NOW</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CHAPTER 1 MONUMENT — FROZEN PERMANENT RECORD ═══ -->
+  <style>
+    .ch1-wrap{padding:48px 20px 32px;position:relative;z-index:2}
+    .ch1-card{max-width:880px;margin:0 auto;background:linear-gradient(180deg,rgba(245,166,35,0.05),rgba(245,166,35,0.02) 60%,rgba(0,0,0,0));
+      border:1px solid rgba(245,166,35,0.35);border-radius:14px;padding:clamp(24px,4vw,40px);
+      position:relative;overflow:hidden;box-shadow:0 0 60px rgba(245,166,35,0.06),inset 0 0 40px rgba(245,166,35,0.02)}
+    .ch1-card::before{content:'';position:absolute;inset:0;
+      background:radial-gradient(circle at 50% 0%,rgba(245,166,35,0.12),transparent 60%);pointer-events:none}
+    .ch1-pre{font:700 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:4px;
+      color:rgba(245,166,35,0.85);text-align:center;margin-bottom:14px;position:relative}
+    .ch1-pre::before,.ch1-pre::after{content:'';display:inline-block;width:24px;height:1px;
+      background:rgba(245,166,35,0.5);vertical-align:middle;margin:0 12px}
+    .ch1-name{font:800 clamp(22px,4vw,32px)/1 'Playfair Display',Georgia,serif;
+      color:#F5A623;text-align:center;letter-spacing:6px;margin-bottom:28px}
+    .ch1-bignum{font:900 clamp(96px,18vw,180px)/0.9 'Playfair Display',Georgia,serif;
+      color:#fff;text-align:center;letter-spacing:-4px;
+      text-shadow:0 0 40px rgba(245,166,35,0.25);margin:8px 0 6px;
+      background:linear-gradient(180deg,#fff 30%,rgba(245,166,35,0.85));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .ch1-biglabel{font:700 11px/1 'IBM Plex Mono',monospace;letter-spacing:8px;
+      color:rgba(255,255,255,0.55);text-align:center;margin-bottom:32px}
+    .ch1-dates{display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,28px);
+      font:700 clamp(11px,2vw,13px)/1 'IBM Plex Mono',monospace;color:rgba(255,255,255,0.75);
+      letter-spacing:2px;text-align:center;flex-wrap:wrap;margin-bottom:26px}
+    .ch1-dates .arrow{color:rgba(245,166,35,0.7);font-size:14px}
+    .ch1-rule{text-align:center;font:700 clamp(11px,1.6vw,13px)/1.6 'IBM Plex Mono',monospace;
+      color:rgba(255,255,255,0.6);letter-spacing:2px;padding:18px 12px;
+      border-top:1px solid rgba(245,166,35,0.15);border-bottom:1px solid rgba(245,166,35,0.15);
+      margin-bottom:22px;background:rgba(0,0,0,0.2)}
+    .ch1-rule span{display:inline-block;margin:0 8px;color:rgba(245,166,35,0.85)}
+    .ch1-note{text-align:center;font:400 clamp(12px,1.6vw,14px)/1.65 'Inter',sans-serif;
+      color:rgba(255,255,255,0.55);max-width:600px;margin:0 auto 24px;font-style:italic}
+    .ch1-stamp{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap}
+    .ch1-seal{display:inline-flex;align-items:center;gap:10px;padding:10px 20px;
+      background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.5);border-radius:6px;
+      font:700 11px 'IBM Plex Mono',monospace;letter-spacing:3px;color:#F5A623}
+    .ch1-seal-dot{width:8px;height:8px;border-radius:50%;background:#F5A623;
+      box-shadow:0 0 12px rgba(245,166,35,0.8)}
+    .ch1-id{font:700 10px 'IBM Plex Mono',monospace;letter-spacing:2px;
+      color:rgba(255,255,255,0.3);text-transform:uppercase}
+    @media (max-width:560px){
+      .ch1-pre::before,.ch1-pre::after{width:14px;margin:0 6px}
+      .ch1-dates{gap:8px;font-size:10px}
+    }
+  </style>
+  <section class="ch1-wrap" id="chapter1">
+    <div class="ch1-card">
+      <div class="ch1-pre">CHAPTER 01 · CLOSED 08 JUN 2026</div>
+      <div class="ch1-name">FOUNDATION</div>
+      <div class="ch1-bignum">110</div>
+      <div class="ch1-biglabel">CONTINUOUS DAYS</div>
+      <div class="ch1-dates">
+        <span>10 FEB 2026</span>
+        <span class="arrow">→</span>
+        <span>08 JUN 2026</span>
+      </div>
+      <div class="ch1-rule">
+        5KM RUN <span>·</span> BEFORE 6:00 AM IST <span>·</span> OLD RULES <span>·</span> BINARY STREAK
+      </div>
+      <div class="ch1-note">
+        The first one hundred and ten days, under the old rules. The body adapted. The system stood. The Chapter closes with honor. Chapter 02 begins 12 JUN 2026 under new rules — no break, ₹15,000 flat, 5 km run before 6:00 AM local.
+      </div>
+      <div class="ch1-stamp">
+        <div class="ch1-seal"><span class="ch1-seal-dot"></span>COMPLETE</div>
+        <div class="ch1-id">RECORD · IMMUTABLE</div>
       </div>
     </div>
   </section>
@@ -2009,11 +2077,11 @@
         <div class="stake-step reveal-el-left">
           <div class="stake-num">02</div>
           <div class="stake-title">WEEKLY DEFICIT &gt; 50 KM</div>
-          <div class="stake-desc">Weekly target: 150 km (run + ride + walk + swim&times;10). Deficit carries forward. Exceeds 50 km? Punishment triggered + ₹<span data-stake-daily>5,000</span> claimable.</div>
+          <div class="stake-desc">Weekly target: 100 km (run + ride + walk + swim&times;10). Deficit carries forward. Exceeds 50 km? Punishment triggered + ₹<span data-stake-daily>15,000</span> claimable.</div>
         </div>
         <div class="stake-step reveal-el-left">
           <div class="stake-num">03</div>
-          <div class="stake-title stake-amount">YOU GET ₹<span data-stake-daily>5,000</span> — DIRECT TRANSFER</div>
+          <div class="stake-title stake-amount">YOU GET ₹<span data-stake-daily>15,000</span> — DIRECT TRANSFER</div>
           <div class="stake-desc">First claim wins. UPI transfer within 24 hours. Plus: deficit &times; 2 punishment km added (immutable).</div>
         </div>
       </div>
@@ -2023,7 +2091,7 @@
         <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.8">Spot a miss? Comment on any <a href="https://www.instagram.com/firstlightlive" target="_blank" style="color:#E1306C;text-decoration:underline">@firstlightlive</a> Instagram post, DM on Instagram, or claim on <a href="accountability.html" style="color:var(--cc-cyan);text-decoration:underline">firstlight.live/accountability</a> — first claim wins. UPI transfer within 24 hours.</div>
       </div>
       <p class="mono text-muted mt-4" style="font-size:13px;letter-spacing:1px"><span data-day>—</span> days tracked. <span data-verify-via>Strava GPS + Apple Watch verified</span>. Zero misses.</p>
-      <p class="mono" style="font-size:9px;color:var(--text-dim);margin-top:12px;letter-spacing:0.5px;line-height:1.8;text-align:center">* Proof verified via <span style="color:#FC4C02">Strava</span> (GPS, heart rate, distance). Weekly recap on <span style="color:#E1306C">Instagram</span>.<br>* Weekly target: 150 km across all sports. Deficit &gt; 50 km = ₹5,000 claimable + punishment km.</p>
+      <p class="mono" style="font-size:9px;color:var(--text-dim);margin-top:12px;letter-spacing:0.5px;line-height:1.8;text-align:center">* Proof verified via <span style="color:#FC4C02">Strava</span> (GPS, heart rate, distance). Weekly recap on <span style="color:#E1306C">Instagram</span>.<br>* Weekly target: 100 km across all sports. Deficit &gt; 50 km = ₹15,000 claimable + punishment km.</p>
     </div>
   </section>
 
@@ -2190,6 +2258,7 @@
   </footer>
 
   <script src="js/config.js"></script>
+  <script src="js/chapters.js"></script>
   <script src="app.js"></script>
   <script>
     // Populate daily record post numbers (counting back from current day)
@@ -2283,7 +2352,7 @@
         var banner = document.getElementById('streakBrokenBanner');
         if (banner) banner.classList.add('active');
 
-        var stake = (typeof getCurrentStake === 'function') ? getCurrentStake().toLocaleString('en-IN') : '5,000';
+        var stake = (typeof getCurrentStake === 'function') ? getCurrentStake().toLocaleString('en-IN') : '15,000';
         var claimEl = document.getElementById('brokenClaimAmount');
         if (claimEl) claimEl.textContent = '₹' + stake + ' CLAIMABLE';
 
@@ -2348,7 +2417,7 @@
         if (cdM) cdM.textContent = String(mins).padStart(2, '0');
         if (cdS) cdS.textContent = String(secs).padStart(2, '0');
 
-        var stake = (typeof getCurrentStake === 'function') ? getCurrentStake().toLocaleString('en-IN') : '5,000';
+        var stake = (typeof getCurrentStake === 'function') ? getCurrentStake().toLocaleString('en-IN') : '15,000';
 
         // Activity already logged today — STREAK ALIVE (green, any time)
         if (_streakActivityCheck.checked && _streakActivityCheck.hasActivity) {

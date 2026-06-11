@@ -324,7 +324,7 @@ async function syncReadingLog(date, type, ruleNumber) {
 
 // ── BACKFILL: sync any localStorage reading entries to Supabase ──
 function backfillReadingLog() {
-  var streakStart = new Date('2026-02-10');
+  var streakStart = new Date('2026-06-12');
   for (var i = 0; i < localStorage.length; i++) {
     var key = localStorage.key(i);
     if (key && key.startsWith('fl_daily_rule_read_')) {

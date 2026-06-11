@@ -296,7 +296,7 @@
   }
 
   function getDayNumber(forDate) {
-    var startDate = new Date('2026-02-10T12:00:00');
+    var startDate = new Date('2026-06-12T12:00:00');
     var d = forDate ? new Date(forDate) : new Date();
     d.setHours(12, 0, 0, 0);
     return Math.floor((d - startDate) / 86400000) + 1;
@@ -346,9 +346,9 @@
 
     ctx.textAlign = 'center';
     var dayNum = getDayNumber(weekRange.end);
-    var pctRaw = stats.totalKm / 150;
+    var pctRaw = stats.totalKm / 100;
     var pctClamped = Math.min(pctRaw, 1);
-    var targetHit = stats.totalKm >= 150;
+    var targetHit = stats.totalKm >= 100;
     var days = stats.days;
 
     // ════════════════════════════════════════
@@ -504,11 +504,11 @@
     if (targetHit) {
       ctx.font = '700 13px "IBM Plex Mono", monospace';
       ctx.fillStyle = '#00E676';
-      ctx.fillText('TARGET HIT  ·  ' + Math.round(pctRaw * 100) + '%  ·  ' + Math.round(stats.totalKm) + ' / 150 km', W / 2, achY);
+      ctx.fillText('TARGET HIT  ·  ' + Math.round(pctRaw * 100) + '%  ·  ' + Math.round(stats.totalKm) + ' / 100 km', W / 2, achY);
     } else {
       ctx.font = '400 12px "IBM Plex Mono", monospace';
       ctx.fillStyle = T.dim;
-      ctx.fillText(Math.round(stats.totalKm) + ' / 150 km  ·  ' + Math.round(150 - stats.totalKm) + ' km remaining', W / 2, achY);
+      ctx.fillText(Math.round(stats.totalKm) + ' / 100 km  ·  ' + Math.round(100 - stats.totalKm) + ' km remaining', W / 2, achY);
     }
 
     // ── Sport split (inline) ──
@@ -562,9 +562,9 @@
 
     ctx.textAlign = 'center';
     var dayNum = getDayNumber(weekRange.end);
-    var pctRaw = stats.totalKm / 150;
+    var pctRaw = stats.totalKm / 100;
     var pctClamped = Math.min(pctRaw, 1);
-    var targetHit = stats.totalKm >= 150;
+    var targetHit = stats.totalKm >= 100;
     var days = stats.days;
 
     // ════════════════════════════════════════
@@ -710,11 +710,11 @@
     if (targetHit) {
       ctx.font = '700 16px "IBM Plex Mono", monospace';
       ctx.fillStyle = '#00E676';
-      ctx.fillText('TARGET HIT  ·  ' + Math.round(pctRaw * 100) + '%  ·  ' + Math.round(stats.totalKm) + ' / 150 km', W / 2, achY);
+      ctx.fillText('TARGET HIT  ·  ' + Math.round(pctRaw * 100) + '%  ·  ' + Math.round(stats.totalKm) + ' / 100 km', W / 2, achY);
     } else {
       ctx.font = '400 14px "IBM Plex Mono", monospace';
       ctx.fillStyle = T.dim;
-      ctx.fillText(Math.round(stats.totalKm) + ' / 150 km  ·  ' + Math.round(150 - stats.totalKm) + ' km remaining', W / 2, achY);
+      ctx.fillText(Math.round(stats.totalKm) + ' / 100 km  ·  ' + Math.round(100 - stats.totalKm) + ' km remaining', W / 2, achY);
     }
 
     // Sport split

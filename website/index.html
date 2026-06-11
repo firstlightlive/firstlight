@@ -763,6 +763,28 @@
           <div class="hero-wake-label">NO SLEEP UNTIL 5 PM</div>
         </div>
       </div>
+      <!-- ── CHAPTER 1 LEGACY RIBBON — preserves 110-day achievement ── -->
+      <style>
+        .hero-chapter-ribbon{display:inline-flex;align-items:center;gap:10px;margin-top:24px;
+          padding:10px 18px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.35);
+          border-radius:6px;font:700 10px 'IBM Plex Mono',monospace;letter-spacing:3px;
+          color:rgba(245,166,35,0.9);text-decoration:none;transition:all 0.25s;
+          box-shadow:0 0 24px rgba(245,166,35,0.06)}
+        .hero-chapter-ribbon:hover{background:rgba(245,166,35,0.12);border-color:rgba(245,166,35,0.6);
+          transform:translateY(-1px);box-shadow:0 4px 24px rgba(245,166,35,0.15)}
+        .hero-chapter-ribbon .ch-dot{width:6px;height:6px;border-radius:50%;background:#F5A623;
+          box-shadow:0 0 10px rgba(245,166,35,0.8)}
+        .hero-chapter-ribbon .ch-sep{color:rgba(245,166,35,0.4)}
+        .hero-chapter-ribbon .ch-num{color:#F5A623;font-size:11px}
+        @media (max-width:560px){
+          .hero-chapter-ribbon{font-size:9px;letter-spacing:2px;padding:8px 14px;gap:6px}
+        }
+      </style>
+      <a href="streak.html#chapter1" class="hero-chapter-ribbon">
+        <span class="ch-dot"></span>
+        CHAPTER 01 COMPLETE <span class="ch-sep">·</span>
+        <span class="ch-num">110</span> DAYS <span class="ch-sep">·</span> CHAPTER 02 BEGINS 12 JUN
+      </a>
     </div>
     <div class="hero-scroll-cue">SCROLL TO EXPLORE &#x25BC;</div>
   </section>
@@ -816,7 +838,7 @@
         </div>
       </div>
 
-      <!-- WEEKLY 150KM TARGET -->
+      <!-- WEEKLY 100KM TARGET -->
       <div style="margin-top:48px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;padding:28px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;opacity:1;transform:none">
         <div style="position:relative;width:120px;height:120px">
           <svg viewBox="0 0 120 120" style="width:120px;height:120px;transform:rotate(-90deg)">
@@ -826,12 +848,12 @@
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div id="weekGaugePct" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:#fff">0%</div>
-            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim)">OF 150 KM</div>
+            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim)">OF 100 KM</div>
           </div>
         </div>
         <div>
           <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:4px;color:var(--text-dim);margin-bottom:8px">WEEKLY TARGET</div>
-          <div id="weekGaugeKm" style="font-family:var(--font-mono);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:700;color:#fff">0 <span style="font-size:0.6em;color:var(--text-dim)">/ 150 KM</span></div>
+          <div id="weekGaugeKm" style="font-family:var(--font-mono);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:700;color:#fff">0 <span style="font-size:0.6em;color:var(--text-dim)">/ 100 KM</span></div>
           <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
             <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--strava)"><span id="weekGaugeRun">0</span> km run</div>
             <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--green)"><span id="weekGaugeRide">0</span> km ride</div>
@@ -865,7 +887,7 @@
        ============================================ -->
   <section class="stakes-section" id="stakes">
     <div class="holo-card reveal-scale" id="holoCard">
-      <div class="holo-amount"><span class="currency">&#8377;</span><span id="stakeAmount">5,000</span></div>
+      <div class="holo-amount"><span class="currency">&#8377;</span><span id="stakeAmount">15,000</span></div>
       <div class="holo-label">PER ZERO-ACTIVITY DAY</div>
       <div class="holo-stats">
         <div class="holo-stat">
@@ -883,8 +905,8 @@
       </div>
       <a href="accountability.html" class="holo-cta">CLAIM IF I MISS</a>
       <div style="margin-top:20px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;line-height:1.8;max-width:360px;text-align:center">
-        WEEKLY: 150 km minimum (all sports)<br>
-        DEFICIT &gt; 50 km = ₹5,000 claimable + punishment km<br>
+        WEEKLY: 100 km minimum (all sports)<br>
+        DEFICIT &gt; 50 km = ₹15,000 claimable + punishment km<br>
         SLIPS ARE IMMUTABLE — NO DELETE, NO EDIT
       </div>
     </div>

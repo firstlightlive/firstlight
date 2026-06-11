@@ -156,7 +156,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
       <div class="d-card">
         <div class="d-countdown">
           <div class="d-countdown-time" id="dashCountdown">--:--:--</div>
-          <div class="d-countdown-label">UNTIL 6:00 AM IST DEADLINE</div>
+          <div class="d-countdown-label">UNTIL 6:00 AM LOCAL DEADLINE</div>
         </div>
       </div>
 
@@ -215,8 +215,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
 <script src="../js/config.js"></script>
 <script>
 // ── CONFIG ──
-const STREAK_START='2026-02-10';
-const STAKE_SCHEDULE=[[100,15000],[200,20000],[365,25000],[Infinity,30000]];
+const STREAK_START='2026-06-12';
+const STAKE_SCHEDULE=[[Infinity,15000]];
 const SB_URL=FL.SUPABASE_URL;
 const SB_KEY=FL.SUPABASE_ANON_KEY;
 
@@ -278,7 +278,7 @@ function syncSleepNow(){
 // (mirrors initStreakLog in index.html so dots are green without visiting story generator)
 function ensureStreakLog(){
   try{
-    const origin=new Date(2026,1,10);origin.setHours(0,0,0,0);
+    const origin=new Date(2026,5,11);origin.setHours(0,0,0,0);
     const today=new Date();today.setHours(0,0,0,0);
     const log=JSON.parse(localStorage.getItem('fl_log')||'{}');
     let changed=false;
@@ -328,12 +328,13 @@ function initDash(){
 }
 
 function updateCountdown(){
-  const ist=getNowIST();
-  const h=ist.getHours(),m=ist.getMinutes(),s=ist.getSeconds();
-  let target=new Date(ist);
+  // Deadline is 6:00 AM in user's LOCAL timezone (works wherever in the world)
+  const now=new Date();
+  const h=now.getHours();
+  let target=new Date(now);
   if(h>=6){target.setDate(target.getDate()+1);}
   target.setHours(6,0,0,0);
-  const diff=target-ist;
+  const diff=target-now;
   if(diff<=0){document.getElementById('dashCountdown').textContent='DEADLINE PASSED';return;}
   const hh=Math.floor(diff/3600000);
   const mm=Math.floor((diff%3600000)/60000);

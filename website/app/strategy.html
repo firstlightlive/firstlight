@@ -376,7 +376,7 @@ body{
     <div class="soar-group">
       <div class="soar-item">
         <div class="soar-lbl">S &mdash; SITUATION <span>Set the scene</span></div>
-        <textarea class="soar-input" id="soarS" placeholder="Day 51. April 1st. Alarm went off at 3:15 AM." rows="2"></textarea>
+        <textarea class="soar-input" id="soarS" placeholder="Day 51. April 1st. Alarm went off at 3:30 AM." rows="2"></textarea>
       </div>
       <div class="soar-item">
         <div class="soar-lbl">O &mdash; OBSTACLE <span>What tried to stop you</span></div>
@@ -887,7 +887,7 @@ body{
 
 <script>
 // ===== CONSTANTS =====
-const STREAK_ORIGIN = new Date(2026, 1, 10); // Feb 10, 2026
+const STREAK_ORIGIN = new Date(2026, 5, 12); // Jun 12, 2026 — Chapter 02 Day 1
 const LS_PREFIX = 'fl_strat_';
 
 function ls(key, val) {
@@ -926,23 +926,13 @@ function formatIndianCurrency(num) {
   return rest + result + ',' + last3;
 }
 
-// Escalating stakes: ₹15K (days 1-100), ₹20K (101-200), ₹25K (201-365+)
+// Flat stake: ₹15,000/day from Day 1, no escalation
 function getCurrentStake(day) {
-  if (day <= 100) return 15000;
-  if (day <= 200) return 20000;
-  return 25000;
+  return 15000;
 }
 
 function getTotalUnclaimed(day) {
-  let total = 0;
-  if (day <= 100) {
-    total = day * 15000;
-  } else if (day <= 200) {
-    total = 100 * 15000 + (day - 100) * 20000;
-  } else {
-    total = 100 * 15000 + 100 * 20000 + (day - 200) * 25000;
-  }
-  return total;
+  return day * 15000;
 }
 
 function fillTemplate(text, day) {
@@ -1418,7 +1408,7 @@ function copyHashtags() {
 
 // ===== MODULE 4: STORIES WORKFLOW =====
 const STORIES = [
-  { name: 'THE ALARM', time: '3:15-3:30 AM', desc: 'Screenshot of alarm. Raw, dark, real. No editing needed.', sticker: 'Countdown Sticker' },
+  { name: 'THE ALARM', time: '3:30-3:45 AM', desc: 'Screenshot of alarm. Raw, dark, real. No editing needed.', sticker: 'Countdown Sticker' },
   { name: 'THE EMPTY ROAD', time: '5:00 AM', desc: 'Bangalore streets at 5 AM. The emptiness IS the content.', sticker: 'Location Tag + Poll' },
   { name: 'THE RUN DATA', time: 'Post-run', desc: 'Strava screenshot. This is where raw data belongs.', sticker: 'Quiz: Guess my pace' },
   { name: 'THE GYM', time: 'Post-gym', desc: 'Quick selfie or video. Use Poll: Could you do this on 3.8h sleep?', sticker: 'Poll Sticker' },

@@ -291,7 +291,7 @@ async function _forceSleepSync() {
 
     // Write to proof_archive (only sleep_hrs — don't touch other columns)
     log('Writing to proof_archive...');
-    var streakStart = new Date('2026-02-10');
+    var streakStart = new Date('2026-06-12');
     var dayNum = Math.floor((new Date(today) - streakStart) / 86400000) + 1;
     await fetch(sbUrl + '/rest/v1/proof_archive?on_conflict=date', {
       method: 'POST',

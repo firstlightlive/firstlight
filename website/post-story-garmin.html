@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FIRST LIGHT — Daily Story · Garmin Snapshot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Playfair+Display:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:#0A0C10}
+  body{
+    font-family:'IBM Plex Mono',monospace;
+    color:rgba(255,255,255,0.85);
+    padding:80px 60px;
+    display:flex;flex-direction:column;
+    position:relative;
+  }
+  body::before{
+    content:'';position:absolute;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity:0.04;pointer-events:none;z-index:1;
+  }
+  body::after{
+    content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+    background:radial-gradient(ellipse at top,rgba(0,212,255,0.06),transparent 60%);
+    pointer-events:none;z-index:1;
+  }
+  .wrap{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;align-items:center}
+
+  .header{text-align:center;margin-bottom:30px}
+  .brand{font-size:22px;letter-spacing:9px;color:#F5A623;font-weight:700}
+  .day-line{font-size:16px;letter-spacing:5px;color:rgba(255,255,255,0.55);margin-top:16px}
+
+  .snapshot-slot{
+    width:920px;height:1080px;
+    background:linear-gradient(135deg,#0a1218 0%,#0d1820 100%);
+    border:2px solid rgba(0,212,255,0.25);
+    border-radius:14px;
+    background-image:url('GARMIN_SNAPSHOT_URL_HERE');
+    background-size:contain;background-repeat:no-repeat;background-position:center;background-color:#0a1218;
+    box-shadow:0 0 80px rgba(0,212,255,0.1),inset 0 0 40px rgba(0,0,0,0.4);
+    display:flex;align-items:center;justify-content:center;
+    margin:16px 0 28px;position:relative;
+    overflow:hidden;
+  }
+  .snapshot-placeholder{
+    text-align:center;color:rgba(0,212,255,0.35);
+    font-size:22px;letter-spacing:8px;font-weight:700;line-height:2;
+  }
+  .snapshot-corner{
+    position:absolute;top:18px;left:22px;
+    font-size:10px;letter-spacing:3px;color:rgba(0,212,255,0.55);font-weight:700;
+  }
+
+  .stats-line{
+    font-size:18px;letter-spacing:4px;
+    color:rgba(255,255,255,0.75);text-align:center;
+    margin-bottom:24px;
+  }
+  .stats-line .accent{color:#fff;font-weight:700}
+
+  .proof-badge{
+    display:inline-block;
+    background:linear-gradient(180deg,rgba(245,166,35,0.18),rgba(245,166,35,0.08));
+    border:2px solid #F5A623;
+    padding:20px 36px;border-radius:10px;
+    font-size:26px;font-weight:700;letter-spacing:5px;
+    color:#F5A623;margin:0 auto 32px;
+    box-shadow:0 0 50px rgba(245,166,35,0.2);
+  }
+
+  .footer{margin-top:auto;text-align:center;width:100%}
+  .verified-row{
+    display:flex;gap:10px;justify-content:center;align-items:center;margin-bottom:16px;
+  }
+  .garmin-badge{
+    display:inline-block;background:#0084c8;color:#fff;
+    padding:6px 14px;border-radius:5px;
+    font-size:12px;font-weight:700;letter-spacing:2.5px;
+  }
+  .strava-badge{
+    display:inline-block;background:#FC4C02;color:#fff;
+    padding:6px 14px;border-radius:5px;
+    font-size:12px;font-weight:700;letter-spacing:2.5px;
+  }
+  .footer-domain{
+    font-size:16px;color:rgba(255,255,255,0.55);letter-spacing:5px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="brand">◆ FIRST LIGHT</div>
+    <div class="day-line">DAY <span id="day">111</span> · <span id="date">10 JUN 2026</span></div>
+  </div>
+
+  <div class="snapshot-slot">
+    <div class="snapshot-corner">GARMIN FĒNIX 8</div>
+    <div class="snapshot-placeholder">GARMIN<br>SNAPSHOT<br>HERE</div>
+  </div>
+
+  <div class="stats-line"><span class="accent" id="km">5.2</span> KM · <span class="accent" id="duration">33:14</span> · STARTED <span class="accent" id="startTime">04:12 AM</span></div>
+
+  <div style="text-align:center">
+    <div class="proof-badge">✓ BEFORE 6:00 AM</div>
+  </div>
+
+  <div class="footer">
+    <div class="verified-row">
+      <div class="garmin-badge">GARMIN</div>
+      <div class="strava-badge">STRAVA</div>
+    </div>
+    <div class="footer-domain">firstlight.live</div>
+  </div>
+</div>
+</body>
+</html>

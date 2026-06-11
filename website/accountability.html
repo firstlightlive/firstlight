@@ -242,11 +242,11 @@
 
   <!-- Active Rules — compact, below stats -->
   <div class="rules-card reveal">
-    <div class="rules-title">ACTIVE RULES — FROM DAY 111</div>
-    <div class="rules-row"><div class="rules-key">DAILY</div><div class="rules-val">Any Strava-logged activity = safe. Zero activity = ₹5,000 claimable.</div></div>
-    <div class="rules-row"><div class="rules-key">WEEKLY</div><div class="rules-val">150 km minimum across all sports (Mon–Sun). Swim 1 km = 10 km equivalent.</div></div>
-    <div class="rules-row"><div class="rules-key">DEFICIT</div><div class="rules-val">≤ 50 km carries to next week. <span class="rules-danger">&gt; 50 km = ₹5,000 + deficit × 2 punishment km.</span></div></div>
-    <div class="rules-row"><div class="rules-key">CLAIM</div><div class="rules-val">First person to spot a miss → ₹5,000 via UPI within 24 hours.</div></div>
+    <div class="rules-title">ACTIVE RULES — CHAPTER 02 · FROM 12 JUN 2026</div>
+    <div class="rules-row"><div class="rules-key">DAILY</div><div class="rules-val">5 km run before 6:00 AM local time, Strava-verified. Miss = ₹15,000 claimable.</div></div>
+    <div class="rules-row"><div class="rules-key">WEEKLY</div><div class="rules-val">100 km minimum across all sports (Mon–Sun). Swim 1 km = 10 km equivalent.</div></div>
+    <div class="rules-row"><div class="rules-key">DEFICIT</div><div class="rules-val">≤ 50 km carries to next week. <span class="rules-danger">&gt; 50 km = ₹15,000 + deficit × 2 punishment km.</span></div></div>
+    <div class="rules-row"><div class="rules-key">CLAIM</div><div class="rules-val">First person to spot a miss → ₹15,000 via UPI within 24 hours.</div></div>
     <div class="rules-row"><div class="rules-key" style="color:var(--red)">TAMPER</div><div class="rules-val">Slips are immutable. No delete. No edit. The system is stronger than any weak moment.</div></div>
   </div>
 </section>
@@ -507,7 +507,7 @@ function filterSlips(type) {
 
     // Head
     html += '<div class="slip-head">';
-    html += '<div class="slip-date">' + (s.date || '') + ' · DAY ' + getDayForDate(s.date) + '</div>';
+    html += '<div class="slip-date">' + (s.date || '') + ' · DAY ' + getDayForDate(s.date, s.day_number) + '</div>';
     html += '<span class="slip-badge ' + ruleBadgeClass + '">' + ruleLabel + '</span>';
     html += '</div>';
 
@@ -561,9 +561,12 @@ function filterSlips(type) {
     return html;
   }
 
-  function getDayForDate(dateStr) {
+  function getDayForDate(dateStr, storedDayNum) {
+    // Prefer immutable day_number stored at slip creation time
+    // (preserves historical Chapter 1 day numbers after STREAK_START changes for Chapter 2)
+    if (storedDayNum != null && !isNaN(storedDayNum)) return storedDayNum;
     if (!dateStr) return '?';
-    var start = new Date(FL.STREAK_START || '2026-02-10');
+    var start = new Date(FL.STREAK_START || '2026-06-12');
     var target = new Date(dateStr);
     return Math.floor((target - start) / 86400000) + 1;
   }

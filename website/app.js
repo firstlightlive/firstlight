@@ -41,7 +41,7 @@ function initTheme() {
 
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
-  STREAK_START: '2026-02-10',
+  STREAK_START: '2026-06-12',
   STAKE_PER_DAY: 5000,
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',
@@ -221,11 +221,9 @@ function formatINRFull(num) {
   return rest + ',' + last3;
 }
 
-// ── STAKE SCHEDULE — auto-compute daily stake + cumulative unclaimed ──
+// ── STAKE SCHEDULE — flat ₹15,000/day, no escalation, miss = pay & continue ──
 var STAKE_SCHEDULE = [
-  { fromDay: 1, amount: 15000 },
-  { fromDay: 101, amount: 20000 },
-  { fromDay: 110, amount: 5000 }
+  { fromDay: 1, amount: 15000 }
 ];
 
 function getCurrentStake(day) {

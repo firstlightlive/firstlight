@@ -42,9 +42,7 @@
     // Mirror STAKE_SCHEDULE from app.js
     if (typeof getCumulativeUnclaimed === 'function') return getCumulativeUnclaimed(day);
     var schedule = [
-      { fromDay: 1, amount: 15000 },
-      { fromDay: 101, amount: 20000 },
-      { fromDay: 110, amount: 5000 }
+      { fromDay: 1, amount: 15000 }
     ];
     var total = 0;
     for (var i = 0; i < schedule.length; i++) {
@@ -60,7 +58,7 @@
 
   function getDayNum() {
     if (typeof getDayNumber === 'function') return getDayNumber();
-    var start = new Date('2026-02-10T00:00:00+05:30');
+    var start = new Date('2026-06-12T00:00:00+05:30');
     var now = new Date();
     var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     var ist = new Date(utc + (5.5 * 3600000));
@@ -604,15 +602,15 @@
       // Store bars for animation
       window._weekBarData = dayBars;
 
-      // Weekly 150km gauge
+      // Weekly 100km gauge
       var weekTotal = runKm + bikeKm + walkKm + (swimKm * 10);
-      var weekPct = Math.min(100, Math.round(weekTotal / 150 * 100));
-      var deficit = Math.max(0, 150 - weekTotal);
+      var weekPct = Math.min(100, Math.round(weekTotal / 100 * 100));
+      var deficit = Math.max(0, 100 - weekTotal);
       var circ = 2 * Math.PI * 52;
       var el;
       el = document.getElementById('weekGaugeArc'); if (el) el.setAttribute('stroke-dasharray', Math.round(weekPct / 100 * circ) + ' ' + circ);
       el = document.getElementById('weekGaugePct'); if (el) el.textContent = weekPct + '%';
-      el = document.getElementById('weekGaugeKm'); if (el) el.innerHTML = Math.round(weekTotal) + ' <span style="font-size:0.6em;color:var(--text-dim)">/ 150 KM</span>';
+      el = document.getElementById('weekGaugeKm'); if (el) el.innerHTML = Math.round(weekTotal) + ' <span style="font-size:0.6em;color:var(--text-dim)">/ 100 KM</span>';
       el = document.getElementById('weekGaugeRun'); if (el) el.textContent = Math.round(runKm);
       el = document.getElementById('weekGaugeRide'); if (el) el.textContent = Math.round(bikeKm);
       el = document.getElementById('weekGaugeWalk'); if (el) el.textContent = Math.round(walkKm);
