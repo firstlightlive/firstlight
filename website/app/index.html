@@ -961,7 +961,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
 
     <div class="slide-tabs" id="slideTabs">
       <button class="s-tab active" onclick="showS(0,this)">TRACKER</button>
-      <button class="s-tab" onclick="showS(1,this)">GYM PROOF</button>
+      <button class="s-tab" onclick="showS(1,this)" id="tab2">GYM PROOF</button>
       <button class="s-tab" onclick="showS(2,this)" id="tab3">RUN PROOF</button>
       <button class="s-tab" onclick="showS(3,this)" id="tab4">SLEEP DATA</button>
       <button class="s-tab" onclick="showS(4,this)" id="tab5" style="display:none">🏆 MILESTONE</button>
@@ -975,7 +975,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
       <canvas id="c5" width="2160" height="2700"></canvas>
     </div>
 
-    <div class="dots"><div class="dt active" onclick="showS(0)"></div><div class="dt" onclick="showS(1)"></div><div class="dt" onclick="showS(2)" id="dot3"></div><div class="dt" onclick="showS(3)" id="dot4"></div><div class="dt" onclick="showS(4)" id="dot5" style="display:none"></div></div>
+    <div class="dots"><div class="dt active" onclick="showS(0)"></div><div class="dt" onclick="showS(1)" id="dot2"></div><div class="dt" onclick="showS(2)" id="dot3"></div><div class="dt" onclick="showS(3)" id="dot4"></div><div class="dt" onclick="showS(4)" id="dot5" style="display:none"></div></div>
 
     <!-- Thumbnail downloads — YouTube + Instagram Reel Cover + Stories -->
     <div class="thumb-row">
@@ -1600,7 +1600,7 @@ function setMode(m){
   const tabs=document.querySelectorAll('.s-tab');
   if(m==='travel'){pr.classList.remove('one');pr.classList.add('two');d2.style.display='flex';
     // Travel: 3 slides — summary(c1) + gym(c2) + run(c3). Hide sleep(c4), route map(c7).
-    ['tab3','dot3','sb3'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display=''});
+    ['tab2','dot2','tab3','dot3','sb3'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display=''});
     ['tab4','dot4','sb4','tab7','dot7','sb7'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none'});
     if(cond)cond.style.display='grid';if(pr2)pr2.style.display='none';const ps2=document.getElementById('pledgeSec');if(ps2)ps2.style.display='';
     if(d1Icon)d1Icon.textContent='⌚';
@@ -1612,6 +1612,7 @@ function setMode(m){
     if(tabs[2])tabs[2].textContent='RUN PROOF';
   }else if(m==='lastlight'){pr.classList.remove('two');pr.classList.add('one');d2.style.display='none';
     ['tab3','dot3','sb3','tab4','dot4','sb4','tab7','dot7','sb7'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none'});
+    ['tab2','dot2'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display=''});
     if(cond)cond.style.display='none';if(pr2)pr2.style.display='none';
     const ps=document.getElementById('pledgeSec');if(ps)ps.style.display='none';
     if(d1Icon)d1Icon.textContent='⌚';
@@ -1621,6 +1622,8 @@ function setMode(m){
   }else{pr.classList.remove('one');pr.classList.add('two');d2.style.display='flex';
     // Normal: 4 slides — summary(c1) + gym(c2) + run(c3) + routemap(c7) + sleep(c4)
     ['tab3','dot3','sb3','tab4','dot4','sb4'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display=''});
+    // Gym slide retired from normal mode — gym photos go via Strava posts
+    ['tab2','dot2'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none'});
     // Route map tab shown/hidden dynamically based on upload
     if(cond)cond.style.display='grid';if(pr2)pr2.style.display='';const ps2=document.getElementById('pledgeSec');if(ps2)ps2.style.display='';
     if(d1Icon)d1Icon.textContent='⌚';
@@ -1628,7 +1631,6 @@ function setMode(m){
     if(d2Icon)d2Icon.textContent='🏋️';
     if(d2Text)d2Text.innerHTML='GYM SELFIE<br>CLOCK VISIBLE';
     if(tabs[0])tabs[0].textContent='TRACKER';
-    if(tabs[1])tabs[1].textContent='GYM PROOF';
     if(tabs[2])tabs[2].textContent='RUN PROOF';
     if(tabs[3])tabs[3].textContent='SLEEP DATA';
   }
@@ -4296,12 +4298,13 @@ function slide2(day,km,mn,kc,loc,total,handleIG,handleX,wStart,wEnd,bpmVal,strav
 
     // Title — gold, consistent with other slides
     c.textAlign='left';c.font='700 28px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.fillText('RUNNING PROOF',60,H-240);
-    c.font='300 12px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('APPLE WATCH · VERIFIED',60,H-210);
+    c.font='300 12px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('WATCH + STRAVA · VERIFIED',60,H-210);
     // Always show 3 stat boxes — dash if not entered so layout never collapses
     let bx=60;
     drawStatBox(c,bx,H-190,km||'—','KM');bx+=180;
     drawStatBox(c,bx,H-190,mn||'—','MIN');bx+=180;
-    drawStatBox(c,bx,H-190,kc||'—','KCAL');
+    drawStatBox(c,bx,H-190,kc||'—','KCAL');bx+=180;
+    drawStatBox(c,bx,H-190,'✓','FOOD CODE');
     // Year heatmap (no Strava image — uses localStorage streak data only)
     drawHeatmapPanels(c,W,H,null,stravaStats);
     // Social footer
@@ -7886,7 +7889,7 @@ function _getSlideCanvases(){
   // c1=Summary, c2=Gym, c3=Run, c4=Sleep, c5=Milestone, c7=Route Map
   if(mode==='lastlight') return ['c1','c2'];
   const day=document.getElementById('dayNum').value;
-  const ids=['c1','c2','c3'];
+  const ids = mode==='normal' ? ['c1','c3'] : ['c1','c2','c3'];
   if(window._hasRouteMap) ids.push('c7');
   if(mode==='normal') ids.push('c4');
   if(isMilestone(day)) ids.push('c5');

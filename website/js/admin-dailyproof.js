@@ -193,19 +193,21 @@
     ctx.fillText(fmtDateLong(s.date), W / 2, 668);
 
     // Receipt card
-    var cardX = 90, cardW = W - 180, cardY = 730, cardH = 252;
+    var cardX = 90, cardW = W - 180, cardY = 716, cardH = 324;
     ctx.fillStyle = T.cardBg;
     ctx.beginPath(); ctx.roundRect(cardX, cardY, cardW, cardH, 14); ctx.fill();
     ctx.strokeStyle = T.cardBorder;
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.roundRect(cardX, cardY, cardW, cardH, 14); ctx.stroke();
 
+    var foodBroken = s.foodClean === false;
     var rows = [
       ['STARTED', fmtClock(s.start)],
       ['ENDED', fmtClock(s.end)],
-      ['DEADLINE', '06:00 AM']
+      ['DEADLINE', '06:00 AM'],
+      ['FOOD CODE', foodBroken ? '✗ BROKEN' : '✓ CLEAN', foodBroken ? RED : GREEN]
     ];
-    var ry = cardY + 72;
+    var ry = cardY + 68;
     rows.forEach(function(row) {
       ctx.textAlign = 'left';
       ctx.font = '500 26px ' + MONO;
@@ -213,14 +215,14 @@
       ctx.fillText(row[0], cardX + 50, ry);
       ctx.textAlign = 'right';
       ctx.font = '700 30px ' + MONO;
-      ctx.fillStyle = T.text;
+      ctx.fillStyle = row[2] || T.text;
       ctx.fillText(row[1], cardX + cardW - 50, ry);
-      ry += 72;
+      ry += 64;
     });
 
     // Proof seal
     ctx.textAlign = 'center';
-    var sealY = 1036, sealH = 190;
+    var sealY = 1080, sealH = 190;
     var sc = sealColorFor(s, T);
     ctx.save();
     ctx.shadowColor = sc;
@@ -247,7 +249,7 @@
     }
 
     // Stats — 3 columns
-    var statY = 1346;
+    var statY = 1390;
     ctx.strokeStyle = T.cardBorder;
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(90, statY - 72); ctx.lineTo(W - 90, statY - 72); ctx.stroke();
@@ -272,13 +274,13 @@
     // Stake line
     ctx.font = '700 34px ' + MONO;
     ctx.fillStyle = T.text;
-    ctx.fillText(s.made ? '₹15,000 STAKED. STILL MINE.' : '₹15,000 GONE. TOMORROW I SHOW UP.', W / 2, 1556);
+    ctx.fillText(s.made ? '₹15,000 STAKED. STILL MINE.' : '₹15,000 GONE. TOMORROW I SHOW UP.', W / 2, 1584);
 
     // Lifetime strip
     ctx.font = '500 22px ' + MONO;
     ctx.fillStyle = T.dim;
     var extra = s.extraSessions > 0 ? '  ·  +' + s.extraSessions + ' MORE TODAY' : '';
-    ctx.fillText('LIFETIME ' + s.lifetime + '  ·  CH 01: 110  ·  CH 02: ' + s.day + extra, W / 2, 1626);
+    ctx.fillText('LIFETIME ' + s.lifetime + '  ·  CH 01: 110  ·  CH 02: ' + s.day + extra, W / 2, 1648);
 
     // Badges
     var bw = 150, bh = 52, gap = 16, by = 1742;
@@ -593,13 +595,20 @@
         if (err) { statusEl.textContent = 'Fetch failed: ' + err.message; return; }
         if (!activities.length) { statusEl.textContent = 'No activities found for ' + dateStr + ' — sync Strava first.'; return; }
         currentStats = buildStats(activities, dateStr);
-        renderBoth();
-        captionEl.value = generateCaption(currentStats);
-        statusEl.textContent = 'Day ' + currentStats.day + ' · ' + currentStats.km.toFixed(1) + ' km · ' +
-          (currentStats.made ? '✓ before 6 AM (' + fmtMargin(currentStats.marginMin) + ' margin)' : '✗ deadline missed — slip variant rendered');
-        downloadPostBtn.style.display = '';
-        downloadStoryBtn.style.display = '';
-        copyCaptionBtn.style.display = '';
+        fetch(SUPA + '/rest/v1/proof_archive?date=eq.' + dateStr + '&select=food_clean', { headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY } })
+          .then(function(r) { return r.json(); })
+          .then(function(rows) { currentStats.foodClean = (rows && rows[0]) ? rows[0].food_clean !== false : true; })
+          .catch(function() { currentStats.foodClean = true; })
+          .then(function() {
+            renderBoth();
+            captionEl.value = generateCaption(currentStats);
+            statusEl.textContent = 'Day ' + currentStats.day + ' · ' + currentStats.km.toFixed(1) + ' km · ' +
+              (currentStats.made ? '✓ before 6 AM (' + fmtMargin(currentStats.marginMin) + ' margin)' : '✗ deadline missed — slip variant rendered') +
+              (currentStats.foodClean === false ? ' · food code BROKEN' : ' · food ✓');
+            downloadPostBtn.style.display = '';
+            downloadStoryBtn.style.display = '';
+            copyCaptionBtn.style.display = '';
+          });
       });
     });
 
