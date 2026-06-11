@@ -1330,8 +1330,8 @@ if('serviceWorker' in navigator){
 // SW registration disabled — re-enable when deploying to production
 // if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 
-// ===== STREAK ORIGIN — Feb 10, 2026 =====
-const STREAK_ORIGIN=new Date(2026,5,11); // Jan=0, so 1=Feb, day=10
+// ===== STREAK ORIGIN — Chapter 02 · Jun 12, 2026 =====
+const STREAK_ORIGIN=new Date(2026,5,12); // Jan=0, so 5=Jun, day=12
 
 function computeStreakDay(){
   const now=new Date();
@@ -1339,7 +1339,7 @@ function computeStreakDay(){
   return Math.max(1,Math.floor((today-STREAK_ORIGIN)/86400000)+1);
 }
 
-// Pre-fill fl_log with done:true for every day Feb 10 → yesterday
+// Pre-fill fl_log with done:true for every day from chapter start → yesterday
 // (only sets days not already explicitly logged, preserves real data)
 function initStreakLog(){
   try{
@@ -1360,7 +1360,7 @@ function initStreakLog(){
 }
 initStreakLog();
 
-// Auto-calculate day number from streak origin (Feb 10, 2026) — refreshes every minute
+// Auto-calculate day number from streak origin (Chapter 02 · Jun 12, 2026) — refreshes every minute
 function refreshDayNum(){document.getElementById('dayNum').value=String(computeStreakDay());}
 refreshDayNum();
 setInterval(refreshDayNum,60000); // re-check at midnight edge cases
@@ -2393,7 +2393,7 @@ function drawHeatmapPanels(c,W,H,stravaImg,stravaStats){
   c.textAlign='center';c.font='800 20px "Rajdhani",sans-serif';
   c.fillStyle=P.accent;c.shadowColor=P.acR+'0.5)';c.shadowBlur=10;
   c.fillText(String(yr),LX+LW/2,LY+24);c.shadowBlur=0;
-  c.font='400 7px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('STREAK · SINCE FEB 10',LX+LW/2,LY+35);
+  c.font='400 7px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('STREAK · SINCE 12 JUN',LX+LW/2,LY+35);
   // Accent rule
   const ug=c.createLinearGradient(LX+20,0,LX+LW-20,0);
   ug.addColorStop(0,'transparent');ug.addColorStop(0.5,P.acR+'0.35)');ug.addColorStop(1,'transparent');
@@ -2401,8 +2401,8 @@ function drawHeatmapPanels(c,W,H,stravaImg,stravaStats){
   // Month rows
   const mLblW=26;const cSz=5;const cGp=1;const mStartX=LX+8+mLblW+4;const mStartY=LY+48;
   const rowH=(LH-52)/12;
-  // Streak origin: Feb 10, 2026
-  const streakOriginMs=new Date(2026,5,11).getTime();
+  // Streak origin: Chapter 02 · Jun 12, 2026
+  const streakOriginMs=new Date(2026,5,12).getTime();
   for(let m=0;m<12;m++){
     const ry=mStartY+m*rowH;
     // Month label
@@ -6199,7 +6199,7 @@ function genStoryTemplate(idx){
       c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.15)';c.fillText('PACE',W/4,470);
       c.font='700 40px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.2)';c.fillText('42',W/4,580);
       c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.15)';c.fillText('MIN',W/4,610);
-      c.font='400 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.1)';c.fillText('10 FEB 2026',W/4,700);
+      c.font='400 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.1)';c.fillText('12 JUN 2026',W/4,700);
       // Today side
       c.font='700 14px "JetBrains Mono",monospace';c.fillStyle=P.accent;c.fillText('DAY '+day,W*3/4,100);
       c.font='900 80px "Rajdhani",sans-serif';c.fillStyle='#fff';c.shadowColor=P.acR+'0.4)';c.shadowBlur=20;c.fillText(km||'\u2014',W*3/4,300);c.shadowBlur=0;
@@ -6229,9 +6229,9 @@ function genStoryTemplate(idx){
       // Day labels
       var dayLabels=['M','T','W','T','F','S','S'];
       for(var di=0;di<7;di++){c.textAlign='center';c.font='600 10px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText(dayLabels[di],gridX+di*(cellSz+cellGap)+cellSz/2,gridY-8);}
-      // Origin: Feb 10 2026 (Mon)
-      var originDate=new Date(2026,5,11);var originDay=1;
-      var startDow=0; // Monday
+      // Origin: Jun 12 2026 (Fri)
+      var originDate=new Date(2026,5,12);var originDay=1;
+      var startDow=4; // Friday (Mon=0)
       for(var d2=0;d2<dn+14;d2++){
         var dayNum=d2+1;var slot=startDow+d2;var col2=slot%cols;var row2=Math.floor(slot/cols);
         var cx=gridX+col2*(cellSz+cellGap);var cy=gridY+row2*(cellSz+cellGap);

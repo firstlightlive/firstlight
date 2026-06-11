@@ -345,7 +345,7 @@
     ctx.fillRect(0, 0, W, H);
 
     ctx.textAlign = 'center';
-    var dayNum = getDayNumber(weekRange.end);
+    var dayNum = Math.max(1, getDayNumber(weekRange.end));
     var pctRaw = stats.totalKm / 100;
     var pctClamped = Math.min(pctRaw, 1);
     var targetHit = stats.totalKm >= 100;
@@ -561,7 +561,7 @@
     ctx.fillRect(0, 0, W, H);
 
     ctx.textAlign = 'center';
-    var dayNum = getDayNumber(weekRange.end);
+    var dayNum = Math.max(1, getDayNumber(weekRange.end));
     var pctRaw = stats.totalKm / 100;
     var pctClamped = Math.min(pctRaw, 1);
     var targetHit = stats.totalKm >= 100;
