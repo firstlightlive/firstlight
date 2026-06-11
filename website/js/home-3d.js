@@ -63,7 +63,7 @@
     var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     var ist = new Date(utc + (5.5 * 3600000));
     var today = new Date(ist.getFullYear(), ist.getMonth(), ist.getDate());
-    return Math.max(1, Math.floor((today - start) / 86400000) + 1);
+    return Math.max(0, Math.floor((today - start) / 86400000) + 1);
   }
 
   function populateDayNumbers() {

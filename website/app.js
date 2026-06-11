@@ -146,7 +146,7 @@ function getDayNumber() {
   const ist = getNowIST();
   const today = new Date(ist.getFullYear(), ist.getMonth(), ist.getDate());
   const diff = Math.floor((today - start) / 86400000);
-  return Math.max(1, diff + 1);
+  return Math.max(0, diff + 1);
 }
 
 function getUnclaimed(dayNum) {
@@ -181,7 +181,7 @@ function getVerifiedDayNumber(callback) {
       _verifiedDay = calendarDay;
     } else {
       // No proof for today — show yesterday's day number
-      _verifiedDay = Math.max(1, calendarDay - 1);
+      _verifiedDay = Math.max(0, calendarDay - 1);
     }
     if (callback) callback(_verifiedDay);
   })
@@ -528,7 +528,7 @@ function buildCalendar(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  const start = new Date(FL.STREAK_START);
+  const start = new Date(FL.STREAK_START + 'T00:00:00+05:30');
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
