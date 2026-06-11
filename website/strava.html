@@ -343,7 +343,7 @@
     #svECGCanvas { width:100%; height:60px; display:block; margin-top:16px; border-radius:8px; }
     #svConstellCanvas { width:100%; height:220px; display:block; border-radius:12px; }
 
-    /* ═══ WEEKLY 150KM GAUGE ═══ */
+    /* ═══ WEEKLY 100KM GAUGE ═══ */
     .sv-gauge-wrap {
       display:flex; align-items:center; justify-content:center; gap:40px;
       flex-wrap:wrap; margin-bottom:40px;
@@ -521,13 +521,13 @@
 <!-- ═══ WEEKLY TARGET ═══ -->
 <div class="sv-container reveal">
   <div class="sv-section-label">THIS WEEK</div>
-  <div class="sv-section-title" id="svGaugeTitle">150 KM Target</div>
+  <div class="sv-section-title" id="svGaugeTitle">100 KM Target</div>
   <div class="sv-gauge-wrap">
     <div class="sv-gauge">
       <canvas id="svGaugeCanvas"></canvas>
       <div class="sv-gauge-center">
         <div class="sv-gauge-val" id="svGaugeVal">--</div>
-        <div class="sv-gauge-label" id="svGaugeLabel">OF 150 KM</div>
+        <div class="sv-gauge-label" id="svGaugeLabel">OF 100 KM</div>
       </div>
     </div>
     <div class="sv-gauge-meta" id="svGaugeMeta">
@@ -1367,7 +1367,7 @@
       }
     })();
 
-    // ═══ HOOK: Weekly 150km gauge ═══
+    // ═══ HOOK: Weekly 100km gauge ═══
     if (typeof window._drawGauge === 'function') {
       var weekRun = thisWeek.filter(function(a){return a.type==='Run';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
       var weekRide = thisWeek.filter(function(a){return a.type==='Ride';}).reduce(function(s,a){return s+parseFloat(a.distance||0)/1000;},0);
@@ -1801,7 +1801,7 @@
 
   // Weekly gauge
   window._drawGauge = function(km, breakdown) {
-    var target = 150;
+    var target = 100;
     var canvas = document.getElementById('svGaugeCanvas');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
