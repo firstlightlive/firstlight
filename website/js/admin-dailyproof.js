@@ -361,6 +361,172 @@
     applyFX(ctx, T, W, H);
   }
 
+  // ══════════════════════════════════════════
+  // RENDER: RESTART ANNOUNCEMENT — DAY 0
+  // ══════════════════════════════════════════
+  function renderRestartStory(canvas, theme) {
+    var T = THEMES[theme] || THEMES.gold;
+    var W = 1080, H = 1920;
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = T.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    var halo = ctx.createRadialGradient(W / 2, 760, 0, W / 2, 760, 900);
+    halo.addColorStop(0, T.cardBg);
+    halo.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'center';
+
+    ctx.font = '700 30px ' + MONO;
+    ctx.fillStyle = T.accent;
+    ctx.fillText('◆  F I R S T   L I G H T', W / 2, 128);
+    ctx.font = '500 22px ' + MONO;
+    ctx.fillStyle = T.dim;
+    ctx.fillText('C H A P T E R   0 2  —  R E B U I L D', W / 2, 196);
+
+    ctx.font = '700 40px ' + MONO;
+    ctx.fillStyle = T.text;
+    ctx.fillText('I RAN 110 DAYS STRAIGHT.', W / 2, 348);
+    ctx.fillStyle = T.accent === T.text ? T.accent2 : T.accent;
+    ctx.fillText("THEN ONE MORNING, I DIDN'T.", W / 2, 418);
+
+    ctx.font = '500 24px ' + MONO;
+    ctx.fillStyle = T.dim;
+    ctx.fillText('THE COUNTER RESETS.', W / 2, 530);
+
+    ctx.font = '700 320px ' + MONO;
+    ctx.fillStyle = heroGradient(ctx, T, 570, 860);
+    ctx.fillText('0', W / 2, 850);
+
+    // Rules card
+    var cardX = 90, cardW = W - 180, cardY = 930, cardH = 260;
+    ctx.fillStyle = T.cardBg;
+    ctx.beginPath(); ctx.roundRect(cardX, cardY, cardW, cardH, 14); ctx.fill();
+    ctx.strokeStyle = T.cardBorder;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(cardX, cardY, cardW, cardH, 14); ctx.stroke();
+
+    var rows = [
+      ['THE RULE', '5 KM RUN · BEFORE 6 AM'],
+      ['THE STAKE', '₹15,000 / DAY'],
+      ['END DATE', 'NONE']
+    ];
+    var ry = cardY + 74;
+    rows.forEach(function(row) {
+      ctx.textAlign = 'left';
+      ctx.font = '500 26px ' + MONO;
+      ctx.fillStyle = T.dim;
+      ctx.fillText(row[0], cardX + 50, ry);
+      ctx.textAlign = 'right';
+      ctx.font = '700 30px ' + MONO;
+      ctx.fillStyle = T.text;
+      ctx.fillText(row[1], cardX + cardW - 50, ry);
+      ry += 74;
+    });
+
+    // Day 1 seal
+    ctx.textAlign = 'center';
+    var sealY = 1268, sealH = 184;
+    var sc = T.accent === '#FFFFFF' ? GREEN : T.accent;
+    ctx.save();
+    ctx.shadowColor = sc;
+    ctx.shadowBlur = 60;
+    ctx.fillStyle = T.cardBg;
+    ctx.beginPath(); ctx.roundRect(90, sealY, W - 180, sealH, 14); ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = sc;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.roundRect(90, sealY, W - 180, sealH, 14); ctx.stroke();
+
+    ctx.font = '700 48px ' + MONO;
+    ctx.fillStyle = sc;
+    ctx.fillText('DAY 1 — TOMORROW', W / 2, sealY + 82);
+    ctx.font = '500 25px ' + MONO;
+    ctx.fillStyle = T.dim;
+    ctx.fillText('12 JUN 2026 · 5 KM · BEFORE 6:00 AM', W / 2, sealY + 140);
+
+    ctx.font = '700 38px ' + MONO;
+    ctx.fillStyle = T.text;
+    ctx.fillText('WATCH ME REBUILD.', W / 2, 1570);
+
+    ctx.font = '500 22px ' + MONO;
+    ctx.fillStyle = T.dim;
+    ctx.fillText('CHAPTER 01 — 110 DAYS — PRESERVED FOREVER', W / 2, 1636);
+
+    var bw = 150, bh = 52, gap = 16, by = 1742;
+    ctx.fillStyle = '#0084c8';
+    ctx.beginPath(); ctx.roundRect(W / 2 - bw - gap / 2, by, bw, bh, 8); ctx.fill();
+    ctx.font = '700 22px ' + MONO;
+    ctx.fillStyle = '#fff';
+    ctx.fillText('GARMIN', W / 2 - gap / 2 - bw / 2, by + 34);
+    ctx.fillStyle = '#FC4C02';
+    ctx.beginPath(); ctx.roundRect(W / 2 + gap / 2, by, bw, bh, 8); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText('STRAVA', W / 2 + gap / 2 + bw / 2, by + 34);
+
+    ctx.font = '500 26px ' + MONO;
+    ctx.fillStyle = T.dim;
+    ctx.fillText('f i r s t l i g h t . l i v e', W / 2, 1858);
+
+    applyFX(ctx, T, W, H);
+  }
+
+  function renderRestartPost(canvas, theme) {
+    var T = THEMES[theme] || THEMES.gold;
+    var W = 1080, H = 1080;
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = T.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    var halo = ctx.createRadialGradient(W / 2, H / 2 - 60, 0, W / 2, H / 2 - 60, 700);
+    halo.addColorStop(0, T.cardBg);
+    halo.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'center';
+
+    ctx.font = '700 26px ' + MONO;
+    ctx.fillStyle = T.accent;
+    ctx.fillText('◆  F I R S T   L I G H T', W / 2, 122);
+
+    ctx.font = '500 24px ' + MONO;
+    ctx.fillStyle = T.dim;
+    ctx.fillText('110 DAYS. THEN ONE MORNING — NOTHING.', W / 2, 268);
+
+    ctx.font = '700 430px ' + MONO;
+    ctx.fillStyle = heroGradient(ctx, T, 320, 700);
+    ctx.fillText('0', W / 2, 690);
+
+    ctx.strokeStyle = T.accent;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(W / 2 - 50, 752); ctx.lineTo(W / 2 + 50, 752); ctx.stroke();
+
+    ctx.font = '700 46px ' + MONO;
+    ctx.fillStyle = T.text;
+    ctx.fillText('STARTING OVER', W / 2, 830);
+
+    ctx.font = '500 27px ' + MONO;
+    ctx.fillStyle = T.accent === T.text ? T.accent2 : T.accent;
+    ctx.fillText('5 KM BEFORE 6:00 AM · EVERY DAY', W / 2, 890);
+
+    ctx.font = '500 20px ' + MONO;
+    ctx.fillStyle = T.dim;
+    ctx.fillText('₹15,000/DAY AT STAKE · DAY 1 — 12 JUN 2026', W / 2, 948);
+
+    ctx.font = '500 24px ' + MONO;
+    ctx.fillStyle = T.dim;
+    ctx.fillText('f i r s t l i g h t . l i v e', W / 2, 1014);
+
+    applyFX(ctx, T, W, H);
+  }
+
   // ── Caption ──
   function generateCaption(s) {
     if (!s.made) {
@@ -380,6 +546,7 @@
     if (!panel || inited) return;
     inited = true;
 
+    var modeSelect = panel.querySelector('#dproofMode');
     var dateSelect = panel.querySelector('#dproofDate');
     var themeSelect = panel.querySelector('#dproofTheme');
     var generateBtn = panel.querySelector('#dproofGenerate');
@@ -397,11 +564,26 @@
 
     function renderBoth() {
       var theme = themeSelect.value;
+      if (currentStats && currentStats.restart) {
+        renderRestartStory(previewStory, theme);
+        renderRestartPost(previewPost, theme);
+        return;
+      }
       renderStory(previewStory, currentStats, theme);
       renderPost(previewPost, currentStats, theme);
     }
 
     generateBtn.addEventListener('click', function() {
+      if (modeSelect && modeSelect.value === 'restart') {
+        currentStats = { restart: true, day: 0 };
+        renderBoth();
+        captionEl.value = '0\n\n110 days. Then one morning, nothing.\nRestarting tomorrow — 5 km before 6 AM. Every day. ₹15,000/day at stake.\n\nfirstlight.live';
+        statusEl.textContent = 'Restart announcement rendered — Day 0. No Strava data needed.';
+        downloadPostBtn.style.display = '';
+        downloadStoryBtn.style.display = '';
+        copyCaptionBtn.style.display = '';
+        return;
+      }
       var d = new Date();
       if (dateSelect.value === '-1') d.setDate(d.getDate() - 1);
       var dateStr = dateStrLocal(d);
@@ -425,14 +607,14 @@
 
     downloadPostBtn.addEventListener('click', function() {
       var link = document.createElement('a');
-      link.download = 'daily-post-day' + currentStats.day + '.jpg';
+      link.download = (currentStats.restart ? 'restart-post' : 'daily-post-day' + currentStats.day) + '.jpg';
       link.href = previewPost.toDataURL('image/jpeg', 0.95);
       link.click();
     });
 
     downloadStoryBtn.addEventListener('click', function() {
       var link = document.createElement('a');
-      link.download = 'daily-story-day' + currentStats.day + '.jpg';
+      link.download = (currentStats.restart ? 'restart-story' : 'daily-story-day' + currentStats.day) + '.jpg';
       link.href = previewStory.toDataURL('image/jpeg', 0.95);
       link.click();
     });
@@ -535,7 +717,7 @@
     }
   }
 
-  window.FL_DAILYPROOF = { renderStory: renderStory, renderPost: renderPost, buildStats: buildStats };
+  window.FL_DAILYPROOF = { renderStory: renderStory, renderPost: renderPost, buildStats: buildStats, renderRestartStory: renderRestartStory, renderRestartPost: renderRestartPost };
 
   if (typeof window.switchPanel === 'function') {
     var _origSwitch = window.switchPanel;

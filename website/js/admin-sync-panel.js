@@ -270,7 +270,7 @@ async function _forceSleepSync() {
 
     if (!sleepHrs) {
       // Manual input fallback
-      var manual = prompt('No sleep data from Apple Watch.\nEnter sleep hours manually (e.g. 5.5):');
+      var manual = prompt('No sleep data from watch.\nEnter sleep hours manually (e.g. 5.5):');
       if (manual && parseFloat(manual) > 0) {
         sleepHrs = parseFloat(manual);
         log('Manual input: ' + sleepHrs + 'h');

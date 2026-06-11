@@ -1250,7 +1250,14 @@
           <div class="cc-panel-sub">Chapter 02 daily story + post — auto from Strava, one click</div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+          <div>
+            <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">MODE</label>
+            <select id="dproofMode" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)">
+              <option value="daily" selected>DAILY PROOF</option>
+              <option value="restart">RESTART — DAY 0</option>
+            </select>
+          </div>
           <div>
             <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">DATE</label>
             <select id="dproofDate" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)">
@@ -3363,7 +3370,7 @@
   <script src="js/admin-journal.js"></script>
   <script src="js/admin-content.js"></script>
   <script src="js/admin-recap.js?v=20260608r"></script>
-  <script src="js/admin-dailyproof.js?v=20260611a"></script>
+  <script src="js/admin-dailyproof.js?v=20260612a"></script>
   <script src="js/admin-weekly.js"></script>
   <script src="js/admin-analytics.js"></script>
   <script src="js/admin-races.js"></script>
