@@ -754,6 +754,7 @@
       <div class="cc-group" data-group="content">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 📸 CONTENT ENGINE</div>
         <div class="cc-group-items">
+          <div class="cc-item" data-panel="dailyproof"><span class="cc-icon">☀</span> Daily Proof</div>
           <div class="cc-item" data-panel="recap"><span class="cc-icon">📊</span> Weekly/Monthly Recap</div>
           <div class="cc-item" data-panel="generators"><span class="cc-icon">🎨</span> Generators</div>
           <div class="cc-item" data-panel="schedule"><span class="cc-icon">📅</span> Posting Schedule</div>
@@ -1243,6 +1244,85 @@
       <!-- ════════════════════════════════════════════════
            PANEL: WEEKLY/MONTHLY RECAP GENERATOR
            ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-dailyproof">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">DAILY PROOF</div>
+          <div class="cc-panel-sub">Chapter 02 daily story + post — auto from Strava, one click</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+          <div>
+            <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">DATE</label>
+            <select id="dproofDate" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)">
+              <option value="0" selected>TODAY</option>
+              <option value="-1">YESTERDAY</option>
+            </select>
+          </div>
+          <div>
+            <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">THEME</label>
+            <select id="dproofTheme" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)">
+              <option value="gold" selected>GOLD (Black & Gold)</option>
+              <option value="noir">NOIR (Black & White)</option>
+              <option value="heatmap">HEAT MAP (Orange)</option>
+              <option value="terminal">TERMINAL (Green)</option>
+              <option value="gradient">GRADIENT (Cyan/Purple)</option>
+              <option value="strava">STRAVA (Orange)</option>
+              <option value="arctic">ARCTIC (Ice Blue)</option>
+              <option value="infrared">INFRARED (Hot Red)</option>
+              <option value="neon">NEON (Pink/Cyan)</option>
+              <option value="earth">EARTH (Warm Brown)</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button id="dproofGenerate" style="width:100%;padding:10px 12px;background:linear-gradient(135deg,#F5A623,#D4861A);border:none;border-radius:8px;color:#0A0C10;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer;transition:opacity 0.2s">GENERATE</button>
+          </div>
+        </div>
+
+        <div id="dproofStatus" style="font:500 11px var(--font-mono);color:var(--text-muted);margin-bottom:16px;min-height:16px"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 0.56fr;gap:16px;margin-bottom:20px;align-items:start">
+          <div>
+            <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:8px">POST (1080x1080) — THE MONUMENT</div>
+            <canvas id="dproofPreviewPost" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#000"></canvas>
+          </div>
+          <div>
+            <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:8px">STORY (1080x1920) — THE RECEIPT</div>
+            <canvas id="dproofPreviewStory" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#000"></canvas>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:8px">CAPTION</div>
+          <textarea id="dproofCaption" style="width:100%;height:80px;padding:12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:400 12px var(--font-mono);resize:vertical" placeholder="Caption will appear here..."></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button id="dproofDownloadPost" style="display:none;padding:12px 20px;background:linear-gradient(135deg,#00E676,#00C853);border:none;border-radius:8px;color:#0A0C10;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer">DOWNLOAD POST</button>
+          <button id="dproofDownloadStory" style="display:none;padding:12px 20px;background:linear-gradient(135deg,#E040FB,#833AB4);border:none;border-radius:8px;color:#fff;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer">DOWNLOAD STORY</button>
+          <button id="dproofCopyCaption" style="display:none;padding:12px 20px;background:var(--bg2);border:1px solid rgba(0,212,255,0.2);border-radius:8px;color:var(--cyan);font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer">COPY CAPTION</button>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+          <button id="dproofPublishStory" style="padding:12px 20px;background:linear-gradient(135deg,#833AB4,#5B51D8);border:none;border-radius:8px;color:#fff;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer;transition:all 0.2s">PUBLISH STORY TO IG</button>
+          <button id="dproofPublishPost" style="padding:12px 20px;background:linear-gradient(135deg,#E1306C,#C13584);border:none;border-radius:8px;color:#fff;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer;transition:all 0.2s">PUBLISH POST TO IG</button>
+        </div>
+
+        <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04)">
+          <div style="font:600 9px var(--font-mono);color:var(--text-dim);letter-spacing:2px;margin-bottom:12px">THEME LIBRARY — click to select</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap" id="dproofThemeSwatches">
+            <div data-swatch="gold" style="width:48px;height:48px;background:#080808;border:2px solid #F5A623;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#F5A623;transition:all 0.2s" title="GOLD">GOLD</div>
+            <div data-swatch="noir" style="width:48px;height:48px;background:#000;border:2px solid #fff;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#fff;transition:all 0.2s" title="NOIR">NOIR</div>
+            <div data-swatch="heatmap" style="width:48px;height:48px;background:#0A0C10;border:2px solid #FC4C02;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#FC4C02;transition:all 0.2s" title="HEAT MAP">HEAT</div>
+            <div data-swatch="terminal" style="width:48px;height:48px;background:#0A0F0A;border:2px solid #00E676;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#00E676;transition:all 0.2s" title="TERMINAL">TERM</div>
+            <div data-swatch="gradient" style="width:48px;height:48px;background:#0A0C1A;border:2px solid #00D4FF;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#00D4FF;transition:all 0.2s" title="GRADIENT">GRAD</div>
+            <div data-swatch="strava" style="width:48px;height:48px;background:#000;border:2px solid #FC4C02;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#FC4C02;transition:all 0.2s" title="STRAVA">STRV</div>
+            <div data-swatch="arctic" style="width:48px;height:48px;background:#0A1628;border:2px solid #93C5FD;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#93C5FD;transition:all 0.2s" title="ARCTIC">ARCT</div>
+            <div data-swatch="infrared" style="width:48px;height:48px;background:#0A0000;border:2px solid #FF1744;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#FF1744;transition:all 0.2s" title="INFRARED">INFR</div>
+            <div data-swatch="neon" style="width:48px;height:48px;background:#0A0A14;border:2px solid #E040FB;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#E040FB;transition:all 0.2s" title="NEON">NEON</div>
+            <div data-swatch="earth" style="width:48px;height:48px;background:#1A1410;border:2px solid #8D6E63;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#8D6E63;transition:all 0.2s" title="EARTH">ERTH</div>
+          </div>
+        </div>
+      </div>
+
       <div class="cc-panel" id="p-recap">
         <div style="padding:24px 0 8px">
           <div class="cc-panel-title">WEEKLY / MONTHLY RECAP</div>
@@ -3283,6 +3363,7 @@
   <script src="js/admin-journal.js"></script>
   <script src="js/admin-content.js"></script>
   <script src="js/admin-recap.js?v=20260608r"></script>
+  <script src="js/admin-dailyproof.js?v=20260611a"></script>
   <script src="js/admin-weekly.js"></script>
   <script src="js/admin-analytics.js"></script>
   <script src="js/admin-races.js"></script>
