@@ -530,6 +530,135 @@
   }
 
   // ── Caption ──
+  // ══════════════════════════════════════════
+  // RENDER: THE COMEBACK (Chapter 2 Day 1) — real run stats, rebuild narrative
+  // ══════════════════════════════════════════
+  function renderComebackStory(canvas, s, theme) {
+    var T = THEMES[theme] || THEMES.gold;
+    var W = 1080, H = 1920;
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = T.bg; ctx.fillRect(0, 0, W, H);
+    var halo = ctx.createRadialGradient(W / 2, 640, 0, W / 2, 640, 900);
+    halo.addColorStop(0, T.cardBg); halo.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+
+    ctx.font = '700 26px ' + MONO; ctx.fillStyle = T.accent;
+    ctx.fillText('◆  F I R S T   L I G H T', W / 2, 122);
+    ctx.font = '500 22px ' + MONO; ctx.fillStyle = T.dim;
+    ctx.fillText('CHAPTER 02 — REBUILD', W / 2, 170);
+
+    ctx.font = '700 44px ' + MONO; ctx.fillStyle = T.text;
+    ctx.fillText('I RAN 110 DAYS STRAIGHT.', W / 2, 300);
+    ctx.fillStyle = T.accent === T.text ? T.accent2 : T.accent;
+    ctx.fillText('THIS MORNING — I CAME BACK.', W / 2, 364);
+
+    ctx.font = '700 24px ' + MONO; ctx.fillStyle = T.dim;
+    ctx.fillText('D A Y', W / 2, 520);
+    ctx.font = '700 360px ' + MONO;
+    ctx.fillStyle = heroGradient(ctx, T, 540, 880);
+    ctx.fillText(String(s.day), W / 2, 860);
+
+    var cardY = 950, cardH = 420;
+    ctx.save(); ctx.fillStyle = T.cardBg;
+    ctx.beginPath(); ctx.roundRect(90, cardY, W - 180, cardH, 14); ctx.fill(); ctx.restore();
+    ctx.strokeStyle = T.cardBorder; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(90, cardY, W - 180, cardH, 14); ctx.stroke();
+
+    function row(label, val, y) {
+      ctx.textAlign = 'left'; ctx.font = '500 24px ' + MONO; ctx.fillStyle = T.dim;
+      ctx.fillText(label, 140, y);
+      ctx.textAlign = 'right'; ctx.font = '700 28px ' + MONO; ctx.fillStyle = T.text;
+      ctx.fillText(val, W - 140, y);
+    }
+    row('STARTED', s.start ? fmtClock(s.start) : '—', cardY + 70);
+    row('ENDED', s.end ? fmtClock(s.end) : '—', cardY + 136);
+    row('DISTANCE', s.km ? s.km.toFixed(2) + ' KM' : '—', cardY + 202);
+    row('PACE', s.paceSec ? fmtDur(Math.round(s.paceSec)) + ' /KM' : '—', cardY + 268);
+    row('HEART RATE', s.hr ? s.hr + ' BPM' : '—', cardY + 334);
+    ctx.textAlign = 'center';
+
+    var sc = sealColorFor(s, T);
+    var sealY = 1430, sealH = 170;
+    ctx.save(); ctx.fillStyle = T.cardBg;
+    ctx.beginPath(); ctx.roundRect(90, sealY, W - 180, sealH, 14); ctx.fill(); ctx.restore();
+    ctx.strokeStyle = sc; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.roundRect(90, sealY, W - 180, sealH, 14); ctx.stroke();
+    ctx.font = '700 44px ' + MONO; ctx.fillStyle = sc;
+    ctx.fillText(s.made ? '✓ BEFORE 6:00 AM' : '✗ AFTER 6:00 AM — ₹15,000 PAID', W / 2, sealY + 78);
+    ctx.font = '500 24px ' + MONO; ctx.fillStyle = T.dim;
+    ctx.fillText(s.made ? fmtMargin(s.marginMin) + ' OF MARGIN · DEADLINE HELD' : 'THE STREAK CONTINUES — NO RESET', W / 2, sealY + 130);
+
+    ctx.font = '700 38px ' + MONO; ctx.fillStyle = T.text;
+    ctx.fillText('110 BEHIND ME. REBUILDING.', W / 2, 1690);
+
+    var bw = 150, bh = 52, gap = 16, by = 1756;
+    ctx.fillStyle = '#0084c8';
+    ctx.beginPath(); ctx.roundRect(W / 2 - bw - gap / 2, by, bw, bh, 8); ctx.fill();
+    ctx.font = '700 22px ' + MONO; ctx.fillStyle = '#fff';
+    ctx.fillText('GARMIN', W / 2 - gap / 2 - bw / 2, by + 34);
+    ctx.fillStyle = '#FC4C02';
+    ctx.beginPath(); ctx.roundRect(W / 2 + gap / 2, by, bw, bh, 8); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText('STRAVA', W / 2 + gap / 2 + bw / 2, by + 34);
+
+    ctx.font = '500 26px ' + MONO; ctx.fillStyle = T.dim;
+    ctx.fillText('f i r s t l i g h t . l i v e', W / 2, 1872);
+
+    applyFX(ctx, T, W, H);
+  }
+
+  function renderComebackPost(canvas, s, theme) {
+    var T = THEMES[theme] || THEMES.gold;
+    var W = 1080, H = 1080;
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = T.bg; ctx.fillRect(0, 0, W, H);
+    var halo = ctx.createRadialGradient(W / 2, H / 2 - 60, 0, W / 2, H / 2 - 60, 700);
+    halo.addColorStop(0, T.cardBg); halo.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+
+    ctx.font = '700 26px ' + MONO; ctx.fillStyle = T.accent;
+    ctx.fillText('◆  F I R S T   L I G H T', W / 2, 122);
+
+    ctx.font = '500 24px ' + MONO; ctx.fillStyle = T.dim;
+    ctx.fillText('YESTERDAY: 0. THIS MORNING:', W / 2, 268);
+
+    ctx.font = '700 430px ' + MONO;
+    ctx.fillStyle = heroGradient(ctx, T, 320, 700);
+    ctx.fillText(String(s.day), W / 2, 690);
+
+    ctx.strokeStyle = T.accent; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(W / 2 - 50, 752); ctx.lineTo(W / 2 + 50, 752); ctx.stroke();
+
+    ctx.font = '700 46px ' + MONO; ctx.fillStyle = T.text;
+    ctx.fillText('THE COMEBACK', W / 2, 830);
+
+    var sc = sealColorFor(s, T);
+    ctx.font = '500 27px ' + MONO; ctx.fillStyle = sc;
+    var statLine = (s.km ? s.km.toFixed(1) + ' KM' : '5 KM') + ' · ' + (s.end ? 'DONE ' + fmtClock(s.end) : 'BEFORE 6:00 AM');
+    ctx.fillText((s.made ? '✓ ' : '') + statLine, W / 2, 890);
+
+    ctx.font = '500 20px ' + MONO; ctx.fillStyle = T.dim;
+    var MABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    var dd = s.date ? (String(s.date.getDate()).padStart(2, '0') + ' ' + MABBR[s.date.getMonth()] + ' ' + s.date.getFullYear()) : '';
+    ctx.fillText('₹15,000 STAKED · STILL MINE · DAY ' + s.day + (dd ? ' — ' + dd : ''), W / 2, 948);
+
+    ctx.font = '500 24px ' + MONO; ctx.fillStyle = T.dim;
+    ctx.fillText('f i r s t l i g h t . l i v e', W / 2, 1014);
+
+    applyFX(ctx, T, W, H);
+  }
+
+  function comebackCaption(s) {
+    return '1\n\nYesterday I posted a zero.\nThis morning: ' + (s.km ? s.km.toFixed(1) : '5') + ' km, done ' +
+      (s.end ? fmtClock(s.end).toLowerCase() : 'before 6:00 am') + '.\n\nDay 1 of the rebuild.\n\nfirstlight.live';
+  }
+
   function generateCaption(s) {
     if (!s.made) {
       return 'Day ' + s.day + '. Missed. ₹15,000 paid.\nThe streak continues tomorrow.\n\nfirstlight.live';
@@ -571,6 +700,11 @@
         renderRestartPost(previewPost, theme);
         return;
       }
+      if (currentStats && currentStats.comeback) {
+        renderComebackStory(previewStory, currentStats, theme);
+        renderComebackPost(previewPost, currentStats, theme);
+        return;
+      }
       renderStory(previewStory, currentStats, theme);
       renderPost(previewPost, currentStats, theme);
     }
@@ -595,13 +729,14 @@
         if (err) { statusEl.textContent = 'Fetch failed: ' + err.message; return; }
         if (!activities.length) { statusEl.textContent = 'No activities found for ' + dateStr + ' — sync Strava first.'; return; }
         currentStats = buildStats(activities, dateStr);
+        if (currentStats && modeSelect && modeSelect.value === 'comeback') currentStats.comeback = true;
         fetch(SUPA + '/rest/v1/proof_archive?date=eq.' + dateStr + '&select=food_clean', { headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY } })
           .then(function(r) { return r.json(); })
           .then(function(rows) { currentStats.foodClean = (rows && rows[0]) ? rows[0].food_clean !== false : true; })
           .catch(function() { currentStats.foodClean = true; })
           .then(function() {
             renderBoth();
-            captionEl.value = generateCaption(currentStats);
+            captionEl.value = currentStats.comeback ? comebackCaption(currentStats) : generateCaption(currentStats);
             statusEl.textContent = 'Day ' + currentStats.day + ' · ' + currentStats.km.toFixed(1) + ' km · ' +
               (currentStats.made ? '✓ before 6 AM (' + fmtMargin(currentStats.marginMin) + ' margin)' : '✗ deadline missed — slip variant rendered') +
               (currentStats.foodClean === false ? ' · food code BROKEN' : ' · food ✓');
@@ -616,14 +751,14 @@
 
     downloadPostBtn.addEventListener('click', function() {
       var link = document.createElement('a');
-      link.download = (currentStats.restart ? 'restart-post' : 'daily-post-day' + currentStats.day) + '.jpg';
+      link.download = (currentStats.restart ? 'restart-post' : (currentStats.comeback ? 'comeback-post-day' + currentStats.day : 'daily-post-day' + currentStats.day)) + '.jpg';
       link.href = previewPost.toDataURL('image/jpeg', 0.95);
       link.click();
     });
 
     downloadStoryBtn.addEventListener('click', function() {
       var link = document.createElement('a');
-      link.download = (currentStats.restart ? 'restart-story' : 'daily-story-day' + currentStats.day) + '.jpg';
+      link.download = (currentStats.restart ? 'restart-story' : (currentStats.comeback ? 'comeback-story-day' + currentStats.day : 'daily-story-day' + currentStats.day)) + '.jpg';
       link.href = previewStory.toDataURL('image/jpeg', 0.95);
       link.click();
     });
@@ -726,7 +861,7 @@
     }
   }
 
-  window.FL_DAILYPROOF = { renderStory: renderStory, renderPost: renderPost, buildStats: buildStats, renderRestartStory: renderRestartStory, renderRestartPost: renderRestartPost };
+  window.FL_DAILYPROOF = { renderStory: renderStory, renderPost: renderPost, buildStats: buildStats, renderRestartStory: renderRestartStory, renderRestartPost: renderRestartPost, renderComebackStory: renderComebackStory, renderComebackPost: renderComebackPost };
 
   if (typeof window.switchPanel === 'function') {
     var _origSwitch = window.switchPanel;
