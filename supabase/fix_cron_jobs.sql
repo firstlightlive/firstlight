@@ -121,5 +121,60 @@ SELECT cron.schedule(
   $$
 );
 
+-- ══════════════════════════════════
+-- ADDED 2026-06-12 (eve of Chapter 2): dense deadline window
+-- Strava sync is mission-critical around the 6:00 AM IST deadline.
+-- Live morning cadence: 5:30 · 5:45 · 5:55 · 5:59 · 6:00 · 6:01 · 6:15 IST.
+-- Applied to the live DB via Supabase Management API on 2026-06-12.
+-- ══════════════════════════════════
+
+-- 5:30 AM IST = 00:00 UTC
+SELECT cron.schedule('sync-0530', '0 0 * * *', $$
+  SELECT net.http_get(
+    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer <SUPABASE_ANON_KEY>',
+      'X-Admin-Key', '<ADMIN_API_KEY>'
+    )
+  );
+  $$
+);
+
+-- 5:45 AM IST = 00:15 UTC
+SELECT cron.schedule('sync-0545', '15 0 * * *', $$
+  SELECT net.http_get(
+    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer <SUPABASE_ANON_KEY>',
+      'X-Admin-Key', '<ADMIN_API_KEY>'
+    )
+  );
+  $$
+);
+
+-- 6:00 AM IST = 00:30 UTC
+SELECT cron.schedule('sync-0600', '30 0 * * *', $$
+  SELECT net.http_get(
+    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer <SUPABASE_ANON_KEY>',
+      'X-Admin-Key', '<ADMIN_API_KEY>'
+    )
+  );
+  $$
+);
+
+-- 6:01 AM IST = 00:31 UTC (deadline-edge capture)
+SELECT cron.schedule('sync-0601', '31 0 * * *', $$
+  SELECT net.http_get(
+    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer <SUPABASE_ANON_KEY>',
+      'X-Admin-Key', '<ADMIN_API_KEY>'
+    )
+  );
+  $$
+);
+
 -- Verify new jobs
 SELECT jobid, jobname, schedule FROM cron.job ORDER BY jobid;
