@@ -223,12 +223,12 @@ const SB_KEY=FL.SUPABASE_ANON_KEY;
 // ── IST TIME ──
 function getNowIST(){const n=new Date();return new Date(n.getTime()+(n.getTimezoneOffset()*60000)+(5.5*3600000));}
 
-// ── DAY NUMBER ──
+// ── DAY NUMBER ── (IST-anchored; Day 0 before chapter start, then 1, 2, 3… automatically)
 function getDayNum(){
   const s=new Date(STREAK_START+'T00:00:00+05:30');
   const ist=getNowIST();
   const t=new Date(ist.getFullYear(),ist.getMonth(),ist.getDate());
-  return Math.max(1,Math.floor((t-s)/86400000)+1);
+  return Math.max(0,Math.floor((t-s)/86400000)+1);
 }
 
 // ── STAKE ──
@@ -291,15 +291,31 @@ function ensureStreakLog(){
 }
 ensureStreakLog();
 
-function initDash(){
+// Day/date/stake refresher — re-runs every 30s so the dashboard rolls past midnight
+// and keeps counting (Day 1 → 2 → 3…) with zero redeploys.
+function refreshDayBits(){
   const day=getDayNum();
   const ist=getNowIST();
   const M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const D=['SUN','MON','TUE','WED','THU','FRI','SAT'];
-
   document.getElementById('dashDay').textContent=day;
   document.getElementById('dashDate').textContent=D[ist.getDay()]+' · '+ist.getDate()+' '+M[ist.getMonth()]+' '+ist.getFullYear();
-  document.getElementById('dashStake').textContent='₹'+fmtINR(getTotalRisk(day))+' UNCLAIMED · ₹'+fmtINR(getStake(day))+'/DAY';
+  if(day===0){
+    const sd=new Date(STREAK_START+'T00:00:00+05:30');
+    document.getElementById('dashStake').textContent='₹'+fmtINR(getStake(1))+'/DAY · DAY 1 BEGINS '+sd.getDate()+' '+M[sd.getMonth()];
+  }else{
+    document.getElementById('dashStake').textContent='₹'+fmtINR(getTotalRisk(day))+' UNCLAIMED · ₹'+fmtINR(getStake(day))+'/DAY';
+  }
+  return {day:day,ist:ist};
+}
+
+function initDash(){
+  const r=refreshDayBits();
+  const day=r.day;
+  const ist=r.ist;
+  const M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const D=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  setInterval(refreshDayBits,30000);
 
   // 7-day streak
   const log=JSON.parse(localStorage.getItem('fl_log')||'{}');
