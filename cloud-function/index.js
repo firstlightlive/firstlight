@@ -3,9 +3,13 @@ const { Storage } = require('@google-cloud/storage');
 const https = require('https');
 
 // ═══════════════════════════════════════════
-// FIRSTLIGHT — Cloud Sync Function
-// Runs on Cloud Scheduler: 5:55 AM, 6:15 AM, 9 AM, 7 PM, 2 AM IST
-// Zero Mac dependency. Runs forever in Google Cloud.
+// DEPRECATED 2026-06-12 — Migrated to Supabase Edge Function.
+// Live source: supabase/functions/firstlight-sync/index.ts
+// Schedule: pg_cron jobs in supabase/fix_cron_jobs.sql (NOT Google Cloud Scheduler).
+// This file is kept only as a reference for the prior GCP shape.
+// Do NOT edit here — edit the Supabase Edge Function instead.
+// ═══════════════════════════════════════════
+// (Below is the original GCP Cloud Sync Function code, pre-migration.)
 // ═══════════════════════════════════════════
 
 // Config — loaded from environment variables
@@ -19,6 +23,19 @@ const IG_ACCOUNT_ID = process.env.IG_ACCOUNT_ID || '17841466893616231';
 const GCS_BUCKET = 'firstlightlive';
 
 const storage = new Storage();
+
+// ── Chapter-aware day numbering ──
+// Chapter 1: 2026-02-10 → 2026-06-08 (Day 1..110, CLOSED). Gap days Jun 9-12 → 0.
+// Chapter 2: 2026-06-13 onward (Day 1..). Shift here when starting a new chapter.
+const CHAPTER_1_START = new Date('2026-02-10T00:00:00+05:30');
+const CHAPTER_1_END = new Date('2026-06-09T00:00:00+05:30'); // exclusive: Day 110 = Jun 8
+const CHAPTER_2_START = new Date('2026-06-13T00:00:00+05:30');
+function chapterDay(date) {
+  const d = (date instanceof Date) ? date : new Date(date);
+  if (d >= CHAPTER_2_START) return Math.floor((d - CHAPTER_2_START) / 86400000) + 1;
+  if (d >= CHAPTER_1_START && d < CHAPTER_1_END) return Math.floor((d - CHAPTER_1_START) / 86400000) + 1;
+  return 0;
+}
 
 // ── HTTP helpers ──
 function httpGet(url, headers) {
@@ -129,6 +146,35 @@ async function getToken(name) {
   }
 }
 
+// ── Alerting via Resend ──
+const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
+const ALERT_TO = process.env.ALERT_TO || 'firstlightlive@gmail.com';
+const ALERT_FROM = process.env.ALERT_FROM || 'onboarding@resend.dev';
+async function sendAlert(subject, body) {
+  if (!RESEND_API_KEY) return;
+  try {
+    const data = JSON.stringify({
+      from: ALERT_FROM,
+      to: [ALERT_TO],
+      subject: '[FIRSTLIGHT] ' + subject,
+      text: body
+    });
+    await new Promise((resolve) => {
+      const req = https.request({
+        hostname: 'api.resend.com', path: '/emails', method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + RESEND_API_KEY,
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(data)
+        }
+      }, (res) => { res.on('data', () => {}); res.on('end', () => resolve()); });
+      req.on('error', () => resolve());
+      req.setTimeout(8000, () => { try { req.destroy(); } catch (e) {} resolve(); });
+      req.write(data); req.end();
+    });
+  } catch (e) {}
+}
+
 async function saveToken(name, value) {
   try {
     const secretName = SECRET_MAP[name];
@@ -165,7 +211,11 @@ async function syncStrava(log) {
     grant_type: 'refresh_token'
   });
 
-  if (!tokenResp.access_token) { log.push('Strava: token refresh failed'); return; }
+  if (!tokenResp.access_token) {
+    log.push('Strava: token refresh failed');
+    await sendAlert('Strava token refresh FAILED', 'Strava OAuth refresh returned no access_token. Today\'s run will NOT sync. Re-authorize at https://www.strava.com/settings/apps and update the refresh token in Secret Manager (fl-strava-refresh). Response: ' + JSON.stringify(tokenResp).slice(0, 500));
+    return;
+  }
 
   await saveToken('strava_access', tokenResp.access_token);
   await saveToken('strava_refresh', tokenResp.refresh_token);
@@ -268,7 +318,10 @@ async function syncInstagram(log) {
         if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
       }
     }
-    if (!refreshed) log.push('⚠ Instagram: ALL 3 REFRESH ATTEMPTS FAILED — token has ' + daysLeft + ' days left');
+    if (!refreshed) {
+      log.push('⚠ Instagram: ALL 3 REFRESH ATTEMPTS FAILED — token has ' + daysLeft + ' days left');
+      await sendAlert('IG token refresh FAILED (3 attempts)', 'Instagram long-lived token has ' + daysLeft + ' days remaining and all 3 refresh attempts failed. If days_left reaches 0, IG sync + daily proof publish dies. Regenerate manually at https://developers.facebook.com/tools/explorer/ and update fl-ig-access in Secret Manager.');
+    }
   }
 
   // Pull latest 10 posts
@@ -278,12 +331,14 @@ async function syncInstagram(log) {
 
   if (!posts?.data?.length) { log.push('Instagram: no posts'); return; }
 
-  const streakStart = new Date('2026-02-10');
   let synced = 0;
+  let skipped = 0;
 
   for (const p of posts.data) {
     const postDate = new Date(p.timestamp);
-    const dayNum = Math.floor((postDate - streakStart) / 86400000) + 1;
+    const dayNum = chapterDay(postDate);
+    // Skip gap-day posts (Jun 9-12) so they don't overwrite existing day_numbers
+    if (dayNum < 1) { skipped++; continue; }
 
     const row = {
       id: p.id, ig_id: p.id,
@@ -351,8 +406,7 @@ async function syncProofArchive(log) {
   if (!stravaToken) return;
 
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-  const streakStart = new Date('2026-02-10');
-  const dayNum = Math.floor((new Date(today) - streakStart) / 86400000) + 1;
+  const dayNum = chapterDay(today + 'T00:00:00+05:30');
 
   // Get today's run from Strava
   const yesterday = Math.floor(Date.now() / 1000) - 86400;
@@ -476,6 +530,9 @@ async function dailyBackup(log) {
   });
 
   log.push(`Backup: ${tables.length} tables, ${totalRows} rows → GCS`);
+  if (totalRows === 0) {
+    await sendAlert('Backup wrote 0 rows', 'dailyBackup() completed but every source table returned empty or errored. Check Supabase availability + RLS on tables: ' + tables.join(', '));
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -1079,9 +1136,8 @@ functions.http('sync', async (req, res) => {
             // 2. proof_archive — homepage reads this FIRST (sleep_hrs column)
             // Only send sleep_hrs (never null for other cols) — safe with merge-duplicates
             var proofRow = { date, sleep_hrs: row.sleep_hours };
-            // Ensure day_number is set if this creates a new row
-            var streakStart = new Date('2026-02-10');
-            var dn = Math.floor((new Date(date) - streakStart) / 86400000) + 1;
+            // Ensure day_number is set if this creates a new row (chapter-aware)
+            var dn = chapterDay(date + 'T00:00:00+05:30');
             if (dn > 0) proofRow.day_number = dn;
             await supaUpsert('proof_archive', proofRow, '?on_conflict=date');
 

@@ -28,12 +28,12 @@ CREATE TRIGGER tr_secrets_updated BEFORE UPDATE ON secrets
 -- INSERT INTO secrets (key, value) VALUES
 --   ('strava_refresh', '<your-strava-refresh-token>'),
 --   ('strava_access', '<your-strava-access-token>'),
---   ('strava_client_id', '226450'),
---   ('strava_client_secret', '7c170155ea6d2bdb53deb382173ada49a036860e'),
+--   ('strava_client_id', '<your-strava-client-id>'),
+--   ('strava_client_secret', '<your-strava-client-secret>'),
 --   ('ig_access', '<your-ig-long-lived-token>'),
 --   ('ig_app_id', '<your-ig-app-id>'),
 --   ('ig_app_secret', '<your-ig-app-secret>'),
---   ('admin_api_key', 'b8464678b573c885c449958a9ea760c08b01279d01d3a1f996fc92b7364f10b7'),
---   ('health_webhook_secret', '462d7df4b0326c4fbad064fe7fe278b1d89185da41345bf6')
+--   ('admin_api_key', '<your-admin-api-key>'),
+--   ('health_webhook_secret', '<your-health-webhook-secret>')
 -- ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 -- ═══════════════════════════════════════════════════════

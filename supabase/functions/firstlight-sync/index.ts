@@ -11,6 +11,34 @@ const SUPA_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 const SUPA_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') || ''
 const IG_ACCOUNT_ID = '17841466893616231'
 
+// ── Chapter-aware day numbering ──
+// Chapter 1: 2026-02-10 → 2026-06-08 (Day 1..110, CLOSED). Gap days Jun 9-12 → 0.
+// Chapter 2: 2026-06-13 onward (Day 1..). Shift CHAPTER_2_START here when starting a new chapter.
+const CHAPTER_1_START = new Date('2026-02-10T00:00:00+05:30')
+const CHAPTER_1_END = new Date('2026-06-09T00:00:00+05:30') // exclusive — Day 110 = Jun 8
+const CHAPTER_2_START = new Date('2026-06-13T00:00:00+05:30')
+function chapterDay(date: Date | string): number {
+  const d = (date instanceof Date) ? date : new Date(date)
+  if (d.getTime() >= CHAPTER_2_START.getTime()) return Math.floor((d.getTime() - CHAPTER_2_START.getTime()) / 86400000) + 1
+  if (d.getTime() >= CHAPTER_1_START.getTime() && d.getTime() < CHAPTER_1_END.getTime()) return Math.floor((d.getTime() - CHAPTER_1_START.getTime()) / 86400000) + 1
+  return 0
+}
+
+// ── Alerting via Resend (set RESEND_API_KEY in Edge Function secrets) ──
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
+const ALERT_TO = Deno.env.get('ALERT_TO') || 'firstlightlive@gmail.com'
+const ALERT_FROM = Deno.env.get('ALERT_FROM') || 'onboarding@resend.dev'
+async function sendAlert(subject: string, body: string) {
+  if (!RESEND_API_KEY) return
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: ALERT_FROM, to: [ALERT_TO], subject: '[FIRSTLIGHT] ' + subject, text: body })
+    })
+  } catch (_e) { /* silent — alerting must never break sync */ }
+}
+
 // Supabase client with service_role (for secrets table)
 const supaAdmin = createClient(SUPA_URL, SUPA_SERVICE_KEY)
 // Supabase client with anon key (for public tables)
@@ -60,7 +88,11 @@ async function syncStrava(log: string[]) {
     body: `client_id=${clientId}&client_secret=${clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`
   }).then(r => r.json())
 
-  if (!tokenResp.access_token) { log.push('Strava: token refresh failed'); return }
+  if (!tokenResp.access_token) {
+    log.push('Strava: token refresh failed')
+    await sendAlert('Strava token refresh FAILED', 'Strava OAuth refresh returned no access_token. Today\'s run will NOT sync to proof_archive. Re-authorize at https://www.strava.com/settings/apps and update strava_refresh in the secrets table. Response: ' + JSON.stringify(tokenResp).slice(0, 500))
+    return
+  }
 
   await setSecret('strava_access', tokenResp.access_token)
   await setSecret('strava_refresh', tokenResp.refresh_token)
@@ -145,7 +177,10 @@ async function syncInstagram(log: string[]) {
           await setSecret('ig_access', igToken)
           log.push('Instagram: ✅ token refreshed')
         }
-      } catch (e) { log.push(`Instagram: ⚠ refresh failed: ${(e as Error).message}`) }
+      } catch (e) {
+        log.push(`Instagram: ⚠ refresh failed: ${(e as Error).message}`)
+        await sendAlert('IG token refresh FAILED', `Instagram long-lived token has ${daysLeft} days remaining and refresh threw: ${(e as Error).message}. If days_left reaches 0, IG sync + daily proof publish dies. Regenerate manually at https://developers.facebook.com/tools/explorer/ and update ig_access in the secrets table.`)
+      }
     }
   }
 
@@ -156,7 +191,6 @@ async function syncInstagram(log: string[]) {
 
   if (!posts?.data?.length) { log.push('Instagram: no posts'); return }
 
-  const streakStart = new Date('2026-02-10')
   let synced = 0, skipped = 0
 
   // Pre-load already-synced dates to prevent duplicate posts per day
@@ -171,7 +205,10 @@ async function syncInstagram(log: string[]) {
   for (const p of posts.data) {
     const postDate = new Date(p.timestamp)
     const dateStr = postDate.toISOString().split('T')[0]
-    const dayNum = Math.floor((postDate.getTime() - streakStart.getTime()) / 86400000) + 1
+    const dayNum = chapterDay(postDate)
+
+    // Skip gap-day posts (Jun 9-12, between chapters) so we don't pollute existing rows
+    if (dayNum < 1) { skipped++; continue }
 
     // Skip if a different post for this date already exists in DB (dedup by date)
     if (syncedDates.has(dateStr) && !syncedIds.has(String(p.id))) {
@@ -254,8 +291,6 @@ async function syncProofArchive(log: string[]) {
   const stravaToken = await getSecret('strava_access')
   if (!stravaToken) return
 
-  const streakStart = new Date('2026-02-10')
-
   // Build list of dates to sync: today + last 2 days (backfill missed days)
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
   const datesToSync: string[] = []
@@ -263,21 +298,23 @@ async function syncProofArchive(log: string[]) {
     const d = new Date(today + 'T12:00:00Z')
     d.setUTCDate(d.getUTCDate() - i)
     const ds = d.toISOString().substring(0, 10)
-    // Only include dates on or after streak start
+    // Only include dates on or after Chapter 1 start
     if (ds >= '2026-02-10') datesToSync.push(ds)
   }
 
   for (const targetDate of datesToSync) {
     try {
-      await syncProofForDate(targetDate, streakStart, log)
+      await syncProofForDate(targetDate, log)
     } catch (e) {
       log.push(`Proof: ${targetDate} error — ${(e as Error).message}`)
     }
   }
 }
 
-async function syncProofForDate(targetDate: string, streakStart: Date, log: string[]) {
-  const dayNum = Math.floor((new Date(targetDate).getTime() - streakStart.getTime()) / 86400000) + 1
+async function syncProofForDate(targetDate: string, log: string[]) {
+  const dayNum = chapterDay(targetDate + 'T00:00:00+05:30')
+  // Skip gap days (Jun 9-12) — between chapters, nothing to file under
+  if (dayNum < 1) return
 
   // Get activities for this date from Supabase (already synced by syncStrava)
   const { data: dayActivities } = await supaAdmin.from('strava_activities')
@@ -595,8 +632,7 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
       if (finalSleepHours > 0) {
         await supaUpsert('sleep_log', { date, sleep_hours: finalSleepHours, bedtime: row.bedtime || null, wake_time: row.wake_time || null, source: 'health_auto_export' }, 'date')
 
-        const streakStart = new Date('2026-02-10')
-        const dn = Math.floor((new Date(date).getTime() - streakStart.getTime()) / 86400000) + 1
+        const dn = chapterDay(date + 'T00:00:00+05:30')
         const proofRow: Record<string, unknown> = { date, sleep_hrs: finalSleepHours }
         if (dn > 0) proofRow.day_number = dn
         await supaUpsert('proof_archive', proofRow, 'date')

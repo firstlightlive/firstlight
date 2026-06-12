@@ -215,7 +215,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
 <script src="../js/config.js"></script>
 <script>
 // ── CONFIG ──
-const STREAK_START='2026-06-12';
+const STREAK_START='2026-06-13';
 const STAKE_SCHEDULE=[[Infinity,15000]];
 const SB_URL=FL.SUPABASE_URL;
 const SB_KEY=FL.SUPABASE_ANON_KEY;
@@ -278,7 +278,7 @@ function syncSleepNow(){
 // (mirrors initStreakLog in index.html so dots are green without visiting story generator)
 function ensureStreakLog(){
   try{
-    const origin=new Date(2026,5,12);origin.setHours(0,0,0,0);
+    const origin=new Date(2026,5,13);origin.setHours(0,0,0,0);
     const today=new Date();today.setHours(0,0,0,0);
     const log=JSON.parse(localStorage.getItem('fl_log')||'{}');
     let changed=false;

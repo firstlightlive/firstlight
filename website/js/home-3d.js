@@ -58,7 +58,7 @@
 
   function getDayNum() {
     if (typeof getDayNumber === 'function') return getDayNumber();
-    var start = new Date('2026-06-12T00:00:00+05:30');
+    var start = new Date('2026-06-13T00:00:00+05:30');
     var now = new Date();
     var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     var ist = new Date(utc + (5.5 * 3600000));
@@ -76,7 +76,7 @@
     if (footDay) footDay.textContent = day;
     var streakDays = document.getElementById('streakDays');
     if (streakDays) animateCounter(streakDays, day);
-    // Total at risk (₹5,000 per day)
+    // Total at risk (₹15,000 per day)
     var totalRisk = document.getElementById('totalRisk');
     if (totalRisk) {
       var amt = getCumulativeUnclaimedHome(day);

@@ -10,7 +10,7 @@
   var KEY = (window.FL && FL.SUPABASE_ANON_KEY) || localStorage.getItem('fl_supabase_key') || '';
 
   var CHAPTER1_DAYS = 110;
-  var STREAK_START = (window.FL && FL.STREAK_START) || '2026-06-12';
+  var STREAK_START = (window.FL && FL.STREAK_START) || '2026-06-13';
 
   var THEMES = {
     noir:     { name: 'NOIR',     bg: '#000000', text: '#FFFFFF', dim: '#5A6B80', accent: '#FFFFFF', accent2: '#888888', cardBg: 'rgba(255,255,255,0.04)', cardBorder: 'rgba(255,255,255,0.1)',  grain: true,  scanlines: false },
@@ -449,7 +449,7 @@
     ctx.fillText('DAY 1 — TOMORROW', W / 2, sealY + 82);
     ctx.font = '500 25px ' + MONO;
     ctx.fillStyle = T.dim;
-    ctx.fillText('12 JUN 2026 · 5 KM · BEFORE 6:00 AM', W / 2, sealY + 140);
+    ctx.fillText('13 JUN 2026 · 5 KM · BEFORE 6:00 AM', W / 2, sealY + 140);
 
     ctx.font = '700 38px ' + MONO;
     ctx.fillStyle = T.text;
@@ -520,7 +520,7 @@
 
     ctx.font = '500 20px ' + MONO;
     ctx.fillStyle = T.dim;
-    ctx.fillText('₹15,000/DAY AT STAKE · DAY 1 — 12 JUN 2026', W / 2, 948);
+    ctx.fillText('₹15,000/DAY AT STAKE · DAY 1 — 13 JUN 2026', W / 2, 948);
 
     ctx.font = '500 24px ' + MONO;
     ctx.fillStyle = T.dim;

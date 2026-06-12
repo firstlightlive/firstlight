@@ -41,7 +41,7 @@ function initTheme() {
 
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
-  STREAK_START: '2026-06-12',
+  STREAK_START: '2026-06-13',
   STAKE_PER_DAY: 5000,
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',

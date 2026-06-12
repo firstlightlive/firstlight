@@ -30,7 +30,7 @@ window.FL_BREAK = {
 window.FL_CURRENT_CHAPTER = {
   id: 2,
   name: 'REBUILD',
-  start: '2026-06-12',
+  start: '2026-06-13',
   rule: '5KM RUN BEFORE 6:00 AM LOCAL',
   stakePerDay: 15000,
   escalations: 'NO BREAK CLAUSE',

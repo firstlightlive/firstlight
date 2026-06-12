@@ -296,7 +296,7 @@
   }
 
   function getDayNumber(forDate) {
-    var startDate = new Date('2026-06-12T12:00:00');
+    var startDate = new Date('2026-06-13T12:00:00');
     var d = forDate ? new Date(forDate) : new Date();
     d.setHours(12, 0, 0, 0);
     return Math.floor((d - startDate) / 86400000) + 1;

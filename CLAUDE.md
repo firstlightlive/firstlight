@@ -41,16 +41,16 @@
 - Deploy: firebase deploy --only hosting --project firstlightlive-5012b
 
 ### Deployment
-- Firebase Hosting: firstlightlive-5012b.web.app
+- Hosting: Cloudflare Workers (`cd website && npx wrangler deploy --name firstlight`) — auth as firstlightlive@gmail.com
 - Custom domain: firstlight.live
-- Cloud Function: asia-south1/firstlight-sync (project-f050b6ba-60db-4eee-98a)
-- Cloud Scheduler: 5 jobs (5:55 AM, 6:15 AM, 9 AM, 7 PM, 2 AM IST)
-- GCS Bucket: gs://firstlightlive
+- Backend sync: Supabase Edge Function `firstlight-sync` at supabase/functions/firstlight-sync/index.ts. Deploy: `SUPABASE_ACCESS_TOKEN=sbp_... supabase functions deploy firstlight-sync --project-ref edgnudrbysybefbqyijq`
+- Scheduler: pg_cron jobs inside Supabase (see supabase/fix_cron_jobs.sql) — NOT Google Cloud Scheduler
 - Supabase: edgnudrbysybefbqyijq.supabase.co
+- DEPRECATED: cloud-function/ (GCP Cloud Function, retired Apr 2026) and Firebase Hosting
 
 ### Security Rules
 - Never put API secrets in HTML or JS files
-- Secrets stored in: scripts/.env (local) + Cloud Function env vars + Secret Manager (tokens)
+- Secrets stored in: scripts/.env (local, gitignored) + Supabase Edge Function secrets (RESEND_API_KEY etc) + Supabase secrets table (strava_*, ig_*, admin_api_key, health_webhook_secret)
 - Private tables (brahma, journal, checkin, mastery, rituals) require authenticated role
 - Public tables (instagram_posts, strava_activities, proof_archive, slips, comments) allow anon SELECT
 - Slips are immutable — no delete, no core field update

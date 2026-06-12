@@ -2,19 +2,19 @@
 // FIRST LIGHT — RITUALS
 // ═══════════════════════════════════════════
 
-var RITUAL_VERSION = '2026-05-30-v4'; // bump to auto-reset stored defs on next load
+var RITUAL_VERSION = '2026-06-12-v5'; // bump to auto-reset stored defs on next load
 
 var RITUAL_DEFAULTS = {
   morning: [
-    // WAKE — ORAL CARE (4:00-4:10)
-    { id: 'm_alarm', block: 'WAKE \u2014 ORAL CARE (4:00-4:10)', blockId: 'mblk0', time: '4:00', title: 'Alarm \u2014 Wake immediately', desc: 'Zero negotiation. The alarm is a command, not a suggestion. Feet on cold floor activates cortisol awakening response. No snooze. Ever. 4:00 AM is decided at 8:30 PM the night before.', cat: 'BIOHACK' },
-    { id: 'm_tongue_scraper', block: 'WAKE \u2014 ORAL CARE (4:00-4:10)', blockId: 'mblk0', time: '4:01', title: 'Tongue scraper (copper)', desc: 'Removes Ama (toxins). 30 seconds. Before any water or food enters the mouth. Ayurvedic morning detox.', cat: 'AYUR' },
-    { id: 'm_oil_pull', block: 'WAKE \u2014 ORAL CARE (4:00-4:10)', blockId: 'mblk0', time: '4:02', title: 'Oil pull (coconut oil)', desc: 'Start swishing immediately before any water. Standing in bathroom. Mouth completely dry. Pulls bacteria, whitens teeth, strengthens gums. 3-4 min.', cat: 'AYUR' },
-    { id: 'm_cold_dive', block: 'WAKE \u2014 ORAL CARE (4:00-4:10)', blockId: 'mblk0', time: '4:03', title: 'Cold water dive reflex', desc: 'While still swishing oil. Vagus nerve activated. Full wakefulness. Resets nervous system. BIOHACK.', cat: 'BIOHACK' },
-    { id: 'm_spit_oil', block: 'WAKE \u2014 ORAL CARE (4:00-4:10)', blockId: 'mblk0', time: '4:05', title: 'Spit oil pull + rinse', desc: 'Spit into trash, not sink. Rinse mouth with warm water. Oil pulling complete \u2014 bacteria removed, gums strengthened.', cat: 'AYUR' },
-    { id: 'm_brush', block: 'WAKE \u2014 ORAL CARE (4:00-4:10)', blockId: 'mblk0', time: '4:06', title: 'Brush teeth', desc: 'After oil pull, not before. Brush thoroughly. Clean slate before fenugreek water enters the system.', cat: 'AYUR' },
-    { id: 'm_fenugreek', block: 'WAKE \u2014 ORAL CARE (4:00-4:10)', blockId: 'mblk0', time: '4:07', title: 'Fenugreek water (soaked overnight)', desc: 'Soak 1 tsp methi overnight in copper vessel. Copper ionises water, kills bacteria, thyroid support. Total 250ml.', cat: 'AYUR' },
-    { id: 'm_chyawanprash', block: 'WAKE \u2014 ORAL CARE (4:00-4:10)', blockId: 'mblk0', time: '4:08', title: 'Chyawanprash (1 tsp)', desc: '2-3 min after fenugreek. Empty stomach. Amla Vit C absorbed by 4:27 AM when collagen arrives \u2014 direct co-factor for synthesis. Immunity. Ojas.', cat: 'AYUR' },
+    // WAKE — ORAL CARE (3:30-3:40)
+    { id: 'm_alarm', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:30', title: 'Alarm \u2014 Wake immediately', desc: 'Zero negotiation. The alarm is a command, not a suggestion. Feet on cold floor activates cortisol awakening response. No snooze. Ever. 3:30 AM is decided at 9:30 PM the night before.', cat: 'BIOHACK' },
+    { id: 'm_tongue_scraper', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:31', title: 'Tongue scraper (copper)', desc: 'Removes Ama (toxins). 30 seconds. Before any water or food enters the mouth. Ayurvedic morning detox.', cat: 'AYUR' },
+    { id: 'm_oil_pull', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:32', title: 'Oil pull (coconut oil)', desc: 'Start swishing immediately before any water. Standing in bathroom. Mouth completely dry. Pulls bacteria, whitens teeth, strengthens gums. 3-4 min.', cat: 'AYUR' },
+    { id: 'm_cold_dive', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:33', title: 'Cold water dive reflex', desc: 'While still swishing oil. Vagus nerve activated. Full wakefulness. Resets nervous system. BIOHACK.', cat: 'BIOHACK' },
+    { id: 'm_spit_oil', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:35', title: 'Spit oil pull + rinse', desc: 'Spit into trash, not sink. Rinse mouth with warm water. Oil pulling complete \u2014 bacteria removed, gums strengthened.', cat: 'AYUR' },
+    { id: 'm_brush', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:36', title: 'Brush teeth', desc: 'After oil pull, not before. Brush thoroughly. Clean slate before fenugreek water enters the system.', cat: 'AYUR' },
+    { id: 'm_fenugreek', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:37', title: 'Fenugreek water (soaked overnight)', desc: 'Soak 1 tsp methi overnight in copper vessel. Copper ionises water, kills bacteria, thyroid support. Total 250ml.', cat: 'AYUR' },
+    { id: 'm_chyawanprash', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:38', title: 'Chyawanprash (1 tsp)', desc: '2-3 min after fenugreek. Empty stomach. Amla Vit C absorbed by 4:27 AM when collagen arrives \u2014 direct co-factor for synthesis. Immunity. Ojas.', cat: 'AYUR' },
     // BRAHMA MUHURTA (4:10-4:28) — compressed for 4 AM schedule
     { id: 'm_marma', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:10', title: 'Marma point self-massage', desc: 'Vagbhata. Ajna 30s, Hridaya 30s, Nabhi 30s clockwise. 2 min. Full body energy activated. Pressure points.', cat: 'AYUR' },
     { id: 'm_pranayama', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:12', title: 'Pranayama (Nadi Shodhana)', desc: 'Nadi Shodhana or Kapalabhati. Open air rooftop. Phone away. 5 min compressed. SACRED.', cat: 'SACRED' },
@@ -49,7 +49,7 @@ var RITUAL_DEFAULTS = {
     { id: 'e_sprout_mix', block: 'EVENING \u2014 7 PM SHUTDOWN', blockId: 'eblk0', time: '7:05', title: 'Sprout mix (moong/chana)', desc: 'Last food of the day. 1.5h before sleep. Light meal = stomach clear by 8:30 PM. Empty stomach sleep = full recovery mode. Growth hormone maximised. Evening Covenant begins.', cat: 'FUEL' },
     { id: 'e_shata_pada', block: 'EVENING \u2014 7 PM SHUTDOWN', blockId: 'eblk0', time: '7:10', title: 'Shata Pada (100 steps)', desc: '', cat: 'AYUR' },
     // NIGHT PREP (7:12-7:22)
-    { id: 'e_tomorrow_plan', block: 'NIGHT PREP (7:12-7:22)', blockId: 'eblk1', time: '7:12', title: 'Tomorrow planning (time blocks)', desc: 'Write tomorrow\'s plan NOW so 4 AM wake has zero decision-making. Pre-decide everything.', cat: 'MIND' },
+    { id: 'e_tomorrow_plan', block: 'NIGHT PREP (7:12-7:22)', blockId: 'eblk1', time: '7:12', title: 'Tomorrow planning (time blocks)', desc: 'Write tomorrow\'s plan NOW so 3:30 AM wake has zero decision-making. Pre-decide everything.', cat: 'MIND' },
     { id: 'e_copper_vessel', block: 'NIGHT PREP (7:12-7:22)', blockId: 'eblk1', time: '7:14', title: 'Fill copper vessel + soak methi', desc: '', cat: 'AYUR' },
     { id: 'e_gym_bag', block: 'NIGHT PREP (7:12-7:22)', blockId: 'eblk1', time: '7:15', title: 'Gym bag packed', desc: '', cat: 'MOVE' },
     { id: 'e_clothes', block: 'NIGHT PREP (7:12-7:22)', blockId: 'eblk1', time: '7:16', title: 'Clothes laid out (run + gym kit)', desc: '', cat: 'MIND' },
@@ -78,7 +78,7 @@ var RITUAL_DEFAULTS = {
     { id: 'e_trataka', block: 'REFLECTION + SLEEP (8:05-8:30)', blockId: 'eblk5', time: '8:18', title: 'Trataka (candle gazing)', desc: 'Fixed gaze on flame. 5 min. Sharpens concentration, improves eyesight, calms mind. SACRED.', cat: 'SACRED' },
     { id: 'e_hooponopono', block: 'REFLECTION + SLEEP (8:05-8:30)', blockId: 'eblk5', time: '8:22', title: "Ho\u2019oponopono prayer", desc: "4 phrases directed at anyone with mild irritation: I love you. I\u2019m sorry. Please forgive me. Thank you. Held resentment = chronic cortisol = accelerated aging. 3 min Hawaiian forgiveness.", cat: 'SACRED' },
     { id: 'e_cyclic_sighing', block: 'REFLECTION + SLEEP (8:05-8:30)', blockId: 'eblk5', time: '8:25', title: 'Cyclic sighing (5 min)', desc: '', cat: 'SLEEP' },
-    { id: 'e_lights_out', block: 'REFLECTION + SLEEP (8:05-8:30)', blockId: 'eblk5', time: '8:30', title: 'LIGHTS OUT', desc: '4:00 AM is decided here. 8:30 PM \u2192 4:00 AM = 7.5h = 5 complete sleep cycles = natural wake at cycle boundary. Zero grogginess. The morning is won or lost in the first 60 seconds of this moment.', cat: 'SLEEP' }
+    { id: 'e_lights_out', block: 'REFLECTION + SLEEP (8:05-9:30)', blockId: 'eblk5', time: '9:30', title: 'LIGHTS OUT', desc: '3:30 AM is decided here. 9:30 PM \u2192 3:30 AM = 6h sleep (personal optimal, not 7.5h standard). The morning is won or lost in the first 60 seconds of this moment.', cat: 'SLEEP' }
   ],
   midday: [
     // PRE-LUNCH RESET (12:00-1:25)
