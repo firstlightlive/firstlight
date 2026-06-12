@@ -905,7 +905,7 @@ function lsShared(key, val) {
 function computeStreakDay() {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return Math.max(1, Math.floor((today - STREAK_ORIGIN) / 86400000) + 1);
+  return Math.max(0, Math.floor((today - STREAK_ORIGIN) / 86400000) + 1);
 }
 
 function todayKey() {

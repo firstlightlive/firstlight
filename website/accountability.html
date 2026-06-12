@@ -65,7 +65,7 @@
       text-align:center; max-width:500px; margin:0 auto 48px; line-height:1.7; }
 
     /* ═══ Stats Strip ═══ */
-    .stats { display:grid; grid-template-columns:repeat(5,1fr); gap:2px; max-width:900px; margin:0 auto;
+    .stats { display:grid; grid-template-columns:repeat(6,1fr); gap:2px; max-width:1000px; margin:0 auto;
       background:var(--border); border-radius:16px; overflow:hidden; }
     .stat { text-align:center; padding:28px 12px; background:var(--bg); position:relative; }
     .stat:first-child { border-radius:16px 0 0 16px; }
@@ -238,6 +238,7 @@
     <div class="stat"><div class="stat-val" style="color:var(--gold)" id="accPending">0</div><div class="stat-label">PENDING</div></div>
     <div class="stat"><div class="stat-val" style="color:var(--cyan)" id="accTotalKm">0</div><div class="stat-label">PENALTY KM</div></div>
     <div class="stat"><div class="stat-val" style="color:var(--cyan)" id="accStreakDays"><span data-day>—</span></div><div class="stat-label">STREAK DAYS</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)" id="accFortress">0</div><div class="stat-label">PHONE BREACHES</div></div>
   </div>
 
   <!-- Active Rules — compact, below stats -->
@@ -247,6 +248,8 @@
     <div class="rules-row"><div class="rules-key">WEEKLY</div><div class="rules-val">100 km minimum across all sports (Mon–Sun). Swim 1 km = 10 km equivalent.</div></div>
     <div class="rules-row"><div class="rules-key">DEFICIT</div><div class="rules-val">≤ 50 km carries to next week. <span class="rules-danger">&gt; 50 km = ₹15,000 + deficit × 2 punishment km.</span></div></div>
     <div class="rules-row"><div class="rules-key">CLAIM</div><div class="rules-val">First person to spot a miss → ₹15,000 via UPI within 24 hours.</div></div>
+    <div class="rules-row"><div class="rules-key">CHECK-IN</div><div class="rules-val">Daily check-in must happen every day. Missed check-in = <span class="rules-danger">20 km walk auto-fine</span>. No record = a miss. Enforced from 13 JUN 2026.</div></div>
+    <div class="rules-row"><div class="rules-key">DEVICE</div><div class="rules-val">The home is device-free. Phone inside = <span class="rules-danger">10 km walk per 30 minutes</span> kept in the room. Self-logged, every incident public below.</div></div>
     <div class="rules-row"><div class="rules-key" style="color:var(--red)">TAMPER</div><div class="rules-val">Slips are immutable. No delete. No edit. The system is stronger than any weak moment.</div></div>
   </div>
 </section>
@@ -254,6 +257,37 @@
 <!-- ═══════════════════════════════════════
      3. LEDGER — The main event
      ═══════════════════════════════════════ -->
+<!-- ═══ DEVICE FORTRESS ═══ -->
+<section style="padding:56px 24px 0">
+  <div style="max-width:900px;margin:0 auto">
+    <div class="rules-card reveal" style="border-color:rgba(255,82,82,0.18)">
+      <div class="rules-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <span>DEVICE FORTRESS — THE PHONE STAYS OUT</span>
+        <span id="fortressStatus" style="font-size:0.55rem;letter-spacing:2px;color:var(--green)">HOLDING</span>
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:0.8rem;color:var(--text-dim);line-height:1.6;margin:10px 0 18px">
+        The home is device-free. Every time the phone comes inside, the breach is logged here — permanently.
+        <span style="color:var(--red)">10 km walk fine per 30 minutes</span> the phone stays in the room. No exceptions, no edits, no deletes.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:16px">
+        <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border-radius:8px 0 0 8px">
+          <div id="fortressCount" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--green)">0</div>
+          <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">BREACHES</div>
+        </div>
+        <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02)">
+          <div id="fortressKm" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--gold)">0</div>
+          <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">FINED KM</div>
+        </div>
+        <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0">
+          <div id="fortressLast" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--cyan)">—</div>
+          <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">LAST BREACH</div>
+        </div>
+      </div>
+      <div id="fortressList"></div>
+    </div>
+  </div>
+</section>
+
 <section style="padding:60px 0 0">
   <div class="s-eyebrow reveal">IMMUTABLE RECORD</div>
   <div class="s-heading reveal">Slip Ledger</div>
@@ -361,6 +395,8 @@ function filterSlips(type) {
   function calcEscalatedKm(slip) {
     if (slip.penalty_status === 'cleared') return parseFloat(slip.proof_km) || 0;
     var base = (slip.cascade_level && slip.cascade_level > 0) ? ESC.CASCADE_BASE : (PENALTY_MAP[slip.category] || DEFAULT_PENALTY).base_km;
+    // Device breaches carry a computed fine (10 km / 30 min) — stored on the slip, overrides category base
+    if (slip.category === 'device_at_home' && slip.penalty_km && !slip.cascade_level) base = parseFloat(slip.penalty_km);
     var ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
     var slipDate = new Date(slip.date + 'T00:00:00+05:30');
     var days = Math.floor((ist.getTime() - slipDate.getTime()) / 86400000);
@@ -379,7 +415,7 @@ function filterSlips(type) {
 
     if (typeof SB !== 'undefined' && SB.init()) {
       try {
-        slips = await sbFetch('slips', 'GET', null, '?select=id,date,rule,category,penalty,penalty_status,proof_km,proof_strava_url,proof_strava_activity_id,cleared_at,created_at,cascade_level,parent_slip_id,client_id&order=date.desc,created_at.desc');
+        slips = await sbFetch('slips', 'GET', null, '?select=id,date,rule,category,penalty,penalty_km,description,penalty_status,proof_km,proof_strava_url,proof_strava_activity_id,cleared_at,created_at,cascade_level,parent_slip_id,client_id&order=date.desc,created_at.desc');
         if (slips && Array.isArray(slips)) {
           var sbIds = new Set(slips.map(function(s) { return s.id; }));
           var localOnly = localSlips.filter(function(s) { return s.id && !sbIds.has(s.id); });
@@ -434,7 +470,52 @@ function filterSlips(type) {
     return slips.concat(extras);
   }
 
+  function renderFortress(slips) {
+    var breaches = slips.filter(function(s) {
+      return (s.rule === 'Phone Inside Home' || s.category === 'device_at_home') &&
+             !(s.id && String(s.id).indexOf('virt_') === 0);
+    });
+    var count = breaches.length;
+    var totalKm = breaches.reduce(function(sum, s) {
+      return sum + (s.penalty_status === 'cleared' ? (parseFloat(s.proof_km) || 0) : (parseFloat(s.penalty_km) || 20));
+    }, 0);
+    var last = breaches.length ? breaches.reduce(function(a, b) { return (a.date || '') > (b.date || '') ? a : b; }).date : null;
+
+    var countEl = document.getElementById('fortressCount');
+    var kmEl = document.getElementById('fortressKm');
+    var lastEl = document.getElementById('fortressLast');
+    var statusEl = document.getElementById('fortressStatus');
+    var statEl = document.getElementById('accFortress');
+    var listEl = document.getElementById('fortressList');
+
+    if (countEl) { countEl.textContent = count; countEl.style.color = count === 0 ? 'var(--green)' : 'var(--red)'; }
+    if (kmEl) kmEl.textContent = Math.round(totalKm);
+    if (lastEl) lastEl.textContent = last ? last.substring(5).split('-').reverse().join('/') : '—';
+    if (statusEl) {
+      statusEl.textContent = count === 0 ? 'HOLDING' : 'BREACHED ×' + count;
+      statusEl.style.color = count === 0 ? 'var(--green)' : 'var(--red)';
+    }
+    if (statEl) { statEl.textContent = count; statEl.style.color = count === 0 ? 'var(--green)' : 'var(--red)'; }
+
+    if (listEl) {
+      if (!count) {
+        listEl.innerHTML = '<div style="text-align:center;padding:18px;font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;letter-spacing:2px;color:var(--green);background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.12);border-radius:10px">◆ ZERO BREACHES — THE FORTRESS HOLDS</div>';
+      } else {
+        listEl.innerHTML = breaches.slice(0, 20).map(function(s) {
+          var cleared = s.penalty_status === 'cleared';
+          var km = cleared ? (parseFloat(s.proof_km) || 0) : (parseFloat(s.penalty_km) || 20);
+          var desc = s.description || 'Phone was inside the home.';
+          var mins = (desc.match(/(\d+)\s*minutes/) || [])[1];
+          return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;background:rgba(255,82,82,' + (cleared ? '0.03' : '0.06') + ');border:1px solid rgba(255,82,82,' + (cleared ? '0.08' : '0.18') + ');border-radius:8px;flex-wrap:wrap">' +
+            '<span style="font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;color:#fff;letter-spacing:1px">' + (s.date || '?') + (mins ? ' · ' + mins + ' MIN INSIDE' : '') + '</span>' +
+            '<span style="font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;font-weight:700;letter-spacing:1px;color:' + (cleared ? 'var(--green)' : 'var(--red)') + '">' + Math.round(km) + ' KM ' + (cleared ? '✓ SERVED' : 'OWED') + '</span></div>';
+        }).join('');
+      }
+    }
+  }
+
   function renderSlips(slips) {
+    renderFortress(slips);
     var total = slips.length;
     var clearedCount = 0, pendingCount = 0, totalPenaltyKm = 0;
     var pendingSlips = [], clearedSlips = [];

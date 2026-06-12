@@ -1307,7 +1307,7 @@ function genTheme(t,e){
   onGenerate();
 }
 
-function getDateStr(){const n=new Date();return `${D[n.getDay()]} · ${n.getDate()} ${M[n.getMonth()]} ${n.getFullYear()}`}
+function getDateStr(){const n=streakRenderDate();return `${D[n.getDay()]} · ${n.getDate()} ${M[n.getMonth()]} ${n.getFullYear()}`}
 
 // ===== INIT =====
 document.getElementById('dateStr').textContent=getDateStr();
@@ -1336,7 +1336,16 @@ const STREAK_ORIGIN=new Date(2026,5,13); // Jan=0, so 5=Jun, day=13
 function computeStreakDay(){
   const now=new Date();
   const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  return Math.max(1,Math.floor((today-STREAK_ORIGIN)/86400000)+1);
+  if(today<STREAK_ORIGIN) return 1; // pre-start: generator previews Day 1 assets
+  return Math.floor((today-STREAK_ORIGIN)/86400000)+1;
+}
+
+// Generator date labels: before the chapter starts, render the START date (Day 1 preview),
+// not today's date — so assets made on the eve carry tomorrow's date.
+function streakRenderDate(){
+  const now=new Date();
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  return today<STREAK_ORIGIN ? new Date(STREAK_ORIGIN) : now;
 }
 
 // Pre-fill fl_log with done:true for every day from chapter start → yesterday
@@ -3434,7 +3443,7 @@ function _generateInner(){
   localStorage.setItem('fl_ig',handleIG);
   localStorage.setItem('fl_x',handleX);
   const liner=document.getElementById('oneLiner').value.trim();
-  const now=new Date();
+  const now=streakRenderDate();
   const dateStr=`${D[now.getDay()]} · ${now.getDate()} ${M[now.getMonth()]} ${now.getFullYear()}`;
   // ── SLEEP SLIDE: always show in normal mode (placeholder if no data) ──
   const _sleepVal=mode!=='lastlight'?parseFloat(document.getElementById('sleepHrs')?.value||'0'):0;
@@ -5640,7 +5649,7 @@ function downloadIGCover(){
   c.fillText('FIRST LIGHT',40,120);
 
   // Date
-  const now2=new Date();
+  const now2=streakRenderDate();
   const M2=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const D2=['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const dateStr2=`${D2[now2.getDay()]} · ${now2.getDate()} ${M2[now2.getMonth()]}`;
@@ -5790,7 +5799,7 @@ function downloadStoriesCard(){
   c.fillStyle=P.acR+'0.50)';
   c.fillText('www.firstlight.live',40,106);
 
-  const now=new Date();
+  const now=streakRenderDate();
   const M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const D=['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const dateStr=`${D[now.getDay()]}  ${now.getDate()} ${M[now.getMonth()]}`;
@@ -6267,7 +6276,7 @@ function genStoryTemplate(idx){
       c.textAlign='left';c.font='italic 700 28px "DM Serif Display",serif';c.fillStyle='#00D4FF';c.fillText('FIRST LIGHT',48,68);
       c.font='600 10px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.4)';c.fillText('www.firstlight.live',48,86);
       // Date
-      var now=new Date();var dStr=['SUN','MON','TUE','WED','THU','FRI','SAT'][now.getDay()]+' · '+now.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now.getMonth()];
+      var now=streakRenderDate();var dStr=['SUN','MON','TUE','WED','THU','FRI','SAT'][now.getDay()]+' · '+now.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now.getMonth()];
       c.textAlign='right';c.font='600 16px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.4)';c.fillText(dStr,W-48,72);
       // DAY label
       c.textAlign='center';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='#00D4FF';c.fillText('D A Y',W/2,150);
@@ -6598,7 +6607,7 @@ function genStoryTemplate(idx){
       c.fillText('WESTERN UNION TELEGRAM',W/2,72);c.shadowBlur=0;
       c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.55)';
       c.fillText('FIRST LIGHT ACCOUNTABILITY NETWORK \u00B7 BANGALORE DIVISION',W/2,102);
-      var now=new Date();var ds=['SUN','MON','TUE','WED','THU','FRI','SAT'][now.getDay()]+' '+now.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now.getMonth()]+' '+now.getFullYear();
+      var now=streakRenderDate();var ds=['SUN','MON','TUE','WED','THU','FRI','SAT'][now.getDay()]+' '+now.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now.getMonth()]+' '+now.getFullYear();
       c.textAlign='left';c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.45)';c.fillText('DATE: '+ds,40,142);
       c.textAlign='right';c.fillText('NO. FL-'+String(day).padStart(4,'0'),W-40,142);
       var ty=220;
@@ -6783,7 +6792,7 @@ function genStoryTemplate(idx){
       c.strokeStyle='rgba(255,240,0,0.18)';c.lineWidth=1;c.strokeRect(0,0,W,140);
       c.textAlign='center';c.font='700 15px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.55)';
       c.fillText('FIRSTLIGHT ACCOUNTABILITY ARENA \u00B7 LIVE SCOREBOARD',W/2,50);
-      var now=new Date();
+      var now=streakRenderDate();
       c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.32)';
       c.fillText(['SUN','MON','TUE','WED','THU','FRI','SAT'][now.getDay()]+' \u00B7 DAY '+day+' \u00B7 STREAK IN PROGRESS',W/2,80);
       function scorePanel(x,y,w,h,team,score,tC,sC){
@@ -6845,7 +6854,7 @@ function genStoryTemplate(idx){
       c.fillText('FIRSTLIGHT LEDGER',W/2,68);
       c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(200,216,192,0.55)';
       c.fillText('DISCIPLINE ACCOUNTING \u00B7 DAY '+day+' \u00B7 PERIOD OPEN',W/2,98);
-      var now2=new Date();var ds2=['SUN','MON','TUE','WED','THU','FRI','SAT'][now2.getDay()]+' '+now2.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now2.getMonth()]+' '+now2.getFullYear();
+      var now2=streakRenderDate();var ds2=['SUN','MON','TUE','WED','THU','FRI','SAT'][now2.getDay()]+' '+now2.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now2.getMonth()]+' '+now2.getFullYear();
       c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(200,216,192,0.4)';c.fillText(ds2+' \u00B7 BANGALORE \u00B7 ANUPAM KUMAR',W/2,126);c.fillText('ACCOUNT: #FL-001 \u00B7 STATUS: ACTIVE \u00B7 AUDITOR: PUBLIC',W/2,150);
       var colH=210;
       c.fillStyle='#EAE4D6';c.fillRect(0,colH,W,48);c.strokeStyle='rgba(0,80,30,0.13)';c.lineWidth=0.8;c.strokeRect(0,colH,W,48);
@@ -8775,7 +8784,7 @@ async function generateReel(){
   const day=document.getElementById('dayNum').value||'1';
   const handleIG=document.getElementById('handleIG').value||'@firstlight.daily';
   const handleX=document.getElementById('handleX').value||'@firstlightdly';
-  const now=new Date();
+  const now=streakRenderDate();
   const dateStr=`${D[now.getDay()]} · ${now.getDate()} ${M[now.getMonth()]} ${now.getFullYear()}`;
   const liner=document.getElementById('oneLiner').value.trim();
   const moodLine=mode!=='lastlight'?(document.getElementById('moodLine').value.trim()||''):'';

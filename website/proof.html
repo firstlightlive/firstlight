@@ -124,7 +124,7 @@
   <section class="proof-header">
     <div class="reveal-el" style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:rgba(0,212,255,0.6);margin-bottom:16px;display:inline-block;padding:5px 14px;border:1px solid rgba(0,212,255,0.15);border-radius:4px">EVIDENCE ARCHIVE</div>
     <h1 class="reveal-el">THE EVIDENCE</h1>
-    <p class="reveal-el"><span data-day>—</span> days. Zero excuses. Every number verified by Strava + Garmin.</p>
+    <p class="reveal-el"><span id="proofLifetimeDays">—</span> lifetime days across <span id="proofChapterCount">—</span> chapters. Zero excuses. Every number verified by Strava + Garmin — a record built to hold decades.</p>
     <div class="reveal-el" style="display:flex;gap:12px;justify-content:center;margin-top:16px">
       <a href="https://www.instagram.com/firstlightlive" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:0.7rem;font-weight:700;letter-spacing:1px;text-decoration:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
@@ -141,8 +141,8 @@
   <!-- ═══ SUMMARY CARDS ═══ -->
   <div class="summary-cards">
     <div class="summary-card">
-      <div class="label">Total Days</div>
-      <div class="value"><span data-day>—</span></div>
+      <div class="label">Days Logged</div>
+      <div class="value" id="proofCardDays">—</div>
     </div>
     <div class="summary-card">
       <div class="label">Total KM</div>
@@ -161,6 +161,16 @@
       <div class="value" id="proofAvgDistCard">— km</div>
     </div>
   </div>
+
+  <!-- ═══ CHAPTER SELECTOR ═══ -->
+  <style>
+    .ch-tabs { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:0 auto 24px; max-width:1100px; padding:0 20px }
+    .ch-tab { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:1.5px; font-weight:600;
+      background:rgba(255,255,255,0.02); color:var(--text-dim,#5A6B80); border:1px solid rgba(255,255,255,0.08);
+      border-radius:6px; padding:9px 16px; cursor:pointer; transition:all .2s; -webkit-tap-highlight-color:transparent; touch-action:manipulation; min-height:44px }
+    .ch-tab:hover, .ch-tab.active { color:#fff; border-color:rgba(0,212,255,0.35); background:rgba(0,212,255,0.05) }
+  </style>
+  <div class="ch-tabs reveal-el" id="chapterTabs"></div>
 
   <!-- ═══ FILTER BAR ═══ -->
   <div class="filter-bar reveal-el">
@@ -207,8 +217,8 @@
   <div style="max-width:1100px;margin:0 auto;padding:0 20px 60px">
     <div class="reveal-el" style="text-align:center;margin-bottom:40px">
       <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:rgba(0,230,118,0.5);margin-bottom:12px">ANALYTICS</div>
-      <h2 style="font-family:'IBM Plex Mono',monospace;font-size:clamp(1.4rem,3.5vw,2rem);font-weight:700;letter-spacing:0.1em;color:#fff;margin-bottom:8px">YEAR IN DATA</h2>
-      <p style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--text-dim)">365-day rolling view. Every metric. Real data from Strava + Garmin.</p>
+      <h2 id="chapterDataTitle" style="font-family:'IBM Plex Mono',monospace;font-size:clamp(1.4rem,3.5vw,2rem);font-weight:700;letter-spacing:0.1em;color:#fff;margin-bottom:8px">CHAPTER IN DATA</h2>
+      <p id="chapterDataSub" style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--text-dim)">Day-by-day view of the selected chapter. Every metric from Strava + Garmin.</p>
     </div>
 
     <!-- MONTHLY SUMMARY CARDS -->
@@ -270,6 +280,23 @@
 
     <!-- CUMULATIVE TOTALS -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px" id="proofCumulativeTotals"></div>
+
+    <!-- ═══ THE LONG GAME — LIFETIME GRID ═══ -->
+    <div class="reveal-el" style="text-align:center;margin:64px 0 28px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:rgba(245,166,35,0.55);margin-bottom:12px">THE LONG GAME</div>
+      <h2 style="font-family:'IBM Plex Mono',monospace;font-size:clamp(1.3rem,3vw,1.8rem);font-weight:700;letter-spacing:0.1em;color:#fff;margin-bottom:8px">EVERY DAY. EVERY YEAR.</h2>
+      <p style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--text-dim)">The lifetime grid — one cell per day, one row per year. Built to hold decades.</p>
+    </div>
+    <div id="lifetimeHeat" style="display:flex;flex-direction:column;gap:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px"></div>
+    <div style="display:flex;gap:10px;justify-content:center;align-items:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:0.5rem;color:var(--text-dim);letter-spacing:1px">
+      <span>LESS</span>
+      <span style="width:9px;height:9px;border-radius:2px;background:rgba(255,255,255,0.05)"></span>
+      <span style="width:9px;height:9px;border-radius:2px;background:rgba(252,76,2,0.3)"></span>
+      <span style="width:9px;height:9px;border-radius:2px;background:rgba(252,76,2,0.55)"></span>
+      <span style="width:9px;height:9px;border-radius:2px;background:rgba(252,76,2,0.8)"></span>
+      <span style="width:9px;height:9px;border-radius:2px;background:#FC4C02"></span>
+      <span>MORE KM</span>
+    </div>
   </div>
 
   <!-- ═══ CTA ═══ -->
@@ -291,10 +318,30 @@
   <footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
 
   <script src="js/config.js"></script>
+  <script src="js/chapters.js?v=20260613a"></script>
   <script src="app.js?v=20260613a"></script>
   <script>
   (function(){
     const dayNum = getDayNumber();
+
+    // ── Chapter registry — closed chapters from chapters.js + the live one ──
+    var CHAPTERS = [];
+    (window.FL_CHAPTERS || []).forEach(function(c) { CHAPTERS.push({ id: c.id, name: c.name, start: c.start, end: c.end, live: false }); });
+    if (window.FL_CURRENT_CHAPTER) CHAPTERS.push({ id: window.FL_CURRENT_CHAPTER.id, name: window.FL_CURRENT_CHAPTER.name, start: window.FL_CURRENT_CHAPTER.start, end: null, live: true });
+    if (!CHAPTERS.length) CHAPTERS.push({ id: 1, name: 'STREAK', start: (window.FL && FL.STREAK_START) || '2026-06-13', end: null, live: true });
+
+    function chapterOf(dateStr) {
+      for (var i = CHAPTERS.length - 1; i >= 0; i--) {
+        var c = CHAPTERS[i];
+        if (dateStr >= c.start && (!c.end || dateStr <= c.end)) return c;
+      }
+      return null;
+    }
+    function dayInChapter(dateStr, c) {
+      return Math.floor((new Date(dateStr + 'T00:00:00+05:30') - new Date(c.start + 'T00:00:00+05:30')) / 86400000) + 1;
+    }
+    var chapterRows = [];
+    var _selChapter = CHAPTERS[CHAPTERS.length - 1].id;
     const PER_PAGE = 30;
     let currentPage = 1;
     let allRows = [];
@@ -365,9 +412,13 @@
       var stravaMap = results[1];
       if (!data || !data.length) return;
 
-      var streakData = data.filter(function(r) { return r.day_number && r.day_number > 0; });
+      var streakData = data.filter(function(r) { return r.date; });
 
       allRows = streakData.map(function(r) {
+        // Date → chapter. Gap days between chapters are not part of any record.
+        var ch = chapterOf(r.date);
+        if (!ch) return null;
+        var dayIn = dayInChapter(r.date, ch);
         // Get Strava data for this date (more complete than proof_archive)
         var strava = stravaMap[r.date] || {};
 
@@ -401,11 +452,14 @@
         // Distance display
         var distStr = totalKm > 0 ? totalKm.toFixed(1) + ' km' : (r.gym ? 'Gym' : '—');
 
-        // Stake calculation using schedule
-        var stake = (typeof getCumulativeUnclaimed === 'function') ? getCumulativeUnclaimed(r.day_number) : r.day_number * 15000;
+        // Stake: live chapter accumulates; closed chapters show CLOSED
+        var stake = ch.live ? ((typeof getCumulativeUnclaimed === 'function') ? getCumulativeUnclaimed(dayIn) : dayIn * 15000) : null;
 
         return {
-          day: r.day_number,
+          day: dayIn,
+          chapter: ch.id,
+          chapterName: ch.name,
+          chapterLive: !!ch.live,
           date: r.date,
           sleep: r.sleep_hrs ? parseFloat(r.sleep_hrs).toFixed(1) : '—',
           sleepNum: r.sleep_hrs ? parseFloat(r.sleep_hrs) : null,
@@ -426,34 +480,83 @@
           walkKmNum: walkKm,
           paceNum: (r.run_time_sec && runKm > 0) ? r.run_time_sec / 60 / runKm : null
         };
-      });
-      allRows.sort(function(a,b) { return b.day - a.day; });
-      filteredRows = allRows;
+      }).filter(Boolean);
+      allRows.sort(function(a,b) { return (b.date || '').localeCompare(a.date || ''); });
 
-      // Update summary cards
-      var totalDist = allRows.reduce(function(s,r) { return s + (r.distNum || 0); }, 0);
-      var sleepArr = allRows.filter(function(r) { return r.sleep !== '—'; });
-      var avgSleep = sleepArr.length ? (sleepArr.reduce(function(s,r) { return s + parseFloat(r.sleep); }, 0) / sleepArr.length).toFixed(1) : '—';
-      var activeDays = allRows.filter(function(r) { return r.sports !== '—'; });
-      var avgDist = activeDays.length ? (totalDist / activeDays.length).toFixed(1) : '—';
-
-      // Update summary card values
-      var tkEl = document.getElementById('proofTotalKm');
-      if (tkEl) tkEl.textContent = Math.round(totalDist) + ' km';
-      var sleepCardEl = document.getElementById('proofAvgSleepCard');
-      if (sleepCardEl) sleepCardEl.textContent = avgSleep + ' hrs';
-      var distCardEl = document.getElementById('proofAvgDistCard');
-      if (distCardEl) distCardEl.textContent = avgDist + ' km';
-
-      renderTable();
-      // Render analytics charts
-      if (typeof renderProofCharts === 'function') renderProofCharts(allRows);
+      buildChapterTabs();
+      applyChapter(_selChapter);
+      if (typeof renderLifetimeHeat === 'function') renderLifetimeHeat(allRows, CHAPTERS);
     })
     .catch(function(e) {
       console.error('[Proof]', e);
       var tbody = document.getElementById('proofBody');
       if (tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;font-family:var(--font-mono);color:var(--red,#FF5252)">Failed to load evidence data. Please refresh the page.</td></tr>';
     });
+
+    // ── Chapter selector ──
+    function buildChapterTabs() {
+      var el = document.getElementById('chapterTabs');
+      if (el) {
+        var html = '';
+        CHAPTERS.forEach(function(c) {
+          var n = allRows.filter(function(r) { return r.chapter === c.id; }).length;
+          html += '<button class="ch-tab" data-ch="' + c.id + '">CH ' + String(c.id).padStart(2, '0') + ' · ' + c.name + (c.live ? ' <span style="color:var(--green,#00E676)">● LIVE</span>' : ' (' + n + 'd)') + '</button>';
+        });
+        html += '<button class="ch-tab" data-ch="all">ALL CHAPTERS</button>';
+        el.innerHTML = html;
+        el.querySelectorAll('.ch-tab').forEach(function(b) {
+          b.addEventListener('click', function() {
+            var v = this.dataset.ch;
+            applyChapter(v === 'all' ? 'all' : parseInt(v, 10));
+          });
+        });
+      }
+      // Lifetime header numbers
+      var lifeEl = document.getElementById('proofLifetimeDays');
+      if (lifeEl) {
+        var closed = 0;
+        (window.FL_CHAPTERS || []).forEach(function(c) { closed += (c.days || 0); });
+        var cur = (typeof getDayNumber === 'function') ? Math.max(0, getDayNumber()) : 0;
+        lifeEl.textContent = closed + cur;
+      }
+      var ccEl = document.getElementById('proofChapterCount');
+      if (ccEl) ccEl.textContent = CHAPTERS.length;
+    }
+
+    function applyChapter(sel) {
+      _selChapter = sel;
+      chapterRows = (sel === 'all') ? allRows : allRows.filter(function(r) { return r.chapter === sel; });
+      filteredRows = chapterRows;
+      currentPage = 1; _showAll = false;
+      var sEl = document.getElementById('proofSearch'); if (sEl) sEl.value = '';
+      document.querySelectorAll('.ch-tab').forEach(function(b) {
+        b.classList.toggle('active', String(b.dataset.ch) === String(sel));
+      });
+
+      // Summary cards — scoped to selection
+      var totalDist = chapterRows.reduce(function(s,r) { return s + (r.distNum || 0); }, 0);
+      var sleepArr = chapterRows.filter(function(r) { return r.sleep !== '—'; });
+      var avgSleep = sleepArr.length ? (sleepArr.reduce(function(s,r) { return s + parseFloat(r.sleep); }, 0) / sleepArr.length).toFixed(1) : '—';
+      var activeDays = chapterRows.filter(function(r) { return r.sports !== '—'; });
+      var avgDist = activeDays.length ? (totalDist / activeDays.length).toFixed(1) : '—';
+      var dEl = document.getElementById('proofCardDays'); if (dEl) dEl.textContent = chapterRows.length;
+      var tkEl = document.getElementById('proofTotalKm'); if (tkEl) tkEl.textContent = Math.round(totalDist) + ' km';
+      var scEl = document.getElementById('proofAvgSleepCard'); if (scEl) scEl.textContent = avgSleep + ' hrs';
+      var dcEl = document.getElementById('proofAvgDistCard'); if (dcEl) dcEl.textContent = avgDist + ' km';
+
+      renderTable();
+
+      // Charts: selected chapter (or the live chapter when ALL)
+      var chartCh = (sel === 'all') ? CHAPTERS[CHAPTERS.length - 1] : CHAPTERS.filter(function(c) { return c.id === sel; })[0];
+      if (chartCh && typeof renderProofCharts === 'function') {
+        var chartRows = allRows.filter(function(r) { return r.chapter === chartCh.id; });
+        if (chartRows.length) renderProofCharts(chartRows, chartCh);
+      }
+      var tEl = document.getElementById('chapterDataTitle');
+      if (tEl && chartCh) tEl.textContent = 'CHAPTER ' + String(chartCh.id).padStart(2, '0') + ' — ' + chartCh.name + ' · IN DATA';
+      var pEl = document.getElementById('chapterDataSub');
+      if (pEl && chartCh) pEl.textContent = (chartCh.live ? 'Live chapter — growing every morning. ' : 'Closed chapter — immutable record. ') + 'Every metric from Strava + Garmin.';
+    }
 
     function renderTable(){
       const tbody = document.getElementById('proofBody');
@@ -495,7 +598,7 @@
 
       tbody.innerHTML = page.map(function(r){
         return '<tr>'+
-          '<td style="font-weight:700;color:var(--cyan)">'+r.day+'</td>'+
+          '<td style="font-weight:700;color:var(--cyan)">'+(_selChapter==='all' ? '<span style="color:var(--text-dim);font-size:0.6rem">C'+r.chapter+'</span> ' : '')+'D'+r.day+'</td>'+
           '<td>'+r.date+'</td>'+
           '<td style="color:'+(parseFloat(r.sleep)>=6?'var(--green)':'var(--red,#FF5252)')+'">'+r.sleep+'h</td>'+
           '<td>'+colorSports(r.sports)+'</td>'+
@@ -503,7 +606,7 @@
           '<td>'+r.duration+'</td>'+
           '<td>'+(r.hr || '—')+'</td>'+
           '<td>'+(r.food ? '<span class="check">✓</span>' : '<span class="miss">✗</span>')+'</td>'+
-          '<td style="color:var(--gold)">₹'+formatINR(r.unclaimed)+'</td>'+
+          '<td style="color:var(--gold)">'+(r.unclaimed==null ? '<span style="color:var(--text-dim);font-size:0.65rem">CLOSED</span>' : '₹'+formatINR(r.unclaimed))+'</td>'+
           '<td style="color:'+(r.source==='Strava ✓'?'var(--green)':'var(--text-dim)')+'">'+r.source+'</td>'+
         '</tr>';
       }).join('');
@@ -523,9 +626,9 @@
     document.getElementById('proofSearch').addEventListener('input', function(){
       var q = this.value.toLowerCase();
       if(!q){
-        filteredRows = allRows;
+        filteredRows = chapterRows;
       } else {
-        filteredRows = allRows.filter(function(r){
+        filteredRows = chapterRows.filter(function(r){
           return String(r.day).indexOf(q) !== -1 ||
                  r.date.toLowerCase().indexOf(q) !== -1 ||
                  r.source.toLowerCase().indexOf(q) !== -1;
@@ -565,9 +668,9 @@
 
     /* ── CSV EXPORT ── */
     document.getElementById('exportCsv').addEventListener('click', function(){
-      var csv = 'DAY,DATE,SLEEP,SPORTS,DISTANCE,DURATION,AVG HR,FOOD,UNCLAIMED,SOURCE\n';
+      var csv = 'CHAPTER,DAY,DATE,SLEEP,SPORTS,DISTANCE,DURATION,AVG HR,FOOD,UNCLAIMED,SOURCE\n';
       allRows.forEach(function(r){
-        csv += r.day+','+r.date+','+r.sleep+','+r.sports+','+r.distance+','+r.duration+','+r.hr+','+(r.food?'YES':'NO')+','+r.unclaimed+','+r.source+'\n';
+        csv += 'C'+r.chapter+','+r.day+','+r.date+','+r.sleep+','+r.sports+','+r.distance+','+r.duration+','+r.hr+','+(r.food?'YES':'NO')+','+(r.unclaimed==null?'CLOSED':r.unclaimed)+','+r.source+'\n';
       });
       var blob = new Blob([csv], {type:'text/csv'});
       var a = document.createElement('a');
@@ -583,20 +686,24 @@
   var _proofRows = [];
   var _months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
-  function renderProofCharts(rows) {
+  function renderProofCharts(rows, chapter) {
     if (!rows || !rows.length) return;
     _proofRows = rows;
 
-    // Build 365-day timeline from streak start
-    var streakStart = new Date(((FL && FL.STREAK_START) || '2026-06-13') + 'T00:00:00+05:30');
+    // Build day-by-day timeline for the chapter's date range (capped at 730 cells per render)
+    var startStr = (chapter && chapter.start) || ((window.FL && FL.STREAK_START) || '2026-06-13');
+    var endStr = (chapter && chapter.end) || null;
+    var chStart = new Date(startStr + 'T00:00:00+05:30');
+    var chEnd = endStr ? new Date(endStr + 'T23:59:59+05:30') : null;
     var today = new Date();
     var dayMap = {};
     rows.forEach(function(r) { if (r.date) dayMap[r.date] = r; });
 
     var timeline = [];
-    for (var i = 0; i < 365; i++) {
-      var d = new Date(streakStart); d.setDate(d.getDate() + i);
+    for (var i = 0; i < 730; i++) {
+      var d = new Date(chStart); d.setDate(d.getDate() + i);
       if (d > today) break;
+      if (chEnd && d > chEnd) break;
       var ds = d.toISOString().split('T')[0];
       var r = dayMap[ds];
       timeline.push({
@@ -848,6 +955,51 @@
         cumCard(avgSleepAll.toFixed(1), 'HRS', 'AVG SLEEP', '#70AEFF') +
         cumCard(avgHrAll, 'BPM', 'AVG HR', '#FF5252');
     }
+  }
+
+  // ── THE LONG GAME — lifetime grid, one row per year, one cell per day ──
+  function renderLifetimeHeat(rows, chapters) {
+    var el = document.getElementById('lifetimeHeat');
+    if (!el) return;
+    var kmByDate = {};
+    rows.forEach(function(r) { if (r.date) kmByDate[r.date] = (kmByDate[r.date] || 0) + (r.distNum || 0); });
+    function inChapter(ds) {
+      for (var i = 0; i < (chapters || []).length; i++) {
+        var c = chapters[i];
+        if (ds >= c.start && (!c.end || ds <= c.end)) return true;
+      }
+      return false;
+    }
+    var firstYear = (chapters && chapters.length) ? parseInt(chapters[0].start.substring(0, 4), 10) : new Date().getFullYear();
+    var now = new Date();
+    var nowYear = now.getFullYear();
+    var todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    var html = '';
+    for (var y = firstYear; y <= nowYear; y++) {
+      var cells = '';
+      var jan1 = new Date(y, 0, 1);
+      var offset = (jan1.getDay() + 6) % 7; // Monday = row 0
+      for (var p = 0; p < offset; p++) cells += '<span style="width:10px;height:10px"></span>';
+      var d = new Date(y, 0, 1);
+      while (d.getFullYear() === y) {
+        var ds = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        var km = kmByDate[ds];
+        var bg, title;
+        if (ds > todayStr) { bg = 'rgba(255,255,255,0.015)'; title = ds; }
+        else if (km != null && km > 0) {
+          bg = km >= 20 ? '#FC4C02' : km >= 10 ? 'rgba(252,76,2,0.8)' : km >= 5 ? 'rgba(252,76,2,0.55)' : 'rgba(252,76,2,0.3)';
+          title = ds + ' · ' + km.toFixed(1) + ' km';
+        }
+        else if (inChapter(ds)) { bg = 'rgba(255,255,255,0.05)'; title = ds + ' · no distance logged'; }
+        else { bg = 'rgba(255,255,255,0.025)'; title = ds; }
+        cells += '<span title="' + title + '" style="width:10px;height:10px;border-radius:2px;background:' + bg + '"></span>';
+        d.setDate(d.getDate() + 1);
+      }
+      html += '<div style="display:flex;align-items:flex-start;gap:12px;justify-content:center;min-width:620px">' +
+        '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--cyan,#00D4FF);padding-top:30px">' + y + '</span>' +
+        '<span style="display:inline-grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;grid-auto-columns:10px;gap:2px">' + cells + '</span></div>';
+    }
+    el.innerHTML = html;
   }
   </script>
 

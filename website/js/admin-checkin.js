@@ -319,6 +319,15 @@ function renderCheckin() {
 
   html += '</div>'; // end manual section
 
+  // Device Fortress — phone-in-home breach logger (always logs against TODAY)
+  html += '<div style="margin-top:20px;padding:16px;background:rgba(255,82,82,0.04);border:1px solid rgba(255,82,82,0.15);border-radius:10px">';
+  html += '<div style="font-family:var(--font-mono);font-size:11px;color:var(--red,#FF5252);letter-spacing:2px;font-weight:700;margin-bottom:4px">⚠ DEVICE FORTRESS — LOG A BREACH</div>';
+  html += '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:0.5px;margin-bottom:10px">Phone inside the home = 10 km walk per 30 min. Self-logged. Immutable. Public.</div>';
+  html += '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
+  html += '<input type="number" id="ci-phone-min" class="form-input" min="1" max="1440" step="1" placeholder="Minutes inside" style="width:140px;font-size:12px;padding:10px">';
+  html += '<button class="btn-primary" onclick="logPhoneBreach()" style="font-size:10px;letter-spacing:2px;padding:10px 18px;background:var(--red,#FF5252);border-color:var(--red,#FF5252)">LOG BREACH → FINE</button>';
+  html += '</div></div>';
+
   // Seal button
   if (!locked) {
     html += '<div style="text-align:center;margin-top:24px">';
@@ -501,9 +510,10 @@ async function checkMissedSealPunishments() {
   }
 }
 
-// ── AUTO-PUNISHMENT: Morning check-in not ticked ──
-// If app_updated was NOT marked true for a locked day → 20 km walk punishment.
-// Enforced from 2026-06-02 (next Monday) onward.
+// ── AUTO-PUNISHMENT: Daily check-in missed ──
+// If the daily check-in did not happen for a locked day → 20 km walk auto-fine.
+// Chapter 2 rule (from 2026-06-13): a missing check-in record IS a miss — no record = fined.
+// Pre-Chapter-2 dates are never re-judged (gap days Jun 9-12 + closed Chapter 1 are exempt).
 var _morningCheckDone = false;
 async function checkMissedMorningCheckin() {
   if (_morningCheckDone) return;
@@ -512,7 +522,7 @@ async function checkMissedMorningCheckin() {
   if (lastCheck === today) { _morningCheckDone = true; return; }
   _morningCheckDone = true;
 
-  var ENFORCE_FROM = '2026-06-02'; // next Monday
+  var ENFORCE_FROM = '2026-06-13'; // Chapter 2 Day 1 — never judge gap days or closed Chapter 1
   var newSlips = [];
 
   for (var i = 1; i <= 7; i++) {
@@ -520,7 +530,7 @@ async function checkMissedMorningCheckin() {
     d.setDate(d.getDate() - i);
     var dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 
-    // Only enforce from June 2 onward
+    // Only enforce Chapter 2 dates
     if (dateStr < ENFORCE_FROM) continue;
     // Only check locked days
     if (!isDateLocked(dateStr)) continue;
@@ -530,8 +540,7 @@ async function checkMissedMorningCheckin() {
     if (checkin && checkin.app_updated === true) continue;
     // If day was sealed (implies check-in was done) → fine
     if (checkin && checkin.sealed === true) continue;
-    // If no checkin record at all for this day → skip (user didn't open app)
-    if (!checkin || Object.keys(checkin).length === 0) continue;
+    // Chapter 2 rule: NO record at all = the check-in did not happen = fined.
 
     // Deterministic ID
     var slipId = 'slip_morning_' + dateStr;
@@ -540,15 +549,15 @@ async function checkMissedMorningCheckin() {
     var slips = [];
     try { slips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) {}
     var exists = slips.some(function(s) {
-      return s.id === slipId || (s.date === dateStr && s.rule === 'Missed Morning Check-in');
+      return s.id === slipId || (s.date === dateStr && (s.rule === 'Missed Daily Check-in' || s.rule === 'Missed Morning Check-in'));
     });
     if (exists) continue;
 
-    // Dedup: Supabase
+    // Dedup: Supabase (by deterministic id — rule-name agnostic)
     if (typeof sbFetch === 'function') {
       try {
         var remote = await sbFetch('slips', 'GET', null,
-          '?select=id&date=eq.' + dateStr + '&rule=eq.Missed Morning Check-in&limit=1');
+          '?select=id&id=eq.' + slipId + '&limit=1');
         if (remote && Array.isArray(remote) && remote.length > 0) continue;
       } catch(_e) {}
     }
@@ -557,16 +566,16 @@ async function checkMissedMorningCheckin() {
       id: slipId,
       client_id: slipId,
       date: dateStr,
-      rule: 'Missed Morning Check-in',
-      category: 'food_violation',
-      description: 'Morning check-in was not marked as completed on ' + dateStr + '.',
+      rule: 'Missed Daily Check-in',
+      category: 'missed_diary',
+      description: 'Daily check-in did not happen on ' + dateStr + '.',
       function_met: false,
-      upstream_gap: 'Did not tick "YES — UPDATED" in the morning check-in section.',
-      insight: 'The morning check-in ensures daily accountability. Missing it triggers an automatic 10 km walk punishment.',
-      penalty_type: '10km walk',
-      penalty_km: 10,
-      penalty_walk_km: 10,
-      penalty_cycling_km: 20,
+      upstream_gap: 'The check-in panel was never completed for this day — no seal, no morning tick.',
+      insight: 'The daily check-in is the heartbeat of the system. Missing it triggers an automatic 20 km walk fine.',
+      penalty_type: '20km walk',
+      penalty_km: 20,
+      penalty_walk_km: 20,
+      penalty_cycling_km: 40,
       penalty_status: 'pending',
       proof_url: null,
       created_at: new Date().toISOString(),
@@ -585,8 +594,60 @@ async function checkMissedMorningCheckin() {
   localStorage.setItem('fl_morning_check_date', today);
 
   if (newSlips.length > 0) {
-    alert('⚠ MISSED MORNING CHECK-IN\n\nYou did not complete the morning check-in on:\n' + newSlips.join(', ') + '\n\nPunishment per day: 10 KM WALK or 20 KM CYCLING\n\nThese slips are PERMANENT. Enforced from June 2, 2026.');
+    alert('⚠ MISSED DAILY CHECK-IN\n\nThe daily check-in did not happen on:\n' + newSlips.join(', ') + '\n\nAuto-fine per day: 20 KM WALK or 40 KM CYCLING\n\nThese slips are PERMANENT. Chapter 2 rule — enforced from June 13, 2026.');
   }
+}
+
+// ── DEVICE FORTRESS: phone brought inside the home ──
+// Rule: 10 km walk fine per 30 minutes the phone is kept inside the room. Self-logged, immutable.
+function logPhoneBreach() {
+  var minEl = document.getElementById('ci-phone-min');
+  var minutes = parseInt(minEl && minEl.value, 10);
+  if (!minutes || minutes < 1) { alert('Enter how many minutes the phone was inside.'); return; }
+  if (minutes > 1440) { alert('Maximum 1440 minutes (24 hours).'); return; }
+
+  var units = Math.ceil(minutes / 30);
+  var km = units * 10;
+  var date = getEffectiveToday();
+
+  var ok = confirm('LOG FORTRESS BREACH?\n\nPhone inside for ' + minutes + ' min = ' + units + ' × 30-min block' + (units > 1 ? 's' : '') + '\nFine: ' + km + ' KM WALK (or ' + (km * 2) + ' km cycling)\n\nThis slip is PERMANENT. No delete. No edit.');
+  if (!ok) return;
+
+  var now = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+  var hm = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+  var slipId = 'slip_phone_' + date + '_' + hm;
+
+  var slip = {
+    id: slipId,
+    client_id: slipId,
+    date: date,
+    rule: 'Phone Inside Home',
+    category: 'device_at_home',
+    description: 'Phone was kept inside the room for ' + minutes + ' minutes on ' + date + '. ' + units + ' × 30-min block = ' + km + ' km walk fine.',
+    function_met: false,
+    upstream_gap: 'The phone crossed the door. The fortress was breached for ' + minutes + ' minutes.',
+    insight: 'The home is device-free. Every 30 minutes inside costs 10 km on foot — friction beats willpower.',
+    penalty_type: km + 'km walk',
+    penalty_km: km,
+    penalty_walk_km: km,
+    penalty_cycling_km: km * 2,
+    penalty_status: 'pending',
+    proof_url: null,
+    created_at: new Date().toISOString(),
+    immutable: true
+  };
+
+  var slips = [];
+  try { slips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) {}
+  slips.push(slip);
+  localStorage.setItem('fl_slips', JSON.stringify(slips));
+
+  if (typeof syncSave === 'function') syncSave('slips', slip, 'id');
+  if (typeof sbFetch === 'function') sbFetch('slips', 'POST', slip, '?on_conflict=id');
+
+  if (minEl) minEl.value = '';
+  alert('⚠ FORTRESS BREACH LOGGED\n\n' + minutes + ' minutes inside = ' + km + ' KM WALK fine.\n\nVisible on firstlight.live/accountability. Serve it.');
+  renderCheckin();
 }
 
 // ── AUTO-PUNISHMENT: No run before 6:15 AM ──
