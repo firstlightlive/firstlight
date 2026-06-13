@@ -21,7 +21,7 @@
 // FORCE NUKE all service workers and caches — fixes stale content issues
 if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(w){w.unregister();console.log('[SW] Unregistered:',w.scope);});});caches.keys().then(function(k){k.forEach(function(n){caches.delete(n);console.log('[SW] Cache deleted:',n);});});}
 </script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Bodoni+Moda:wght@400;500;700;900&family=Cormorant+Garamond:wght@300;400;500&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
   @keyframes breathe{0%,100%{opacity:.35}50%{opacity:.7}}
@@ -905,8 +905,32 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
         <span class="bt-icon">🎬</span><span class="bt-name">CINEMATIC<br><span style="opacity:.7;font-size:.85em">5D · teal+amber film</span></span></button>
       <button class="btn-theme" onclick="genTheme('holographic',event)" style="background:linear-gradient(135deg,#FF4FE8,#5FFFEC,#FFD700);color:#0A0518">
         <span class="bt-icon">🪩</span><span class="bt-name">HOLOGRAPHIC<br><span style="opacity:.7;font-size:.85em">8D · iridescent foil</span></span></button>
+      <button class="btn-theme" onclick="genTheme('midnight',event)" style="background:linear-gradient(135deg,#7DA6FF,#070B1A);color:#E4ECFF">
+        <span class="bt-icon">🌌</span><span class="bt-name">MIDNIGHT<br><span style="opacity:.7;font-size:.85em">pre-dawn navy</span></span></button>
+      <button class="btn-theme" onclick="genTheme('amber',event)" style="background:linear-gradient(135deg,#FFB347,#0E0A04);color:#FFF1D6">
+        <span class="bt-icon">🍯</span><span class="bt-name">AMBER<br><span style="opacity:.7;font-size:.85em">honey warmth</span></span></button>
+      <button class="btn-theme" onclick="genTheme('emerald',event)" style="background:linear-gradient(135deg,#2EC678,#040C08);color:#E0F5EB">
+        <span class="bt-icon">💚</span><span class="bt-name">EMERALD<br><span style="opacity:.7;font-size:.85em">forest royal</span></span></button>
+      <button class="btn-theme" onclick="genTheme('pearl',event)" style="background:linear-gradient(135deg,#F8F4ED,#3D3A37);color:#1A1814">
+        <span class="bt-icon">🤍</span><span class="bt-name">PEARL<br><span style="opacity:.7;font-size:.85em">premium light</span></span></button>
+      <button class="btn-theme" onclick="genTheme('copper',event)" style="background:linear-gradient(135deg,#E07B3C,#1E0F08);color:#F5E0D0">
+        <span class="bt-icon">🟠</span><span class="bt-name">COPPER<br><span style="opacity:.7;font-size:.85em">artisan bronze</span></span></button>
+      <button class="btn-theme" onclick="genTheme('jade',event)" style="background:linear-gradient(135deg,#7DBFA0,#06100C);color:#E0F2EA">
+        <span class="bt-icon">🧿</span><span class="bt-name">JADE<br><span style="opacity:.7;font-size:.85em">zen sage</span></span></button>
+      <button class="btn-theme" onclick="genTheme('phantom',event)" style="background:linear-gradient(135deg,#FFFFFF,#000000);color:#FFFFFF">
+        <span class="bt-icon">⚪</span><span class="bt-name">PHANTOM<br><span style="opacity:.7;font-size:.85em">pure mono</span></span></button>
+      <button class="btn-theme" onclick="genTheme('velvet',event)" style="background:linear-gradient(135deg,#A85FFF,#0B0414);color:#F0E5FF">
+        <span class="bt-icon">🟣</span><span class="bt-name">VELVET<br><span style="opacity:.7;font-size:.85em">luxe purple</span></span></button>
+      <button class="btn-theme" onclick="genTheme('sunrise',event)" style="background:linear-gradient(135deg,#FF7B5C,#1A0B10);color:#FFE9DC">
+        <span class="bt-icon">🌅</span><span class="bt-name">SUNRISE<br><span style="opacity:.7;font-size:.85em">coral dawn</span></span></button>
+      <button class="btn-theme" onclick="genTheme('aurora',event)" style="background:linear-gradient(135deg,#5FFFD0,#9D7DFF,#FF6B9D);color:#0C1230">
+        <span class="bt-icon">✨</span><span class="bt-name">AURORA<br><span style="opacity:.7;font-size:.85em">celestial · special</span></span></button>
+      <button class="btn-theme" onclick="genTheme('chrome',event)" style="background:linear-gradient(135deg,#3D5A80,#F0F1F3);color:#0D1B2A">
+        <span class="bt-icon">🔘</span><span class="bt-name">CHROME<br><span style="opacity:.7;font-size:.85em">silver light</span></span></button>
+      <button class="btn-theme" onclick="genTheme('oxide',event)" style="background:linear-gradient(135deg,#C0744D,#1A1208);color:#F0E0CC">
+        <span class="bt-icon">🟫</span><span class="bt-name">OXIDE<br><span style="opacity:.7;font-size:.85em">industrial rust</span></span></button>
     </div>
-    <div class="btn-gen-sub" style="margin-top:8px">TAP A THEME → GENERATES CAROUSEL IN THAT PALETTE</div>
+    <div class="btn-gen-sub" style="margin-top:8px">25 PALETTES · DAY-OF-WEEK AUTO-PICKS · TAP TO OVERRIDE</div>
   </div>
 
   <!-- Output -->
@@ -1248,7 +1272,45 @@ const THEMES={
 
   // ── HOLOGRAPHIC (8D) — iridescent foil pink→cyan→gold, future tech ──
   holographic:{bg1:'#0A0518',bg2:'#150828',accent:'#FF4FE8',text:'#FFF2FF',mint:'#5FFFEC',danger:'#FF3E84',smoke:'#9B7AB8',ash:'#2A1545',acR:'rgba(255,79,232,',cornerAlpha:'.25)',gridAlpha:'.015',
-    ghost:'rgba(200,90,200,',treatment:'holo'}
+    ghost:'rgba(200,90,200,',treatment:'holo'},
+
+  // ── 12 ADDITIONAL PALETTES (25 total) — curated mood spectrum ──
+
+  midnight:{bg1:'#070B1A',bg2:'#0E1429',accent:'#7DA6FF',text:'#E4ECFF',mint:'#5FE5C8',danger:'#FF5252',smoke:'#5A6890',ash:'#1E2A48',acR:'rgba(125,166,255,',cornerAlpha:'.18)',gridAlpha:'.012',
+    ghost:'rgba(95,135,210,'},  // Pre-dawn deep navy + ice white
+
+  amber:{bg1:'#0E0A04',bg2:'#1C1407',accent:'#FFB347',text:'#FFF1D6',mint:'#5FE5C8',danger:'#FF5252',smoke:'#857258',ash:'#3D2E18',acR:'rgba(255,179,71,',cornerAlpha:'.20)',gridAlpha:'.012',
+    ghost:'rgba(220,150,55,'},  // Honey gold · welcoming warmth
+
+  emerald:{bg1:'#040C08',bg2:'#0A1812',accent:'#2EC678',text:'#E0F5EB',mint:'#A8E0C2',danger:'#FF5252',smoke:'#5E8070',ash:'#1A2E22',acR:'rgba(46,198,120,',cornerAlpha:'.18)',gridAlpha:'.012',
+    ghost:'rgba(40,160,95,'},  // Forest royal · serious
+
+  pearl:{bg1:'#F8F4ED',bg2:'#EFE9DE',accent:'#3D3A37',text:'#1A1814',mint:'#1E8B5E',danger:'#A82E2E',smoke:'#7A6E60',ash:'#D5C8B0',acR:'rgba(61,58,55,',cornerAlpha:'.22)',gridAlpha:'.028',light:true,
+    ghost:'rgba(80,75,70,'},  // Premium light · warm cream
+
+  copper:{bg1:'#0F0805',bg2:'#1E0F08',accent:'#E07B3C',text:'#F5E0D0',mint:'#5FE5C8',danger:'#FF5252',smoke:'#8A6852',ash:'#3D2818',acR:'rgba(224,123,60,',cornerAlpha:'.20)',gridAlpha:'.012',
+    ghost:'rgba(180,100,50,'},  // Artisan bronze · warm
+
+  jade:{bg1:'#06100C',bg2:'#0E1E18',accent:'#7DBFA0',text:'#E0F2EA',mint:'#A8E0C2',danger:'#FF5252',smoke:'#6E8A7E',ash:'#1E3328',acR:'rgba(125,191,160,',cornerAlpha:'.18)',gridAlpha:'.010',
+    ghost:'rgba(100,165,135,'},  // Zen sage · balanced
+
+  phantom:{bg1:'#000000',bg2:'#0A0A0A',accent:'#FFFFFF',text:'#FFFFFF',mint:'#7FE5C8',danger:'#FF5252',smoke:'#666666',ash:'#161616',acR:'rgba(255,255,255,',cornerAlpha:'.18)',gridAlpha:'.008',
+    ghost:'rgba(180,180,180,'},  // Pure mono · stark
+
+  velvet:{bg1:'#0B0414',bg2:'#180828',accent:'#A85FFF',text:'#F0E5FF',mint:'#7FE5C8',danger:'#FF4081',smoke:'#7A608A',ash:'#2A1842',acR:'rgba(168,95,255,',cornerAlpha:'.22)',gridAlpha:'.015',
+    ghost:'rgba(140,75,220,'},  // Deep luxury purple
+
+  sunrise:{bg1:'#0E0508',bg2:'#1A0B10',accent:'#FF7B5C',text:'#FFE9DC',mint:'#FFD08A',danger:'#C73A3A',smoke:'#8A5E58',ash:'#3D1F1C',acR:'rgba(255,123,92,',cornerAlpha:'.22)',gridAlpha:'.014',
+    ghost:'rgba(230,100,60,'},  // Coral sunrise · literal dawn
+
+  aurora:{bg1:'#040614',bg2:'#0C1230',accent:'#5FFFD0',text:'#E8FFF4',mint:'#9D7DFF',danger:'#FF6B9D',smoke:'#5A7088',ash:'#1A2348',acR:'rgba(95,255,208,',cornerAlpha:'.22)',gridAlpha:'.015',
+    ghost:'rgba(80,210,170,',treatment:'aurora'},  // Northern lights · celestial special
+
+  chrome:{bg1:'#F0F1F3',bg2:'#E4E6EA',accent:'#3D5A80',text:'#0D1B2A',mint:'#1E8B5E',danger:'#A82E2E',smoke:'#5A6B7C',ash:'#C4CCD4',acR:'rgba(61,90,128,',cornerAlpha:'.22)',gridAlpha:'.025',light:true,
+    ghost:'rgba(70,95,130,'},  // Polished silver · cool light
+
+  oxide:{bg1:'#0D0905',bg2:'#1A1208',accent:'#C0744D',text:'#F0E0CC',mint:'#7DBF80',danger:'#FF5252',smoke:'#8A6E52',ash:'#3D2818',acR:'rgba(192,116,77,',cornerAlpha:'.18)',gridAlpha:'.010',
+    ghost:'rgba(160,90,55,'}  // Iron oxide rust · industrial
 };
 // Default: OBSIDIAN — brand gold daily baseline.
 // Legacy aliases for forward-compat with old localStorage entries
@@ -3899,232 +3961,290 @@ function _postCoverDraw(c,img,x,y,w,h){
 function _postFmt12(t){if(!t)return'';var p=t.split(':');var h=+p[0],m=+p[1];return(h%12||12)+':'+String(m).padStart(2,'0')+' '+(h>=12?'PM':'AM');}
 function _postFmtPace(km,mn){if(!km||!mn)return'—';var p=parseFloat(mn)/parseFloat(km);if(!p||!isFinite(p))return'—';return Math.floor(p)+"'"+String(Math.round((p%1)*60)).padStart(2,'0')+'"';}
 
+
 // ═════════════════════════════════════════════════════════════════
-// SLIDE 1 — THE ROUTE
-// Full-bleed Strava satellite map of the polyline, day badge top-right,
-// bottom stat strip with KM · PACE · MIN · START TIME. The route is the proof.
+// THE SPINE · 1000-DAY LAYERED CANONICAL TILE
+// Replaces ROUTE+BODY+RECEIPT carousel with a single composable design.
 // ═════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MILESTONE + AUTO-PALETTE HELPERS (Chapter 02 — 1000-day system)
+// ═══════════════════════════════════════════════════════════════
+function _isMilestoneDay(day){
+  return [7,14,21,30,50,75,100,150,200,250,300,365,500,750,1000].indexOf(day)>=0;
+}
+function _milestoneLabel(day){
+  var L={7:'WEEK ONE · LOCKED',14:'WEEK TWO · STILL HERE',21:'21 DAYS · HABIT FORMED',
+    30:'ONE MONTH · HABIT LOCKED',50:'HALF CENTURY',75:'75 DAYS · DEEP REPS',
+    100:'TRIPLE DIGITS · THE GAME CHANGES',150:'150 · RELENTLESS',200:'200 · COMPOUND INTEREST',
+    250:'250 · QUARTER OF A THOUSAND',300:'300 · UNYIELDING',365:'ONE FULL YEAR · UNBROKEN',
+    500:'FIVE HUNDRED · LEGENDARY',750:'750 · ALMOST THERE',1000:'ONE THOUSAND · THE IMPOSSIBLE THING'};
+  return L[day]||'';
+}
+// Day-of-week palette algorithm. User can override via theme picker.
+function _autoPickPalette(){
+  if(localStorage.getItem('fl_palette_lock')==='1') return localStorage.getItem('fl_theme')||'obsidian';
+  var dn=parseInt(document.getElementById('dayNum')?.value)||1;
+  // Milestone overrides
+  if(dn===1000||dn===500||dn===750)return 'aurora';
+  if(dn===365)return 'amber';
+  if(dn===100||dn===200||dn===300)return 'holographic';
+  if(dn===50||dn===75||dn===150||dn===250)return 'emerald';
+  if(dn===7||dn===14||dn===21||dn===30)return 'dawn';
+  // Day-of-week rotation
+  var dow=new Date().getDay(); // 0=Sun
+  var rot={0:'dawn',1:'obsidian',2:'steel',3:'obsidian',4:'amber',5:'ember',6:'velvet'};
+  return rot[dow]||'obsidian';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SLIDE 1 — THE SPINE  (the 1000-day canonical tile · 5 layers)
+//   LAYER 0  base grid (BG + vignette)
+//   LAYER 1  identity backbone (wordmark + polyline + day numeral + footer)
+//   LAYER 2  content modules (photo band if uploaded · stats · ticks)
+//   LAYER 3  variation engine (corner micro-marks · numeral weight by day)
+//   LAYER 4  milestone overlay (sun rays · crown · holographic foil)
+// ═══════════════════════════════════════════════════════════════
 function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime){
   const cv=document.getElementById('c1');cv.width=2160;cv.height=2700;
   const c=cv.getContext('2d');c.scale(2,2);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   const W=1080,H=1350;
   const dn=parseInt(day)||1;
+  const milestone=_isMilestoneDay(dn);
   const _wStart=(document.getElementById('workoutStart')?.value||'').trim();
-  const poly=_postLatestPolyline();
-  const accentHex=(P.accent||'#FC4C02').replace('#','');
-  // Map source priority: 1) user-uploaded Strava map screenshot (iM), 2) Mapbox satellite of polyline, 3) hand-drawn polyline.
-  const userMapImg=(typeof iM!=='undefined'&&iM)?iM:null;
-  const url=userMapImg||(poly?_postMapImgUrl(poly,540,675,accentHex):null);
+  const _bpm=(document.getElementById('bpm')?.value||'').trim();
+  const isLight=!!P.light;
+  // Photo source (Layer 2 module — turns on if any photo uploaded)
+  const photoSrc=(typeof iT!=='undefined'&&iT)?iT:(typeof i1!=='undefined'&&i1)?i1:(typeof i2!=='undefined'&&i2)?i2:null;
+  // Polyline (Layer 1 — always tries)
+  const poly=(function(){try{if(_stravaCache&&Array.isArray(_stravaCache)){var r=_stravaCache.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});if(r)return r.summary_polyline;}}catch(e){}return null;})();
 
-  function paint(mapImg){
-    // 1. BASE — dark + map (or fallback)
-    c.fillStyle='#05080C';c.fillRect(0,0,W,H);
-    if(mapImg){
-      _postCoverDraw(c,mapImg,0,0,W,H);
-      // Subtle dark + accent vignette for legibility
-      var dim=c.createLinearGradient(0,0,0,H);
-      dim.addColorStop(0,'rgba(0,0,0,0.55)');dim.addColorStop(0.35,'rgba(0,0,0,0.05)');
-      dim.addColorStop(0.65,'rgba(0,0,0,0.05)');dim.addColorStop(1,'rgba(0,0,0,0.92)');
-      c.fillStyle=dim;c.fillRect(0,0,W,H);
-    } else if(poly){
-      // Hand-drawn polyline fallback when Mapbox didn't load
-      _postPoly(c,poly,40,160,W-80,H-440,P.accent);
-    } else {
-      c.textAlign='center';c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
-      c.fillText('SYNC STRAVA TO LOAD TODAY\'S ROUTE',W/2,H/2);
-    }
+  function fmt12local(t){if(!t)return'';var p=t.split(':');var h=+p[0],m=+p[1];return(h%12||12)+':'+String(m).padStart(2,'0')+' '+(h>=12?'PM':'AM');}
+  function fmtPace(){if(!km||!mn)return'—';var p=parseFloat(mn)/parseFloat(km);if(!p||!isFinite(p))return'—';return Math.floor(p)+"'"+String(Math.round((p%1)*60)).padStart(2,'0')+'"';}
+  // Polyline decoder
+  function _polyPts(s){if(!s)return[];if(typeof _decodePolyline==='function')return _decodePolyline(s);var idx=0,lat=0,lng=0,pts=[];while(idx<s.length){var b,sh=0,r=0;do{b=s.charCodeAt(idx++)-63;r|=(b&0x1f)<<sh;sh+=5;}while(b>=0x20);lat+=(r&1)?~(r>>1):(r>>1);sh=0;r=0;do{b=s.charCodeAt(idx++)-63;r|=(b&0x1f)<<sh;sh+=5;}while(b>=0x20);lng+=(r&1)?~(r>>1):(r>>1);pts.push([lat/1e5,lng/1e5]);}return pts;}
+  function drawPath(poly,bx,by,bw,bh,style,lineW,alpha){var pts=_polyPts(poly);if(!pts||pts.length<2)return false;var lats=pts.map(function(p){return p[0];}),lngs=pts.map(function(p){return p[1];});var minLat=Math.min.apply(null,lats),maxLat=Math.max.apply(null,lats);var minLng=Math.min.apply(null,lngs),maxLng=Math.max.apply(null,lngs);var pad=20,iw=bw-pad*2,ih=bh-pad*2;var sx=iw/(maxLng-minLng||1),sy=ih/(maxLat-minLat||1),s=Math.min(sx,sy);var ox=bx+pad+(iw-(maxLng-minLng)*s)/2,oy=by+pad+(ih-(maxLat-minLat)*s)/2;c.save();c.globalAlpha=alpha||1;c.strokeStyle=style;c.lineWidth=lineW;c.lineCap='round';c.lineJoin='round';c.beginPath();pts.forEach(function(p,i){var x=ox+(p[1]-minLng)*s,y=oy+(maxLat-p[0])*s;if(i===0)c.moveTo(x,y);else c.lineTo(x,y);});c.stroke();c.restore();return true;}
 
-    // 2. TOP STRIP — brand left, day right
-    c.fillStyle='rgba(0,0,0,0.45)';c.fillRect(0,0,W,110);
-    c.fillStyle=P.accent;c.fillRect(0,110,W,2);
-    c.textAlign='left';
-    c.font='400 26px "DM Serif Display",serif';c.fillStyle='#fff';
-    c.fillText('FIRST LIGHT',32,52);
-    c.font='600 10px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.85)';
-    c.fillText('GPS-VERIFIED · STRAVA · BANGALORE',32,76);
-    c.textAlign='right';
-    c.font='900 40px "Rajdhani",sans-serif';c.fillStyle=P.accent;
-    c.fillText('DAY '+String(dn).padStart(3,'0'),W-32,58);
-    c.font='600 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.6)';
-    c.fillText((dateStr||'').toUpperCase(),W-32,82);
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // LAYER 0 — BASE GRID (BG + vignette)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  c.fillStyle=P.bg1;c.fillRect(0,0,W,H);
+  var vg=c.createRadialGradient(W/2,H*0.42,200,W/2,H*0.42,Math.max(W,H));
+  vg.addColorStop(0,P.bg2);vg.addColorStop(1,P.bg1);
+  c.fillStyle=vg;c.fillRect(0,0,W,H);
 
-    // 3. BOTTOM STAT STRIP — the irrefutable line
-    var sy=H-260;
-    c.fillStyle='rgba(0,0,0,0.78)';c.fillRect(0,sy,W,260);
-    c.fillStyle=P.accent;c.fillRect(0,sy,W,3);
-    // 4 cells equal width
-    var cells=[
-      {l:'DISTANCE',v:(km||'—'),u:'KM'},
-      {l:'PACE',v:_postFmtPace(km,mn),u:'/KM'},
-      {l:'DURATION',v:(mn||'—'),u:'MIN'},
-      {l:'START',v:_postFmt12(_wStart)||'—',u:'IST'}
-    ];
-    var cw=W/4;
-    cells.forEach(function(cell,i){
-      var cx=cw*i+cw/2;
-      c.textAlign='center';
-      c.font='600 10px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.7)';
-      c.fillText(cell.l,cx,sy+44);
-      c.font='900 60px "Rajdhani",sans-serif';c.fillStyle='#fff';
-      c.fillText(cell.v,cx,sy+118);
-      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=P.accent;
-      c.fillText(cell.u,cx,sy+146);
-      // Divider
-      if(i<cells.length-1){
-        c.strokeStyle='rgba(255,255,255,0.1)';c.lineWidth=1;
-        c.beginPath();c.moveTo(cw*(i+1),sy+30);c.lineTo(cw*(i+1),sy+170);c.stroke();
-      }
-    });
-    // Footer
-    c.textAlign='center';c.font='500 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.55)';
-    c.fillText('₹15,000 STAKE  ·  LOGGED PUBLIC  ·  EVERY MORNING',W/2,sy+200);
-    c.font='700 13px "JetBrains Mono",monospace';c.fillStyle=P.accent;
-    c.fillText('firstlight.live',W/2,sy+228);
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // LAYER 1 — IDENTITY BACKBONE
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    // 4. CORNER FRAME
-    var bL=22;
-    c.strokeStyle=P.accent;c.lineWidth=2;c.lineCap='square';
-    [[28,134],[W-28,134],[28,sy-22],[W-28,sy-22]].forEach(function(p,j){
-      var dx=j%2===0?1:-1,dy=j<2?1:-1;
-      c.beginPath();c.moveTo(p[0],p[1]+dy*bL);c.lineTo(p[0],p[1]);c.lineTo(p[0]+dx*bL,p[1]);c.stroke();
-    });
+  // 1A — Polyline backbone (full bleed, low opacity)
+  if(poly){drawPath(poly,-30,-30,W+60,H+60,P.accent,4,milestone?0.22:0.18);}
 
-    // 5. THEME-SPECIFIC TREATMENT OVERLAYS (3D/5D/8D dimensional richness)
-    if(P.treatment==='topo'){
-      // Contour-line texture across mid-band
-      c.save();c.globalAlpha=0.35;c.strokeStyle=P.acR+'0.45)';c.lineWidth=1;
-      for(var ti=0;ti<8;ti++){
-        c.beginPath();
-        var baseY=160+ti*100;
-        for(var tx=0;tx<W;tx+=8){
-          var ty=baseY+Math.sin(tx*0.013+ti*0.7)*22+Math.sin(tx*0.03+ti*1.1)*10;
-          if(tx===0)c.moveTo(tx,ty);else c.lineTo(tx,ty);
-        }
-        c.stroke();
-      }
-      c.restore();
-      // Elevation badge top-left
-      c.fillStyle=P.acR+'0.85)';c.fillRect(28,128,160,32);
-      c.textAlign='left';c.font='700 11px "JetBrains Mono",monospace';c.fillStyle=isFinite(P.bg1)?P.bg1:'#1A140E';
-      c.fillText('ELEVATION · TRAIL',40,149);
-    } else if(P.treatment==='cinema'){
-      // Letterbox cinematic bars
-      c.fillStyle='#000';
-      c.fillRect(0,128,W,40);c.fillRect(0,sy-40,W,40);
-      // Anamorphic lens flare across top
-      var lf=c.createLinearGradient(0,160,W,200);
-      lf.addColorStop(0,'transparent');lf.addColorStop(0.45,'rgba(255,168,76,0.0)');
-      lf.addColorStop(0.55,'rgba(255,168,76,0.18)');lf.addColorStop(1,'transparent');
-      c.fillStyle=lf;c.fillRect(0,158,W,100);
-      // Film grain
-      c.save();c.globalAlpha=0.06;
-      for(var gi=0;gi<500;gi++){
-        var gx=(gi*97)%W,gy=(gi*53)%H;
-        c.fillStyle=gi%2?'#FFA84C':'#fff';c.fillRect(gx,gy,1,1);
-      }c.restore();
-    } else if(P.treatment==='holo'){
-      // Iridescent foil sheen across the whole tile
-      c.save();c.globalCompositeOperation='overlay';c.globalAlpha=0.35;
-      var holo=c.createLinearGradient(0,0,W,H);
-      holo.addColorStop(0,'#FF4FE8');holo.addColorStop(0.33,'#5FFFEC');
-      holo.addColorStop(0.66,'#FFD700');holo.addColorStop(1,'#FF4FE8');
-      c.fillStyle=holo;c.fillRect(0,128,W,H-128-260);c.restore();
-      // Chromatic-aberration scan lines on the stat strip
-      c.save();c.globalAlpha=0.20;c.fillStyle='#5FFFEC';
-      for(var si=0;si<H;si+=3){c.fillRect(0,si,W,1);}
-      c.restore();
-      // Hologram corner marker
-      c.fillStyle=P.accent;c.fillRect(W-180,128,150,30);
-      c.textAlign='right';c.font='800 12px "JetBrains Mono",monospace';c.fillStyle='#0A0518';
-      c.fillText('◆ HOLOGRAM',W-38,149);
-    }
+  // 1B — Top wordmark
+  var muted=P.acR+'0.55)';
+  var hair=P.acR+'0.18)';
+  c.textAlign='center';
+  c.font='500 12px "JetBrains Mono",monospace';c.fillStyle=muted;
+  c.fillText('— F I R S T  L I G H T —',W/2,90);
+  c.font='400 9px "JetBrains Mono",monospace';c.fillStyle=hair;
+  c.fillText('CHAPTER 02  ·  BANGALORE  ·  GPS-VERIFIED',W/2,110);
+  c.strokeStyle=hair;c.lineWidth=0.5;
+  c.beginPath();c.moveTo(W/2-180,125);c.lineTo(W/2+180,125);c.stroke();
+
+  // 1C — HERO Day numeral (Bodoni Moda · editorial heavy)
+  c.textAlign='center';
+  var heroY=680;
+  c.font='400 14px "JetBrains Mono",monospace';c.fillStyle=muted;
+  c.fillText('— D A Y —',W/2,heroY-280);
+  // Numeral weight scales with streak
+  var numSize=dn>=1000?660:dn>=100?600:560;
+  c.font='400 '+numSize+'px "Bodoni Moda","DM Serif Display",serif';
+  c.fillStyle=P.accent;
+  c.shadowColor=muted;c.shadowBlur=40;
+  c.fillText(String(dn).padStart(dn>=1000?4:3,'0'),W/2,heroY);
+  c.shadowBlur=0;
+  // Accent rule
+  c.strokeStyle=P.accent;c.lineWidth=0.8;
+  c.beginPath();c.moveTo(W/2-100,heroY+50);c.lineTo(W/2+100,heroY+50);c.stroke();
+  // Italic subtitle
+  c.font='italic 300 24px "Cormorant Garamond","DM Serif Display",serif';c.fillStyle=isLight?P.text:P.text;
+  c.fillText('still holding the line',W/2,heroY+90);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // LAYER 2 — CONTENT MODULES (data-driven)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  // 2A — Photo band (if photo uploaded)
+  var photoBandH=170;
+  var statsY=heroY+(photoSrc?340:170);
+  if(photoSrc){
+    var bandY=heroY+140;
+    var img=new Image();img.crossOrigin='anonymous';
+    img.onload=function(){
+      try{
+        c.save();c.beginPath();c.rect(80,bandY,W-160,photoBandH);c.clip();
+        c.globalAlpha=0.40;
+        var s=Math.max((W-160)/img.width,photoBandH/img.height);
+        var iw=img.width*s,ih=img.height*s;
+        c.drawImage(img,(W-iw)/2,bandY+(photoBandH-ih)/2,iw,ih);
+        c.restore();
+        // Dim overlay
+        var pg=c.createLinearGradient(0,bandY,0,bandY+photoBandH);
+        pg.addColorStop(0,P.bg1+'BB');pg.addColorStop(0.5,'rgba(0,0,0,0.15)');pg.addColorStop(1,P.bg1+'CC');
+        c.fillStyle=pg;c.fillRect(80,bandY,W-160,photoBandH);
+        c.strokeStyle=muted;c.lineWidth=0.7;
+        c.strokeRect(80,bandY,W-160,photoBandH);
+        c.textAlign='center';c.font='500 9px "JetBrains Mono",monospace';c.fillStyle=muted;
+        c.fillText('— THE BODY · WITNESSED —',W/2,bandY+20);
+        // Repaint stats & footer on top
+        _spinePaintStatsAndFooter();
+      }catch(e){console.warn('Photo band error:',e);_spinePaintStatsAndFooter();}
+    };
+    img.onerror=function(){_spinePaintStatsAndFooter();};
+    img.src=photoSrc;
+  } else {
+    _spinePaintStatsAndFooter();
   }
 
-  if(url){_postLoadImg(url).then(paint);}
-  else {paint(null);}
+  function _spinePaintStatsAndFooter(){
+    // 2B — Stats module
+    c.textAlign='center';
+    c.font='500 11px "JetBrains Mono",monospace';c.fillStyle=muted;
+    c.fillText('— SPECIMEN DATA · TODAY —',W/2,statsY);
+    c.font='600 22px "JetBrains Mono",monospace';c.fillStyle=P.text;
+    var statLine=(km||'—')+' KM   ·   '+fmtPace()+'/KM   ·   '+(mn||'—')+' MIN';
+    c.fillText(statLine,W/2,statsY+38);
+    c.font='400 11px "JetBrains Mono",monospace';c.fillStyle=muted;
+    var subLine=(fmt12local(_wStart)||'04:48 AM')+' IST';
+    if(wxStr) subLine += '  ·  '+wxStr.replace(/[•·]/g,' ').toUpperCase();
+    if(_bpm) subLine += '  ·  '+_bpm+' BPM';
+    c.fillText(subLine,W/2,statsY+66);
+
+    // 2C — Tick module (RUN / GYM / FOOD)
+    var chY=statsY+108,chSpacing=145,startX=W/2-chSpacing;
+    [{l:'RUN',v:run},{l:'GYM',v:gym},{l:'FOOD',v:food}].forEach(function(ck,i){
+      var x=startX+i*chSpacing;
+      c.beginPath();c.arc(x-26,chY,15,0,Math.PI*2);
+      if(ck.v){c.fillStyle=P.accent;c.fill();
+        c.strokeStyle=P.text;c.lineWidth=2.5;c.lineCap='round';
+        c.beginPath();c.moveTo(x-32,chY);c.lineTo(x-28,chY+4);c.lineTo(x-21,chY-6);c.stroke();
+      } else {
+        c.strokeStyle=muted;c.lineWidth=2;c.stroke();
+      }
+      c.textAlign='left';c.font='700 16px "JetBrains Mono",monospace';
+      c.fillStyle=ck.v?P.text:muted;
+      c.fillText(ck.l,x-5,chY+5);
+    });
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // LAYER 3 — VARIATION ENGINE (corner micro-marks)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    var inset=72;
+    [[inset,inset],[W-inset,inset],[inset,H-inset],[W-inset,H-inset]].forEach(function(p,i){
+      c.fillStyle=P.accent;c.beginPath();c.arc(p[0],p[1],2,0,Math.PI*2);c.fill();
+      var l=18;
+      c.strokeStyle=muted;c.lineWidth=0.6;
+      var dx=i%2===0?1:-1,dy=i<2?1:-1;
+      c.beginPath();c.moveTo(p[0],p[1]+dy*5);c.lineTo(p[0],p[1]+dy*l);c.stroke();
+      c.beginPath();c.moveTo(p[0]+dx*5,p[1]);c.lineTo(p[0]+dx*l,p[1]);c.stroke();
+    });
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // LAYER 4 — MILESTONE OVERLAY (only if milestone)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    if(milestone){
+      c.save();c.translate(W/2,heroY-100);
+      for(var ri=0;ri<32;ri++){
+        c.rotate(Math.PI/16);
+        c.fillStyle=ri%2===0?muted:hair;
+        c.fillRect(-1.5,-380,3,40);
+      }
+      c.restore();
+      if(dn>=100){
+        c.textAlign='center';
+        c.font='400 16px "JetBrains Mono",monospace';c.fillStyle=P.accent;
+        c.fillText('◆ ◆ ◆',W/2,heroY-310);
+      }
+      if(dn>=365){
+        c.save();c.globalCompositeOperation='overlay';c.globalAlpha=0.18;
+        var holo=c.createLinearGradient(0,heroY-200,W,heroY+200);
+        holo.addColorStop(0,'#FF4FE8');holo.addColorStop(0.33,'#5FFFEC');
+        holo.addColorStop(0.66,'#FFD700');holo.addColorStop(1,'#FF4FE8');
+        c.fillStyle=holo;c.fillRect(0,heroY-300,W,500);c.restore();
+      }
+      var lbl=_milestoneLabel(dn);
+      if(lbl){
+        c.textAlign='center';
+        c.font='600 12px "JetBrains Mono",monospace';c.fillStyle=P.accent;
+        c.fillText('— '+lbl+' —',W/2,statsY+chY-statsY+170);
+      }
+    }
+
+    // FOOTER (always last)
+    c.textAlign='center';
+    c.font='400 11px "JetBrains Mono",monospace';c.fillStyle=muted;
+    c.fillText('₹15,000  STAKE   ·   LOGGED PUBLIC   ·   EVERY MORNING',W/2,H-110);
+    c.font='italic 300 14px "Cormorant Garamond","DM Serif Display",serif';c.fillStyle=hair;
+    c.fillText('firstlight.live  ·  '+(handleIG||'@firstlightlive'),W/2,H-82);
+  }
 }
 
-// ═════════════════════════════════════════════════════════════════
-// SLIDE 2 — THE BODY  (renders to c3)
-// Photo full bleed (uses i1), dimmed, with a single handwritten serif line.
-// The body is the witness.
-// ═════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// SLIDE 2 — THE PROOF  (route + photo combined · only when photo uploaded)
+// ═══════════════════════════════════════════════════════════════
 function slide2(day,km,mn,kc,loc,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats){
   const cv=document.getElementById('c3');cv.width=2160;cv.height=2700;
   const c=cv.getContext('2d');c.scale(2,2);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   const W=1080,H=1350;
   const dn=parseInt(day)||1;
-  // Full photo-source fallback chain — match what the UI actually populates.
-  // iT (tracker photo, the visible upload) is checked FIRST since that's what users upload.
-  const photoSrc=(typeof iT!=='undefined'&&iT)?iT:
-                 (typeof i1!=='undefined'&&i1)?i1:
-                 (typeof i2!=='undefined'&&i2)?i2:null;
-
-  function paint(img){
-    // Base
-    c.fillStyle='#0A0908';c.fillRect(0,0,W,H);
-    if(img){
-      _postCoverDraw(c,img,0,0,W,H);
-      // Editorial dim — darker top + bottom, photo readable middle
-      var g=c.createLinearGradient(0,0,0,H);
-      g.addColorStop(0,'rgba(0,0,0,0.65)');
-      g.addColorStop(0.25,'rgba(0,0,0,0.15)');
-      g.addColorStop(0.75,'rgba(0,0,0,0.25)');
-      g.addColorStop(1,'rgba(0,0,0,0.85)');
-      c.fillStyle=g;c.fillRect(0,0,W,H);
-    } else {
-      // Gradient fallback if no photo uploaded
-      var gf=c.createRadialGradient(W/2,H*0.4,80,W/2,H*0.4,W);
-      gf.addColorStop(0,P.bg2);gf.addColorStop(1,'#000');
-      c.fillStyle=gf;c.fillRect(0,0,W,H);
-      c.textAlign='center';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
-      c.fillText('UPLOAD A PHOTO TO ACTIVATE THIS SLIDE',W/2,H/2);
-    }
-
-    // Top: brand
-    c.textAlign='left';
-    c.font='400 22px "DM Serif Display",serif';c.fillStyle='#fff';
-    c.fillText('FIRST LIGHT',32,52);
-    c.font='600 10px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.95)';
-    c.fillText('THE BODY',32,72);
-    c.textAlign='right';
-    c.font='900 36px "Rajdhani",sans-serif';c.fillStyle=P.accent;
-    c.fillText('DAY '+String(dn).padStart(3,'0'),W-32,56);
-
-    // Center: handwritten serif quote — pick by streak phase
-    var quotes=[
-      ['Before the city woke,','I was already running.'],
-      ['I do not negotiate','with the alarm.'],
-      ['No one watched.','I went anyway.'],
-      ['The road was cold.','The body went anyway.'],
-      ['Tomorrow, the same answer.','And the day after.']
-    ];
-    var q=quotes[dn%quotes.length];
-    var qy=H*0.52;
-    c.textAlign='center';
-    // Soft glow plate behind
-    c.save();c.shadowColor='rgba(0,0,0,0.55)';c.shadowBlur=24;
-    c.font='italic 400 56px "DM Serif Display",serif';c.fillStyle='#FFFFFF';
-    q.forEach(function(line,i){c.fillText('“'+line+'”',W/2,qy+i*70);});
-    c.restore();
-    // Rule under the quote
-    c.strokeStyle='rgba(255,255,255,0.5)';c.lineWidth=1;
-    c.beginPath();c.moveTo(W/2-140,qy+q.length*70+30);c.lineTo(W/2+140,qy+q.length*70+30);c.stroke();
-    c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.75)';
-    c.fillText('—  ANUPAM  ·  DAY '+dn+'  ·  '+(_postFmt12(wStart)||'04:48 AM'),W/2,qy+q.length*70+58);
-
-    // Footer band
-    var fy=H-110;
-    c.fillStyle='rgba(0,0,0,0.55)';c.fillRect(0,fy,W,110);
-    c.fillStyle=P.accent;c.fillRect(0,fy,W,2);
-    c.textAlign='center';c.font='500 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.7)';
-    c.fillText('₹15,000 STAKE  ·  LOGGED PUBLIC  ·  '+(km?km+' KM TODAY':'BEFORE 6 AM'),W/2,fy+44);
-    c.font='700 13px "JetBrains Mono",monospace';c.fillStyle=P.accent;
-    c.fillText('firstlight.live',W/2,fy+72);
+  const photoSrc=(typeof iT!=='undefined'&&iT)?iT:(typeof i1!=='undefined'&&i1)?i1:(typeof i2!=='undefined'&&i2)?i2:null;
+  const poly=(function(){try{if(_stravaCache&&Array.isArray(_stravaCache)){var r=_stravaCache.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});if(r)return r.summary_polyline;}}catch(e){}return null;})();
+  function _polyPts(s){if(!s)return[];if(typeof _decodePolyline==='function')return _decodePolyline(s);var idx=0,lat=0,lng=0,pts=[];while(idx<s.length){var b,sh=0,r=0;do{b=s.charCodeAt(idx++)-63;r|=(b&0x1f)<<sh;sh+=5;}while(b>=0x20);lat+=(r&1)?~(r>>1):(r>>1);sh=0;r=0;do{b=s.charCodeAt(idx++)-63;r|=(b&0x1f)<<sh;sh+=5;}while(b>=0x20);lng+=(r&1)?~(r>>1):(r>>1);pts.push([lat/1e5,lng/1e5]);}return pts;}
+  function drawPath(poly,bx,by,bw,bh,style,lineW,alpha,glow){var pts=_polyPts(poly);if(!pts||pts.length<2)return false;var lats=pts.map(function(p){return p[0];}),lngs=pts.map(function(p){return p[1];});var minLat=Math.min.apply(null,lats),maxLat=Math.max.apply(null,lats);var minLng=Math.min.apply(null,lngs),maxLng=Math.max.apply(null,lngs);var pad=20,iw=bw-pad*2,ih=bh-pad*2;var sx=iw/(maxLng-minLng||1),sy=ih/(maxLat-minLat||1),s=Math.min(sx,sy);var ox=bx+pad+(iw-(maxLng-minLng)*s)/2,oy=by+pad+(ih-(maxLat-minLat)*s)/2;c.save();c.globalAlpha=alpha||1;c.strokeStyle=style;c.lineWidth=lineW;c.lineCap='round';c.lineJoin='round';if(glow){c.shadowColor=style;c.shadowBlur=glow;}c.beginPath();pts.forEach(function(p,i){var x=ox+(p[1]-minLng)*s,y=oy+(maxLat-p[0])*s;if(i===0)c.moveTo(x,y);else c.lineTo(x,y);});c.stroke();c.shadowBlur=0;c.restore();return true;}
+  var splitY=H*0.5;
+  c.fillStyle=P.bg1;c.fillRect(0,0,W,splitY);
+  if(poly){drawPath(poly,40,80,W-80,splitY-100,P.accent,7,1,28);} else {
+    c.textAlign='center';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
+    c.fillText('SYNC STRAVA TO LOAD ROUTE',W/2,splitY/2);
   }
-
-  if(photoSrc){_postLoadImg(photoSrc).then(paint);}
-  else paint(null);
+  c.fillStyle='#0A0908';c.fillRect(0,splitY,W,H-splitY);
+  function overlays(){
+    c.fillStyle=P.accent;c.fillRect(0,splitY-3,W,6);
+    var tw=320,th=86;
+    c.fillStyle=P.bg1;c.fillRect(W/2-tw/2,splitY-th/2,tw,th);
+    c.strokeStyle=P.accent;c.lineWidth=2;c.strokeRect(W/2-tw/2,splitY-th/2,tw,th);
+    c.textAlign='center';c.font='400 36px "Bodoni Moda",serif';c.fillStyle=P.accent;
+    c.fillText(String(dn).padStart(dn>=1000?4:3,'0'),W/2,splitY-2);
+    c.font='500 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.75)';
+    c.fillText('THE ROUTE   ·   THE BODY',W/2,splitY+22);
+    c.fillStyle='rgba(0,0,0,0.55)';c.fillRect(0,0,W,80);
+    c.textAlign='left';c.font='400 24px "DM Serif Display",serif';c.fillStyle='#fff';
+    c.fillText('FIRST LIGHT',32,52);
+    c.textAlign='right';c.font='600 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.75)';
+    c.fillText('GPS-VERIFIED · STRAVA',W-32,42);
+    c.fillText('CHAPTER 02 · BANGALORE',W-32,62);
+    c.fillStyle='rgba(0,0,0,0.65)';c.fillRect(0,H-100,W,100);
+    c.textAlign='center';c.font='500 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.75)';
+    c.fillText((km||'—')+' KM  ·  '+(mn||'—')+' MIN  ·  '+(wStart||'04:48 AM'),W/2,H-62);
+    c.font='700 13px "JetBrains Mono",monospace';c.fillStyle=P.accent;
+    c.fillText('₹15,000 STAKE  ·  firstlight.live  ·  '+(handleIG||'@firstlightlive'),W/2,H-32);
+  }
+  if(photoSrc){
+    var img=new Image();img.crossOrigin='anonymous';
+    img.onload=function(){
+      var s=Math.max(W/img.width,(H-splitY)/img.height);
+      var iw=img.width*s,ih=img.height*s;
+      c.drawImage(img,(W-iw)/2,splitY+((H-splitY)-ih)/2,iw,ih);
+      var g=c.createLinearGradient(0,splitY,0,H);
+      g.addColorStop(0,'rgba(0,0,0,0.10)');g.addColorStop(1,'rgba(0,0,0,0.80)');
+      c.fillStyle=g;c.fillRect(0,splitY,W,H-splitY);
+      overlays();
+    };
+    img.onerror=overlays;img.src=photoSrc;
+  } else {
+    c.textAlign='center';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
+    c.fillText('UPLOAD PHOTO TO UNLOCK SLIDE 2',W/2,splitY+(H-splitY)/2);
+    overlays();
+  }
 }
 
 // ═════════════════════════════════════════════════════════════════
@@ -6852,13 +6972,11 @@ async function igPublishStory(){
 }
 
 function _getSlideCanvases(){
-  // Chapter 02 proof-first carousel: c1=THE ROUTE, c3=THE BODY, c4=THE RECEIPT
-  // c1 IS the route — no separate c7. c5 reserved for huge tier-3 milestones only.
+  // Chapter 02 SPINE: c1 = THE SPINE catalog tile (always)
+  //                   c3 = THE PROOF (route + photo combined) — only when photo uploaded
   if(mode==='lastlight') return ['c1','c2'];
-  const day=parseInt(document.getElementById('dayNum').value)||1;
-  const ids=['c1','c3','c4']; // always 3 slides: ROUTE · BODY · RECEIPT
-  if([100,200,365,500,1000].indexOf(day)>=0) ids.push('c5');
-  return ids;
+  const hasPhoto=(typeof iT!=='undefined'&&iT)||(typeof i1!=='undefined'&&i1)||(typeof i2!=='undefined'&&i2);
+  return hasPhoto?['c1','c3']:['c1'];
 }
 
 function saveAll(){
