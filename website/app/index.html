@@ -941,6 +941,12 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
         <span class="bt-icon">🏁</span><span class="bt-name">CARBON<br><span style="opacity:.7;font-size:.85em">race week / pre-event</span></span></button>
       <button class="btn-theme" onclick="genTheme('void',event)" style="background:linear-gradient(135deg,#F5F0EC,#000000);color:#F5F0EC">
         <span class="bt-icon">⚫</span><span class="bt-name">VOID<br><span style="opacity:.7;font-size:.85em">rest / reflection</span></span></button>
+      <button class="btn-theme" onclick="genTheme('topography',event)" style="background:linear-gradient(135deg,#C97A3F,#1A140E);color:#F0E6D6">
+        <span class="bt-icon">🏔</span><span class="bt-name">TOPOGRAPHY<br><span style="opacity:.7;font-size:.85em">3D · trail · contour</span></span></button>
+      <button class="btn-theme" onclick="genTheme('cinematic',event)" style="background:linear-gradient(135deg,#FFA84C,#08151A);color:#F2E6D5">
+        <span class="bt-icon">🎬</span><span class="bt-name">CINEMATIC<br><span style="opacity:.7;font-size:.85em">5D · teal+amber film</span></span></button>
+      <button class="btn-theme" onclick="genTheme('holographic',event)" style="background:linear-gradient(135deg,#FF4FE8,#5FFFEC,#FFD700);color:#0A0518">
+        <span class="bt-icon">🪩</span><span class="bt-name">HOLOGRAPHIC<br><span style="opacity:.7;font-size:.85em">8D · iridescent foil</span></span></button>
     </div>
     <div class="btn-gen-sub" style="margin-top:8px">TAP A THEME → GENERATES CAROUSEL IN THAT PALETTE</div>
   </div>
@@ -1272,7 +1278,19 @@ const THEMES={
 
   // ── VOID — rest / reflection days. Bone on pitch. Maximum minimalism. ──
   void:{bg1:'#000000',bg2:'#0A0A0A',accent:'#F5F0EC',text:'#F5F0EC',mint:'#7FE5C8',danger:'#FF5252',smoke:'#6E6A65',ash:'#1A1A1A',acR:'rgba(245,240,236,',cornerAlpha:'.12)',gridAlpha:'.008',
-    ghost:'rgba(180,175,170,'}
+    ghost:'rgba(180,175,170,'},
+
+  // ── TOPOGRAPHY (3D) — earthy contour, trail running, mountain vibe ──
+  topography:{bg1:'#0E0B07',bg2:'#1A140E',accent:'#C97A3F',text:'#F0E6D6',mint:'#9DBD58',danger:'#E8654A',smoke:'#7A6A52',ash:'#3D3024',acR:'rgba(201,122,63,',cornerAlpha:'.22)',gridAlpha:'.022',
+    ghost:'rgba(160,100,50,',treatment:'topo'},
+
+  // ── CINEMATIC (5D) — color-graded teal+amber film still, anamorphic feel ──
+  cinematic:{bg1:'#08151A',bg2:'#0D2027',accent:'#FFA84C',text:'#F2E6D5',mint:'#5FB5A8',danger:'#FF5A4C',smoke:'#6A8590',ash:'#1A3340',acR:'rgba(255,168,76,',cornerAlpha:'.20)',gridAlpha:'.012',
+    ghost:'rgba(200,130,60,',treatment:'cinema'},
+
+  // ── HOLOGRAPHIC (8D) — iridescent foil pink→cyan→gold, future tech ──
+  holographic:{bg1:'#0A0518',bg2:'#150828',accent:'#FF4FE8',text:'#FFF2FF',mint:'#5FFFEC',danger:'#FF3E84',smoke:'#9B7AB8',ash:'#2A1545',acR:'rgba(255,79,232,',cornerAlpha:'.25)',gridAlpha:'.015',
+    ghost:'rgba(200,90,200,',treatment:'holo'}
 };
 // Default: OBSIDIAN — brand gold daily baseline.
 // Legacy aliases for forward-compat with old localStorage entries
@@ -3928,7 +3946,7 @@ Return ONLY the caption text.`;
 // ===== SLIDE 1: TRACKER =====
 // ═══ SHARED POST HELPERS (proof-first redesign · Chapter 02) ═══
 function _postLatestPolyline(){
-  if(!window._stravaCache||!Array.isArray(_stravaCache))return null;
+  var sc=null;try{sc=_stravaCache;}catch(e){}if(!sc||!Array.isArray(sc))return null;
   var r=_stravaCache.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});
   return r?r.summary_polyline:null;
 }
@@ -4057,6 +4075,56 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
       var dx=j%2===0?1:-1,dy=j<2?1:-1;
       c.beginPath();c.moveTo(p[0],p[1]+dy*bL);c.lineTo(p[0],p[1]);c.lineTo(p[0]+dx*bL,p[1]);c.stroke();
     });
+
+    // 5. THEME-SPECIFIC TREATMENT OVERLAYS (3D/5D/8D dimensional richness)
+    if(P.treatment==='topo'){
+      // Contour-line texture across mid-band
+      c.save();c.globalAlpha=0.35;c.strokeStyle=P.acR+'0.45)';c.lineWidth=1;
+      for(var ti=0;ti<8;ti++){
+        c.beginPath();
+        var baseY=160+ti*100;
+        for(var tx=0;tx<W;tx+=8){
+          var ty=baseY+Math.sin(tx*0.013+ti*0.7)*22+Math.sin(tx*0.03+ti*1.1)*10;
+          if(tx===0)c.moveTo(tx,ty);else c.lineTo(tx,ty);
+        }
+        c.stroke();
+      }
+      c.restore();
+      // Elevation badge top-left
+      c.fillStyle=P.acR+'0.85)';c.fillRect(28,128,160,32);
+      c.textAlign='left';c.font='700 11px "JetBrains Mono",monospace';c.fillStyle=isFinite(P.bg1)?P.bg1:'#1A140E';
+      c.fillText('ELEVATION · TRAIL',40,149);
+    } else if(P.treatment==='cinema'){
+      // Letterbox cinematic bars
+      c.fillStyle='#000';
+      c.fillRect(0,128,W,40);c.fillRect(0,sy-40,W,40);
+      // Anamorphic lens flare across top
+      var lf=c.createLinearGradient(0,160,W,200);
+      lf.addColorStop(0,'transparent');lf.addColorStop(0.45,'rgba(255,168,76,0.0)');
+      lf.addColorStop(0.55,'rgba(255,168,76,0.18)');lf.addColorStop(1,'transparent');
+      c.fillStyle=lf;c.fillRect(0,158,W,100);
+      // Film grain
+      c.save();c.globalAlpha=0.06;
+      for(var gi=0;gi<500;gi++){
+        var gx=(gi*97)%W,gy=(gi*53)%H;
+        c.fillStyle=gi%2?'#FFA84C':'#fff';c.fillRect(gx,gy,1,1);
+      }c.restore();
+    } else if(P.treatment==='holo'){
+      // Iridescent foil sheen across the whole tile
+      c.save();c.globalCompositeOperation='overlay';c.globalAlpha=0.35;
+      var holo=c.createLinearGradient(0,0,W,H);
+      holo.addColorStop(0,'#FF4FE8');holo.addColorStop(0.33,'#5FFFEC');
+      holo.addColorStop(0.66,'#FFD700');holo.addColorStop(1,'#FF4FE8');
+      c.fillStyle=holo;c.fillRect(0,128,W,H-128-260);c.restore();
+      // Chromatic-aberration scan lines on the stat strip
+      c.save();c.globalAlpha=0.20;c.fillStyle='#5FFFEC';
+      for(var si=0;si<H;si+=3){c.fillRect(0,si,W,1);}
+      c.restore();
+      // Hologram corner marker
+      c.fillStyle=P.accent;c.fillRect(W-180,128,150,30);
+      c.textAlign='right';c.font='800 12px "JetBrains Mono",monospace';c.fillStyle='#0A0518';
+      c.fillText('◆ HOLOGRAM',W-38,149);
+    }
   }
 
   if(url){_postLoadImg(url).then(paint);}
@@ -5541,12 +5609,12 @@ function downloadStoriesCard(){
 // STORY STUDIO — 10 templates + day-of-week scheduling
 // High quality: 2160x3840 canvas, 2x scale, 0.97 JPEG
 
-// 8 proof-first story templates \u2014 Chapter 02 (replaces the 15 catalog-style ones)
-const STORY_SCHEDULE=['route','time','body','receipt','timeline','mapbody','streakbar','promise'];
-const STORY_NAMES=['THE ROUTE','THE TIME','THE BODY','THE RECEIPT','THE TIMELINE','THE MAP & BODY','THE STREAK BAR','THE PROMISE'];
-const STORY_ICONS=['\uD83D\uDDFA','\u23F0','\uD83D\uDCF8','\uD83E\uDDFE','\u2502','\u229E','\u25AC','\u270D'];
-const STORY_DESCS=['Strava polyline full bleed \u2014 the proof','Pitch black + giant time stamp','Photo full bleed + one handwritten line','Mono receipt \u2014 date, route, stake, signed','Today hour-by-hour: wake \u2192 run \u2192 done','Top half route map \u00B7 bottom half photo','Horizontal cell bar \u2014 1 cell = 1 day','Cream paper + tomorrow\'s commitment'];
-const STORY_DAYS=['DAILY','DAILY','PHOTO','DAILY','DAILY','PHOTO','DAILY','SUN'];
+// 13 proof-first story templates \u2014 Chapter 02 (8 original + 5 Strava-language additions)
+const STORY_SCHEDULE=['route','time','body','receipt','timeline','mapbody','streakbar','promise','heatmap','progression','badge','watch','cinema'];
+const STORY_NAMES=['THE ROUTE','THE TIME','THE BODY','THE RECEIPT','THE TIMELINE','THE MAP & BODY','THE STREAK BAR','THE PROMISE','THE HEATMAP','THE PROGRESSION','THE BADGE','THE WATCH','THE CINEMA'];
+const STORY_ICONS=['\uD83D\uDDFA','\u23F0','\uD83D\uDCF8','\uD83E\uDDFE','\u2502','\u229E','\u25AC','\u270D','\uD83D\uDD25','\uD83D\uDCC8','\uD83C\uDFC5','\u231A','\uD83C\uDFAC'];
+const STORY_DESCS=['Strava polyline full bleed \u2014 the proof','Pitch black + giant time stamp','Photo full bleed + one handwritten line','Mono receipt \u2014 date, route, stake, signed','Today hour-by-hour: wake \u2192 run \u2192 done','Top half route map \u00B7 bottom half photo','Horizontal cell bar \u2014 1 cell = 1 day','Cream paper + tomorrow\'s commitment','All-time routes overlaid \u00B7 today bold','30-day bar chart of distance','Strava-style achievement unlocked card','Garmin watch face hero with stats','Photo + cinematic teal+amber color grade'];
+const STORY_DAYS=['DAILY','DAILY','PHOTO','DAILY','DAILY','PHOTO','DAILY','SUN','DAILY','WEEKLY','MILE','DAILY','PHOTO'];
 
 (function initStorySchedule(){
   var el=document.getElementById('storySchedule');var label=document.getElementById('storyTodayLabel');if(!el)return;
@@ -5587,7 +5655,7 @@ function genStoryTemplate(idx){
 
   var kcal=(document.getElementById('kcal')||{value:''}).value.trim();
   function _latestPolyline(){
-    if(!window._stravaCache||!Array.isArray(_stravaCache))return null;
+    var sc=null;try{sc=_stravaCache;}catch(e){}if(!sc||!Array.isArray(sc))return null;
     var r=_stravaCache.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});
     return r?r.summary_polyline:null;
   }
@@ -6116,6 +6184,331 @@ function genStoryTemplate(idx){
       c.font='500 12px "JetBrains Mono",monospace';c.fillStyle='rgba(26,20,8,0.55)';
       c.fillText('₹15,000 stake · logged public · firstlight.live · '+handleIG,W/2,H-44);
       return Promise.resolve();
+    }    ,
+
+    // ════════ 9. THE HEATMAP — all-time routes overlaid, today bold ════════
+    function(){
+      bg();
+      // Brand
+      c.textAlign='left';c.font='400 26px "DM Serif Display",serif';c.fillStyle=P.accent;
+      c.fillText('FIRST LIGHT',48,72);
+      c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.65)';
+      c.fillText('LIFETIME HEATMAP · ALL MORNINGS',48,94);
+      c.textAlign='right';c.font='900 30px "Rajdhani",sans-serif';c.fillStyle=P.accent;
+      c.fillText('DAY '+String(dn).padStart(3,'0'),W-48,80);
+
+      // Collect polylines
+      var _sc1=null;try{_sc1=_stravaCache;}catch(e){}var allRuns=(_sc1&&Array.isArray(_sc1))?_sc1.filter(function(a){return a&&a.type==='Run'&&a.summary_polyline;}):[];
+      var todayPoly=allRuns.length?allRuns[0].summary_polyline:null;
+
+      // Heatmap canvas region
+      var bx=60,by=180,bw=W-120,bh=H*0.62;
+      // Background field
+      c.fillStyle=P.acR+'0.04)';c.fillRect(bx,by,bw,bh);
+      c.strokeStyle=P.acR+'0.18)';c.lineWidth=1;c.strokeRect(bx,by,bw,bh);
+
+      // Draw older runs faint, today's bold
+      var olderRuns=allRuns.slice(1,30); // up to 29 prior
+      olderRuns.forEach(function(a,i){
+        var alpha=0.10+(0.20*(1-i/30));
+        c.save();c.globalAlpha=alpha;
+        _drawPath(a.summary_polyline,bx,by,bw,bh,P.acR+'0.55)',2.2);
+        c.restore();
+      });
+      // Today bold on top
+      if(todayPoly){
+        c.save();c.shadowColor=P.acR+'0.9)';c.shadowBlur=30;
+        _drawPath(todayPoly,bx,by,bw,bh,P.accent,7);
+        c.restore();
+      } else if(!allRuns.length){
+        c.textAlign='center';c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.45)';
+        c.fillText('SYNC STRAVA TO LOAD HEATMAP',W/2,by+bh/2);
+      }
+      // Caption above field
+      c.textAlign='left';c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+      c.fillText((allRuns.length||0)+' RUNS  ·  '+allRuns.reduce(function(s,a){return s+(a.distance||0);},0).toFixed(0)/1000+' KM LIFETIME',bx+8,by-14);
+
+      // Bottom: today highlighted stat
+      var sy=by+bh+30;
+      c.fillStyle=P.acR+'0.06)';c.fillRect(bx,sy,bw,150);
+      c.fillStyle=P.accent;c.fillRect(bx,sy,4,150);
+      c.textAlign='left';
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.7)';
+      c.fillText('TODAY (bold path)',bx+24,sy+34);
+      c.font='900 56px "Rajdhani",sans-serif';c.fillStyle=P.text;
+      c.fillText((km||'—')+' KM · '+(mn||'—')+' MIN',bx+24,sy+92);
+      c.font='500 12px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+      c.fillText('This is not new behavior.',bx+24,sy+124);
+
+      // Footer
+      c.textAlign='center';c.font='500 13px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+      c.fillText('₹15,000 STAKE · LOGGED PUBLIC · firstlight.live',W/2,H-46);
+      return Promise.resolve();
+    },
+
+    // ════════ 10. THE PROGRESSION — 30-day distance bar chart ════════
+    function(){
+      bg();
+      c.textAlign='left';c.font='400 26px "DM Serif Display",serif';c.fillStyle=P.accent;
+      c.fillText('FIRST LIGHT',48,72);
+      c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.65)';
+      c.fillText('30-DAY PROGRESSION · KM PER DAY',48,94);
+      c.textAlign='right';c.font='900 30px "Rajdhani",sans-serif';c.fillStyle=P.accent;
+      c.fillText('DAY '+String(dn).padStart(3,'0'),W-48,80);
+
+      // Build last 30 days bar chart from cache
+      var _sc2=null;try{_sc2=_stravaCache;}catch(e){}var allRuns=(_sc2&&Array.isArray(_sc2))?_sc2.filter(function(a){return a&&(a.type==='Run'||a.type==='Walk');}):[];
+      var today=new Date();today.setHours(0,0,0,0);
+      var bars=[];
+      for(var di=29;di>=0;di--){
+        var d=new Date(today);d.setDate(today.getDate()-di);
+        var dStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        var dayKm=0;
+        allRuns.forEach(function(a){if(a.start_date_local&&a.start_date_local.startsWith(dStr))dayKm+=parseFloat(a.distance||0)/1000;});
+        bars.push({d:d,km:dayKm,isToday:di===0});
+      }
+      var maxKm=Math.max(5,Math.max.apply(null,bars.map(function(b){return b.km;})));
+      // Chart region
+      var bx=60,by=200,bw=W-120,bh=H*0.50;
+      // Y-axis ticks (5/10/15...)
+      c.textAlign='right';c.font='500 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.4)';
+      for(var ti=0;ti<=4;ti++){
+        var v=maxKm*ti/4;
+        var yy=by+bh-(bh*ti/4);
+        c.fillText(v.toFixed(0)+'KM',bx-8,yy+4);
+        c.strokeStyle=P.acR+'0.10)';c.lineWidth=1;
+        c.beginPath();c.moveTo(bx,yy);c.lineTo(bx+bw,yy);c.stroke();
+      }
+      // Bars
+      var barW=Math.floor(bw/30)-4;
+      bars.forEach(function(b,i){
+        var x=bx+i*(barW+4)+2;
+        var h=(b.km/maxKm)*bh;
+        var y=by+bh-h;
+        if(b.isToday){
+          c.fillStyle=P.accent;c.shadowColor=P.acR+'0.7)';c.shadowBlur=20;
+          c.fillRect(x,y,barW,h);c.shadowBlur=0;
+          c.strokeStyle=P.text;c.lineWidth=2;c.strokeRect(x-1,y-1,barW+2,h+2);
+        } else if(b.km>0){
+          c.fillStyle=P.acR+'0.55)';c.fillRect(x,y,barW,h);
+        } else {
+          c.fillStyle=P.acR+'0.08)';c.fillRect(x,by+bh-4,barW,4);
+        }
+      });
+      // X-axis labels (only first/today/middle)
+      c.textAlign='center';c.font='500 10px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+      c.fillText('30D AGO',bx+barW/2,by+bh+22);
+      c.fillText('15D AGO',bx+(barW+4)*15+barW/2,by+bh+22);
+      c.fillStyle=P.accent;
+      c.fillText('TODAY',bx+(barW+4)*29+barW/2,by+bh+22);
+
+      // Below chart: big stats
+      var sy=by+bh+72;
+      var totalKm=bars.reduce(function(s,b){return s+b.km;},0);
+      var runDays=bars.filter(function(b){return b.km>0;}).length;
+      c.textAlign='center';
+      c.font='900 100px "Rajdhani",sans-serif';c.fillStyle=P.text;
+      c.shadowColor=P.acR+'0.4)';c.shadowBlur=30;
+      c.fillText(totalKm.toFixed(1)+' KM',W/2,sy+90);c.shadowBlur=0;
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.65)';
+      c.fillText('LAST 30 DAYS  ·  '+runDays+' RUN DAYS  ·  '+dn+'-DAY STREAK',W/2,sy+130);
+
+      // Footer
+      c.textAlign='center';c.font='500 13px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
+      c.fillText('₹15,000 STAKE · LOGGED PUBLIC · firstlight.live',W/2,H-46);
+      return Promise.resolve();
+    },
+
+    // ════════ 11. THE BADGE — Strava-style achievement card ════════
+    function(){
+      bg();
+      // Decorative confetti dots scattered
+      for(var ci=0;ci<60;ci++){
+        var cx=(ci*97)%W,cy=(ci*53)%H;
+        var crn=(Math.sin(ci*1.37)+1)/2;
+        c.fillStyle=ci%3===0?P.acR+'0.25)':P.acR+'0.10)';
+        c.beginPath();c.arc(cx,cy,2+crn*3,0,Math.PI*2);c.fill();
+      }
+      // Top brand
+      c.textAlign='center';c.font='400 22px "DM Serif Display",serif';c.fillStyle=P.acR+'0.6)';
+      c.fillText('FIRST LIGHT',W/2,80);
+      c.font='600 10px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.45)';
+      c.fillText('ACHIEVEMENT  UNLOCKED',W/2,102);
+      // Big medal/badge — concentric circles
+      var cx=W/2,cy=H*0.36,outerR=240;
+      // Outer ring with notches
+      c.save();c.shadowColor=P.acR+'0.55)';c.shadowBlur=40;
+      c.fillStyle=P.accent;c.beginPath();c.arc(cx,cy,outerR,0,Math.PI*2);c.fill();c.restore();
+      c.fillStyle=P.bg1;c.beginPath();c.arc(cx,cy,outerR-12,0,Math.PI*2);c.fill();
+      c.strokeStyle=P.accent;c.lineWidth=4;c.beginPath();c.arc(cx,cy,outerR-12,0,Math.PI*2);c.stroke();
+      // Sun rays from center
+      c.save();c.translate(cx,cy);
+      for(var ri=0;ri<24;ri++){
+        c.rotate(Math.PI/12);
+        c.fillStyle=P.acR+'0.18)';
+        c.fillRect(-3,-outerR+30,6,outerR-180);
+      }c.restore();
+      // Inner solid badge
+      c.fillStyle=P.accent;c.beginPath();c.arc(cx,cy,140,0,Math.PI*2);c.fill();
+      // Day number on the badge
+      c.textAlign='center';
+      c.fillStyle=(P.light?'#fff':P.bg1);
+      c.font='900 140px "Rajdhani",sans-serif';
+      c.fillText(String(dn).padStart(3,'0'),cx,cy+48);
+      c.font='700 18px "JetBrains Mono",monospace';
+      c.fillText('DAY',cx,cy-38);
+      // Ribbon below
+      c.fillStyle=P.accent;
+      c.beginPath();
+      c.moveTo(cx-90,cy+outerR-30);c.lineTo(cx+90,cy+outerR-30);
+      c.lineTo(cx+60,cy+outerR+30);c.lineTo(cx,cy+outerR+10);c.lineTo(cx-60,cy+outerR+30);
+      c.closePath();c.fill();
+      c.font='700 14px "JetBrains Mono",monospace';c.fillStyle=P.bg1;
+      c.fillText('★ EARNED ★',cx,cy+outerR+5);
+
+      // Title
+      c.font='400 56px "DM Serif Display",serif';c.fillStyle=P.text;
+      c.fillText('FIRST LIGHT',W/2,cy+outerR+110);
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.75)';
+      c.fillText('Awarded for showing up before sunrise.',W/2,cy+outerR+148);
+      // Mock leaderboard row
+      var ly=cy+outerR+200;
+      c.fillStyle=P.acR+'0.10)';c.fillRect(80,ly,W-160,100);
+      c.strokeStyle=P.acR+'0.35)';c.lineWidth=1;c.strokeRect(80,ly,W-160,100);
+      c.fillStyle=P.accent;c.fillRect(80,ly,8,100);
+      c.textAlign='left';c.font='700 16px "JetBrains Mono",monospace';c.fillStyle=P.text;
+      c.fillText('#1   ANUPAM  ·  YOU',110,ly+38);
+      c.font='500 12px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.65)';
+      c.fillText('CONSECUTIVE 5KM RUNS BEFORE 6 AM',110,ly+62);
+      c.textAlign='right';c.font='900 44px "Rajdhani",sans-serif';c.fillStyle=P.accent;
+      c.fillText(dn,W-110,ly+62);
+      // Footer
+      c.textAlign='center';c.font='500 12px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+      c.fillText('₹15,000 STAKE · LOGGED PUBLIC · firstlight.live',W/2,H-50);
+      return Promise.resolve();
+    },
+
+    // ════════ 12. THE WATCH — Garmin/Apple-watch face hero ════════
+    function(){
+      bg();
+      // Top label
+      c.textAlign='center';c.font='600 12px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+      c.fillText('WORKOUT SUMMARY  ·  DAY '+String(dn).padStart(3,'0'),W/2,86);
+      c.font='400 22px "DM Serif Display",serif';c.fillStyle=P.accent;
+      c.fillText('FIRST LIGHT',W/2,118);
+
+      // Watch face — large rounded rect (Garmin Fenix style)
+      var wx=W/2,wy=H*0.46,wr=340;
+      // Outer bezel
+      c.save();c.shadowColor=P.acR+'0.5)';c.shadowBlur=40;
+      c.fillStyle=P.acR+'0.95)';c.beginPath();c.arc(wx,wy,wr,0,Math.PI*2);c.fill();c.restore();
+      c.fillStyle='#0E1218';c.beginPath();c.arc(wx,wy,wr-18,0,Math.PI*2);c.fill();
+      // Bezel notches
+      c.save();c.translate(wx,wy);
+      for(var bi=0;bi<60;bi++){
+        c.rotate(Math.PI/30);
+        c.fillStyle=bi%5===0?P.accent:P.acR+'0.35)';
+        var nw=bi%5===0?4:2,nh=bi%5===0?14:7;
+        c.fillRect(-nw/2,-wr+4,nw,nh);
+      }c.restore();
+      // Inner screen content
+      // 4 quadrant stats
+      var quads=[
+        {label:'DISTANCE',v:(km||'—'),u:'KM',pos:[-1,-1]},
+        {label:'TIME',v:(mn||'—'),u:'MIN',pos:[1,-1]},
+        {label:'PACE',v:fmtP(),u:'/KM',pos:[-1,1]},
+        {label:'HR',v:(bpmV||'—'),u:'BPM',pos:[1,1]}
+      ];
+      var qOff=130;
+      quads.forEach(function(q){
+        var qx=wx+q.pos[0]*qOff,qy=wy+q.pos[1]*qOff;
+        c.textAlign='center';
+        c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.7)';
+        c.fillText(q.label,qx,qy-50);
+        c.font='900 64px "Rajdhani",sans-serif';c.fillStyle=P.text;
+        c.fillText(q.v,qx,qy);
+        c.font='600 12px "JetBrains Mono",monospace';c.fillStyle=P.accent;
+        c.fillText(q.u,qx,qy+24);
+      });
+      // Center crosshair
+      c.strokeStyle=P.acR+'0.3)';c.lineWidth=1;
+      c.beginPath();c.moveTo(wx-50,wy);c.lineTo(wx+50,wy);c.stroke();
+      c.beginPath();c.moveTo(wx,wy-50);c.lineTo(wx,wy+50);c.stroke();
+      // FIRSTLIGHT label below screen
+      c.textAlign='center';c.font='800 14px "JetBrains Mono",monospace';c.fillStyle=P.accent;
+      c.fillText('▲ FIRST LIGHT',wx,wy+wr-50);
+
+      // Bottom: start time + GPS verified
+      c.textAlign='center';
+      c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.7)';
+      c.fillText('START · '+(fmt12(wStart)||'04:48 AM IST'),W/2,wy+wr+70);
+      c.font='500 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
+      c.fillText('GPS-VERIFIED · STRAVA · BANGALORE',W/2,wy+wr+96);
+      c.font='500 12px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+      c.fillText('₹15,000 STAKE · LOGGED PUBLIC · firstlight.live',W/2,H-46);
+      return Promise.resolve();
+    },
+
+    // ════════ 13. THE CINEMA — photo with cinematic teal+amber grade ════════
+    function(){
+      var photoSrc=(typeof iT!=='undefined'&&iT)?iT:(typeof i1!=='undefined'&&i1)?i1:(typeof i2!=='undefined'&&i2)?i2:null;
+      return lp(photoSrc).then(function(pi){
+        c.fillStyle='#000';c.fillRect(0,0,W,H);
+        // Letterbox bars
+        var lbH=180;
+        c.fillStyle='#000';c.fillRect(0,0,W,lbH);c.fillRect(0,H-lbH,W,lbH);
+        // Photo region
+        if(pi){
+          c.save();c.beginPath();c.rect(0,lbH,W,H-lbH*2);c.clip();
+          _coverDraw(pi,0,lbH,W,H-lbH*2);
+          // Teal shadow + amber highlight grade
+          var teal=c.createLinearGradient(0,lbH,0,H-lbH);
+          teal.addColorStop(0,'rgba(20,80,90,0.35)');teal.addColorStop(0.5,'rgba(15,40,50,0.1)');teal.addColorStop(1,'rgba(20,80,90,0.35)');
+          c.fillStyle=teal;c.fillRect(0,lbH,W,H-lbH*2);
+          // Amber highlight band
+          var amber=c.createRadialGradient(W*0.65,H*0.42,40,W*0.65,H*0.42,600);
+          amber.addColorStop(0,'rgba(255,168,76,0.20)');amber.addColorStop(1,'transparent');
+          c.fillStyle=amber;c.fillRect(0,lbH,W,H-lbH*2);
+          c.restore();
+        } else {
+          c.textAlign='center';c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,168,76,0.6)';
+          c.fillText('UPLOAD A PHOTO TO ACTIVATE',W/2,H/2);
+        }
+        // Anamorphic lens flare horizontal streak
+        c.save();c.globalAlpha=0.35;
+        var flare=c.createLinearGradient(0,H*0.42,W,H*0.42);
+        flare.addColorStop(0,'transparent');flare.addColorStop(0.45,'rgba(255,200,120,0)');
+        flare.addColorStop(0.5,'rgba(255,210,130,0.65)');flare.addColorStop(0.55,'rgba(255,200,120,0)');
+        flare.addColorStop(1,'transparent');
+        c.fillStyle=flare;c.fillRect(0,H*0.42-8,W,16);c.restore();
+        // Film grain over everything
+        c.save();c.globalAlpha=0.06;
+        for(var gi=0;gi<900;gi++){
+          var gx=(gi*97)%W,gy=(gi*53)%H;
+          c.fillStyle=gi%2?'#FFD0A0':'#fff';c.fillRect(gx,gy,1,1);
+        }c.restore();
+
+        // Top letterbox: title (left) + reel info (right)
+        c.textAlign='left';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,168,76,0.85)';
+        c.fillText('FIRST LIGHT  ·  EXT. STREET — PRE-DAWN',60,68);
+        c.font='400 38px "DM Serif Display",serif';c.fillStyle='#FFE9C2';
+        c.fillText('DAY '+String(dn).padStart(3,'0')+'  /  TAKE 1',60,118);
+        c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,150,0.55)';
+        c.fillText((km||'—')+' KM   ·   '+(mn||'—')+' MIN   ·   '+(fmt12(wStart)||'04:48 AM'),60,148);
+        c.textAlign='right';c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,150,0.55)';
+        c.fillText('SCENE 1 / OF MANY',W-60,68);
+        c.fillText('ANAMORPHIC 2.39:1',W-60,88);
+        c.fillText('GRADE: TEAL/AMBER',W-60,108);
+        c.fillText('STK CH02 · '+(new Date()).toISOString().slice(0,10),W-60,128);
+
+        // Bottom letterbox: tagline + brand
+        c.textAlign='center';c.font='italic 400 32px "DM Serif Display",serif';c.fillStyle='#FFE3B5';
+        c.fillText('"Before the city woke, I was already running."',W/2,H-110);
+        c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,168,76,0.85)';
+        c.fillText('—  ANUPAM  ·  '+handleIG+'  ·  firstlight.live',W/2,H-66);
+        c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,200,150,0.45)';
+        c.fillText('₹15,000 stake · logged public · every morning',W/2,H-42);
+      });
     }
   ];
 
