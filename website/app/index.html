@@ -808,23 +808,24 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
     </div>
   </div>
 
-  <!-- Photos -->
-  <div class="sec" style="display:none">
-    <div class="sec-label">PROOF PHOTOS</div>
+  <!-- Optional extra photo slots (TRACKER PHOTO above is the primary slot for THE BODY) -->
+  <div class="sec">
+    <div class="sec-label">OPTIONAL EXTRA PHOTOS</div>
     <div class="card" style="padding:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ash);margin-bottom:10px;letter-spacing:.5px">These are optional fallbacks if you want different photos in different slides.</div>
       <div class="photo-row two" id="photoRow">
         <div class="p-drop" id="d1" onclick="document.getElementById('f1').click()">
-          <div class="p-icon">⌚</div><div class="p-text">APPLE WATCH<br>RUN DATA</div>
+          <div class="p-icon">🏃</div><div class="p-text">RUN PHOTO<br>(SETS i1)</div>
           <input type="file" id="f1" accept="image/jpeg,image/png,.jpg,.jpeg,.png" onchange="loadImg(this,'d1','i1')">
         </div>
         <div class="p-drop" id="d2" onclick="document.getElementById('f2').click()">
-          <div class="p-icon">🏋️</div><div class="p-text">GYM SELFIE<br>CLOCK VISIBLE</div>
+          <div class="p-icon">🏋️</div><div class="p-text">GYM / BODY<br>(SETS i2)</div>
           <input type="file" id="f2" accept="image/jpeg,image/png,.jpg,.jpeg,.png" onchange="loadImg(this,'d2','i2')">
         </div>
       </div>
       <div class="photo-row one" id="photoRow2" style="margin-top:8px">
         <div class="p-drop" id="d3" onclick="document.getElementById('f3').click()">
-          <div class="p-icon">😴</div><div class="p-text">SLEEP DATA<br>SCREENSHOT</div>
+          <div class="p-icon">😴</div><div class="p-text">SLEEP DATA<br>(SETS i3)</div>
           <input type="file" id="f3" accept="image/jpeg,image/png,.jpg,.jpeg,.png" onchange="loadImg(this,'d3','i3')">
         </div>
       </div>
@@ -3980,7 +3981,9 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
   const _wStart=(document.getElementById('workoutStart')?.value||'').trim();
   const poly=_postLatestPolyline();
   const accentHex=(P.accent||'#FC4C02').replace('#','');
-  const url=poly?_postMapImgUrl(poly,540,675,accentHex):null;
+  // Map source priority: 1) user-uploaded Strava map screenshot (iM), 2) Mapbox satellite of polyline, 3) hand-drawn polyline.
+  const userMapImg=(typeof iM!=='undefined'&&iM)?iM:null;
+  const url=userMapImg||(poly?_postMapImgUrl(poly,540,675,accentHex):null);
 
   function paint(mapImg){
     // 1. BASE — dark + map (or fallback)
@@ -4070,7 +4073,11 @@ function slide2(day,km,mn,kc,loc,total,handleIG,handleX,wStart,wEnd,bpmVal,strav
   const c=cv.getContext('2d');c.scale(2,2);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   const W=1080,H=1350;
   const dn=parseInt(day)||1;
-  const photoSrc=(typeof i1!=='undefined'&&i1)?i1:((typeof i2!=='undefined'&&i2)?i2:null);
+  // Full photo-source fallback chain — match what the UI actually populates.
+  // iT (tracker photo, the visible upload) is checked FIRST since that's what users upload.
+  const photoSrc=(typeof iT!=='undefined'&&iT)?iT:
+                 (typeof i1!=='undefined'&&i1)?i1:
+                 (typeof i2!=='undefined'&&i2)?i2:null;
 
   function paint(img){
     // Base
@@ -5618,7 +5625,9 @@ function genStoryTemplate(idx){
     // ════════ 1. THE ROUTE — Strava map full-bleed proof ════════
     function(){
       var poly=_latestPolyline();
-      var url=poly?_mapImgUrl(poly,540,960):null;
+      // Map source priority: 1) user-uploaded Strava map screenshot (iM), 2) Mapbox of polyline, 3) hand-drawn.
+      var userMap=(typeof iM!=='undefined'&&iM)?iM:null;
+      var url=userMap||(poly?_mapImgUrl(poly,540,960):null);
       return lp(url).then(function(mi){
         c.fillStyle='#04060A';c.fillRect(0,0,W,H);
         if(mi){
@@ -5730,7 +5739,9 @@ function genStoryTemplate(idx){
 
     // ════════ 3. THE BODY — photo + handwritten line ════════
     function(){
-      return lp(i1).then(function(pi){
+      // Photo source priority: iT (visible "tracker photo" upload), i1, i2
+      var photoSrc=(typeof iT!=='undefined'&&iT)?iT:(typeof i1!=='undefined'&&i1)?i1:(typeof i2!=='undefined'&&i2)?i2:null;
+      return lp(photoSrc).then(function(pi){
         c.fillStyle='#06060A';c.fillRect(0,0,W,H);
         if(pi){
           _coverDraw(pi,0,0,W,H);
@@ -5932,8 +5943,10 @@ function genStoryTemplate(idx){
     // ════════ 6. THE MAP & BODY — top: route, bottom: photo ════════
     function(){
       var poly=_latestPolyline();
-      var mapUrl=poly?_mapImgUrl(poly,540,500):null;
-      return Promise.all([lp(mapUrl),lp(i1)]).then(function(arr){
+      var userMap=(typeof iM!=='undefined'&&iM)?iM:null;
+      var mapUrl=userMap||(poly?_mapImgUrl(poly,540,500):null);
+      var photoSrc=(typeof iT!=='undefined'&&iT)?iT:(typeof i1!=='undefined'&&i1)?i1:(typeof i2!=='undefined'&&i2)?i2:null;
+      return Promise.all([lp(mapUrl),lp(photoSrc)]).then(function(arr){
         var mi=arr[0],pi=arr[1];
         var splitY=Math.round(H*0.5);
         // Top half — map
