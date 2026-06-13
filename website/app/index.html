@@ -3926,358 +3926,162 @@ Return ONLY the caption text.`;
 
 // ===== SLIDE 1: TRACKER =====
 function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime){
-  // 1. 4:5 PORTRAIT — 1080×1350 for maximum mobile real estate
+  // ═══ REDESIGNED — Chapter 02 · streak hero, ₹15K footer ═══
+  // Single hierarchy: DAY (massive) → ZERO MISSES → stat line → checks → footer
   const cv=document.getElementById('c1');cv.width=2160;cv.height=2700;
   const c=cv.getContext('2d');c.scale(2,2);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   const W=1080,H=1350;
   const dayNum=parseInt(day)||1;
-  // ── TIER DETECTION ──
-  // ── TIER DETECTION (4-tier milestone system) ──
-  const oneLinerRaw=document.getElementById('oneLiner')?.value.trim()||'';
-  const specialKeywords=['fasting','ekadashi','punishment','rain','PR','personal best'];
-  const isSpecialEvent=specialKeywords.some(kw=>oneLinerRaw.toLowerCase().includes(kw.toLowerCase()));
-  const _msResult=detectMilestoneTier(dayNum);
-  let tier='A';
-  let milestoneLabel='';
-  // Priority: B3 > B2 > B1 > C > A
-  if(_msResult){tier=_msResult.tier;milestoneLabel=_msResult.label;}
-  else if(isSpecialEvent&&oneLinerRaw){tier='C';}
-
-  // ── EXPANDED STORY TEASER BANK (50 teasers) ──
-  const _sl=parseFloat(sleepHrs)||0;
-  const _km2=parseFloat(km)||0;
   const _wStart=(document.getElementById('workoutStart')?.value||'').trim();
-  const _mn2=parseFloat(mn)||0;
-  const _kc2=parseFloat(kc)||0;
   const _bpm=(document.getElementById('bpm')?.value||'').trim();
-  const _pace=(_km2>0&&_mn2>0)?(_mn2/_km2).toFixed(1):'';
-  const _slPct=_sl>0?Math.min(Math.round((_sl/8)*100),100):0;
-  // Countdown: look ahead 3 days for B2/B3 milestones
-  const _nextMsInfo=(function(){
-    for(var ahead=1;ahead<=3;ahead++){
-      var futureMs=detectMilestoneTier(dayNum+ahead);
-      if(futureMs&&(futureMs.tier==='B2'||futureMs.tier==='B3'))
-        return {daysAway:ahead,label:futureMs.label,day:dayNum+ahead};
-    }
-    return null;
-  })();
-  const _nextMilestone=_nextMsInfo?_nextMsInfo.day:'';
-  const _nearMilestone=_nextMsInfo&&_nextMsInfo.daysAway<=3?_nextMsInfo.day:null;
-  const _wxLower=(wxStr||'').toLowerCase();
-  const _isRain=_wxLower.includes('rain')||_wxLower.includes('storm');
-  const _isCold=_wxLower.includes('cold')||_wxLower.includes('fog');
-  const _temp=(wxStr||'').match(/(\d+)\s*°/)?.[1]||'';
+  const isLight=!!P.light;
 
-  // Build teaser pools by category
-  const sleepTeasers=[];
-  if(_sl>0&&_sl<5){
-    if(_km2>0&&_wStart) sleepTeasers.push(_sl+'h sleep. Still ran '+_km2+'K at '+_wStart+' AM.');
-    sleepTeasers.push('Slept '+_sl+' hours. Alarm didn\'t care. Neither did I.');
-    if(_km2>0) sleepTeasers.push(_sl+' hours of deep sleep. '+_km2+'K done anyway.');
-    sleepTeasers.push('Couldn\'t sleep. So I started running early.');
-    if(_slPct>0) sleepTeasers.push('Sleep score: '+_slPct+'%. Run score: 100%.');
-  }else if(_sl>=5.5){
-    sleepTeasers.push(_sl+'h sleep. Full tank. Full send.');
-    if(_km2>0&&_wStart) sleepTeasers.push('Slept '+_sl+' hours. Ran '+_km2+'K at '+_wStart+' AM. No excuses today.');
-    if(_km2>0) sleepTeasers.push('Fully charged. '+_km2+'K before the city woke up.');
-    sleepTeasers.push('Sleep score: '+_slPct+'%. Body said go.');
-    if(_sl>=7) sleepTeasers.push(_sl+' hours recovered. Today hits different.');
+  function fmt12local(tv){if(!tv)return'';var p=tv.split(':');var h=+p[0],m=+p[1];return(h%12||12)+':'+String(m).padStart(2,'0')+' '+(h>=12?'PM':'AM');}
+  function fmtPace(){if(!km||!mn)return'—';var p=parseFloat(mn)/parseFloat(km);if(!p||!isFinite(p))return'—';return Math.floor(p)+"'"+String(Math.round((p%1)*60)).padStart(2,'0')+'"';}
+
+  // ── 1. BACKGROUND ──
+  var bg=c.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,P.bg1);bg.addColorStop(1,P.bg2);
+  c.fillStyle=bg;c.fillRect(0,0,W,H);
+  // Subtle radial glow centered on the day hero
+  var glow=c.createRadialGradient(W/2,H*0.40,40,W/2,H*0.40,W*0.7);
+  glow.addColorStop(0,P.acR+'0.10)');glow.addColorStop(1,'transparent');
+  c.fillStyle=glow;c.fillRect(0,0,W,H);
+  // Frame border lines top + bottom
+  c.fillStyle=P.acR+'0.45)';c.fillRect(0,0,W,2);c.fillRect(0,H-2,W,2);
+
+  // ── 2. TOP STRIP — brand left, date right ──
+  c.textAlign='left';
+  c.font='400 22px "DM Serif Display",serif';c.fillStyle=P.accent;
+  c.fillText('FIRST LIGHT',48,68);
+  c.font='600 10px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+  c.fillText('CHAPTER 02 · BANGALORE',48,86);
+  c.textAlign='right';
+  c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.7)';
+  c.fillText((dateStr||'').toUpperCase(),W-48,68);
+  if(_wStart){
+    c.fillStyle=P.acR+'0.5)';
+    c.fillText('START · '+fmt12local(_wStart).toUpperCase(),W-48,86);
   }
-  const weatherTeasers=[];
-  if(_isRain){
-    if(_wStart) weatherTeasers.push('Bangalore rain at '+_wStart+' AM. Ran through it.');
-    if(_km2>0) weatherTeasers.push('Wet roads. Dark sky. '+_km2+'K done.');
+
+  // ── 3. THE HERO — DAY NUMERAL ──
+  // Tiny prefix
+  c.textAlign='center';
+  c.font='600 16px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+  c.fillText('D A Y',W/2,260);
+  // Massive numeral
+  c.font='900 360px "Rajdhani",sans-serif';c.fillStyle=P.accent;
+  c.shadowColor=P.acR+'0.5)';c.shadowBlur=60;
+  c.fillText(String(dayNum).padStart(3,'0'),W/2,580);c.shadowBlur=0;
+  // Underline
+  c.strokeStyle=P.acR+'0.45)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(W/2-200,620);c.lineTo(W/2+200,620);c.stroke();
+  // Caption
+  c.font='600 16px "JetBrains Mono",monospace';c.fillStyle=P.text;
+  c.fillText('ZERO MISSES · STILL HOLDING THE LINE',W/2,660);
+
+  // ── 4. SINGLE STAT LINE ──
+  if(km||mn||_wStart){
+    var parts=[];
+    if(km)parts.push((km)+' KM');
+    if(mn)parts.push(mn+' MIN');
+    if(km&&mn)parts.push(fmtPace()+' /KM');
+    if(_wStart)parts.push('BEFORE '+(fmt12local(_wStart)||'6 AM'));
+    var line=parts.join('   ·   ');
+    c.font='700 26px "JetBrains Mono",monospace';c.fillStyle=P.text;
+    c.fillText(line,W/2,740);
   }
-  if(_temp) weatherTeasers.push(_temp+'\u00B0C at 5 AM. Ran anyway.');
-  if(_isCold){
-    weatherTeasers.push('Cold morning. Warm-up was the first kilometer.');
-    weatherTeasers.push('Fog so thick I couldn\'t see 10 meters ahead.');
-  }
-  const dataTeasers=[];
-  if(_km2>0&&_mn2>0&&_kc2>0) dataTeasers.push(_km2+' km. '+_mn2+' min. '+_kc2+' kcal. Before 6 AM.');
-  if(_bpm&&_km2>0) dataTeasers.push('Heart rate: '+_bpm+' BPM. Distance: '+_km2+'K. Time: dark.');
-  if(_pace&&_km2>0) dataTeasers.push('Avg pace: '+_pace+'/km. Avg excuses: 0.');
-  const struggleTeasers=[
-    'Almost turned off the alarm. Almost.',
-    'Body said no. Laced up anyway.',
-    'Legs were dead from yesterday. Ran slower. Still ran.',
-    'Woke up angry. Running fixed it.',
-    'My bed never felt more comfortable. I left it.'
+
+  // ── 5. TINY CHECK ROW ──
+  var checks=[
+    {l:'RUN',v:run},
+    {l:'GYM',v:gym},
+    {l:'FOOD',v:food}
   ];
-  const philoTeasers=[
-    'Discipline isn\'t motivation. It\'s automation.',
-    'The hardest part is the first 10 seconds.',
-    _wStart?'Nobody\'s watching at '+_wStart+' AM. That\'s the point.':'Nobody\'s watching at 5 AM. That\'s the point.',
-    'Comfort is the enemy. The alarm is the friend.',
-    'Day '+dayNum+'. Still not impressed with myself.'
-  ];
-  const socialTeasers=[
-    'Everyone\'s sleeping. I\'m at kilometer 3.',
-    'Weekend for most. Wednesday for me.',
-    'They said I\'d quit by Day 30. It\'s Day '+dayNum+'.'
-  ];
-  const milestoneTeasers=[];
-  if(_nextMsInfo){
-    if(_nextMsInfo.daysAway===1) milestoneTeasers.push('Tomorrow: '+_nextMsInfo.label+'. One more wake-up.');
-    else if(_nextMsInfo.daysAway===2) milestoneTeasers.push('2 days to '+_nextMsInfo.label+'. Still standing.');
-    else if(_nextMsInfo.daysAway===3) milestoneTeasers.push('3 days to '+_nextMsInfo.label+'.');
-  }
-  milestoneTeasers.push('Started alone. Still alone at 5 AM. Still going.');
-
-  // Select teaser: manual input first, then prioritized auto-selection
-  let storyTeaser=oneLinerRaw;
-  if(!storyTeaser){
-    // Priority: sleep-based > weather-based > data-driven > milestone-adjacent > struggle/philo/social rotation
-    const prioritized=[...sleepTeasers,...weatherTeasers,...dataTeasers,...milestoneTeasers,...struggleTeasers,...philoTeasers,...socialTeasers];
-    if(prioritized.length>0){
-      // Day-based rotation ensures different teaser each day, never same two days in a row
-      storyTeaser=prioritized[dayNum%prioritized.length];
-    }else{
-      storyTeaser='Before 6 AM. Every single day.';
+  var chY=820,chSpacing=180;
+  var startX=W/2-(chSpacing*(checks.length-1))/2;
+  checks.forEach(function(ck,i){
+    var x=startX+i*chSpacing;
+    // Checkbox circle
+    c.beginPath();c.arc(x-30,chY,16,0,Math.PI*2);
+    if(ck.v){c.fillStyle=P.accent;c.fill();}
+    else {c.strokeStyle=P.acR+'0.4)';c.lineWidth=2;c.stroke();}
+    // Tick mark
+    if(ck.v){
+      c.strokeStyle=isLight?'#fff':P.bg1;c.lineWidth=3;c.lineCap='round';
+      c.beginPath();c.moveTo(x-37,chY);c.lineTo(x-32,chY+5);c.lineTo(x-23,chY-7);c.stroke();
     }
-  }
-
-  // ═══ SITUATION TAG — auto-generated from context (replaces story teaser in top zone) ═══
-  const _trackerCapRaw=(document.getElementById('trackerCaption')?.value||'').trim();
-  let _situationTag=_trackerCapRaw.toUpperCase();
-  if(!_situationTag){
-    // Auto-generate situation tag from available data
-    const _moodRaw=(document.getElementById('moodLine')?.value||'').toLowerCase();
-    const _isTravel=mode==='travel';
-    const _locCity=(document.getElementById('locCity')?.value||'').trim();
-    if(_isTravel&&_locCity) _situationTag=_locCity.toUpperCase()+'. STILL RAN '+(_km2>0?_km2+'K.':'5K.');
-    else if(_isTravel) _situationTag='TRAVEL MODE. STILL RAN 5K.';
-    else if(_sl>=7&&_km2>0) _situationTag='FULLY CHARGED. '+_km2+'K. NO EXCUSES.';
-    else if(_sl>=5.5&&_km2>0) _situationTag='FULL TANK. '+_km2+'K BEFORE SUNRISE.';
-    else if(_sl>0&&_sl<4) _situationTag=_sl+'H SLEEP. ALARM DIDN\u2019T CARE.';
-    else if(_sl>0&&_sl<5&&_wStart) _situationTag='SLEPT AT '+(_sl<4?'1':'2')+' AM. RAN AT '+_wStart+'.';
-    else if(_isRain&&_wStart) _situationTag='BANGALORE RAIN. '+_wStart+' AM. NO UMBRELLA.';
-    else if(_isRain) _situationTag='WET ROADS. DARK SKY. '+(_km2>0?_km2+'K.':'5K.');
-    else if(_isCold) _situationTag='FOG. COULDN\u2019T SEE 10 METERS.';
-    else if(_temp&&parseInt(_temp)>35) _situationTag=_temp+'\u00B0C BEFORE DAWN. RAN ANYWAY.';
-    else if(_km2>0&&_wStart) _situationTag=_km2+'K DONE. '+_wStart+' AM START.';
-    else if(_km2>0) _situationTag=_km2+' KM. BEFORE SUNRISE.';
-    else if(_nextMsInfo&&_nextMsInfo.daysAway===1) _situationTag='TOMORROW: '+_nextMsInfo.label.toUpperCase()+'.';
-    else if(_nextMsInfo&&_nextMsInfo.daysAway===2) _situationTag='2 DAYS TO '+_nextMsInfo.label.toUpperCase()+'.';
-    else if(_nextMsInfo&&_nextMsInfo.daysAway===3) _situationTag='3 DAYS TO '+_nextMsInfo.label.toUpperCase()+'.';
-    else if(_wStart&&_wStart<'05:00') _situationTag=_wStart+' AM. FIRST KILOMETER.';
-    else if(_wStart) _situationTag='GYM AT '+_wStart+' AM. NO CROWD. NO EXCUSES.';
-    else{
-      // Rotate through general tags by day
-      const _genTags=['5K DONE. CITY STILL SLEEPING.','CHEST DAY. BEFORE SUNRISE.','EMPTY ROADS. DARK SKY. 5K.','GYM FLOOR. EMPTY. 5 AM.','SATURDAY FOR MOST. 5K FOR ME.','BODY SAID NO. LACED UP ANYWAY.','THE ALARM WENT OFF. SO DID I.'];
-      _situationTag=_genTags[dayNum%_genTags.length];
-    }
-  }
-  // Trim to 40 chars max
-  if(_situationTag.length>40) _situationTag=_situationTag.substring(0,40);
-
-  // ── Shared drawing helpers ──
-  const _drawDayPill=()=>{
-    // Element 3: DAY BADGE — white text inside semi-transparent dark pill, top-right
-    const dayStr='DAY '+day;
-    c.font='900 18px "Rajdhani",sans-serif';
-    const pillTW=c.measureText(dayStr).width+28;
-    const pillX=W-60-pillTW,pillY=62;
-    c.fillStyle='rgba(255,255,255,0.12)';
-    rr(c,pillX,pillY,pillTW,32,16);c.fill();
-    c.strokeStyle='rgba(255,255,255,0.25)';c.lineWidth=1;
-    rr(c,pillX,pillY,pillTW,32,16);c.stroke();
-    c.textAlign='center';c.fillStyle='#FFFFFF';
-    c.fillText(dayStr,pillX+pillTW/2,pillY+22);
-  };
-
-  const _drawCTA=()=>{
-    // Element 7: SWIPE FOR PROOF → inside bordered box, bottom-right, 11-12pt
-    c.textAlign='right';c.font='800 13px "JetBrains Mono",monospace';
-    try{c.letterSpacing='2px';}catch(e){}
-    const swipeTxt='SWIPE FOR PROOF \u2192';
-    const swipeW=c.measureText(swipeTxt).width;
-    const boxW=swipeW+24,boxH=28;
-    const boxX=W-60-boxW,boxY=H-68;
-    // Bordered box
-    c.fillStyle='rgba(255,255,255,0.06)';
-    rr(c,boxX,boxY,boxW,boxH,8);c.fill();
-    c.strokeStyle='rgba(255,255,255,0.45)';c.lineWidth=1.2;
-    rr(c,boxX,boxY,boxW,boxH,8);c.stroke();
-    // Text inside box
-    c.fillStyle='rgba(255,255,255,0.88)';
-    c.shadowColor='rgba(0,0,0,0.5)';c.shadowBlur=8;
-    c.fillText(swipeTxt,boxX+boxW-12,boxY+19);
-    c.shadowBlur=0;try{c.letterSpacing='0px';}catch(e){}
-  };
-
-  // ── LOCKED BOTTOM ZONE — ₹15,000 + IF I MISS + streak (same on ALL tiers) ──
-  const _drawBottomZone=(heroSize)=>{
-    const heroY=H-320;
     c.textAlign='left';
-    // Element 4: ₹15,000 — Gold/Amber #D4A017, heaviest weight
-    c.save();
-    c.shadowColor='rgba(212,160,23,0.55)';c.shadowBlur=45;
-    c.font='900 '+heroSize+'px "Rajdhani",sans-serif';
-    c.fillStyle='#D4A017';
-    c.fillText('\u20B915,000',60,heroY);
-    c.shadowColor='rgba(232,200,80,0.35)';c.shadowBlur=20;
-    c.fillStyle='#E8C060';
-    c.fillText('\u20B915,000',60,heroY);
-    c.shadowBlur=0;c.restore();
-    // Element 5: IF I MISS EVEN 1 DAY — pure white + gold glow for urgency
-    c.font='900 28px "Rajdhani",sans-serif';c.fillStyle='#FFFFFF';
-    c.shadowColor='rgba(212,160,23,0.30)';c.shadowBlur=12;
-    c.fillText('IF I MISS EVEN 1 DAY',60,heroY+42);c.shadowBlur=0;
-    // Element 6: XX days. Zero misses. — muted white 60-70%, ~14-16pt
-    c.font='600 16px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.65)';
-    c.shadowColor='rgba(0,0,0,0.6)';c.shadowBlur=10;
-    c.fillText(dayNum+' days. Zero misses.',60,heroY+68);c.shadowBlur=0;
-  };
+    c.font='700 17px "JetBrains Mono",monospace';
+    c.fillStyle=ck.v?P.text:P.acR+'0.5)';
+    c.fillText(ck.l,x-6,chY+6);
+  });
 
-  // ── Drawing logic branched by tier ──
-  const _trackerImg=iT||i2;
-  const _isPhoto=!!_trackerImg;
-  const _brandColor=_isPhoto?'#E04040':undefined;
-  const _drawContent=()=>{
-    // ═══ TOP ZONE ═══
-    // Element 1: FIRST LIGHT brand — red #E04040 on photo, accent otherwise
-    drawBrand(c,_brandColor);
-    // Element 2: SITUATION TAG — bold, readable, color-coded by theme
-    // On photo: white with strong shadow for contrast on any background
-    // On dark theme: theme accent color for visual pop
-    // On light theme: dark text for contrast
-    c.textAlign='left';c.font='900 41px "Rajdhani",sans-serif';
-    try{c.letterSpacing='2px';}catch(e){}
-    if(_isPhoto){
-      // Photo background — accent colored with strong dark shadow for contrast
-      c.fillStyle=P.accent;
-      c.shadowColor='rgba(0,0,0,0.90)';c.shadowBlur=18;
-    }else if(P.light){
-      // Light theme (Titanium) — accent for brand consistency
-      c.fillStyle=P.accent;
-      c.shadowColor='rgba(0,0,0,0.20)';c.shadowBlur=6;
-    }else{
-      // Dark themes — accent with glow
-      c.fillStyle=P.accent;
-      c.shadowColor=P.acR+'0.55)';c.shadowBlur=14;
-    }
-    c.fillText(_situationTag,62,148);
-    c.shadowBlur=0;try{c.letterSpacing='0px';}catch(e){}
-    // Element 0: STREAK + number — below subtitle, right-aligned
-    c.save();c.textAlign='right';
-    c.font='900 21px "JetBrains Mono",monospace';
-    try{c.letterSpacing='3px';}catch(e){}
-    if(_isPhoto){c.fillStyle='rgba(255,255,255,0.85)';c.shadowColor='rgba(0,0,0,0.7)';c.shadowBlur=10;}
-    else{c.fillStyle=P.accent;c.shadowBlur=0;}
-    c.fillText('STREAK '+dayNum,W-60,178);
-    c.shadowBlur=0;try{c.letterSpacing='0px';}catch(e){}
-    c.restore();
-    // Element 3: DAY badge — top-right
-    drawCorners(c,W,H);
-    _drawDayPill();
-
-    // ═══ BOTTOM ZONE — branched by tier but bottom 4 elements always present ═══
-    if(tier==='B1'){
-      // ═══ TIER B1: MINOR MILESTONE (every 100 days) ═══
-      const _mhY=H/2+20;
-      c.save();c.textAlign='left';
-      c.shadowColor='rgba(212,160,23,0.50)';c.shadowBlur=40;
-      c.font='900 90px "Rajdhani",sans-serif';
-      c.fillStyle='#D4A017';
-      c.fillText('DAY '+dayNum,60,_mhY);
-      c.shadowBlur=0;c.restore();
-      c.textAlign='left';c.font='900 28px "Rajdhani",sans-serif';c.fillStyle='#D4A017';
-      c.shadowColor='rgba(0,0,0,0.5)';c.shadowBlur=10;
-      c.fillText(milestoneLabel,60,_mhY+38);c.shadowBlur=0;
-      _drawBottomZone(60);
-
-    }else if(tier==='B2'){
-      // ═══ TIER B2: MAJOR MILESTONE (yearly + thousands) ═══
-      const _mhY=H/2+10;
-      c.save();c.textAlign='left';
-      c.shadowColor='rgba(212,160,23,0.65)';c.shadowBlur=70;
-      c.font='900 110px "Rajdhani",sans-serif';
-      c.fillStyle='#D4A017';
-      c.fillText('DAY '+dayNum,60,_mhY);
-      c.shadowBlur=0;c.restore();
-      c.textAlign='left';c.font='900 34px "Rajdhani",sans-serif';c.fillStyle='#FFFFFF';
-      c.shadowColor='rgba(0,0,0,0.5)';c.shadowBlur=10;
-      c.fillText(milestoneLabel,60,_mhY+48);c.shadowBlur=0;
-      c.font='700 18px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.80)';
-      c.fillText('\u20B915,000 on the line. '+dayNum+' days. Zero misses.',60,_mhY+78);
-      _drawBottomZone(50);
-
-    }else if(tier==='B3'){
-      // ═══ TIER B3: LEGENDARY MILESTONE (7 posts in 68 years) ═══
-      const dayStr='DAY '+dayNum;
-      const digitLen=String(dayNum).length;
-      const adjustedFont=digitLen<=3?320:digitLen<=4?260:digitLen<=5?200:160;
-      const _mhY=H/2+Math.round(adjustedFont*0.25);
-      c.save();c.textAlign='left';
-      c.shadowColor='rgba(212,160,23,0.80)';c.shadowBlur=100;
-      c.font='900 '+adjustedFont+'px "Rajdhani",sans-serif';
-      c.fillStyle='#D4A017';
-      c.fillText(dayStr,60,_mhY);
-      c.shadowColor='rgba(232,200,80,0.40)';c.shadowBlur=50;
-      c.fillText(dayStr,60,_mhY);
-      c.shadowBlur=0;c.restore();
-      c.textAlign='left';c.font='900 38px "Rajdhani",sans-serif';c.fillStyle='#FFFFFF';
-      c.shadowColor='rgba(212,160,23,0.4)';c.shadowBlur=15;
-      c.fillText(milestoneLabel,60,_mhY+52);c.shadowBlur=0;
-      _drawBottomZone(40);
-
-    }else if(tier==='C'){
-      // ═══ TIER C: SPECIAL EVENT DAY ═══
-      // Event hook as hero — ~48-56pt
-      const _ehY=H/2+20;
-      c.save();c.textAlign='left';
-      c.shadowColor='rgba(255,255,255,0.3)';c.shadowBlur=30;
-      c.font='900 52px "Rajdhani",sans-serif';c.fillStyle='#FFFFFF';
-      c.fillText(oneLinerRaw.toUpperCase(),60,_ehY);
-      c.shadowBlur=0;c.restore();
-      // Bottom zone at supporting size (~55pt) — STILL PRESENT
-      _drawBottomZone(55);
-
-    }else{
-      // ═══ TIER A: REGULAR DAY (90% of posts) ═══
-      // ₹15,000 is the hero at full size (~140pt)
-      _drawBottomZone(140);
-    }
-
-    // Element 7: SWIPE FOR PROOF → in bordered box — all tiers
-    _drawCTA();
-    // Footer branding
-    drawSocialFooter(c,W,H,handleIG,handleX);
-  };
-
-  if(_trackerImg){
-    // ═══ TRACKER PHOTO MODE — full-bleed photo background ═══
-    const img=new Image();img.crossOrigin='anonymous';
-    img.onload=()=>{
-      // Full-bleed photo (cover)
-      const sc=Math.max(W/img.width,H/img.height);
-      const sw=img.width*sc,sh=img.height*sc;
-      c.drawImage(img,(W-sw)/2,(H-sh)/2,sw,sh);
-
-      // Top gradient — subtle, mirrors bottom for visual symmetry
-      // 50-60% opacity at top edge, fully transparent by ~20% down
-      const topG=c.createLinearGradient(0,0,0,Math.round(H*0.20));
-      topG.addColorStop(0,'rgba(0,0,0,0.58)');
-      topG.addColorStop(0.6,'rgba(0,0,0,0.25)');
-      topG.addColorStop(1,'rgba(0,0,0,0)');
-      c.fillStyle=topG;c.fillRect(0,0,W,Math.round(H*0.20));
-      // Bottom gradient: starts from mid-chest, very dark at bottom
-      const botG=c.createLinearGradient(0,H-750,0,H);
-      botG.addColorStop(0,'rgba(0,0,0,0)');
-      botG.addColorStop(0.25,'rgba(0,0,0,0.35)');
-      botG.addColorStop(0.5,'rgba(0,0,0,0.65)');
-      botG.addColorStop(1,'rgba(0,0,0,0.97)');
-      c.fillStyle=botG;c.fillRect(0,H-750,W,750);
-
-      _drawContent();
-    };
-    img.src=_trackerImg;
-  }else{
-    // ═══ FALLBACK — no tracker photo, dark gradient ═══
-    drawBg(c,W,H);
-    _drawContent();
+  // ── 6. SUPPORTING DATA RAIL (sleep + heart rate, only if available) ──
+  var rail=[];
+  if(sleepHrs)rail.push({l:'SLEEP',v:sleepHrs+' HRS'});
+  if(_bpm)rail.push({l:'HR',v:_bpm+' BPM'});
+  if(kc)rail.push({l:'BURN',v:kc+' KCAL'});
+  if(rail.length){
+    var rY=920,rSpacing=W/(rail.length+1);
+    c.textAlign='center';
+    rail.forEach(function(r,i){
+      var x=rSpacing*(i+1);
+      c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.55)';
+      c.fillText(r.l,x,rY);
+      c.font='700 22px "JetBrains Mono",monospace';c.fillStyle=P.text;
+      c.fillText(r.v,x,rY+30);
+    });
   }
+
+  // ── 7. ONE-LINER (the day's voice) ──
+  var oneLiner=(document.getElementById('oneLiner')?.value||'').trim();
+  if(oneLiner){
+    c.textAlign='center';c.font='italic 400 26px "DM Serif Display",serif';
+    c.fillStyle=P.text;
+    // Wrap if long
+    var maxW=W-160;
+    var words=oneLiner.split(' ');
+    var lines=[];var cur='';
+    words.forEach(function(w){
+      var test=cur?cur+' '+w:w;
+      if(c.measureText(test).width>maxW){lines.push(cur);cur=w;}else cur=test;
+    });
+    if(cur)lines.push(cur);
+    lines=lines.slice(0,2);
+    lines.forEach(function(ln,i){
+      c.fillText('"'+ln+'"',W/2,1040+i*36);
+    });
+  }
+
+  // ── 8. WEATHER strip (if present) ──
+  if(wxStr){
+    c.textAlign='center';
+    c.font='500 14px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.6)';
+    c.fillText(wxStr.replace(/[•·]/g,'·').toUpperCase(),W/2,1130);
+  }
+
+  // ── 9. FOOTER — ₹15K stake (small, quiet) ──
+  // Top accent rule above footer
+  c.strokeStyle=P.acR+'0.3)';c.lineWidth=1;
+  c.beginPath();c.moveTo(W/2-260,1190);c.lineTo(W/2+260,1190);c.stroke();
+  // Stake line (single tiny line)
+  c.textAlign='center';
+  c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.7)';
+  c.fillText('₹15,000  STAKE  ·  LOGGED PUBLIC  ·  EVERY MORNING',W/2,1230);
+  // Domain + handle
+  c.font='700 13px "JetBrains Mono",monospace';c.fillStyle=P.accent;
+  c.fillText('firstlight.live',W/2,1270);
+  c.font='500 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
+  c.fillText(handleIG||'@firstlightlive',W/2,1295);
+
+  // ── 10. Corner brackets — subtle frame ──
+  var bL=24;
+  c.strokeStyle=P.acR+'0.45)';c.lineWidth=2;c.lineCap='square';
+  [[36,118],[W-36,118],[36,1240],[W-36,1240]].forEach(function(p,j){
+    var dx=j%2===0?1:-1,dy=j<2?1:-1;
+    c.beginPath();c.moveTo(p[0],p[1]+dy*bL);c.lineTo(p[0],p[1]);c.lineTo(p[0]+dx*bL,p[1]);c.stroke();
+  });
 }
 
 function slide2(day,km,mn,kc,loc,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats){
