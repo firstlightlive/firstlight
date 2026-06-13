@@ -1310,6 +1310,10 @@ function genTheme(t,e){
 
 function getDateStr(){const n=streakRenderDate();return `${D[n.getDay()]} · ${n.getDate()} ${M[n.getMonth()]} ${n.getFullYear()}`}
 
+// ===== STREAK ORIGIN — Chapter 02 · Jun 13, 2026 =====
+// MUST be declared before the INIT block — getDateStr()/updateStreak() read it at load time (TDZ)
+const STREAK_ORIGIN=new Date(2026,5,13); // Jan=0, so 5=Jun, day=13
+
 // ===== INIT =====
 document.getElementById('dateStr').textContent=getDateStr();
 updateTime();setInterval(updateTime,30000);
@@ -1330,9 +1334,6 @@ if('serviceWorker' in navigator){
 }
 // SW registration disabled — re-enable when deploying to production
 // if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
-
-// ===== STREAK ORIGIN — Chapter 02 · Jun 13, 2026 =====
-const STREAK_ORIGIN=new Date(2026,5,13); // Jan=0, so 5=Jun, day=13
 
 function computeStreakDay(){
   const now=new Date();
