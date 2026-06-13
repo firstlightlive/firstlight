@@ -1004,7 +1004,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button onclick="genStoryTemplate()" style="flex:1;min-width:140px;padding:12px;background:linear-gradient(135deg,#E040FB,#833AB4);border:none;border-radius:10px;font:700 11px 'Rajdhani',sans-serif;letter-spacing:3px;color:#fff;cursor:pointer;transition:transform .1s" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''">\u2726 TODAY'S STORY</button>
         <button onclick="genStoryTemplate(10)" style="padding:12px 10px;background:transparent;border:1px solid rgba(0,212,255,.2);border-radius:10px;font:700 8px 'JetBrains Mono',monospace;letter-spacing:1px;color:#00D4FF;cursor:pointer">\uD83C\uDF03 NOIR</button>
-        <button onclick="genStoryTemplate(14)" style="padding:12px 10px;background:transparent;border:1px solid rgba(224,64,251,.2);border-radius:10px;font:700 8px 'JetBrains Mono',monospace;letter-spacing:1px;color:#E040FB;cursor:pointer">\u267B UNCLAIMED</button>
+        <button onclick="genStoryTemplate(14)" style="padding:12px 10px;background:transparent;border:1px solid rgba(224,64,251,.2);border-radius:10px;font:700 8px 'JetBrains Mono',monospace;letter-spacing:1px;color:#E040FB;cursor:pointer">\u267B DEFENDED</button>
       </div>
     </div>
 
@@ -1799,7 +1799,7 @@ function _renderPolylineFallback(container,polyline,w,h){
 // ===== SLEEP — Auto-pull from Supabase (synced by Apple Shortcut) =====
 async function pullSleepFromSupabase(){
   try{
-    var today=new Date().toISOString().split('T')[0];
+    var today=_localDateStr();
     var resp=await fetch(_SUPA+'/rest/v1/sleep_log?date=eq.'+today+'&select=*&limit=1',{
       headers:{'apikey':_SUPA_KEY,'Authorization':'Bearer '+_SUPA_KEY}
     });
@@ -1818,6 +1818,12 @@ async function pullSleepFromSupabase(){
 // Auto-pull sleep on page load
 pullSleepFromSupabase().catch(function(){});
 
+// Local date string (NOT toISOString — that's UTC and hides today's run before 5:30 AM IST)
+function _localDateStr(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
 async function pullStravaLive(){
   var kmEl=document.getElementById('stravaLiveKm');
   var lblEl=document.getElementById('stravaLiveLabel');
@@ -1825,7 +1831,18 @@ async function pullStravaLive(){
   var statusEl=document.getElementById('stravaStatus');
   lblEl.textContent='PULLING FROM STRAVA...';
   box.style.borderColor='rgba(252,76,2,0.6)';
-  statusEl.style.display='block';statusEl.textContent='Fetching activities from Supabase...';
+  statusEl.style.display='block';
+  // Force a fresh Strava→DB sync first — the cron window ends at 6:01 AM, so a run
+  // uploaded to Strava after that isn't in the DB yet without this.
+  statusEl.textContent='Syncing Strava → database (10-20s)...';
+  try{
+    await fetch(_IG_SYNC_URL+'?action=sync&admin_key='+_ADMIN_KEY,{
+      method:'POST',signal:AbortSignal.timeout(40000),
+      headers:{'Authorization':'Bearer '+FL.SUPABASE_ANON_KEY}
+    });
+    _stravaCache=null;
+  }catch(_se){console.warn('[STRAVA] Live sync failed, using last-synced DB data:',_se.message);}
+  statusEl.textContent='Fetching activities from Supabase...';
   try{
     if(!_stravaCache){
       var all=[],offset=0,pageSize=1000,hasMore=true;
@@ -1847,7 +1864,7 @@ async function pullStravaLive(){
     lblEl.textContent=acts.length+' ACTIVITIES · STRAVA SYNCED';
     box.style.borderStyle='solid';box.style.borderColor='rgba(252,76,2,0.5)';box.style.background='rgba(252,76,2,0.05)';
     // Auto-fill km/min fields from today's latest run
-    var today=new Date().toISOString().split('T')[0];
+    var today=_localDateStr();
     var todayRuns=acts.filter(function(a){return a.start_date_local&&a.start_date_local.startsWith(today)&&a.type==='Run';});
     if(todayRuns.length>0){
       var latest=todayRuns[0];
@@ -2634,7 +2651,7 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
   c.fillStyle=P.accent;c.fillText('\u20B915,000',W/2,mY);
   c.font='700 34px "Rajdhani",sans-serif';c.fillStyle=P.text;
   try{c.letterSpacing='3px';}catch(e){}
-  c.fillText('TO A RANDOM FOLLOWER',W/2,mY+58);
+  c.fillText('LOGGED PUBLIC. SAME DAY.',W/2,mY+58);
   try{c.letterSpacing='0px';}catch(e){}
   const divG=c.createLinearGradient(W/2-200,0,W/2+200,0);
   divG.addColorStop(0,'transparent');divG.addColorStop(0.15,P.acR+'0.45)');
@@ -2679,11 +2696,11 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
   c.fillText(day+' DAYS  \u00B7  ZERO MISSES',W/2,infoY+24);
   c.font='900 34px "Rajdhani",sans-serif';c.fillStyle=P.accent;
   c.save();c.shadowColor=P.acR+'0.45)';c.shadowBlur=14;
-  c.fillText('\u20B9'+_unclaimedAmt+' UNCLAIMED',W/2,infoY+62);
+  c.fillText('\u20B9'+_unclaimedAmt+' DEFENDED',W/2,infoY+62);
   c.restore();
   // Background pill
   c.font='900 34px "Rajdhani",sans-serif';
-  const spW2=Math.max(c.measureText('\u20B9'+_unclaimedAmt+' UNCLAIMED').width,c.measureText(day+' DAYS  \u00B7  ZERO MISSES').width)+70;
+  const spW2=Math.max(c.measureText('\u20B9'+_unclaimedAmt+' DEFENDED').width,c.measureText(day+' DAYS  \u00B7  ZERO MISSES').width)+70;
   c.save();c.globalCompositeOperation='destination-over';
   c.fillStyle=P.acR+'0.08)';rr(c,W/2-spW2/2,infoY-4,spW2,76,16);c.fill();
   c.strokeStyle=P.acR+'0.25)';c.lineWidth=0.7;rr(c,W/2-spW2/2,infoY-4,spW2,76,16);c.stroke();
@@ -2711,9 +2728,9 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
     c.fillText(_fc<100?'Kam followers = jeetne ka zyada chance. Abhi follow karo.':'Abhi follow karo. Baad mein chance kam hoga.',W/2,oddsY+28);
   }else{
     c.font='800 22px "JetBrains Mono",monospace';c.fillStyle=P.accent;
-    c.fillText('FOLLOW KARO = \u20B915,000 JEETNE KA CHANCE',W/2,oddsY);
+    c.fillText('\u20B915,000 DAILY STAKE \u2014 SAB PUBLIC HAI',W/2,oddsY);
     c.font='700 20px "Rajdhani",sans-serif';c.fillStyle=P.text;
-    c.fillText('Jis din miss karunga, first comment karne wale ko \u20B915,000 milenge.',W/2,oddsY+30);
+    c.fillText('Jis din miss karunga, \u20B915,000 jayega \u2014 slip public hogi. Sab dekhenge.',W/2,oddsY+30);
   }
 
   // ═══ ZONE 4: THE ACTION ═══
@@ -2727,13 +2744,13 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
   c.fillStyle=shimmer;rr(c,ctaX,ctaY,ctaW,ctaH,14);c.fill();
   c.textAlign='center';c.font='900 48px "Rajdhani",sans-serif';
   c.fillStyle=isL?'#FFFFFF':P.bg1;
-  c.fillText('\u2192  FOLLOW TO WIN',W/2,ctaY+ctaH/2+16);
+  c.fillText('\u2192  FOLLOW THE STREAK',W/2,ctaY+ctaH/2+16);
   const _dow=new Date().getDay();
   let _engCTA='';
   if(_dow===1||_dow===3) _engCTA='Aapka alarm kitne baje lagta hai? Comment mein batao \u2193';
-  else if(_dow===2||_dow===4) _engCTA='Save karo. Kal 6 AM check karo. Post nahi hai? \u20B915,000 claim karo.';
+  else if(_dow===2||_dow===4) _engCTA='Save karo. Kal 6 AM check karo. Proof hoga \u2014 ya slip public hogi.';
   else if(_dow===5||_dow===6) _engCTA='Apne us dost ko bhejo jo roz alarm snooze karta hai.';
-  else _engCTA='Follow karo. Kal 6 AM post nahi dikhi? First comment karo \u2014 \u20B915,000 tumhare.';
+  else _engCTA='Follow karo. Kal 6 AM check karo. Har din ka proof yahin hoga.';
   c.textAlign='center';c.font='italic 600 18px "DM Serif Display",serif';
   c.fillStyle=P.smoke;c.fillText(_engCTA,W/2,ctaY+ctaH+44);
   c.font='500 15px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.45)';
@@ -3408,13 +3425,13 @@ function _ensureCaptionPopulated(){
   var km=(document.getElementById('km')||document.getElementById('tkm')||{value:''}).value;
   var handle=document.getElementById('handleIG')?document.getElementById('handleIG').value:'@firstlightlive';
   if(capEl&&!capEl.textContent.trim()){
-    capEl.textContent='Day '+day+'. '+(km?km+' km. ':'')+'Before 6 AM.\n\n\u20B915,000 on the line. Every single day.\nMiss once \u2014 first comment collects.\n\n'+day+'-day streak. Zero misses.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n\uD83D\uDCF8 '+handle;
+    capEl.textContent='Day '+day+'. '+(km?km+' km. ':'')+'Before 6 AM.\n\n\u20B915,000 on the line. Every single day.\nEvery miss goes public. Same day.\n\n'+day+'-day streak. Zero misses.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n\uD83D\uDCF8 '+handle;
   }
   if(htEl&&!htEl.textContent.trim()){
     htEl.textContent='#firstlightlive #accountability #noexcuses #streak #running';
   }
   if(fcEl&&!fcEl.textContent.trim()){
-    fcEl.textContent='\u26A1 THE DEAL:\nMiss 1 day = \u20B915,000 to first comment.\nNo questions. No delays.\n\n'+day+'-day streak.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+    fcEl.textContent='\u26A1 THE STAKE:\nMiss 1 day = \u20B915,000 gone. Logged public, same day.\n\n'+day+'-day streak.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
   }
 }
 
@@ -3615,7 +3632,7 @@ function _generateInner(){
     const _allDone=(food&&run&&gym);
     const _hookLine=_allDone
       ?`Day ${day} done. All 3. Before 6AM.\n₹15,000 stays mine. 🤝`
-      :`Day ${day}. I almost talked myself out of it this morning.\n₹15,000 on the line if I quit — and someone collects.`;
+      :`Day ${day}. I almost talked myself out of it this morning.\n₹15,000 on the line if I quit — and everyone will see it.`;
     cap=_hookLine+`\n\n`;
     cap+=`Day ${day} — ${dateStr}\n🍱${food?'✅':'❌'} 🏃${run?'✅':'❌'} 🏋️${gym?'✅':'❌'}`;
     if(km)cap+=`\n📏 ${km} km`;if(mn)cap+=` ⏱ ${mn} min`;if(kc)cap+=` 🔥 ${kc} kcal`;
@@ -3631,7 +3648,7 @@ function _generateInner(){
   if(liner)cap+=`\n\n${liner}`;
 
   // ── Engagement CTAs — save + follow are the two highest Instagram algorithm signals ──
-  cap+=`\n\n💾 Save this. Come back tomorrow at 6AM to check.\nFollow to claim ₹15,000 if I ever miss a day. 👇`;
+  cap+=`\n\n💾 Save this. Come back tomorrow at 6AM to check.\nFollow the streak — every day is public. 👇`;
 
   // ===== MILESTONE SLIDE — show if applicable =====
   const milestone=isMilestone(day);
@@ -3663,9 +3680,9 @@ function _generateInner(){
 
   // Pledge in caption
   if(!deadlineMet){
-    cap+=`\n\n🚨 PLEDGE BROKEN — ₹15,000 ($200 USD) to a random follower. I pick one. They get paid. Done.`;
+    cap+=`\n\n🚨 PLEDGE BROKEN — ₹15,000 penalty. Logged public. Paid. Done.`;
   }else if(document.querySelector('[data-key="deadline"]')){
-    cap+=`\n\n⚡ Public Pledge: Miss even 1 day → I pay ₹15,000 ($200) to a random follower. Not charity. Real cash. Follow me — you could be next.`;
+    cap+=`\n\n⚡ Public Pledge: Miss even 1 day → ₹15,000 penalty, logged public the same day. Not theory. Real cash.`;
   }
 
   // ═══ SMART CAPTION ENGINE ═══
@@ -3687,7 +3704,7 @@ function _generateInner(){
   const _wxT=document.getElementById('wxTemp')?.value.trim()||'';
 
   // Part 0: Deal Hook (ALWAYS first line — strategy requirement)
-  const _dealHook='🚨 MISS 1 DAY = ₹'+_stake+' TO FIRST COMMENT 🚨';
+  const _dealHook='₹'+_stake+' ON THE LINE. EVERY SINGLE DAY.';
 
   // Part 1: Hook (5 types, rotating by day)
   const _hookBank=[
@@ -3724,8 +3741,8 @@ function _generateInner(){
   const _food=document.querySelector('[data-key="food"]')?.classList.contains('on');
   const _run=document.querySelector('[data-key="run"]')?.classList.contains('on');
   const _gym=document.querySelector('[data-key="gym"]')?.classList.contains('on');
-  if(_food&&_run&&_gym) _result='Gym done. Food code: clean. ₹'+_unclaimed+' stays unclaimed.';
-  else _result='₹'+_unclaimed+' unclaimed. Day '+_day+'. The streak lives.';
+  if(_food&&_run&&_gym) _result='Gym done. Food code: clean. ₹'+_unclaimed+' defended.';
+  else _result='₹'+_unclaimed+' defended. Day '+_day+'. The streak lives.';
 
   const _soar=_situation+'\n'+_obstacle+'\n'+_action+'\n'+_result;
 
@@ -3740,12 +3757,12 @@ function _generateInner(){
   // Part 4: CTA (rotating by day-of-week per strategy)
   const _dow=new Date().getDay();
   const _ctaMap={
-    0:'Follow me. Set your alarm for 6 AM. If I\'m not here — you collect ₹'+_stake+'.',  // Sun
+    0:'Follow me. Set your alarm for 6 AM. If I\'m not here — the slip goes public.',  // Sun
     1:'What\'s the earliest you\'ve ever woken up to train? Drop it below.',  // Mon
-    2:'Save this post. Come back at 6 AM tomorrow. If I missed — first comment gets ₹'+_stake+'.',  // Tue
+    2:'Save this post. Come back at 6 AM tomorrow. The proof will be here — or the slip will.',  // Tue
     3:'What time does YOUR alarm go off? Drop it below. ↓',  // Wed
-    4:'Save this. Follow the streak. Be the first to comment if I fail.',  // Thu
-    5:'Send this to someone who keeps hitting snooze. They need this bet.',  // Fri
+    4:'Save this. Follow the streak. Every day is public.',  // Thu
+    5:'Send this to someone who keeps hitting snooze. They need this.',  // Fri
     6:'Tag someone who needs a wake-up call. Literally.'   // Sat
   };
   const _cta=_ctaMap[_dow];
@@ -3888,7 +3905,7 @@ Return ONLY the caption text.`;
   if(_fcb){
     const _stakeAmt=formatIndianCurrency(getCurrentStake(_day));
     const _totalAmt=formatIndianCurrency(getTotalAtRisk(_day));
-    _fcb.textContent='\u26A1 THE DEAL:\nMiss 1 day = \u20B9'+_stakeAmt+' to first comment.\nNo questions. No delays. First come, first paid.\n\n'+_day+'-day streak. \u20B9'+_totalAmt+' unclaimed.\nSet your alarm. Check tomorrow at 6 AM.\nIf I\u2019m not here \u2014 claim your \u20B9'+_stakeAmt+'.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+    _fcb.textContent='\u26A1 THE STAKE:\nMiss 1 day = \u20B9'+_stakeAmt+' gone. Logged public, same day.\n\n'+_day+'-day streak. \u20B9'+_totalAmt+' defended.\nSet your alarm. Check tomorrow at 6 AM.\nThe proof will be here \u2014 or the slip will.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
   }
 
   // Alt Text — accessibility descriptions per slide
@@ -3911,7 +3928,7 @@ Return ONLY the caption text.`;
     // Fallback — at minimum populate caption with basic info
     var _fbDay=document.getElementById('dayNum').value||'1';
     var _fbKm=(document.getElementById('km')||document.getElementById('tkm')||{value:''}).value;
-    var _fbCaption='Day '+_fbDay+'. '+(_fbKm?_fbKm+' km. ':'')+'Before 6 AM.\n\n₹15,000 on the line. Every single day.\nMiss once — first comment collects.\n\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n📸 @firstlightlive';
+    var _fbCaption='Day '+_fbDay+'. '+(_fbKm?_fbKm+' km. ':'')+'Before 6 AM.\n\n₹15,000 on the line. Every single day.\nEvery miss goes public. Same day.\n\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n📸 @firstlightlive';
     var _fbEl=document.getElementById('capIG');if(_fbEl)_fbEl.textContent=_fbCaption;
     var _fbHt=document.getElementById('hashtagText');if(_fbHt)_fbHt.textContent='#firstlightlive #accountability #noexcuses #streak #running';
     var _fbFc=document.getElementById('firstCommentText');if(_fbFc)_fbFc.textContent='⚡ THE DEAL:\nMiss 1 day = ₹15,000 to first comment.\nNo questions. No delays.\n\n'+_fbDay+'-day streak.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
@@ -4736,7 +4753,7 @@ function slide4(day,total,handleIG,handleX,moodLine,food){
     c.shadowColor='rgba(0,0,0,0.8)';c.shadowBlur=28;
     c.fillText('WALLET SAFE.',60,H-160);c.shadowBlur=0;
     c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.55)';
-    c.fillText('Rs. 15,000 UNCLAIMED  ·  STREAK UNBROKEN',60,H-126);
+    c.fillText('Rs. 15,000 DEFENDED  ·  STREAK UNBROKEN',60,H-126);
     c.restore();
     drawCorners(c,W,H,P.acR+'0.12)');drawBrand(c);
     // DAY pill badge — matching Slide 1 style
@@ -6011,7 +6028,7 @@ function downloadStoriesCard(){
 // High quality: 2160x3840 canvas, 2x scale, 0.97 JPEG
 
 const STORY_SCHEDULE=['number','streak','clock','dashboard','stakes','receipt','redline','witness','compare','heatmap','noir','light','dawn','paper','unclaimed','route','blueprint','telegram','film','manifesto','devotion','scoreboard','ledger','press','carbon','mirror','vault','signal','radar','capsule','mosaic','poster','glitch','cypher','neon','sanction','century','orbit','pyramid','forge','wall','belt','proclamation','constellation'];
-const STORY_NAMES=['THE NUMBER','THE STREAK','THE CLOCK','THE DASHBOARD','THE STAKES','THE RECEIPT','THE REDLINE','THE WITNESS','THE COMPARE','THE HEATMAP','THE NOIR','THE LIGHT','THE DAWN','THE PAPER','THE UNCLAIMED','THE ROUTE','THE BLUEPRINT','THE TELEGRAM','THE FILM','THE MANIFESTO','THE DEVOTION','THE SCOREBOARD','THE LEDGER','THE PRESS','THE CARBON','THE MIRROR','THE VAULT','THE SIGNAL','THE RADAR','THE CAPSULE','THE MOSAIC','THE POSTER','THE GLITCH','THE CYPHER','THE NEON','THE SANCTION','THE CENTURY','THE ORBIT','THE PYRAMID','THE FORGE','THE WALL','THE BELT','THE PROCLAMATION','THE CONSTELLATION'];
+const STORY_NAMES=['THE NUMBER','THE STREAK','THE CLOCK','THE DASHBOARD','THE STAKES','THE RECEIPT','THE REDLINE','THE WITNESS','THE COMPARE','THE HEATMAP','THE NOIR','THE LIGHT','THE DAWN','THE PAPER','THE DEFENDED','THE ROUTE','THE BLUEPRINT','THE TELEGRAM','THE FILM','THE MANIFESTO','THE DEVOTION','THE SCOREBOARD','THE LEDGER','THE PRESS','THE CARBON','THE MIRROR','THE VAULT','THE SIGNAL','THE RADAR','THE CAPSULE','THE MOSAIC','THE POSTER','THE GLITCH','THE CYPHER','THE NEON','THE SANCTION','THE CENTURY','THE ORBIT','THE PYRAMID','THE FORGE','THE WALL','THE BELT','THE PROCLAMATION','THE CONSTELLATION'];
 const STORY_ICONS=['\uD83D\uDD22','\uD83D\uDD25','\u23F0','\uD83D\uDCCA','\uD83D\uDCB0','\uD83E\uDDFE','\uD83D\uDFE5','\uD83D\uDC41','\u2194\uFE0F','\uD83D\uDFE9','\uD83C\uDF03','\u2600\uFE0F','\uD83C\uDF05','\uD83D\uDCF0','\u267B\uFE0F','\uD83D\uDDFA\uFE0F','\uD83D\uDCCF','\uD83D\uDCDF','\uD83C\uDF9E','\uD83D\uDCDC','\uD83C\uDF0C','\uD83C\uDFDF','\uD83D\uDCCA','\uD83D\uDCF0','\u26A1','\uD83E\uDE9E','\uD83D\uDD10','\uD83D\uDC93','\uD83D\uDCE1','\uD83D\uDCDC','\uD83C\uDFA8','\u2B50','\u26A1','\uD83D\uDD12','\uD83C\uDF06','\u2696\uFE0F','\uD83C\uDFCF','\uD83C\uDF0D','\uD83D\uDD3A','\u2694\uFE0F','\uD83D\uDCB8','\uD83C\uDFC6','\uD83D\uDCDC','\u2728'];
 const STORY_DESCS=['Giant KM hero','Day counter + dots','Start time hero','All stats grid','Danger zone','Thermal receipt','Minimalist threat','Reply challenge','Day 1 vs Today','Streak grid','Dark cyan dashboard','Cream KM + watch','Cream clock emboss','White serif minimal','Black unclaimed only','Satellite map + stats','Engineering grid callouts','Western Union format','Three-frame film strip','Raw prose intensity wall','Pre-dawn stars + 3:30 AM','Stadium LED scoreboard','Accounting balance sheet','Newspaper front page','Carbon weave premium tech','Full-bleed photo + data wall','Gold vault door + streak security','EKG heartbeat monitor pulse','Military radar + data points','Time capsule letter to future self','Mondrian color block data art','Soviet-era propaganda poster','RGB glitch distortion art','Encrypted code terminal reveal','Neon city skyline cyberpunk','Legal contract + penalty clause','Cricket 100* NOT OUT scoreboard','Earth orbit + deep space progress','Egyptian pyramid built stone by stone','Forge blade from raw iron milestone','Stack of Rs.500 notes not forfeited','Championship belt with day engraved','Royal decree parchment + wax seal','Starfield constellation of all days'];
 const STORY_DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','ANY','MILE','MILE','MILE','MILE','MILE','MILE','MILE','MILE'];
@@ -6057,11 +6074,11 @@ function genStoryTemplate(idx){
     // 0: THE NUMBER (Mon) — Giant KM hero
     function(){return lp(i1).then(function(wi){bg();brand();dayBadge();accent();c.textAlign='center';c.font='900 200px "Rajdhani",sans-serif';c.fillStyle='#FFF';c.shadowColor=P.acR+'0.5)';c.shadowBlur=50;c.fillText(km||'\u2014',W/2,500);c.shadowBlur=0;c.font='700 26px "JetBrains Mono",monospace';c.fillStyle=P.accent;c.fillText('K I L O M E T E R S',W/2,550);c.fillStyle=P.accent;c.globalAlpha=0.4;c.fillRect(W/2-200,572,400,2);c.globalAlpha=1;c.font='800 38px "Rajdhani",sans-serif';c.fillStyle=P.text||'#F0EDE5';c.fillText([fmtP()+'/km',mn?(mn+' min'):'',bpmV?(bpmV+' bpm'):''].filter(Boolean).join('  \u00B7  '),W/2,630);if(wi){var pW=W-96,pH=820,pX=48,pY=700;c.save();c.shadowColor='rgba(0,0,0,0.35)';c.shadowBlur=25;c.fillStyle='rgba(0,0,0,.15)';rr(c,pX,pY,pW,pH,18);c.fill();c.restore();c.strokeStyle=P.acR+'0.18)';c.lineWidth=1.5;rr(c,pX,pY,pW,pH,18);c.stroke();c.save();rr(c,pX,pY,pW,pH,18);c.clip();var sc=Math.min(pW/wi.width,pH/wi.height);c.drawImage(wi,pX+(pW-wi.width*sc)/2,pY+(pH-wi.height*sc)/2,wi.width*sc,wi.height*sc);c.restore();}c.font='500 13px "JetBrains Mono",monospace';c.fillStyle=P.smoke||'#8A8681';c.textAlign='center';c.fillText('\u231A GPS VERIFIED',W/2,1560);status();handle();});},
     // 1: THE STREAK (Tue) — Day counter + dots
-    function(){return lp(i1).then(function(wi){bg();brand();accent();c.textAlign='center';c.font='900 280px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.shadowColor=P.acR+'0.6)';c.shadowBlur=70;c.fillText(day,W/2,580);c.shadowBlur=0;c.font='700 30px "JetBrains Mono",monospace';c.fillStyle=P.text||'#F0EDE5';c.fillText('D A Y S',W/2,640);c.font='500 16px "JetBrains Mono",monospace';c.fillStyle=P.smoke||'#8A8681';c.fillText('ZERO MISSES \u00B7 ZERO EXCUSES',W/2,680);var dotY=750,dotSz=14,dotGap=6,dotCnt=30,dotW=dotCnt*(dotSz+dotGap)-dotGap,dotX=W/2-dotW/2;for(var ii=0;ii<dotCnt;ii++){var dd=dn-dotCnt+1+ii;c.fillStyle=dd===dn?P.accent:dd>0?'rgba(46,232,154,0.6)':'rgba(255,255,255,0.06)';c.beginPath();c.arc(dotX+ii*(dotSz+dotGap)+dotSz/2,dotY+dotSz/2,dotSz/2,0,Math.PI*2);c.fill();}c.font='700 48px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.fillText('\u20B9'+formatIndianCurrency(totalRisk),W/2,880);c.font='500 14px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('UNCLAIMED',W/2,920);if(wi){var pW=640,pH=540,pX=W/2-pW/2,pY=980;c.save();rr(c,pX,pY,pW,pH,14);c.clip();var sc=Math.min(pW/wi.width,pH/wi.height);c.drawImage(wi,pX+(pW-wi.width*sc)/2,pY+(pH-wi.height*sc)/2,wi.width*sc,wi.height*sc);c.restore();}status();handle();});},
+    function(){return lp(i1).then(function(wi){bg();brand();accent();c.textAlign='center';c.font='900 280px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.shadowColor=P.acR+'0.6)';c.shadowBlur=70;c.fillText(day,W/2,580);c.shadowBlur=0;c.font='700 30px "JetBrains Mono",monospace';c.fillStyle=P.text||'#F0EDE5';c.fillText('D A Y S',W/2,640);c.font='500 16px "JetBrains Mono",monospace';c.fillStyle=P.smoke||'#8A8681';c.fillText('ZERO MISSES \u00B7 ZERO EXCUSES',W/2,680);var dotY=750,dotSz=14,dotGap=6,dotCnt=30,dotW=dotCnt*(dotSz+dotGap)-dotGap,dotX=W/2-dotW/2;for(var ii=0;ii<dotCnt;ii++){var dd=dn-dotCnt+1+ii;c.fillStyle=dd===dn?P.accent:dd>0?'rgba(46,232,154,0.6)':'rgba(255,255,255,0.06)';c.beginPath();c.arc(dotX+ii*(dotSz+dotGap)+dotSz/2,dotY+dotSz/2,dotSz/2,0,Math.PI*2);c.fill();}c.font='700 48px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.fillText('\u20B9'+formatIndianCurrency(totalRisk),W/2,880);c.font='500 14px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('DEFENDED',W/2,920);if(wi){var pW=640,pH=540,pX=W/2-pW/2,pY=980;c.save();rr(c,pX,pY,pW,pH,14);c.clip();var sc=Math.min(pW/wi.width,pH/wi.height);c.drawImage(wi,pX+(pW-wi.width*sc)/2,pY+(pH-wi.height*sc)/2,wi.width*sc,wi.height*sc);c.restore();}status();handle();});},
     // 2: THE CLOCK (Wed) — Start time hero
     function(){return lp(iT||i2||i1).then(function(ph){bg();brand();dayBadge();accent();c.textAlign='center';c.font='900 150px "DM Serif Display",serif';c.fillStyle='#FFF';c.shadowColor=P.acR+'0.4)';c.shadowBlur=30;c.fillText(fmt12(wStart)||'4:48 AM',W/2,540);c.shadowBlur=0;c.font='700 20px "JetBrains Mono",monospace';c.fillStyle=P.accent;c.fillText('ALARM OFF. FEET ON THE GROUND.',W/2,600);c.fillStyle=P.acR+'0.3)';c.fillRect(W/2-150,630,300,1.5);c.font='800 52px "Rajdhani",sans-serif';c.fillStyle=P.text||'#F0EDE5';c.fillText((km||'\u2014')+' KM  \u00B7  '+(mn||'\u2014')+' MIN',W/2,710);if(bpmV){c.font='600 24px "JetBrains Mono",monospace';c.fillStyle='rgba(255,82,82,0.8)';c.fillText('\u2764 '+bpmV+' BPM',W/2,760);}if(ph){var pW=W-96,pH=740,pX=48,pY=830;c.save();rr(c,pX,pY,pW,pH,18);c.clip();var sc=Math.max(pW/ph.width,pH/ph.height);c.drawImage(ph,(W-ph.width*sc)/2,pY+(pH-ph.height*sc)/2,ph.width*sc,ph.height*sc);var ov=c.createLinearGradient(0,pY+pH-160,0,pY+pH);ov.addColorStop(0,'transparent');ov.addColorStop(1,'rgba(0,0,0,0.7)');c.fillStyle=ov;c.fillRect(pX,pY,pW,pH);c.restore();}handle();});},
     // 3: THE DASHBOARD (Thu) — Stats grid
-    function(){return lp(i1).then(function(wi){bg();brand();dayBadge();accent();c.textAlign='center';c.font='700 14px "JetBrains Mono",monospace';c.fillStyle=P.accent;c.fillText('DAILY REPORT',W/2,160);c.fillStyle=P.acR+'0.25)';c.fillRect(W/2-100,170,200,1);var stats=[{v:km||'\u2014',u:'KM',l:'DISTANCE'},{v:fmtP(),u:'/KM',l:'PACE'},{v:mn||'\u2014',u:'MIN',l:'DURATION'},{v:bpmV||'\u2014',u:'BPM',l:'HEART RATE'},{v:sleepH||'\u2014',u:'HRS',l:'SLEEP'},{v:'\u20B9'+formatIndianCurrency(stake),u:'/DAY',l:'AT STAKE'},{v:day,u:'DAYS',l:'STREAK'},{v:'\u20B9'+formatIndianCurrency(totalRisk),u:'',l:'UNCLAIMED'}];var gX=60,gY=210,gW=(W-120-16)/2,gH=130,gap=8;stats.forEach(function(s,i){var col=i%2,row=Math.floor(i/2);var x=gX+col*(gW+gap),y=gY+row*(gH+gap);c.fillStyle='rgba(255,255,255,0.025)';rr(c,x,y,gW,gH,12);c.fill();c.strokeStyle=P.acR+'0.10)';c.lineWidth=0.5;rr(c,x,y,gW,gH,12);c.stroke();c.textAlign='center';c.font='900 42px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.shadowColor=P.acR+'0.3)';c.shadowBlur=8;c.fillText(s.v,x+gW/2,y+56);c.shadowBlur=0;c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText(s.u,x+gW/2,y+78);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.4)';c.fillText(s.l,x+gW/2,y+100);});status();if(wi){var pW=500,pH=400,pX=W/2-pW/2,pY=gY+4*(gH+gap)+60;c.save();rr(c,pX,pY,pW,pH,12);c.clip();var sc=Math.min(pW/wi.width,pH/wi.height);c.drawImage(wi,pX+(pW-wi.width*sc)/2,pY+(pH-wi.height*sc)/2,wi.width*sc,wi.height*sc);c.restore();}handle();});},
+    function(){return lp(i1).then(function(wi){bg();brand();dayBadge();accent();c.textAlign='center';c.font='700 14px "JetBrains Mono",monospace';c.fillStyle=P.accent;c.fillText('DAILY REPORT',W/2,160);c.fillStyle=P.acR+'0.25)';c.fillRect(W/2-100,170,200,1);var stats=[{v:km||'\u2014',u:'KM',l:'DISTANCE'},{v:fmtP(),u:'/KM',l:'PACE'},{v:mn||'\u2014',u:'MIN',l:'DURATION'},{v:bpmV||'\u2014',u:'BPM',l:'HEART RATE'},{v:sleepH||'\u2014',u:'HRS',l:'SLEEP'},{v:'\u20B9'+formatIndianCurrency(stake),u:'/DAY',l:'AT STAKE'},{v:day,u:'DAYS',l:'STREAK'},{v:'\u20B9'+formatIndianCurrency(totalRisk),u:'',l:'DEFENDED'}];var gX=60,gY=210,gW=(W-120-16)/2,gH=130,gap=8;stats.forEach(function(s,i){var col=i%2,row=Math.floor(i/2);var x=gX+col*(gW+gap),y=gY+row*(gH+gap);c.fillStyle='rgba(255,255,255,0.025)';rr(c,x,y,gW,gH,12);c.fill();c.strokeStyle=P.acR+'0.10)';c.lineWidth=0.5;rr(c,x,y,gW,gH,12);c.stroke();c.textAlign='center';c.font='900 42px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.shadowColor=P.acR+'0.3)';c.shadowBlur=8;c.fillText(s.v,x+gW/2,y+56);c.shadowBlur=0;c.font='600 11px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText(s.u,x+gW/2,y+78);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.4)';c.fillText(s.l,x+gW/2,y+100);});status();if(wi){var pW=500,pH=400,pX=W/2-pW/2,pY=gY+4*(gH+gap)+60;c.save();rr(c,pX,pY,pW,pH,12);c.clip();var sc=Math.min(pW/wi.width,pH/wi.height);c.drawImage(wi,pX+(pW-wi.width*sc)/2,pY+(pH-wi.height*sc)/2,wi.width*sc,wi.height*sc);c.restore();}handle();});},
     // 4: THE STAKES (Fri) — REDESIGNED: Danger zone with red gradient + pulse rings + progress bar
     function(){
       // Blood-red gradient background
@@ -6092,7 +6109,7 @@ function genStoryTemplate(idx){
       c.fillStyle=barGrad;c.shadowColor='rgba(255,30,30,0.5)';c.shadowBlur=12;rr(c,barX,barY,barW*pct,barH,9);c.fill();c.shadowBlur=0;
       c.font='800 12px "Rajdhani",sans-serif';c.fillStyle='#fff';c.fillText(day+' / 365',barX+barW*pct/2,barY+13);
       // Total unclaimed
-      c.font='500 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.3)';c.fillText('TOTAL UNCLAIMED',W/2,790);
+      c.font='500 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.3)';c.fillText('TOTAL DEFENDED',W/2,790);
       c.font='900 100px "Rajdhani",sans-serif';c.fillStyle='#fff';c.shadowColor='rgba(255,82,82,0.3)';c.shadowBlur=30;
       c.fillText('\u20B9'+formatIndianCurrency(totalRisk),W/2,900);c.shadowBlur=0;
       c.font='500 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,82,82,0.5)';c.fillText(day+' DAYS \u00B7 ZERO MISSES \u00B7 THE LINE HOLDS',W/2,950);
@@ -6222,7 +6239,7 @@ function genStoryTemplate(idx){
       c.fillText(now2.getDate()+' '+['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][now2.getMonth()]+' '+now2.getFullYear(),W*3/4,700);
       // Bottom — unclaimed spanning both
       c.font='700 36px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.shadowColor=P.acR+'0.4)';c.shadowBlur=16;
-      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED',W/2,H-200);c.shadowBlur=0;
+      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' DEFENDED',W/2,H-200);c.shadowBlur=0;
       c.font='500 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.3)';c.fillText(day+' DAYS \u00B7 ZERO MISSES',W/2,H-160);
       handle();
       return Promise.resolve();
@@ -6265,7 +6282,7 @@ function genStoryTemplate(idx){
       if(statY>H-180)statY=H-180;
       c.textAlign='center';c.font='900 60px "Rajdhani",sans-serif';c.fillStyle=P.accent;c.shadowColor=P.acR+'0.4)';c.shadowBlur=16;
       c.fillText('\u20B9'+formatIndianCurrency(totalRisk),W/2,statY);c.shadowBlur=0;
-      c.font='500 14px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('UNCLAIMED \u00B7 ZERO MISSES',W/2,statY+30);
+      c.font='500 14px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('DEFENDED \u00B7 ZERO MISSES',W/2,statY+30);
       status();handle();return Promise.resolve();
     },
     // 10: THE NOIR — Dark cyan dashboard with checkmark cards + watch embed
@@ -6421,7 +6438,7 @@ function genStoryTemplate(idx){
       c.fillText('IF I MISS EVEN ONE DAY',W/2,820);
       // Unclaimed + streak
       c.font='400 18px "JetBrains Mono",monospace';c.fillStyle='#BBB';
-      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED \u00B7 '+day+' DAYS \u00B7 ZERO MISSES',W/2,900);
+      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' DEFENDED \u00B7 '+day+' DAYS \u00B7 ZERO MISSES',W/2,900);
       // Infinity symbol
       c.font='400 36px serif';c.fillStyle='#CCC';c.fillText('\u221E',W/2,970);
       // Sleep
@@ -6431,14 +6448,14 @@ function genStoryTemplate(idx){
       c.font='400 14px "JetBrains Mono",monospace';c.fillStyle='#999';c.fillText('www.firstlight.live \u00B7 The streak. The evidence. The system.',W/2,H-150);
       return Promise.resolve();
     },
-    // 14: THE UNCLAIMED — Pure black, just the money, nothing else
+    // 14: THE DEFENDED — Pure black, just the money, nothing else
     function(){
       c.fillStyle='#000';c.fillRect(0,0,W,H);
       // Giant unclaimed amount — white, centered
       c.textAlign='center';c.font='900 130px "DM Serif Display",serif';c.fillStyle='#fff';
       c.fillText('\u20B9'+formatIndianCurrency(totalRisk),W/2,820);
       c.font='500 22px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.4)';
-      c.fillText('UNCLAIMED',W/2,870);
+      c.fillText('DEFENDED',W/2,870);
       // Infinity
       c.font='400 36px serif';c.fillStyle='rgba(255,255,255,0.3)';c.fillText('\u221E',W/2,940);
       // Streak statement — bold
@@ -6477,7 +6494,7 @@ function genStoryTemplate(idx){
       c.fillText('IF I MISS EVEN ONE DAY',W/2,408);
       // Streak
       c.font='400 14px "JetBrains Mono",monospace';c.fillStyle='#BBB';
-      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED \u00B7 '+day+' DAYS \u00B7 ZERO MISSES',W/2,444);
+      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' DEFENDED \u00B7 '+day+' DAYS \u00B7 ZERO MISSES',W/2,444);
       // Checklist
       c.font='500 14px "JetBrains Mono",monospace';c.fillStyle='#999';
       c.fillText((food?'\u2611':'\u2610')+' FOOD   '+(runD?'\u2611':'\u2610')+' RUN   '+(gymD?'\u2611':'\u2610')+' GYM',W/2,478);
@@ -6590,7 +6607,7 @@ function genStoryTemplate(idx){
       callout(cX-120,cY,80,840,'PACE',fmtP()+'/KM');
       callout(cX+120,cY,W-80,840,'HEART RATE',(bpmV||'\u2014')+' BPM');
       callout(cX-90,cY+90,120,1200,'DAILY STAKE','\u20B9'+formatIndianCurrency(stake));
-      callout(cX+90,cY+90,W-120,1200,'TOTAL UNCLAIMED','\u20B9'+formatIndianCurrency(totalRisk));
+      callout(cX+90,cY+90,W-120,1200,'TOTAL DEFENDED','\u20B9'+formatIndianCurrency(totalRisk));
       c.textAlign='left';c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(80,140,255,0.3)';
       c.fillText('NOTE 1: ALL DIMENSIONS GPS-VERIFIED. NO ROUNDING.',60,1380);
       c.fillText('NOTE 2: STRUCTURAL TOLERANCE = ZERO MISSED DAYS.',60,1404);
@@ -6625,7 +6642,7 @@ function genStoryTemplate(idx){
       tLines.push('GYM '+(gymD?'DONE':'PENDING')+' STOP');
       tLines.push('STREAK ALIVE STOP');
       tLines.push('STAKE \u20B9'+formatIndianCurrency(stake)+' STOP');
-      tLines.push('TOTAL \u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED STOP');
+      tLines.push('TOTAL \u20B9'+formatIndianCurrency(totalRisk)+' DEFENDED STOP');
       tLines.push('ZERO BREAKS STOP');
       tLines.forEach(function(l){c.textAlign='center';c.fillText(l,W/2,ty);ty+=62;});
       c.fillStyle='#1A1A80';c.fillRect(40,ty+10,W-80,1);
@@ -6685,7 +6702,7 @@ function genStoryTemplate(idx){
       c.fillText('\u20B9'+formatIndianCurrency(stake),fX+fW/2,f3Y+152);c.shadowBlur=0;
       c.font='600 15px "JetBrains Mono",monospace';c.fillStyle='rgba(255,100,100,0.6)';c.fillText('IF I MISS  \u00B7  YOU COLLECT',fX+fW/2,f3Y+200);
       c.font='800 40px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.75)';
-      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED',fX+fW/2,f3Y+280);
+      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' DEFENDED',fX+fW/2,f3Y+280);
       c.textAlign='left';c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.3)';c.fillText('FRAME 03/03 \u2014 THE COVENANT',fX,f3Y+f3H+18);
       c.textAlign='center';c.font='600 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,150,0.25)';
       c.fillText('@firstlightlive \u00B7 www.firstlight.live \u00B7 SHOT AT 3:30 AM \u00B7 DEVELOPED IN SWEAT',W/2,H-22);
@@ -6737,7 +6754,7 @@ function genStoryTemplate(idx){
       c.fillStyle='rgba(255,23,68,0.12)';c.fillRect(70,H-180,W-140,1);
       c.font='500 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.18)';
       c.fillText('@firstlightlive \u00B7 www.firstlight.live',70,H-148);
-      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' unclaimed \u00B7 '+day+' days \u00B7 zero misses',70,H-118);
+      c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' defended \u00B7 '+day+' days \u00B7 zero misses',70,H-118);
       c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,23,68,0.28)';
       c.fillText('firstlight.live / the streak / the evidence / the system',70,H-88);
       return Promise.resolve();
@@ -6773,7 +6790,7 @@ function genStoryTemplate(idx){
       c.fillText('Before the world wakes,',W/2,1068);c.fillText('the oath holds.',W/2,1114);
       c.fillStyle='rgba(255,255,255,0.08)';c.fillRect(W/2-80,1148,160,1);
       c.font='700 20px "Rajdhani",sans-serif';c.fillStyle='rgba(255,220,150,0.4)';
-      c.fillText('DAY '+day+'  \u00B7  ZERO BREAKS  \u00B7  \u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED',W/2,1196);
+      c.fillText('DAY '+day+'  \u00B7  ZERO BREAKS  \u00B7  \u20B9'+formatIndianCurrency(totalRisk)+' DEFENDED',W/2,1196);
       c.font='600 17px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.32)';
       c.fillText((food?'\u2705':'\u25A1')+' FOOD  '+(runD?'\u2705':'\u25A1')+' RUN  '+(gymD?'\u2705':'\u25A1')+' GYM',W/2,1264);
       var botG2=c.createLinearGradient(0,H-160,0,H);botG2.addColorStop(0,'transparent');botG2.addColorStop(1,'rgba(0,0,0,0.55)');
@@ -6839,7 +6856,7 @@ function genStoryTemplate(idx){
       var pbG=c.createLinearGradient(60,0,60+pbW*pbPct,0);pbG.addColorStop(0,'rgba(0,230,100,0.8)');pbG.addColorStop(1,'rgba(0,200,80,0.5)');
       c.fillStyle=pbG;c.shadowColor='rgba(0,230,100,0.38)';c.shadowBlur=7;rr(c,60,pbY,pbW*pbPct,22,11);c.fill();c.shadowBlur=0;
       c.font='700 12px "Rajdhani",sans-serif';c.fillStyle='#fff';c.textAlign='center';c.fillText(day+' / 365',W/2,pbY+16);
-      c.font='700 17px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,100,0.45)';c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED \u00B7 '+day+' DAYS',W/2,pbY+52);
+      c.font='700 17px "JetBrains Mono",monospace';c.fillStyle='rgba(0,230,100,0.45)';c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' DEFENDED \u00B7 '+day+' DAYS',W/2,pbY+52);
       c.fillStyle='rgba(255,240,0,0.1)';c.fillRect(0,H-96,W,96);
       c.font='700 20px "Rajdhani",sans-serif';c.fillStyle='rgba(255,240,0,0.55)';c.fillText('@firstlightlive \u00B7 www.firstlight.live',W/2,H-58);
       c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,240,0,0.28)';c.fillText('DISCIPLINE WINS. EVERY TIME.',W/2,H-32);
@@ -6883,7 +6900,7 @@ function genStoryTemplate(idx){
       c.beginPath();c.moveTo(30,eY-10);c.lineTo(W-30,eY-10);c.stroke();
       c.beginPath();c.moveTo(30,eY-6);c.lineTo(W-30,eY-6);c.stroke();
       eY+=18;
-      c.textAlign='left';c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='#003D1A';c.fillText('TOTAL UNCLAIMED (CREDIT)',50,eY);
+      c.textAlign='left';c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='#003D1A';c.fillText('TOTAL DEFENDED (CREDIT)',50,eY);
       c.textAlign='right';c.font='900 26px "Rajdhani",sans-serif';c.fillStyle='#003D1A';c.shadowColor='rgba(0,120,60,0.28)';c.shadowBlur=7;
       c.fillText('\u20B9'+formatIndianCurrency(totalRisk),W-50,eY);c.shadowBlur=0;eY+=52;
       c.textAlign='left';c.font='700 13px "JetBrains Mono",monospace';c.fillStyle='rgba(200,50,50,0.65)';c.fillText('FAILURES RECORDED',50,eY);
@@ -6916,7 +6933,7 @@ function genStoryTemplate(idx){
       c.fillStyle='#111';c.fillRect(60,486,W-120,2);
       var bY=506,colW=Math.floor((W-200)/2),c1X=60,c2X=c1X+colW+80,lhN=30;
       c.font='400 15px "JetBrains Mono",monospace';c.fillStyle='#222';
-      var col1=['BANGALORE \u2014 In what observers call','a display of uncommon resolve, Anupam','Kumar completed Day '+String(day).padStart(3,'0')+' this morning.','','He rose at '+(fmt12(wStart)||'3:30 AM')+', completed',''+km+' km on foot, followed by gym.','No food code violations recorded.','','Total unclaimed penalty: \u20B9'+formatIndianCurrency(totalRisk),'remains untouched. Zero excuses.','GPS-verified. Strava-confirmed.','The line holds.'];
+      var col1=['BANGALORE \u2014 In what observers call','a display of uncommon resolve, Anupam','Kumar completed Day '+String(day).padStart(3,'0')+' this morning.','','He rose at '+(fmt12(wStart)||'3:30 AM')+', completed',''+km+' km on foot, followed by gym.','No food code violations recorded.','','Total penalty defended: \u20B9'+formatIndianCurrency(totalRisk),'remains untouched. Zero excuses.','GPS-verified. Strava-confirmed.','The line holds.'];
       col1.forEach(function(ln,i){c.textAlign='left';c.fillText(ln,c1X,bY+i*lhN);});
       c.strokeStyle='rgba(0,0,0,0.13)';c.lineWidth=1;c.strokeRect(c2X-10,bY-18,colW+20,col1.length*lhN+10);
       c.font='700 12px "JetBrains Mono",monospace';c.fillStyle='#111';c.fillText("TODAY'S STATS",c2X,bY-5);
@@ -6979,7 +6996,7 @@ function genStoryTemplate(idx){
       c.font='900 98px "Rajdhani",sans-serif';
       var stG2=c.createLinearGradient(0,stY+52,0,stY+168);stG2.addColorStop(0,'#FFD700');stG2.addColorStop(1,'rgba(255,180,0,0.55)');
       c.fillStyle=stG2;c.shadowColor='rgba(255,215,0,0.38)';c.shadowBlur=22;c.fillText('\u20B9'+formatIndianCurrency(stake),W/2,stY+148);c.shadowBlur=0;
-      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.32)';c.fillText('IF I MISS \u00B7 YOU COLLECT \u00B7 TOTAL UNCLAIMED: \u20B9'+formatIndianCurrency(totalRisk),W/2,stY+190);
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.32)';c.fillText('IF I MISS \u00B7 YOU COLLECT \u00B7 TOTAL DEFENDED: \u20B9'+formatIndianCurrency(totalRisk),W/2,stY+190);
       c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=(food&&runD&&gymD)?'rgba(0,230,100,0.65)':'rgba(255,165,0,0.65)';
       c.fillText((food?'\u2713':'\u2717')+' FOOD   '+(runD?'\u2713':'\u2717')+' RUN   '+(gymD?'\u2713':'\u2717')+' GYM',W/2,1270);
       c.fillStyle=acG;c.fillRect(0,H-118,W,1);
@@ -7026,7 +7043,7 @@ function genStoryTemplate(idx){
       c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,215,0,0.48)';c.fillText('DAILY STAKE',px,py);py+=22;
       c.font='900 50px "Rajdhani",sans-serif';c.fillStyle='rgba(255,215,0,0.88)';c.shadowColor='rgba(255,215,0,0.28)';c.shadowBlur=11;
       c.fillText('\u20B9'+formatIndianCurrency(stake),px,py+44);c.shadowBlur=0;py+=68;
-      c.font='700 13px "Rajdhani",sans-serif';c.fillStyle='rgba(255,215,0,0.38)';c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' UNCLAIMED',px,py);py+=36;
+      c.font='700 13px "Rajdhani",sans-serif';c.fillStyle='rgba(255,215,0,0.38)';c.fillText('\u20B9'+formatIndianCurrency(totalRisk)+' DEFENDED',px,py);py+=36;
       c.font='600 13px "JetBrains Mono",monospace';c.fillStyle=(food&&runD&&gymD)?'rgba(0,230,100,0.68)':'rgba(255,165,0,0.68)';
       c.fillText((food?'\u2713':'\u2717')+' FOOD  '+(runD?'\u2713':'\u2717')+' RUN  '+(gymD?'\u2713':'\u2717')+' GYM',px,py);
       c.textAlign='left';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.65)';c.shadowColor='rgba(0,0,0,0.9)';c.shadowBlur=6;
@@ -7065,7 +7082,7 @@ function genStoryTemplate(idx){
       c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(212,168,67,0.4)';c.fillText('VAULT OF UNBROKEN DAYS',48,96);
       // Stats below vault
       var sy=1250,sx=80,sw=(W-160)/3;
-      var vStats=[{v:km||'\u2014',u:'KM',l:'RUN'},{v:'\u20B9'+formatIndianCurrency(stake),u:'/DAY',l:'AT STAKE'},{v:'\u20B9'+formatIndianCurrency(totalRisk),u:'',l:'UNCLAIMED'}];
+      var vStats=[{v:km||'\u2014',u:'KM',l:'RUN'},{v:'\u20B9'+formatIndianCurrency(stake),u:'/DAY',l:'AT STAKE'},{v:'\u20B9'+formatIndianCurrency(totalRisk),u:'',l:'DEFENDED'}];
       vStats.forEach(function(s,i){var x=sx+i*(sw+20);c.fillStyle='rgba(212,168,67,0.06)';rr(c,x,sy,sw,120,10);c.fill();c.strokeStyle='rgba(212,168,67,0.15)';c.lineWidth=1;rr(c,x,sy,sw,120,10);c.stroke();c.textAlign='center';c.font='800 36px "Rajdhani",sans-serif';c.fillStyle='rgba(212,168,67,0.9)';c.fillText(s.v,x+sw/2,sy+52);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(212,168,67,0.4)';c.fillText(s.u,x+sw/2,sy+70);c.fillText(s.l,x+sw/2,sy+96);});
       // SECURED text
       c.textAlign='center';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='rgba(46,232,154,0.7)';c.fillText('\u2713 VAULT SECURED \u00B7 ZERO BREACHES',W/2,1440);
@@ -7162,7 +7179,7 @@ function genStoryTemplate(idx){
       c.font='400 20px "DM Serif Display",serif';c.fillStyle='rgba(60,40,15,0.6)';c.fillText('From: Day '+day+' Anupam',lx,ly);ly+=50;
       c.fillStyle='rgba(100,70,20,0.3)';c.fillRect(lx,ly,lw,1);ly+=32;
       c.font='400 22px "DM Serif Display",serif';c.fillStyle='rgba(60,40,15,0.8)';
-      var lines2=['Today I woke up and ran.','That\'s the whole story.','',' '+( km||'—')+' km. '+(mn||'—')+' min. Still here.','','The money is still mine — ₹'+formatIndianCurrency(stake)+'/day.','₹'+formatIndianCurrency(totalRisk)+' unclaimed. Every. Single. Day.','','When you read this, remember:','the body that ran today','made you who you are then.'];
+      var lines2=['Today I woke up and ran.','That\'s the whole story.','',' '+( km||'—')+' km. '+(mn||'—')+' min. Still here.','','The money is still mine — ₹'+formatIndianCurrency(stake)+'/day.','₹'+formatIndianCurrency(totalRisk)+' defended. Every. Single. Day.','','When you read this, remember:','the body that ran today','made you who you are then.'];
       lines2.forEach(function(ln){if(ln===''){ly+=20;return;}c.fillText(ln,lx,ly);ly+=36;});
       ly+=20;c.fillStyle='rgba(100,70,20,0.3)';c.fillRect(lx,ly,lw,1);ly+=36;
       c.font='400 22px "DM Serif Display",serif';c.fillStyle='rgba(60,40,15,0.6)';c.fillText('Yours in discipline,',lx,ly);ly+=38;
@@ -7199,7 +7216,7 @@ function genStoryTemplate(idx){
       mText(W*0.33,H*0.36,W*0.35,H*0.14,fmtP(),'#1A1A1A',38);mSub(W*0.33,H*0.36,W*0.35,H*0.14,'PACE','rgba(0,0,0,0.5)');
       mText(W*0.68,H*0.22,W*0.32,H*0.28,bpmV||'\u2014','#F5F0E8',52);mSub(W*0.68,H*0.22,W*0.32,H*0.28,'BPM','rgba(255,255,255,0.5)');
       mText(0,H*0.5,W*0.5,H*0.18,'\u20B9'+formatIndianCurrency(totalRisk),'#1A1A1A',38);
-      mSub(0,H*0.5,W*0.5,H*0.18,'UNCLAIMED','rgba(0,0,0,0.5)');
+      mSub(0,H*0.5,W*0.5,H*0.18,'DEFENDED','rgba(0,0,0,0.5)');
       mText(W*0.5,H*0.5,W*0.5,H*0.18,sleepH||'\u2014','#1A1A1A',52);mSub(W*0.5,H*0.5,W*0.5,H*0.18,'HRS SLEEP','rgba(0,0,0,0.5)');
       mText(W*0.25,H*0.68,W*0.45,H*0.16,'FIRST','#F5F0E8',44);
       mText(W*0.25,H*0.84,W*0.45,H*0.16,'LIGHT','#F5F0E8',44);
@@ -7228,7 +7245,7 @@ function genStoryTemplate(idx){
       // Stats in bold black grid on cream
       var py2=redH+100;c.fillStyle='#1A1A1A';
       function pStat(label,val){c.textAlign='left';c.font='700 14px "JetBrains Mono",monospace';c.fillStyle='#8B0000';c.fillText('\u25BA '+label,80,py2);c.textAlign='right';c.font='900 40px "Rajdhani",sans-serif';c.fillStyle='#1A1A1A';c.fillText(val,W-80,py2);c.fillStyle='rgba(0,0,0,0.15)';c.fillRect(80,py2+8,W-160,1);py2+=58;}
-      pStat('RUN DISTANCE',( km||'\u2014')+' KM');pStat('DURATION',(mn||'\u2014')+' MIN');if(bpmV)pStat('HEART RATE',bpmV+' BPM');pStat('DAILY STAKE','\u20B9'+formatIndianCurrency(stake));pStat('UNCLAIMED','\u20B9'+formatIndianCurrency(totalRisk));pStat('FOOD CODE',food?'CLEAN':'BROKEN');
+      pStat('RUN DISTANCE',( km||'\u2014')+' KM');pStat('DURATION',(mn||'\u2014')+' MIN');if(bpmV)pStat('HEART RATE',bpmV+' BPM');pStat('DAILY STAKE','\u20B9'+formatIndianCurrency(stake));pStat('DEFENDED','\u20B9'+formatIndianCurrency(totalRisk));pStat('FOOD CODE',food?'CLEAN':'BROKEN');
       // Bottom slogan
       c.fillStyle='#8B0000';c.fillRect(0,H-140,W,4);
       c.textAlign='center';c.font='700 18px "JetBrains Mono",monospace';c.fillStyle='#8B0000';c.fillText('NO EXCUSES. NO QUARTER. INFINITE.', W/2,H-100);
@@ -7379,7 +7396,7 @@ function genStoryTemplate(idx){
       var ng=c.createLinearGradient(W/2-150,554,W/2+150,610);ng.addColorStop(0,'rgba(245,166,35,0.2)');ng.addColorStop(1,'rgba(245,166,35,0.08)');c.fillStyle=ng;rr(c,W/2-150,554,300,58,29);c.fill();c.strokeStyle='rgba(245,166,35,0.5)';c.lineWidth=1.5;rr(c,W/2-150,554,300,58,29);c.stroke();
       c.font='800 22px "JetBrains Mono",monospace';c.fillStyle='#F5A623';c.fillText('* NOT  OUT *',W/2,591);
       // Scoreboard — cricket style
-      var scY=680,scCols=[{v:km||'—',l:'KM'},{v:mn||'—',l:'MIN'},{v:bpmV||'—',l:'BPM'},{v:'₹'+formatIndianCurrency(totalRisk),l:'UNCLAIMED'}];
+      var scY=680,scCols=[{v:km||'—',l:'KM'},{v:mn||'—',l:'MIN'},{v:bpmV||'—',l:'BPM'},{v:'₹'+formatIndianCurrency(totalRisk),l:'DEFENDED'}];
       var scW=(W-40)/4;
       scCols.forEach(function(s,i){var x=20+i*scW;c.fillStyle=i%2===0?'rgba(245,166,35,0.07)':'rgba(245,166,35,0.03)';c.fillRect(x,scY,scW-2,108);c.textAlign='center';c.font='800 40px "Rajdhani",sans-serif';c.fillStyle='rgba(245,166,35,0.9)';c.fillText(s.v,x+scW/2,scY+56);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(245,166,35,0.4)';c.fillText(s.l,x+scW/2,scY+80);});
       c.font='500 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.4)';c.fillText('DAYS OF UNBROKEN DISCIPLINE',W/2,870);
@@ -7409,7 +7426,7 @@ function genStoryTemplate(idx){
       c.fillStyle='#00D4FF';c.shadowColor='rgba(0,212,255,0.9)';c.shadowBlur=22;c.beginPath();c.arc(mx,my,12,0,Math.PI*2);c.fill();c.shadowBlur=0;c.fillStyle='rgba(0,0,0,0.8)';c.beginPath();c.arc(mx,my,5,0,Math.PI*2);c.fill();
       c.textAlign='center';c.font='900 150px "Rajdhani",sans-serif';c.fillStyle='rgba(0,212,255,0.92)';c.shadowColor='rgba(0,212,255,0.5)';c.shadowBlur=40;c.fillText('DAY '+day,W/2,290);c.shadowBlur=0;
       c.font='700 16px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.55)';c.fillText(Math.round(prog*1000)/10+'% OF ONE FULL ORBIT',W/2,336);
-      var oStats=[{v:km||'—',u:'KM',l:'DISTANCE'},{v:'₹'+formatIndianCurrency(totalRisk),u:'',l:'UNCLAIMED'},{v:day,u:'DAYS',l:'IN ORBIT'}];
+      var oStats=[{v:km||'—',u:'KM',l:'DISTANCE'},{v:'₹'+formatIndianCurrency(totalRisk),u:'',l:'DEFENDED'},{v:day,u:'DAYS',l:'IN ORBIT'}];
       var osY=1160,osW=(W-120)/3;oStats.forEach(function(s,i){var x=60+i*(osW+20);c.fillStyle='rgba(0,212,255,0.04)';rr(c,x,osY,osW,108,10);c.fill();c.strokeStyle='rgba(0,212,255,0.12)';c.lineWidth=1;rr(c,x,osY,osW,108,10);c.stroke();c.textAlign='center';c.font='800 34px "Rajdhani",sans-serif';c.fillStyle='rgba(0,212,255,0.86)';c.fillText(s.v,x+osW/2,osY+50);c.font='500 9px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.36)';c.fillText(s.u,x+osW/2,osY+70);c.fillText(s.l,x+osW/2,osY+88);});
       c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(0,212,255,0.28)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-60);
       return Promise.resolve();
@@ -7457,7 +7474,7 @@ function genStoryTemplate(idx){
       c.font='700 20px "JetBrains Mono",monospace';c.fillStyle=stCol;c.fillText(stage,W/2,314);
       var pbW=W-160,pbX=80,pbY=368,pbH=12;c.fillStyle='rgba(255,100,0,0.1)';rr(c,pbX,pbY,pbW,pbH,6);c.fill();var pf=Math.min(dN3/365,1);var pbGr=c.createLinearGradient(pbX,0,pbX+pbW,0);pbGr.addColorStop(0,'rgba(160,60,0,0.8)');pbGr.addColorStop(0.5,'rgba(255,140,0,0.9)');pbGr.addColorStop(1,'rgba(255,220,100,0.92)');c.fillStyle=pbGr;rr(c,pbX,pbY,pbW*pf,pbH,6);c.fill();
       ['ORE','BLOOM','BILLET','BAR','BLADE','MASTER'].forEach(function(st,i){c.textAlign='center';c.font='500 9px "JetBrains Mono",monospace';var sx=[0,0.16,0.32,0.5,0.66,0.9][i];c.fillStyle=sx<=pf?'rgba(255,180,50,0.72)':'rgba(255,255,255,0.18)';c.fillText(st,pbX+sx*pbW,pbY+28);});
-      var fStats=[{v:km||'—',l:'KM'},{v:'₹'+formatIndianCurrency(totalRisk),l:'UNCLAIMED'},{v:bpmV||'—',l:'BPM'},{v:sleepH||'—',l:'SLEEP HRS'}];
+      var fStats=[{v:km||'—',l:'KM'},{v:'₹'+formatIndianCurrency(totalRisk),l:'DEFENDED'},{v:bpmV||'—',l:'BPM'},{v:sleepH||'—',l:'SLEEP HRS'}];
       var fsY=1150,fsW=(W-80)/4;fStats.forEach(function(s,i){var x=40+i*fsW;c.fillStyle='rgba(255,100,0,0.05)';rr(c,x,fsY,fsW-8,98,8);c.fill();c.strokeStyle='rgba(255,100,0,0.14)';c.lineWidth=1;rr(c,x,fsY,fsW-8,98,8);c.stroke();c.textAlign='center';c.font='700 30px "Rajdhani",sans-serif';c.fillStyle='rgba(255,160,50,0.86)';c.fillText(s.v,x+fsW/2,fsY+46);c.font='500 8px "JetBrains Mono",monospace';c.fillStyle='rgba(255,100,0,0.38)';c.fillText(s.l,x+fsW/2,fsY+66);});
       c.font='500 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,100,0,0.32)';c.fillText('www.firstlight.live  ·  '+handleIG,W/2,H-60);
       return Promise.resolve();
@@ -7889,7 +7906,7 @@ async function igPublishCarousel(){
       var _d=document.getElementById('dayNum').value||'1';
       var _k=(document.getElementById('km')||document.getElementById('tkm')||{value:''}).value.trim();
       var _hig=document.getElementById('handleIG')?document.getElementById('handleIG').value:'@firstlightlive';
-      caption='Day '+_d+'. '+(_k?_k+' km. ':'')+'Before 6 AM.\n\n\u20B9'+formatIndianCurrency(getCurrentStake(parseInt(_d)||1))+' on the line. Every single day.\nMiss once \u2014 first comment collects.\n\n'+_d+'-day streak. Zero misses.\nwww.firstlight.live\n\n\uD83D\uDCF8 '+_hig;
+      caption='Day '+_d+'. '+(_k?_k+' km. ':'')+'Before 6 AM.\n\n\u20B9'+formatIndianCurrency(getCurrentStake(parseInt(_d)||1))+' on the line. Every single day.\nEvery miss goes public. Same day.\n\n'+_d+'-day streak. Zero misses.\nwww.firstlight.live\n\n\uD83D\uDCF8 '+_hig;
       _igLog(log,'Caption auto-generated (no custom caption found)','var(--gold)');
     }
     _igLog(log,'Caption: '+caption.substring(0,80)+'...','var(--smoke)');
@@ -7900,7 +7917,7 @@ async function igPublishCarousel(){
       var _d2=document.getElementById('dayNum').value||'1';
       var _stk2=formatIndianCurrency(getCurrentStake(parseInt(_d2)||1));
       var _tot2=formatIndianCurrency(getTotalAtRisk(parseInt(_d2)||1));
-      firstComment='\u26A1 THE DEAL:\nMiss 1 day = \u20B9'+_stk2+' to first comment.\nNo questions. No delays.\n\n'+_d2+'-day streak. \u20B9'+_tot2+' unclaimed.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+      firstComment='\u26A1 THE STAKE:\nMiss 1 day = \u20B9'+_stk2+' gone. Logged public, same day.\n\n'+_d2+'-day streak. \u20B9'+_tot2+' defended.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
       _igLog(log,'First comment auto-generated','var(--gold)');
     }
 
@@ -8556,7 +8573,7 @@ async function fetchReelScript(day,km,mn,kcal,sleepHrs,bpm,statusColor,streak,ha
   if(hasWakeVid)assets.unshift('waking-up / yawn video');
   if(hasJarVid)assets.splice(hasWakeVid?1:0,0,'physical penalty jar video');
   const sys='You are a viral Instagram Reels strategist for high-stakes fitness content. Return ONLY raw JSON — no markdown, no explanation.';
-  const usr=`Challenge: "First Light" — run 5km + gym before 6AM or pay ₹15,000 to a random follower.\nDay: ${day} | Streak: ${streak}\nStats: ${km}km · ${mn}min · ${kcal}kcal${bpm?' · '+bpm+'BPM':''}\nSleep: ${sleepHrs||'?'}hrs | Performance: ${statusColor||'YELLOW'}\nAssets: ${assets.join(', ')}\nProblem: 90% reel skip rate. Fix the first 3 seconds.\nReturn ONLY this JSON (no markdown):\n{"negativeHook":"2-second spoken/text line — near-miss tension, references ₹15,000","pacingGuide":[{"time":"0.0–1.5s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"1.5–3.0s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"3.0–4.5s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"4.5–6.0s","clip":"exact asset + camera note","text":"ALL CAPS overlay"}],"heroStatLine":"stats as mission-accomplished — max 8 words all caps","ctaLine":"comment-to-enter CTA — max 12 words, forces obligation","captionHook":"caption first line — FOMO, max 15 words"}`;
+  const usr=`Challenge: "First Light" — run 5km + gym before 6AM or pay a ₹15,000 penalty, logged public.\nDay: ${day} | Streak: ${streak}\nStats: ${km}km · ${mn}min · ${kcal}kcal${bpm?' · '+bpm+'BPM':''}\nSleep: ${sleepHrs||'?'}hrs | Performance: ${statusColor||'YELLOW'}\nAssets: ${assets.join(', ')}\nProblem: 90% reel skip rate. Fix the first 3 seconds.\nReturn ONLY this JSON (no markdown):\n{"negativeHook":"2-second spoken/text line — near-miss tension, references ₹15,000","pacingGuide":[{"time":"0.0–1.5s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"1.5–3.0s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"3.0–4.5s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"4.5–6.0s","clip":"exact asset + camera note","text":"ALL CAPS overlay"}],"heroStatLine":"stats as mission-accomplished — max 8 words all caps","ctaLine":"save-or-follow CTA — max 12 words, no giveaway or payout language","captionHook":"caption first line — FOMO, max 15 words"}`;
   const raw=await _aiReq(key,[{role:'system',content:sys},{role:'user',content:usr}],680,0.8,9000);
   if(!raw)return null;
   try{
@@ -9315,7 +9332,7 @@ async function generateReel(){
         const _cumTotal=_dn*15000;
         const _heroNum=_phase===1?'₹15,000':'₹'+_cumTotal.toLocaleString('en-IN');
         const _heroFz=_heroNum.length<=7?258:_heroNum.length<=9?218:_heroNum.length<=11?178:148;
-        const _sub1=_phase===1?'TO A RANDOM FOLLOWER':'UNCLAIMED  ·  ZERO MISSES';
+        const _sub1=_phase===1?'GONE. LOGGED PUBLIC.':'DEFENDED  ·  ZERO MISSES';
         const _sub2=_phase===1?'IF I MISS EVEN 1 DAY  →  YOU GET PAID':'DAY '+_dn+'  ·  ₹15,000 PER MISS  ·  NO EXCEPTIONS';
         const _phLabel=_phase===1?'T H E   S T A K E S':_phase===2?'C U M U L A T I V E   S T A K E S':_phase<=3?'₹ 1 5   L A K H   C H A L L E N G E':'L E G E N D   T E R R I T O R Y';
 
@@ -9417,15 +9434,15 @@ async function generateReel(){
             c.font='900 64px "Rajdhani",sans-serif';
             c.fillStyle=_spokeDanger;
             c.shadowColor='rgba(0,0,0,0.95)';c.shadowBlur=28;
-            c.fillText('YOU WIN ₹15,000 FROM ME.',W/2,_sy2);
+            c.fillText('I PAY ₹15,000. LOGGED PUBLIC.',W/2,_sy2);
             c.shadowColor=_spokeDangerR+'0.45)';c.shadowBlur=44;
-            c.fillText('YOU WIN ₹15,000 FROM ME.',W/2,_sy2);
+            c.fillText('I PAY ₹15,000. LOGGED PUBLIC.',W/2,_sy2);
             c.shadowBlur=0;
             c.restore();
           }
         }
 
-        // ── SUBTITLE 1: "TO A RANDOM FOLLOWER" / "UNCLAIMED · ZERO MISSES" ──
+        // ── SUBTITLE 1: "TO A RANDOM FOLLOWER" / "DEFENDED · ZERO MISSES" ──
         // Phase 2+: show immediately so the big cumulative number has context before it lands
         if(pt>(_phase>1?0.02:0.10)){
           const _s1Thr=_phase>1?0.02:0.10;
@@ -10271,10 +10288,10 @@ async function generateReel(){
           c.fillStyle=P.accent;rr(c,-_gcW/2,-_gcH/2,8,_gcH,4);c.fill();
           // Primary line
           c.font='900 32px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.97)';
-          c.fillText('FOLLOW  →  IF I QUIT, YOU WIN ₹15,000',0,-10);
+          c.fillText('FOLLOW  →  EVERY MORNING. PROOF OR PAY.',0,-10);
           // Secondary line
           c.font='600 18px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.80)';
-          c.fillText('FIRST COMMENT ON FAIL POST GETS PAID',0,18);
+          c.fillText('EVERY MISS LOGGED PUBLIC. SAME DAY.',0,18);
           c.restore();c.restore();
         }
         drawVignette(c,W,H,0.28);/* letterbox removed */
@@ -11159,7 +11176,7 @@ function getMilestoneType(day){
   if(ms) return{type:ms.tier,label:ms.label,emoji:ms.tier==='B3'?'👑':ms.tier==='B2'?'🏆':'🔥'};
   return null;
 }
-function generateFirstCommentBlock(day){const stake=getCurrentStake(day);const total=getTotalAtRisk(day);const stakeFormatted=formatIndianCurrency(stake);const totalFormatted=formatIndianCurrency(total);return '━━━━━━━━━━━━━━━━━━━━━━\n⚡ THE DEAL:\nIf my next post isn\'t before 6 AM → ₹'+stakeFormatted+' goes to first comment.\nNo questions. No delays. First come, first paid.\n\n'+day+'-day streak. ₹'+totalFormatted+' unclaimed so far.\n\nSet your alarm. Check tomorrow at 6:00 AM.\nIf I\'m not here → claim your ₹'+stakeFormatted+'.\n━━━━━━━━━━━━━━━━━━━━━━';}
+function generateFirstCommentBlock(day){const stake=getCurrentStake(day);const total=getTotalAtRisk(day);const stakeFormatted=formatIndianCurrency(stake);const totalFormatted=formatIndianCurrency(total);return '━━━━━━━━━━━━━━━━━━━━━━\n⚡ THE STAKE:\nIf my next post isn\'t before 6 AM → ₹'+stakeFormatted+' gone. Logged public, same day.\n\n'+day+'-day streak. ₹'+totalFormatted+' defended so far.\n\nSet your alarm. Check tomorrow at 6:00 AM.\nThe proof will be here → or the slip will.\n━━━━━━━━━━━━━━━━━━━━━━';}
 function generateCaption(day){
   day=parseInt(day)||1;
   const stake=formatIndianCurrency(getCurrentStake(day));
@@ -11180,7 +11197,7 @@ function generateCaption(day){
   const kmV=parseFloat(km)||0;
 
   // Deal Hook
-  const dealHook='🚨 MISS 1 DAY = ₹'+stake+' TO FIRST COMMENT 🚨';
+  const dealHook='₹'+stake+' ON THE LINE. EVERY SINGLE DAY.';
 
   // Hook (5 types rotating)
   const hooks=[
@@ -11196,7 +11213,7 @@ function generateCaption(day){
   let situation='Day '+day+'.'+(wStart?' Alarm went off at '+wStart+'.':' Another morning.');
   let obstacle=sl>0&&sl<5?'Only slept '+sl+' hours. Body said no.':'The bed was warm. The road was cold.';
   let action=kmV>0?'Laced up anyway. '+kmV+' km'+(mn?' in '+mn+' min':'')+(wStart?' starting at '+wStart:'')+'.'  :'Got up. Showed up. Did the work.';
-  let result=food&&run&&gym?'Gym done. Food code: clean. ₹'+unclaimed+' stays unclaimed.':'₹'+unclaimed+' unclaimed. Day '+day+'. The streak lives.';
+  let result=food&&run&&gym?'Gym done. Food code: clean. ₹'+unclaimed+' defended.':'₹'+unclaimed+' defended. Day '+day+'. The streak lives.';
 
   // Stats
   let stats='🍱'+(food?'✅':'❌')+' 🏃'+(run?'✅':'❌')+' 🏋️'+(gym?'✅':'❌');
@@ -11208,7 +11225,7 @@ function generateCaption(day){
 
   // CTA (by day of week)
   const dow=new Date().getDay();
-  const ctas={0:'Follow me. Set your alarm for 6 AM. If I\'m not here — you collect ₹'+stake+'.',1:'What\'s the earliest you\'ve ever woken up to train? Drop it below.',2:'Save this post. Come back at 6 AM tomorrow.',3:'What time does YOUR alarm go off? Drop it below. ↓',4:'Save this. Follow the streak. Be the first to comment if I fail.',5:'Send this to someone who keeps hitting snooze. They need this bet.',6:'Tag someone who needs a wake-up call. Literally.'};
+  const ctas={0:'Follow me. Set your alarm for 6 AM. If I\'m not here — the slip goes public.',1:'What\'s the earliest you\'ve ever woken up to train? Drop it below.',2:'Save this post. Come back at 6 AM tomorrow.',3:'What time does YOUR alarm go off? Drop it below. ↓',4:'Save this. Follow the streak. Every day is public.',5:'Send this to someone who keeps hitting snooze. They need this.',6:'Tag someone who needs a wake-up call. Literally.'};
   const cta=ctas[dow];
 
   // Hashtags (5 max — 2 branded + 2 niche rotating + 1 location)
@@ -11221,11 +11238,11 @@ function generateCaption(day){
   const milestone=getMilestoneType(day);
   if(milestone&&(day===14||day===21||day===30||day===50||day===100)){
     const totalF=formatIndianCurrency(getTotalAtRisk(day));
-    if(day===14) return dealHook+'\n\n'+stats+'\n\nTWO WEEKS.\n\nThe alarm still sucks. My bed is still comfortable.\nBut something shifted.\n\nDay 1: I woke up to prove I could.\nDay 14: I wake up because it\'s who I am now.\n\n₹'+totalF+' unclaimed.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
-    if(day===21) return dealHook+'\n\n'+stats+'\n\n21 DAYS. HABIT LOCKED.\n\nI stopped negotiating. The alarm goes off. My feet hit the floor.\n\n₹'+totalF+' unclaimed. 21 alarms. 21 decisions. 0 excuses.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
-    if(day===30) return dealHook+'\n\n'+stats+'\n\n1 MONTH. 30 days. 30 alarms. 0 excuses.\n\n₹'+totalF+' unclaimed.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
-    if(day===50) return dealHook+'\n\n'+stats+'\n\n50 DAYS. HALF CENTURY.\n\n₹'+totalF+' unclaimed.\nStakes increase to ₹20,000 at Day 101.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
-    if(day===100) return '🚨 MISS 1 DAY = ₹20,000 TO FIRST COMMENT (STAKES INCREASED) 🚨\n\n'+stats+'\n\n100 DAYS. TRIPLE DIGITS.\n\n₹'+totalF+' unclaimed. The game just changed.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===14) return dealHook+'\n\n'+stats+'\n\nTWO WEEKS.\n\nThe alarm still sucks. My bed is still comfortable.\nBut something shifted.\n\nDay 1: I woke up to prove I could.\nDay 14: I wake up because it\'s who I am now.\n\n₹'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===21) return dealHook+'\n\n'+stats+'\n\n21 DAYS. HABIT LOCKED.\n\nI stopped negotiating. The alarm goes off. My feet hit the floor.\n\n₹'+totalF+' defended. 21 alarms. 21 decisions. 0 excuses.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===30) return dealHook+'\n\n'+stats+'\n\n1 MONTH. 30 days. 30 alarms. 0 excuses.\n\n₹'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===50) return dealHook+'\n\n'+stats+'\n\n50 DAYS. HALF CENTURY.\n\n₹'+totalF+' defended.\nStakes increase to ₹20,000 at Day 101.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===100) return '₹20,000 ON THE LINE NOW — STAKES INCREASED.\n\n'+stats+'\n\n100 DAYS. TRIPLE DIGITS.\n\n₹'+totalF+' defended. The game just changed.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
   }
 
   // Generic milestone caption (for all other milestone days)
@@ -11233,7 +11250,7 @@ function generateCaption(day){
   if(_msDetect){
     const totalF=formatIndianCurrency(getTotalAtRisk(day));
     const tierEmoji=_msDetect.tier==='B3'?'👑':_msDetect.tier==='B2'?'🏆':'🔥';
-    return dealHook+'\n\n'+stats+'\n\n'+tierEmoji+' '+_msDetect.label+'\n\nDay '+day+'. \u20B9'+totalF+' unclaimed.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    return dealHook+'\n\n'+stats+'\n\n'+tierEmoji+' '+_msDetect.label+'\n\nDay '+day+'. \u20B9'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
   }
 
   // Standard daily caption
