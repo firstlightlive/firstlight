@@ -545,31 +545,9 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
         <div class="s-card on" data-key="trun" onclick="tap(this)"><div class="s-emoji">🏃</div><div class="s-name">RUN / WALK</div><div class="s-val">DONE</div></div>
         <div class="s-card on" data-key="tcal" onclick="tap(this)"><div class="s-emoji">🔥</div><div class="s-name">300+ CAL</div><div class="s-val">DONE</div></div>
       </div>
-      <!-- LAST LIGHT night mode inputs -->
-      <div id="lastlightRow" style="display:none">
-        <div class="sec-label" style="margin-top:4px;color:#6C5CE7">🌙 END OF DAY REPORT</div>
-        <div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-top:6px">
-          <div class="stat-wrap"><div class="stat-lbl">SLEEP TIME</div><input type="time" class="stat-in" id="llSleep" value="22:00" style="color:#6C5CE7"><div class="stat-unit">BEDTIME</div></div>
-          <div class="stat-wrap"><div class="stat-lbl">LAST MEAL → BED</div><input type="text" class="stat-in" id="llMealGap" placeholder="2.5" inputmode="decimal" style="color:#6C5CE7"><div class="stat-unit">HOURS GAP</div></div>
-        </div>
-        <div class="sec-label" style="margin-top:12px">APPLE WATCH — DAY TOTALS</div>
-        <div class="stat-grid" style="margin-top:6px">
-          <div class="stat-wrap"><div class="stat-lbl">STEPS</div><input type="text" class="stat-in" id="llSteps" placeholder="12500" inputmode="numeric"><div class="stat-unit">STEPS</div></div>
-          <div class="stat-wrap"><div class="stat-lbl">CALORIES</div><input type="text" class="stat-in" id="llCal" placeholder="650" inputmode="numeric"><div class="stat-unit">KCAL</div></div>
-          <div class="stat-wrap"><div class="stat-lbl">STAND HRS</div><input type="text" class="stat-in" id="llStand" placeholder="12" inputmode="numeric"><div class="stat-unit">HOURS</div></div>
-        </div>
-        <div class="stat-grid" style="margin-top:6px">
-          <div class="stat-wrap"><div class="stat-lbl">EXERCISE</div><input type="text" class="stat-in" id="llExMin" placeholder="45" inputmode="numeric"><div class="stat-unit">MIN</div></div>
-          <div class="stat-wrap"><div class="stat-lbl">DISTANCE</div><input type="text" class="stat-in" id="llDist" placeholder="8.2" inputmode="decimal"><div class="stat-unit">KM TOTAL</div></div>
-          <div class="stat-wrap"><div class="stat-lbl">AVG HR</div><input type="text" class="stat-in" id="llHR" placeholder="72" inputmode="numeric"><div class="stat-unit">BPM</div></div>
-        </div>
-        <div class="sec-label" style="margin-top:12px">TODAY'S RULES — TAP IF BROKEN</div>
-        <div class="status-row" id="llRulesRow" style="grid-template-columns:1fr 1fr 1fr;margin-top:6px">
-          <div class="s-card on" data-key="llRun" onclick="tap(this)"><div class="s-emoji">🏃</div><div class="s-name">RUN</div><div class="s-val">DONE</div></div>
-          <div class="s-card on" data-key="llGym" onclick="tap(this)"><div class="s-emoji">🏋️</div><div class="s-name">GYM</div><div class="s-val">DONE</div></div>
-          <div class="s-card on" data-key="llFood" onclick="tap(this)"><div class="s-emoji">🍱</div><div class="s-name">CLEAN FOOD</div><div class="s-val">DONE</div></div>
-        </div>
-      </div>
+      <!-- END OF DAY REPORT / APPLE WATCH DAY TOTALS removed in Chapter 02 cleanup —
+           lastlight mode unused, Apple Watch retired (Garmin arriving July 30, see [[reference_garmin_integration_pending]]) -->
+
       <!-- FOOD CODE rules — always visible in all modes (food rule never changes) -->
       <div class="food-code-bar" id="foodCodeBar">
         <div class="fci-top">
@@ -808,29 +786,9 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
     </div>
   </div>
 
-  <!-- Optional extra photo slots (TRACKER PHOTO above is the primary slot for THE BODY) -->
-  <div class="sec">
-    <div class="sec-label">OPTIONAL EXTRA PHOTOS</div>
-    <div class="card" style="padding:12px">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ash);margin-bottom:10px;letter-spacing:.5px">These are optional fallbacks if you want different photos in different slides.</div>
-      <div class="photo-row two" id="photoRow">
-        <div class="p-drop" id="d1" onclick="document.getElementById('f1').click()">
-          <div class="p-icon">🏃</div><div class="p-text">RUN PHOTO<br>(SETS i1)</div>
-          <input type="file" id="f1" accept="image/jpeg,image/png,.jpg,.jpeg,.png" onchange="loadImg(this,'d1','i1')">
-        </div>
-        <div class="p-drop" id="d2" onclick="document.getElementById('f2').click()">
-          <div class="p-icon">🏋️</div><div class="p-text">GYM / BODY<br>(SETS i2)</div>
-          <input type="file" id="f2" accept="image/jpeg,image/png,.jpg,.jpeg,.png" onchange="loadImg(this,'d2','i2')">
-        </div>
-      </div>
-      <div class="photo-row one" id="photoRow2" style="margin-top:8px">
-        <div class="p-drop" id="d3" onclick="document.getElementById('f3').click()">
-          <div class="p-icon">😴</div><div class="p-text">SLEEP DATA<br>(SETS i3)</div>
-          <input type="file" id="f3" accept="image/jpeg,image/png,.jpg,.jpeg,.png" onchange="loadImg(this,'d3','i3')">
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- OPTIONAL EXTRA PHOTOS section removed in Chapter 02 cleanup —
+       the proof-first carousel only needs TRACKER PHOTO (iT) which is uploaded above. -->
+
 
   <!-- Handles + Caption -->
   <div class="sec">
@@ -957,16 +915,16 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
     <div class="out-sub">SAVE → INSTAGRAM / TWITTER → PASTE CAPTION</div>
 
     <div class="slide-tabs" id="slideTabs">
-      <button class="s-tab active" onclick="showS(0,this)">TRACKER</button>
-      <button class="s-tab" onclick="showS(1,this)" id="tab2">GYM PROOF</button>
-      <button class="s-tab" onclick="showS(2,this)" id="tab3">RUN PROOF</button>
-      <button class="s-tab" onclick="showS(3,this)" id="tab4">SLEEP DATA</button>
+      <button class="s-tab active" onclick="showS(0,this)">🗺 ROUTE</button>
+      <button class="s-tab" onclick="showS(1,this)" id="tab2" style="display:none">GYM</button>
+      <button class="s-tab" onclick="showS(2,this)" id="tab3">📸 BODY</button>
+      <button class="s-tab" onclick="showS(3,this)" id="tab4">🧾 RECEIPT</button>
       <button class="s-tab" onclick="showS(4,this)" id="tab5" style="display:none">🏆 MILESTONE</button>
     </div>
 
     <div class="c-wrap">
       <canvas id="c1" width="2160" height="2700" class="active"></canvas>
-      <canvas id="c2" width="2160" height="2700"></canvas>
+      <canvas id="c2" width="2160" height="2700" style="display:none"></canvas>
       <canvas id="c3" width="2160" height="2700"></canvas>
       <canvas id="c4" width="2160" height="2700"></canvas>
       <canvas id="c5" width="2160" height="2700"></canvas>
@@ -1595,63 +1553,28 @@ restoreFP();
 
 function setMode(m){
   mode=m;localStorage.setItem('fl_mode',m);
-  document.getElementById('modeWrap').className='mode-wrap'+(m==='travel'?' travel':m==='lastlight'?' lastlight':'');
-  document.getElementById('btnNormal').classList.toggle('active',m==='normal');
-  document.getElementById('btnTravel').classList.toggle('active',m==='travel');
-  document.getElementById('btnLastlight').classList.toggle('active',m==='lastlight');
-  document.getElementById('travelLoc').classList.toggle('show',m==='travel');
-  document.getElementById('normalRow').style.display=m==='normal'?'grid':'none';
-  document.getElementById('foodCodeBar').style.display='block';
-  document.getElementById('travelRow').style.display=m==='travel'?'grid':'none';
-  document.getElementById('lastlightRow').style.display=m==='lastlight'?'block':'none';
-  document.getElementById('statsNorm').style.display=m==='normal'?'grid':'none';
-  document.getElementById('statsTravel').style.display=m==='travel'?'grid':'none';
-  document.getElementById('flightProtocol').style.display=m==='travel'?'block':'none';
-  document.getElementById('statsWorkoutTime').style.display=m==='lastlight'?'none':'grid';
-  const pr=document.getElementById('photoRow'),d2=document.getElementById('d2');
-  const pr2=document.getElementById('photoRow2');
-  const cond=document.getElementById('conditionRow');
-  const d1Icon=document.querySelector('#d1 .p-icon');
-  const d1Text=document.querySelector('#d1 .p-text');
-  const d2Icon=document.querySelector('#d2 .p-icon');
-  const d2Text=document.querySelector('#d2 .p-text');
-  const tabs=document.querySelectorAll('.s-tab');
-  if(m==='travel'){pr.classList.remove('one');pr.classList.add('two');d2.style.display='flex';
-    // Travel: 3 slides — summary(c1) + gym(c2) + run(c3). Hide sleep(c4), route map(c7).
-    ['tab2','dot2','tab3','dot3','sb3'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display=''});
-    ['tab4','dot4','sb4','tab7','dot7','sb7'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none'});
-    if(cond)cond.style.display='grid';if(pr2)pr2.style.display='none';const ps2=document.getElementById('pledgeSec');if(ps2)ps2.style.display='';
-    if(d1Icon)d1Icon.textContent='⌚';
-    if(d1Text)d1Text.innerHTML='APPLE WATCH<br>RUN / WALK';
-    if(d2Icon)d2Icon.textContent='💪';
-    if(d2Text)d2Text.innerHTML='WORKOUT PIC<br>TRAVEL PROOF';
-    if(tabs[0])tabs[0].textContent='TRACKER';
-    if(tabs[1])tabs[1].textContent='TRAVEL PROOF';
-    if(tabs[2])tabs[2].textContent='RUN PROOF';
-  }else if(m==='lastlight'){pr.classList.remove('two');pr.classList.add('one');d2.style.display='none';
-    ['tab3','dot3','sb3','tab4','dot4','sb4','tab7','dot7','sb7'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none'});
-    ['tab2','dot2'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display=''});
-    if(cond)cond.style.display='none';if(pr2)pr2.style.display='none';
-    const ps=document.getElementById('pledgeSec');if(ps)ps.style.display='none';
-    if(d1Icon)d1Icon.textContent='⌚';
-    if(d1Text)d1Text.innerHTML='APPLE WATCH<br>DAY SUMMARY';
-    if(tabs[0])tabs[0].textContent='NIGHT REPORT';
-    if(tabs[1])tabs[1].textContent='WATCH DATA';
-  }else{pr.classList.remove('one');pr.classList.add('two');d2.style.display='flex';
-    // Normal: 4 slides — summary(c1) + gym(c2) + run(c3) + routemap(c7) + sleep(c4)
-    ['tab3','dot3','sb3','tab4','dot4','sb4'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display=''});
-    // Gym slide retired from normal mode — gym photos go via Strava posts
-    ['tab2','dot2'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none'});
-    // Route map tab shown/hidden dynamically based on upload
-    if(cond)cond.style.display='grid';if(pr2)pr2.style.display='';const ps2=document.getElementById('pledgeSec');if(ps2)ps2.style.display='';
-    if(d1Icon)d1Icon.textContent='⌚';
-    if(d1Text)d1Text.innerHTML='APPLE WATCH<br>RUN DATA';
-    if(d2Icon)d2Icon.textContent='🏋️';
-    if(d2Text)d2Text.innerHTML='GYM SELFIE<br>CLOCK VISIBLE';
-    if(tabs[0])tabs[0].textContent='TRACKER';
-    if(tabs[2])tabs[2].textContent='RUN PROOF';
-    if(tabs[3])tabs[3].textContent='SLEEP DATA';
-  }
+  // All DOM reads guarded — Chapter 02 cleanup deleted some optional elements
+  // (lastlightRow, flightProtocol may be gone), so every getElementById is null-checked.
+  function setDisp(id,v){var e=document.getElementById(id);if(e)e.style.display=v;}
+  var mw=document.getElementById('modeWrap');if(mw)mw.className='mode-wrap'+(m==='travel'?' travel':m==='lastlight'?' lastlight':'');
+  ['btnNormal','btnTravel','btnLastlight'].forEach(function(b){var e=document.getElementById(b);if(e)e.classList.toggle('active',b==='btn'+(m.charAt(0).toUpperCase()+m.slice(1)));});
+  var tl=document.getElementById('travelLoc');if(tl)tl.classList.toggle('show',m==='travel');
+  setDisp('normalRow',m==='normal'?'grid':'none');
+  setDisp('foodCodeBar','block');
+  setDisp('travelRow',m==='travel'?'grid':'none');
+  setDisp('lastlightRow',m==='lastlight'?'block':'none');
+  setDisp('statsNorm',m==='normal'?'grid':'none');
+  setDisp('statsTravel',m==='travel'?'grid':'none');
+  setDisp('flightProtocol',m==='travel'?'block':'none');
+  setDisp('statsWorkoutTime',m==='lastlight'?'none':'grid');
+  // Chapter 02 cleanup: removed per-mode dT/d1/d2 label rewriting (those elements no
+  // longer exist or have been simplified). The 3-slide carousel ROUTE→BODY→RECEIPT is
+  // the same in every mode; only the tick-card rows above swap between rule sets.
+  // Tab visibility for the new carousel:
+  ['tab3','dot3','sb3','tab4','dot4','sb4'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display=''});
+  ['tab2','dot2','tab7','dot7','sb7'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none'});
+  const cond=document.getElementById('conditionRow');if(cond)cond.style.display=m==='lastlight'?'none':'grid';
+  const ps=document.getElementById('pledgeSec');if(ps)ps.style.display=m==='lastlight'?'none':'';
 }
 
 function tap(el){
@@ -3561,7 +3484,8 @@ function _generateInner(){
     window._s1Badges=computeBadges(parseInt(day)||1,wxCond,wxTemp,wStartRawT);
     slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime);
     slide2(day,km,mn,kc,loc,total,handleIG,handleX,fmt12hT(wStartRawT),fmt12hT(wEndRawT),bpmValT,stravaStats);
-    slide4(day,total,handleIG,handleX,moodLine,food);
+    slide3Sleep(day,total,handleIG,handleX,sleepHrs,wxStr,km,wStartRawT);
+    // slide4 (c2 GYM) retired — not in 3-slide carousel anymore
 
     const _tAllDone=(food&&run&&calOk);
     const _tHook=_tAllDone
@@ -3605,9 +3529,10 @@ function _generateInner(){
     // ── COMPUTE ACHIEVEMENT BADGES ───────────────────────────────────
     window._s1Badges=computeBadges(parseInt(day)||1,wxCond,wxTemp,wStartRaw);
 
-    try{slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,undefined,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime);}catch(e){console.error('Slide1 error:',e);}
-    try{slide4(day,total,handleIG,handleX,moodLine,food);}catch(e){console.error('Slide4 error:',e);}
-    try{slide2(day,km,mn,kc,undefined,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats);}catch(e){console.error('Slide2 error:',e);}
+    try{slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,undefined,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime);}catch(e){console.error('Slide1 (ROUTE) error:',e);}
+    try{slide2(day,km,mn,kc,undefined,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats);}catch(e){console.error('Slide2 (BODY) error:',e);}
+    try{slide3Sleep(day,total,handleIG,handleX,sleepHrs,wxStr,km,wStart);}catch(e){console.error('Slide3 (RECEIPT) error:',e);}
+    // slide4 (c2 GYM) retired — not in 3-slide carousel anymore
     // ── ROUTE MAP SLIDE (c7) — REMOVED in Chapter 02 redesign.
     // c1 (THE ROUTE) IS the route now; no separate c7 slide. Hide the tab.
     window._hasRouteMap=false;
