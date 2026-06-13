@@ -4073,10 +4073,12 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
   // LAYER 2 — CONTENT MODULES (data-driven)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  // 2A — Photo band (if photo uploaded)
-  var photoBandH=170;
-  var statsY=heroY+(photoSrc?340:170);
-  if(photoSrc){
+  // SPINE is now PURE catalog tile — no photo band.
+  // Photo belongs in slide 2 (THE PROOF) where it has room to breathe.
+  // This keeps the SPINE clean for the 1000-day grid catalog effect.
+  var photoBandH=0;
+  var statsY=heroY+170;
+  if(false){ // photo band removed — kept for diff hygiene
     var bandY=heroY+140;
     var img=new Image();img.crossOrigin='anonymous';
     img.onload=function(){
@@ -4087,7 +4089,6 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
         var iw=img.width*s,ih=img.height*s;
         c.drawImage(img,(W-iw)/2,bandY+(photoBandH-ih)/2,iw,ih);
         c.restore();
-        // Dim overlay
         var pg=c.createLinearGradient(0,bandY,0,bandY+photoBandH);
         pg.addColorStop(0,P.bg1+'BB');pg.addColorStop(0.5,'rgba(0,0,0,0.15)');pg.addColorStop(1,P.bg1+'CC');
         c.fillStyle=pg;c.fillRect(80,bandY,W-160,photoBandH);
@@ -4095,7 +4096,6 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
         c.strokeRect(80,bandY,W-160,photoBandH);
         c.textAlign='center';c.font='500 9px "JetBrains Mono",monospace';c.fillStyle=muted;
         c.fillText('— THE BODY · WITNESSED —',W/2,bandY+20);
-        // Repaint stats & footer on top
         _spinePaintStatsAndFooter();
       }catch(e){console.warn('Photo band error:',e);_spinePaintStatsAndFooter();}
     };
@@ -4179,12 +4179,21 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
       }
     }
 
-    // FOOTER (always last)
+    // FOOTER — firstlight.live is HERO. Brand visibility is the point.
     c.textAlign='center';
-    c.font='400 11px "JetBrains Mono",monospace';c.fillStyle=muted;
-    c.fillText('₹15,000  STAKE   ·   LOGGED PUBLIC   ·   EVERY MORNING',W/2,H-110);
-    c.font='italic 300 14px "Cormorant Garamond","DM Serif Display",serif';c.fillStyle=hair;
-    c.fillText('firstlight.live  ·  '+(handleIG||'@firstlightlive'),W/2,H-82);
+    // Stake context line (small)
+    c.font='500 11px "JetBrains Mono",monospace';c.fillStyle=muted;
+    c.fillText('₹15,000  STAKE   ·   LOGGED PUBLIC   ·   EVERY MORNING',W/2,H-160);
+    // Thin accent rule above the URL
+    c.strokeStyle=P.accent;c.lineWidth=1;
+    c.beginPath();c.moveTo(W/2-260,H-130);c.lineTo(W/2+260,H-130);c.stroke();
+    // FIRSTLIGHT.LIVE — big serif, brand accent color
+    c.font='400 56px "Bodoni Moda","DM Serif Display",serif';c.fillStyle=P.accent;
+    c.shadowColor=muted;c.shadowBlur=20;
+    c.fillText('firstlight.live',W/2,H-78);c.shadowBlur=0;
+    // Handle below
+    c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=muted;
+    c.fillText((handleIG||'@firstlightlive')+'  ·  CHAPTER 02',W/2,H-48);
   }
 }
 
@@ -4192,57 +4201,136 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
 // SLIDE 2 — THE PROOF  (route + photo combined · only when photo uploaded)
 // ═══════════════════════════════════════════════════════════════
 function slide2(day,km,mn,kc,loc,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats){
+  // ═════════════════════════════════════════════════════════════════
+  // THE PROOF — slide 2 · photo full-bleed + glowing polyline overlay
+  // One coherent hero image. Photo dominates. Route proves. Stats verify.
+  // firstlight.live BRANDED PROMINENTLY.
+  // ═════════════════════════════════════════════════════════════════
   const cv=document.getElementById('c3');cv.width=2160;cv.height=2700;
   const c=cv.getContext('2d');c.scale(2,2);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   const W=1080,H=1350;
   const dn=parseInt(day)||1;
   const photoSrc=(typeof iT!=='undefined'&&iT)?iT:(typeof i1!=='undefined'&&i1)?i1:(typeof i2!=='undefined'&&i2)?i2:null;
   const poly=(function(){try{if(_stravaCache&&Array.isArray(_stravaCache)){var r=_stravaCache.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});if(r)return r.summary_polyline;}}catch(e){}return null;})();
+
   function _polyPts(s){if(!s)return[];if(typeof _decodePolyline==='function')return _decodePolyline(s);var idx=0,lat=0,lng=0,pts=[];while(idx<s.length){var b,sh=0,r=0;do{b=s.charCodeAt(idx++)-63;r|=(b&0x1f)<<sh;sh+=5;}while(b>=0x20);lat+=(r&1)?~(r>>1):(r>>1);sh=0;r=0;do{b=s.charCodeAt(idx++)-63;r|=(b&0x1f)<<sh;sh+=5;}while(b>=0x20);lng+=(r&1)?~(r>>1):(r>>1);pts.push([lat/1e5,lng/1e5]);}return pts;}
-  function drawPath(poly,bx,by,bw,bh,style,lineW,alpha,glow){var pts=_polyPts(poly);if(!pts||pts.length<2)return false;var lats=pts.map(function(p){return p[0];}),lngs=pts.map(function(p){return p[1];});var minLat=Math.min.apply(null,lats),maxLat=Math.max.apply(null,lats);var minLng=Math.min.apply(null,lngs),maxLng=Math.max.apply(null,lngs);var pad=20,iw=bw-pad*2,ih=bh-pad*2;var sx=iw/(maxLng-minLng||1),sy=ih/(maxLat-minLat||1),s=Math.min(sx,sy);var ox=bx+pad+(iw-(maxLng-minLng)*s)/2,oy=by+pad+(ih-(maxLat-minLat)*s)/2;c.save();c.globalAlpha=alpha||1;c.strokeStyle=style;c.lineWidth=lineW;c.lineCap='round';c.lineJoin='round';if(glow){c.shadowColor=style;c.shadowBlur=glow;}c.beginPath();pts.forEach(function(p,i){var x=ox+(p[1]-minLng)*s,y=oy+(maxLat-p[0])*s;if(i===0)c.moveTo(x,y);else c.lineTo(x,y);});c.stroke();c.shadowBlur=0;c.restore();return true;}
-  var splitY=H*0.5;
-  c.fillStyle=P.bg1;c.fillRect(0,0,W,splitY);
-  if(poly){drawPath(poly,40,80,W-80,splitY-100,P.accent,7,1,28);} else {
-    c.textAlign='center';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
-    c.fillText('SYNC STRAVA TO LOAD ROUTE',W/2,splitY/2);
+  function drawPath(poly,bx,by,bw,bh,style,lineW,alpha,glow){
+    var pts=_polyPts(poly);if(!pts||pts.length<2)return false;
+    var lats=pts.map(function(p){return p[0];}),lngs=pts.map(function(p){return p[1];});
+    var minLat=Math.min.apply(null,lats),maxLat=Math.max.apply(null,lats);
+    var minLng=Math.min.apply(null,lngs),maxLng=Math.max.apply(null,lngs);
+    var pad=40,iw=bw-pad*2,ih=bh-pad*2;
+    var sx=iw/(maxLng-minLng||1),sy=ih/(maxLat-minLat||1),s=Math.min(sx,sy);
+    var ox=bx+pad+(iw-(maxLng-minLng)*s)/2,oy=by+pad+(ih-(maxLat-minLat)*s)/2;
+    c.save();c.globalAlpha=alpha||1;c.strokeStyle=style;c.lineWidth=lineW;c.lineCap='round';c.lineJoin='round';
+    if(glow){c.shadowColor=style;c.shadowBlur=glow;}
+    c.beginPath();
+    pts.forEach(function(p,i){var x=ox+(p[1]-minLng)*s,y=oy+(maxLat-p[0])*s;if(i===0)c.moveTo(x,y);else c.lineTo(x,y);});
+    c.stroke();c.shadowBlur=0;c.restore();
+    return true;
   }
-  c.fillStyle='#0A0908';c.fillRect(0,splitY,W,H-splitY);
+
   function overlays(){
-    c.fillStyle=P.accent;c.fillRect(0,splitY-3,W,6);
-    var tw=320,th=86;
-    c.fillStyle=P.bg1;c.fillRect(W/2-tw/2,splitY-th/2,tw,th);
-    c.strokeStyle=P.accent;c.lineWidth=2;c.strokeRect(W/2-tw/2,splitY-th/2,tw,th);
-    c.textAlign='center';c.font='400 36px "Bodoni Moda",serif';c.fillStyle=P.accent;
-    c.fillText(String(dn).padStart(dn>=1000?4:3,'0'),W/2,splitY-2);
-    c.font='500 11px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.75)';
-    c.fillText('THE ROUTE   ·   THE BODY',W/2,splitY+22);
-    c.fillStyle='rgba(0,0,0,0.55)';c.fillRect(0,0,W,80);
-    c.textAlign='left';c.font='400 24px "DM Serif Display",serif';c.fillStyle='#fff';
+    // ── TOP BAR — FIRST LIGHT brand strip (always visible)
+    var topH=100;
+    var tg=c.createLinearGradient(0,0,0,topH);
+    tg.addColorStop(0,'rgba(0,0,0,0.85)');tg.addColorStop(1,'rgba(0,0,0,0.0)');
+    c.fillStyle=tg;c.fillRect(0,0,W,topH);
+    // Brand left
+    c.textAlign='left';
+    c.font='400 28px "Bodoni Moda","DM Serif Display",serif';c.fillStyle='#fff';
     c.fillText('FIRST LIGHT',32,52);
-    c.textAlign='right';c.font='600 11px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.75)';
-    c.fillText('GPS-VERIFIED · STRAVA',W-32,42);
-    c.fillText('CHAPTER 02 · BANGALORE',W-32,62);
-    c.fillStyle='rgba(0,0,0,0.65)';c.fillRect(0,H-100,W,100);
-    c.textAlign='center';c.font='500 13px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.75)';
-    c.fillText((km||'—')+' KM  ·  '+(mn||'—')+' MIN  ·  '+(wStart||'04:48 AM'),W/2,H-62);
-    c.font='700 13px "JetBrains Mono",monospace';c.fillStyle=P.accent;
-    c.fillText('₹15,000 STAKE  ·  firstlight.live  ·  '+(handleIG||'@firstlightlive'),W/2,H-32);
+    c.font='600 10px "JetBrains Mono",monospace';c.fillStyle=P.accent;
+    c.fillText('GPS-VERIFIED  ·  STRAVA  ·  CHAPTER 02',32,72);
+    // Day badge right
+    c.textAlign='right';
+    c.font='900 56px "Bodoni Moda","DM Serif Display",serif';c.fillStyle=P.accent;
+    c.shadowColor=P.acR+'0.7)';c.shadowBlur=18;
+    c.fillText('DAY '+String(dn).padStart(dn>=1000?4:3,'0'),W-32,60);c.shadowBlur=0;
+    c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.65)';
+    c.fillText('ZERO MISSES  ·  STILL HOLDING',W-32,82);
+
+    // ── ROUTE POLYLINE — drawn glowing OVER the photo, occupying generous middle area
+    if(poly){
+      // Big route overlay — fills most of the slide
+      drawPath(poly,40,140,W-80,H-360,P.accent,8,1,40);
+    } else {
+      c.textAlign='center';c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.5)';
+      c.fillText('SYNC STRAVA — ROUTE WILL OVERLAY HERE',W/2,H/2);
+    }
+
+    // ── BOTTOM PANEL — stats + BIG firstlight.live brand
+    var bH=240;
+    var bg=c.createLinearGradient(0,H-bH,0,H);
+    bg.addColorStop(0,'rgba(0,0,0,0.0)');bg.addColorStop(0.25,'rgba(0,0,0,0.75)');bg.addColorStop(1,'rgba(0,0,0,0.95)');
+    c.fillStyle=bg;c.fillRect(0,H-bH,W,bH);
+    // Accent strip
+    c.fillStyle=P.accent;c.fillRect(0,H-bH,W,3);
+    // STAT ROW — 3 cells
+    var sy=H-bH+30;
+    var cells=[
+      {l:'DISTANCE',v:(km||'—'),u:'KM'},
+      {l:'TIME',v:(mn||'—'),u:'MIN'},
+      {l:'START',v:(wStart||'04:48 AM').split(' ')[0],u:'IST'}
+    ];
+    var cw=W/3;
+    cells.forEach(function(cell,i){
+      var cx=cw*i+cw/2;
+      c.textAlign='center';
+      c.font='600 10px "JetBrains Mono",monospace';c.fillStyle=P.accent;
+      c.fillText(cell.l,cx,sy+20);
+      c.font='900 60px "Bodoni Moda","Rajdhani",sans-serif';c.fillStyle='#fff';
+      c.fillText(cell.v,cx,sy+82);
+      c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.7)';
+      c.fillText(cell.u,cx,sy+106);
+      if(i<cells.length-1){
+        c.strokeStyle='rgba(255,255,255,0.12)';c.lineWidth=1;
+        c.beginPath();c.moveTo(cw*(i+1),sy);c.lineTo(cw*(i+1),sy+120);c.stroke();
+      }
+    });
+    // ── BRAND FOOTER — firstlight.live BIG and obvious
+    c.textAlign='center';
+    c.font='400 44px "Bodoni Moda","DM Serif Display",serif';c.fillStyle=P.accent;
+    c.shadowColor=P.acR+'0.6)';c.shadowBlur=20;
+    c.fillText('firstlight.live',W/2,H-32);c.shadowBlur=0;
+    c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.55)';
+    c.fillText('₹15,000 STAKE · LOGGED PUBLIC · '+(handleIG||'@firstlightlive'),W/2,H-12);
   }
+
+  // ── PHOTO FULL-BLEED (the hero)
   if(photoSrc){
     var img=new Image();img.crossOrigin='anonymous';
     img.onload=function(){
-      var s=Math.max(W/img.width,(H-splitY)/img.height);
+      // Cover-draw the photo across the entire canvas
+      var s=Math.max(W/img.width,H/img.height);
       var iw=img.width*s,ih=img.height*s;
-      c.drawImage(img,(W-iw)/2,splitY+((H-splitY)-ih)/2,iw,ih);
-      var g=c.createLinearGradient(0,splitY,0,H);
-      g.addColorStop(0,'rgba(0,0,0,0.10)');g.addColorStop(1,'rgba(0,0,0,0.80)');
-      c.fillStyle=g;c.fillRect(0,splitY,W,H-splitY);
+      c.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
+      // Soft duotone dim — keeps photo readable AND lets the route glow on top
+      var dim=c.createLinearGradient(0,0,0,H);
+      dim.addColorStop(0,'rgba(0,0,0,0.45)');
+      dim.addColorStop(0.4,'rgba(0,0,0,0.15)');
+      dim.addColorStop(0.7,'rgba(0,0,0,0.25)');
+      dim.addColorStop(1,'rgba(0,0,0,0.55)');
+      c.fillStyle=dim;c.fillRect(0,0,W,H);
+      // Edge vignette
+      var vig=c.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.7);
+      vig.addColorStop(0,'transparent');vig.addColorStop(1,'rgba(0,0,0,0.45)');
+      c.fillStyle=vig;c.fillRect(0,0,W,H);
       overlays();
     };
-    img.onerror=overlays;img.src=photoSrc;
+    img.onerror=function(){
+      // No photo loaded — gradient bg + overlays
+      var gr=c.createRadialGradient(W/2,H*0.4,100,W/2,H*0.4,Math.max(W,H));
+      gr.addColorStop(0,P.bg2);gr.addColorStop(1,P.bg1);
+      c.fillStyle=gr;c.fillRect(0,0,W,H);
+      overlays();
+    };
+    img.src=photoSrc;
   } else {
-    c.textAlign='center';c.font='600 13px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.5)';
-    c.fillText('UPLOAD PHOTO TO UNLOCK SLIDE 2',W/2,splitY+(H-splitY)/2);
+    // No photo: rich gradient bg so the polyline still looks intentional
+    var gr=c.createRadialGradient(W/2,H*0.4,100,W/2,H*0.4,Math.max(W,H));
+    gr.addColorStop(0,P.bg2);gr.addColorStop(1,P.bg1);
+    c.fillStyle=gr;c.fillRect(0,0,W,H);
     overlays();
   }
 }
