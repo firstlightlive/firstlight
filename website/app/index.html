@@ -1075,6 +1075,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
         <button onclick="igPublishCarousel()" style="flex:1;padding:14px;background:linear-gradient(135deg,#E1306C,#C13584);border:none;border-radius:10px;font:700 13px 'Rajdhani',sans-serif;letter-spacing:3px;color:#fff;cursor:pointer;transition:transform .1s" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''">📸 PUBLISH TO INSTAGRAM</button>
         <button onclick="saveAll()" style="padding:14px 18px;background:transparent;border:1px solid rgba(225,48,108,0.25);border-radius:10px;font:700 10px 'JetBrains Mono',monospace;letter-spacing:1px;color:#E1306C;cursor:pointer">📥 DOWNLOAD</button>
       </div>
+      <button onclick="flDiagnose('igPubLog')" style="width:100%;margin-top:8px;padding:10px;background:transparent;border:1px dashed rgba(0,212,255,0.3);border-radius:8px;font:700 9px 'JetBrains Mono',monospace;letter-spacing:2px;color:#00D4FF;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation">🩺 SYSTEM CHECK — IS IT INSTAGRAM OR IS IT US?</button>
       <div id="igPubLog" style="display:none;margin-top:10px;padding:10px;background:rgba(0,0,0,.3);border-radius:8px;font:500 9px 'JetBrains Mono',monospace;color:var(--smoke);line-height:2;max-height:150px;overflow-y:auto"></div>
     </div>
   </div>
@@ -7602,8 +7603,9 @@ function fallbackThumb(cv,fname){
 // INSTAGRAM GRAPH API — CAROUSEL + STORY PUBLISHER
 // ═══════════════════════════════════════════════════════
 const _IG_ACCOUNT='17841466893616231';
-// Legacy name kept for HEIC conversion fallback
-const _GCS_UPLOAD=FL.SUPABASE_URL+'/functions/v1/firstlight-sync?action=upload';
+const _ADMIN_KEY=['b8464678b573c885','c449958a9ea760c0','8b01279d01d3a1f9','96fc92b7364f10b7'].join('');
+// Server-side upload (edge function action=upload) — also used by HEIC conversion fallback
+const _GCS_UPLOAD=FL.SUPABASE_URL+'/functions/v1/firstlight-sync?action=upload&admin_key='+_ADMIN_KEY;
 
 function _igLog(elId,msg,color){
   const el=document.getElementById(elId);if(!el)return;
@@ -7673,40 +7675,120 @@ async function _uploadCanvasToGCS(canvasId,filename){
     }
   }catch(e2){console.warn('[UPLOAD] Retry failed:',e2.message);}
 
-  throw new Error('Upload failed — check internet connection and try again');
+  // METHOD 3: Server-side upload via edge function (service role — survives RLS/auth changes)
+  var lastErr='';
+  try{
+    console.log('[UPLOAD] Trying server-side upload...');
+    const res3=await fetch(_GCS_UPLOAD,{
+      method:'POST',signal:AbortSignal.timeout(60000),
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+FL.SUPABASE_ANON_KEY},
+      body:JSON.stringify({data:cv.toDataURL('image/jpeg',0.85),filename:filename,folder:'instagram'})
+    });
+    const d3=await res3.json().catch(function(){return null;});
+    if(res3.ok&&d3&&(d3.url||d3.publicUrl)){
+      console.log('[UPLOAD] Server upload success:',d3.url||d3.publicUrl);
+      return d3.url||d3.publicUrl;
+    }
+    lastErr='server HTTP '+res3.status+(d3&&d3.error?' — '+d3.error:'');
+  }catch(e3){lastErr=e3.message;}
+
+  throw new Error('Upload failed on all 3 paths ('+lastErr+'). Your slides are safe on this device — use DOWNLOAD and post manually.');
 }
 
 // ── IG Graph API — 100% server-side, token NEVER in browser ──
 const _IG_SYNC_URL='https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync';
-const _ADMIN_KEY=['b8464678b573c885','c449958a9ea760c0','8b01279d01d3a1f9','96fc92b7364f10b7'].join('');
+
+// Translate raw IG Graph API errors into actionable messages
+function _igExplainError(err){
+  if(!err)return 'Unknown Instagram error';
+  var code=err.code,sub=err.error_subcode;
+  var raw=err.error_user_msg||err.message||JSON.stringify(err);
+  if(code===190)return '⛔ IG TOKEN EXPIRED — server needs a token refresh. Infra issue, NOT the account. ['+raw+']';
+  if(code===4||code===17||code===32||code===613)return '⏳ INSTAGRAM RATE LIMIT — too many API calls. Wait 15-60 min, or post manually via DOWNLOAD. ['+raw+']';
+  if(code===24||code===368||code===10||sub===2207050||sub===2207051)return '⛔ ACCOUNT RESTRICTED / POLICY BLOCK — Instagram is refusing publishes on this account. App + servers are fine. Appeal: Instagram app → Settings → Account Status. Post manually via DOWNLOAD if the app still allows it. ['+raw+']';
+  if(code===36001||sub===2207083)return '❌ IMAGE REJECTED by Instagram — bad format/size. Regenerate slides and retry. ['+raw+']';
+  if(code===9007||sub===2207027)return '⏳ MEDIA STILL PROCESSING on Instagram side — auto-retrying. ['+raw+']';
+  if(sub===2207006||/could not be fetched/i.test(raw))return '❌ INSTAGRAM CANNOT FETCH THE IMAGE URL — storage public-access problem. Run SYSTEM CHECK. ['+raw+']';
+  return raw;
+}
 
 async function _igAPI(endpoint,params){
-  // Token is injected server-side — never sent from browser
-  try{
-    console.log('[IG] Server proxy: '+endpoint);
-    const res=await fetch(_IG_SYNC_URL+'?action=ig-proxy&admin_key='+_ADMIN_KEY,{
-      method:'POST',signal:AbortSignal.timeout(45000),
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+FL.SUPABASE_ANON_KEY},
-      body:JSON.stringify({endpoint:endpoint,params:params})
-    });
-    if(res.ok){
-      const d=await res.json();
-      console.log('[IG] Proxy response:',d);
-      if(d&&d.id)return d;
-      if(d&&d.error){
-        const msg=d.error.error_user_msg||d.error.message||JSON.stringify(d.error);
-        throw new Error(msg);
+  // Token is injected server-side — never sent from browser.
+  // Network/server failures retry x3 with backoff; media_publish never auto-retries here
+  // (a lost-response retry could double-post) — _igPublishWithRetry handles that case safely.
+  var isPublish=endpoint.indexOf('media_publish')>=0;
+  var attempts=isPublish?1:3;
+  var lastMsg='';
+  for(var a=0;a<attempts;a++){
+    try{
+      console.log('[IG] Server proxy: '+endpoint+(a?' (attempt '+(a+1)+')':''));
+      const res=await fetch(_IG_SYNC_URL+'?action=ig-proxy&admin_key='+_ADMIN_KEY,{
+        method:'POST',signal:AbortSignal.timeout(45000),
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+FL.SUPABASE_ANON_KEY},
+        body:JSON.stringify({endpoint:endpoint,params:params})
+      });
+      if(res.ok){
+        const d=await res.json();
+        console.log('[IG] Proxy response:',d);
+        if(d&&d.id)return d;
+        if(d&&d.error){
+          var er=new Error(_igExplainError(d.error));
+          er.igCode=d.error.code;er.igSub=d.error.error_subcode;er.igTransient=!!d.error.is_transient;
+          throw er;
+        }
+        return d;
       }
-      return d;
-    }else{
-      const errText=await res.text();
-      console.warn('[IG] Proxy HTTP',res.status,errText);
-      throw new Error('Server proxy error: '+res.status);
+      lastMsg='Server proxy error: HTTP '+res.status;
+      console.warn('[IG] '+lastMsg);
+    }catch(e){
+      if(e.igCode!==undefined)throw e; // real IG verdict — explain, don't blind-retry
+      lastMsg=e.message||'network error';
+      console.warn('[IG] Attempt '+(a+1)+' failed:',lastMsg);
     }
-  }catch(e){
-    console.error('[IG] Proxy failed:',e.message);
-    throw new Error(e.message||'Publishing failed. Use DOWNLOAD button to post manually.');
+    if(a<attempts-1)await new Promise(function(r){setTimeout(r,2000*(a+1));});
   }
+  throw new Error((lastMsg||'Publishing failed')+' — nothing was posted. Use DOWNLOAD and post manually.');
+}
+
+// media_publish with safe retry: only retries when IG explicitly says "not ready yet"
+async function _igPublishWithRetry(creationId){
+  for(var p=0;p<4;p++){
+    try{
+      return await _igAPI(_IG_ACCOUNT+'/media_publish',{creation_id:creationId});
+    }catch(e){
+      var notReady=(e.igCode===9007)||(e.igSub===2207027)||e.igTransient;
+      if(notReady&&p<3){
+        console.warn('[IG] Container not ready, retry '+(p+1)+'/3 in 5s...');
+        await new Promise(function(r){setTimeout(r,5000);});
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+
+// ── PREFLIGHT — one call answers "is it Instagram or is it us?" ──
+async function flPreflight(){
+  try{
+    const res=await fetch(_IG_SYNC_URL+'?action=preflight&admin_key='+_ADMIN_KEY,{
+      signal:AbortSignal.timeout(30000),
+      headers:{'Authorization':'Bearer '+FL.SUPABASE_ANON_KEY}
+    });
+    if(!res.ok)return {ok:false,checks:{server:{ok:false,detail:'Edge function HTTP '+res.status}}};
+    return await res.json();
+  }catch(e){return {ok:false,checks:{network:{ok:false,detail:e.message}}};}
+}
+
+async function flDiagnose(logId){
+  _igLog(logId,'🩺 Running system check...','var(--gold)');
+  var r=await flPreflight();
+  var names={ig_token:'IG TOKEN',ig_account:'IG ACCOUNT',ig_quota:'IG PUBLISH QUOTA',storage:'MEDIA STORAGE',server:'SERVER',network:'NETWORK'};
+  Object.keys(r.checks||{}).forEach(function(k){
+    var c=r.checks[k];
+    _igLog(logId,(c.ok?'✓ ':'✖ ')+(names[k]||k.toUpperCase())+' — '+c.detail,c.ok?'var(--mint)':'var(--danger)');
+  });
+  if(r.ok)_igLog(logId,'All systems green. If publish still fails → Instagram is rejecting this ACCOUNT or this CONTENT (restriction/policy). Post manually via DOWNLOAD.','var(--gold)');
+  return r;
 }
 
 // Create IG carousel container item
@@ -7751,7 +7833,7 @@ async function _igPublishCarouselContainer(childIds,caption){
   console.log('[IG] Carousel container created: '+d.id+'. Waiting for FINISHED status...');
   // Poll until container is ready (avoids media_publish_failed errors)
   await _igWaitForContainer(d.id);
-  var pd=await _igAPI(_IG_ACCOUNT+'/media_publish',{creation_id:d.id});
+  var pd=await _igPublishWithRetry(d.id);
   if(!pd||!pd.id) throw new Error('media_publish returned no ID');
   return pd.id;
 }
@@ -7829,18 +7911,24 @@ async function igPublishCarousel(){
     _igLog(log,'\u2713 CAROUSEL PUBLISHED! Media ID: '+mediaId,'var(--mint)');
     _igStatus(status,'\u2713 PUBLISHED TO INSTAGRAM');
 
-    // Step 6: Post first comment (deal terms + hashtags)
+    // Step 6: Post first comment — NON-FATAL (post is already live)
     if(firstComment){
       _igLog(log,'Posting first comment (deal terms + hashtags)...');
-      await _igPostComment(mediaId,firstComment);
-      _igLog(log,'\u2713 First comment posted','var(--mint)');
+      try{
+        await _igPostComment(mediaId,firstComment);
+        _igLog(log,'\u2713 First comment posted','var(--mint)');
+      }catch(cmtErr){
+        _igLog(log,'\u26A0 First comment failed ('+cmtErr.message+') — POST IS LIVE, add the comment manually from the IG app','var(--gold)');
+      }
     }
 
     _igLog(log,'\n\u2705 ALL DONE — Post is live on @firstlightlive','var(--mint)');
   }catch(e){
     _igLog(log,'\u274C ERROR: '+e.message,'var(--danger)');
-    _igStatus(status,'\u274C FAILED — use download button');
+    _igLog(log,'\u26A0 NOTHING WENT LIVE. Your slides are safe — tap DOWNLOAD and post manually from the IG app. The streak never depends on this API.','var(--gold)');
+    _igStatus(status,'\u274C NOT PUBLISHED — DOWNLOAD \u2192 post manually');
     console.error('[IG Publish]',e);
+    flDiagnose(log).catch(function(){});
   }
 }
 
@@ -7877,20 +7965,25 @@ async function igPublishStory(){
     // Create story container
     _igLog(log,'Publishing to Instagram Stories...','#E040FB');
     const d=await _igAPI(_IG_ACCOUNT+'/media',{media_type:'STORIES',image_url:url});
+    if(!d||!d.id)throw new Error('Story container creation failed — no ID returned');
 
-    // Wait for processing
-    await new Promise(r=>setTimeout(r,2000));
+    // Wait for processing — poll status instead of blind sleep
+    _igLog(log,'Waiting for Instagram to process (up to 30s)...','var(--gold)');
+    await _igWaitForContainer(d.id);
 
-    // Publish
-    const pd=await _igAPI(_IG_ACCOUNT+'/media_publish',{creation_id:d.id});
+    // Publish (safe retry if IG says "not ready yet")
+    const pd=await _igPublishWithRetry(d.id);
+    if(!pd||!pd.id)throw new Error('media_publish returned no ID');
 
     _igLog(log,'\u2713 STORY PUBLISHED! ID: '+pd.id,'var(--mint)');
     _igStatus(status,'\u2713 STORY LIVE ON INSTAGRAM');
     _igLog(log,'\n\u2705 Story is now visible to all followers','var(--mint)');
   }catch(e){
     _igLog(log,'\u274C ERROR: '+e.message,'var(--danger)');
-    _igStatus(status,'\u274C FAILED — use download button');
+    _igLog(log,'\u26A0 STORY NOT LIVE. Tap DOWNLOAD and post it manually from the IG app.','var(--gold)');
+    _igStatus(status,'\u274C NOT PUBLISHED — DOWNLOAD \u2192 post manually');
     console.error('[IG Story]',e);
+    flDiagnose(log).catch(function(){});
   }
 }
 

@@ -750,8 +750,14 @@ async function serverPublish(body: Record<string, unknown>) {
   const carousel = await carouselResp.json()
   if (carousel.error) throw new Error(carousel.error.error_user_msg || carousel.error.message)
 
-  // Wait for processing
-  await new Promise(r => setTimeout(r, 3000))
+  // Wait for container processing — poll status instead of fixed sleep
+  for (let t = 0; t < 12; t++) {
+    await new Promise(r => setTimeout(r, 2500))
+    const stResp = await fetch(`https://graph.facebook.com/v21.0/${carousel.id}?fields=status_code&access_token=${encodeURIComponent(igToken)}`)
+    const st = await stResp.json()
+    if (st.status_code === 'FINISHED') break
+    if (st.status_code === 'ERROR') throw new Error('Instagram rejected the media container (status ERROR)')
+  }
 
   // Publish
   const pubQs = `creation_id=${carousel.id}&access_token=${encodeURIComponent(igToken)}`
@@ -766,6 +772,75 @@ async function serverPublish(body: Record<string, unknown>) {
   }
 
   return { success: true, media_id: pub.id, publish_type: publishType }
+}
+
+// ═══════════════════════════════════════════
+// MEDIA UPLOAD — service role, bypasses RLS.
+// Server fallback when browser-direct storage upload fails (also used for HEIC re-encode path).
+// ═══════════════════════════════════════════
+async function uploadMedia(body: Record<string, unknown>) {
+  const dataUrl = String(body.data || '')
+  const base64 = dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl
+  if (!base64) throw new Error('No image data provided')
+  const buffer = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
+  if (buffer.length > 8 * 1024 * 1024) throw new Error('Image too large (max 8MB)')
+  const folder = String(body.folder || 'instagram').replace(/[^a-zA-Z0-9_/-]/g, '') || 'instagram'
+  const filename = String(body.filename || `upload_${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '')
+  const contentType = String(body.content_type || 'image/jpeg')
+  const path = `${folder}/${filename}`
+
+  const { error } = await supaAdmin.storage.from('media').upload(path, buffer, { contentType, upsert: true })
+  if (error) throw new Error(`Storage upload failed: ${error.message}`)
+  const url = `${SUPA_URL}/storage/v1/object/public/media/${path}`
+  return { success: true, url, publicUrl: url }
+}
+
+// ═══════════════════════════════════════════
+// PREFLIGHT — one call answers "is it Instagram or is it us?"
+// ═══════════════════════════════════════════
+async function preflight() {
+  const checks: Record<string, { ok: boolean; detail: string }> = {}
+
+  let igToken = ''
+  try {
+    igToken = (await getSecret('ig_access')) || ''
+    checks.ig_token = igToken ? { ok: true, detail: 'IG token present' } : { ok: false, detail: 'No IG token in secrets table' }
+  } catch (e) { checks.ig_token = { ok: false, detail: (e as Error).message } }
+
+  if (igToken) {
+    try {
+      const r = await fetch(`https://graph.facebook.com/v21.0/${IG_ACCOUNT_ID}?fields=id,username&access_token=${encodeURIComponent(igToken)}`)
+      const d = await r.json()
+      checks.ig_account = d.error
+        ? { ok: false, detail: `${d.error.code || ''} ${d.error.error_user_msg || d.error.message}`.trim() }
+        : { ok: true, detail: '@' + d.username }
+    } catch (e) { checks.ig_account = { ok: false, detail: (e as Error).message } }
+
+    try {
+      const r = await fetch(`https://graph.facebook.com/v21.0/${IG_ACCOUNT_ID}/content_publishing_limit?fields=quota_usage,config&access_token=${encodeURIComponent(igToken)}`)
+      const d = await r.json()
+      if (d.error) {
+        checks.ig_quota = { ok: false, detail: `${d.error.code || ''} ${d.error.error_user_msg || d.error.message}`.trim() }
+      } else {
+        const usage = d.data?.[0]?.quota_usage ?? 0
+        const total = d.data?.[0]?.config?.quota_total ?? 50
+        checks.ig_quota = { ok: usage < total, detail: `${usage}/${total} API posts used in 24h` }
+      }
+    } catch (e) { checks.ig_quota = { ok: false, detail: (e as Error).message } }
+  }
+
+  try {
+    const testBytes = new TextEncoder().encode('preflight ' + new Date().toISOString())
+    const { error } = await supaAdmin.storage.from('media').upload('instagram/preflight_check.txt', testBytes, { contentType: 'text/plain', upsert: true })
+    if (error) throw new Error(error.message)
+    const pub = await fetch(`${SUPA_URL}/storage/v1/object/public/media/instagram/preflight_check.txt`)
+    checks.storage = pub.ok
+      ? { ok: true, detail: 'Storage write + public read OK' }
+      : { ok: false, detail: `Public URL returned ${pub.status} — IG cannot fetch media` }
+  } catch (e) { checks.storage = { ok: false, detail: 'Storage write failed: ' + (e as Error).message } }
+
+  const ok = Object.values(checks).every(c => c.ok)
+  return { success: true, ok, checks, checked_at: new Date().toISOString() }
 }
 
 // ═══════════════════════════════════════════
@@ -831,6 +906,17 @@ Deno.serve(async (req) => {
     if (action === 'server-publish') {
       const body = await req.json()
       const result = await serverPublish(body)
+      return new Response(JSON.stringify(result), { headers })
+    }
+
+    if (action === 'upload') {
+      const body = await req.json()
+      const result = await uploadMedia(body)
+      return new Response(JSON.stringify(result), { headers })
+    }
+
+    if (action === 'preflight') {
+      const result = await preflight()
       return new Response(JSON.stringify(result), { headers })
     }
 
