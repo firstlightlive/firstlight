@@ -796,6 +796,166 @@ async function uploadMedia(body: Record<string, unknown>) {
 }
 
 // ═══════════════════════════════════════════
+// SCHEDULED EMAIL SYSTEM — 4 daily + 1 weekly
+// Resend HTML emails with FIRST LIGHT brand. All compute day number
+// from STREAK_START and pull today's stats from strava_activities.
+// ═══════════════════════════════════════════
+const STREAK_START_ISO = '2026-06-13' // Chapter 02 Day 1
+function _daysSinceStart(): number {
+  const ms = Date.now() - new Date(STREAK_START_ISO + 'T00:00:00+05:30').getTime()
+  return Math.max(1, Math.floor(ms / 86400000) + 1)
+}
+function _todayLocalISO(): string {
+  // IST date string YYYY-MM-DD
+  const now = new Date()
+  const ist = new Date(now.getTime() + (5.5 * 3600 * 1000))
+  return ist.toISOString().slice(0, 10)
+}
+async function _todayRunStats(): Promise<{ km: number; min: number; pace: string; start: string; name: string } | null> {
+  const today = _todayLocalISO()
+  const { data } = await supaAnon.from('strava_activities').select('name,type,start_date_local,distance,moving_time')
+    .eq('type', 'Run').gte('start_date_local', today + 'T00:00:00').lt('start_date_local', today + 'T23:59:59')
+    .order('start_date_local', { ascending: false }).limit(1)
+  if (!data || !data.length) return null
+  const r = data[0]
+  const km = Math.round((r.distance / 1000) * 100) / 100
+  const min = Math.round((r.moving_time || 0) / 60)
+  const paceN = km > 0 ? (min / km) : 0
+  const pace = paceN > 0 ? `${Math.floor(paceN)}'${String(Math.round((paceN % 1) * 60)).padStart(2, '0')}"` : '—'
+  const start = (r.start_date_local || '').slice(11, 16)
+  return { km, min, pace, start, name: r.name || 'Morning Run' }
+}
+async function _sendEmail(subject: string, html: string, text: string) {
+  if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY not set')
+  const resp = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: ALERT_FROM, to: [ALERT_TO], subject, html, text })
+  })
+  const d = await resp.json()
+  if (!resp.ok) throw new Error('Resend ' + resp.status + ': ' + JSON.stringify(d))
+  return d
+}
+function _emailShell(title: string, bodyHtml: string, footer = ''): string {
+  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#0E0C09;font-family:Georgia,'Times New Roman',serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0E0C09"><tr><td align="center">
+<table width="560" cellpadding="0" cellspacing="0" style="background:#1A1612;border:1px solid rgba(212,168,67,0.18);margin:32px 0">
+<tr><td style="padding:28px 36px;border-bottom:1px solid rgba(212,168,67,0.18)">
+<div style="font-family:Georgia,serif;font-size:11px;letter-spacing:6px;color:rgba(212,168,67,0.55);margin-bottom:4px">— F I R S T  L I G H T —</div>
+<div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:3px;color:rgba(212,168,67,0.35)">CHAPTER 02 · BANGALORE · GPS-VERIFIED</div>
+</td></tr>
+<tr><td style="padding:36px;color:#F0EAD8;font-size:14px;line-height:1.7">
+<h1 style="margin:0 0 24px;font-family:Georgia,serif;font-weight:400;font-size:34px;color:#D4A843;letter-spacing:1px">${title}</h1>
+${bodyHtml}
+</td></tr>
+<tr><td style="padding:24px 36px;border-top:1px solid rgba(212,168,67,0.18);background:#0E0C09">
+<div style="font-family:'Courier New',monospace;font-size:11px;color:rgba(212,168,67,0.55);letter-spacing:1px">₹15,000 STAKE · LOGGED PUBLIC · EVERY MORNING</div>
+<div style="font-family:Georgia,serif;font-size:24px;color:#D4A843;margin-top:8px"><a href="https://firstlight.live" style="color:#D4A843;text-decoration:none">firstlight.live</a></div>
+<div style="font-family:'Courier New',monospace;font-size:10px;color:rgba(212,168,67,0.4);margin-top:4px">@firstlightlive · CHAPTER 02 · ${footer}</div>
+</td></tr>
+</table></td></tr></table></body></html>`
+}
+
+async function emailMorningReminder() {
+  const dn = _daysSinceStart()
+  const html = _emailShell(`Day ${String(dn).padStart(3, '0')}.`,
+    `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 18px">30 minutes to the line.</p>
+<p>Alarm at <b style="color:#D4A843">04:30 AM</b>. Deadline at <b>06:00 AM</b>. The bed is warm. The road is cold. The alarm does not care.</p>
+<p>Lace up. Hit the road. The streak is yours to hold or break.</p>
+<p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Sent at 04:30 IST by the system you built.</p>`,
+    'MORNING REMINDER')
+  await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')}. 30 minutes to the line.`, html, `Day ${dn}. 30 min to the 6 AM line. — firstlight.live`)
+  return { sent: 'morning', day: dn }
+}
+
+async function emailStreakUpdate() {
+  const dn = _daysSinceStart()
+  const stats = await _todayRunStats()
+  if (stats) {
+    const html = _emailShell(`Day ${String(dn).padStart(3, '0')} · alive.`,
+      `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 24px">Still holding the line.</p>
+<table cellpadding="12" cellspacing="0" style="width:100%;border-collapse:collapse;font-family:'Courier New',monospace">
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">DISTANCE</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:20px;color:#F0EAD8">${stats.km} KM</td></tr>
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">DURATION</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:20px;color:#F0EAD8">${stats.min} MIN</td></tr>
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">PACE</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:20px;color:#F0EAD8">${stats.pace} /KM</td></tr>
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">START</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:20px;color:#F0EAD8">${stats.start} IST</td></tr>
+<tr><td style="color:rgba(212,168,67,0.6);font-size:12px">STATUS</td><td style="text-align:right;font-size:20px;color:#D4A843;font-weight:700">DEFENDED</td></tr>
+</table>
+<p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Sent at 06:30 IST after deadline check.</p>`,
+      'STREAK UPDATE')
+    await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')} · streak alive · ${stats.km} km`, html, `Day ${dn} · ${stats.km} km · ${stats.min} min · DEFENDED — firstlight.live`)
+    return { sent: 'streak-alive', day: dn, ...stats }
+  } else {
+    const html = _emailShell(`⚠ Day ${String(dn).padStart(3, '0')} · MISSED?`,
+      `<p style="font-size:18px;font-style:italic;color:#FF6B6B;margin:0 0 18px">No run logged in Strava for today.</p>
+<p>Either the run never happened, or the Strava sync hasn't caught up yet. <b>Check the app at <a href="https://firstlight.live/app" style="color:#D4A843">firstlight.live/app</a></b>.</p>
+<p>If the deadline passed without a run, the slip should be logged public and ₹15,000 paid out. The system does not negotiate.</p>
+<p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Sent at 06:30 IST after deadline check. False alarm if your run is still syncing.</p>`,
+      'DEADLINE CHECK')
+    await _sendEmail(`[FL] ⚠ Day ${String(dn).padStart(3, '0')} · no run found at 06:30`, html, `Day ${dn} · no run logged · check the app — firstlight.live`)
+    return { sent: 'streak-miss-warning', day: dn }
+  }
+}
+
+async function emailPublishConfirm() {
+  const dn = _daysSinceStart()
+  const stats = await _todayRunStats()
+  const html = _emailShell(`Day ${String(dn).padStart(3, '0')} · posted.`,
+    `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 18px">The grid grows by one.</p>
+<p>Today's post is live on <a href="https://www.instagram.com/firstlightlive/" style="color:#D4A843">@firstlightlive</a>.</p>
+${stats ? `<p style="font-family:'Courier New',monospace;font-size:14px;color:rgba(212,168,67,0.85);margin-top:24px">${stats.km} KM &nbsp;·&nbsp; ${stats.min} MIN &nbsp;·&nbsp; ${stats.start} IST</p>` : ''}
+<p style="margin-top:24px">₹15,000 stays mine. Streak rolls forward.</p>
+<p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Triggered when you tap PUBLISH from firstlight.live/app.</p>`,
+    'PUBLISH CONFIRMATION')
+  await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')} · posted · ₹15K defended`, html, `Day ${dn} posted to @firstlightlive — firstlight.live`)
+  return { sent: 'publish-confirm', day: dn }
+}
+
+async function emailEodReport() {
+  const dn = _daysSinceStart()
+  const stats = await _todayRunStats()
+  const html = _emailShell(`Day ${String(dn).padStart(3, '0')} · complete.`,
+    `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 24px">One more morning held.</p>
+${stats ? `<table cellpadding="12" cellspacing="0" style="width:100%;border-collapse:collapse;font-family:'Courier New',monospace">
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">TODAY</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:18px;color:#F0EAD8">${stats.km} KM · ${stats.min} MIN</td></tr>
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">STAKE</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:18px;color:#D4A843">₹15,000 DEFENDED</td></tr>
+<tr><td style="color:rgba(212,168,67,0.6);font-size:12px">STREAK</td><td style="text-align:right;font-size:18px;color:#F0EAD8">DAY ${dn} · ZERO MISSES</td></tr>
+</table>` : `<p>Run data not yet visible in today's log.</p>`}
+<p style="margin-top:28px;font-family:Georgia,serif;font-size:22px;font-style:italic;color:#D4A843">Tomorrow. <b>04:48 AM</b>. Same alarm. Same road. Same answer.</p>
+<p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Sent at 22:00 IST. Wake reminder fires at 04:30.</p>`,
+    'END-OF-DAY')
+  await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')} · complete · tomorrow 04:48`, html, `Day ${dn} complete. Tomorrow 4:48 AM — firstlight.live`)
+  return { sent: 'eod', day: dn }
+}
+
+async function emailWeeklyRecap() {
+  const dn = _daysSinceStart()
+  const today = new Date()
+  const sevenDaysAgo = new Date(today.getTime() - 7 * 86400000).toISOString().slice(0, 10)
+  const { data } = await supaAnon.from('strava_activities').select('distance,moving_time,start_date_local,type')
+    .gte('start_date_local', sevenDaysAgo + 'T00:00:00').eq('type', 'Run')
+  const runs = data || []
+  const totalKm = Math.round(runs.reduce((s: number, r: { distance?: number }) => s + ((r.distance || 0) / 1000), 0) * 10) / 10
+  const totalMin = Math.round(runs.reduce((s: number, r: { moving_time?: number }) => s + ((r.moving_time || 0) / 60), 0))
+  const dayCount = runs.length
+  const week = Math.ceil(dn / 7)
+  const html = _emailShell(`Week ${String(week).padStart(2, '0')} · ${totalKm} KM.`,
+    `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 24px">Seven mornings. Held.</p>
+<table cellpadding="12" cellspacing="0" style="width:100%;border-collapse:collapse;font-family:'Courier New',monospace">
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">RUN DAYS</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:22px;color:#F0EAD8">${dayCount} / 7</td></tr>
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">DISTANCE</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:22px;color:#D4A843">${totalKm} KM</td></tr>
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">TIME</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:22px;color:#F0EAD8">${totalMin} MIN</td></tr>
+<tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">STAKE DEFENDED</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:22px;color:#D4A843">₹${(15000 * dayCount).toLocaleString('en-IN')}</td></tr>
+<tr><td style="color:rgba(212,168,67,0.6);font-size:12px">STREAK</td><td style="text-align:right;font-size:22px;color:#F0EAD8">DAY ${dn}</td></tr>
+</table>
+<p style="margin-top:24px"><a href="https://firstlight.live" style="color:#D4A843">View on firstlight.live →</a></p>
+<p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Sent every Sunday at 07:00 IST.</p>`,
+    'WEEKLY RECAP')
+  await _sendEmail(`[FL] Week ${String(week).padStart(2, '0')} · ${totalKm} km · ${dayCount}/7 mornings held`, html, `Week ${week}: ${totalKm} km, ${dayCount}/7 days — firstlight.live`)
+  return { sent: 'weekly', week, day: dn, totalKm, dayCount, totalMin }
+}
+
+// ═══════════════════════════════════════════
 // PREFLIGHT — one call answers "is it Instagram or is it us?"
 // ═══════════════════════════════════════════
 async function preflight() {
@@ -918,6 +1078,28 @@ Deno.serve(async (req) => {
     if (action === 'preflight') {
       const result = await preflight()
       return new Response(JSON.stringify(result), { headers })
+    }
+
+    // ── EMAIL ROUTES ──
+    if (action === 'email-morning') {
+      const r = await emailMorningReminder()
+      return new Response(JSON.stringify(r), { headers })
+    }
+    if (action === 'email-streak') {
+      const r = await emailStreakUpdate()
+      return new Response(JSON.stringify(r), { headers })
+    }
+    if (action === 'email-publish') {
+      const r = await emailPublishConfirm()
+      return new Response(JSON.stringify(r), { headers })
+    }
+    if (action === 'email-eod') {
+      const r = await emailEodReport()
+      return new Response(JSON.stringify(r), { headers })
+    }
+    if (action === 'email-weekly') {
+      const r = await emailWeeklyRecap()
+      return new Response(JSON.stringify(r), { headers })
     }
 
     if (action === 'sync' || action === 'all') {
