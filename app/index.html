@@ -3608,22 +3608,10 @@ function _generateInner(){
     try{slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,undefined,total,wxStr,sleepHrs,pledgeFine,sActs,sDist,sTime);}catch(e){console.error('Slide1 error:',e);}
     try{slide4(day,total,handleIG,handleX,moodLine,food);}catch(e){console.error('Slide4 error:',e);}
     try{slide2(day,km,mn,kc,undefined,total,handleIG,handleX,wStart,wEnd,bpmVal,stravaStats);}catch(e){console.error('Slide2 error:',e);}
-    // ── ROUTE MAP SLIDE ──
-    try{
-      var _useUploadedMap=(document.getElementById('useStravaMapImg')&&document.getElementById('useStravaMapImg').checked&&iM);
-      var _routeMapGenerated=false;
-      if(_useUploadedMap){
-        // Uploaded image takes priority — no Strava pull needed
-        slideRouteMap(day,km,mn,kc,total,handleIG,handleX,wStart,wEnd,bpmVal);
-        window._hasRouteMap=true;_routeMapGenerated=true;
-      }else if(_stravaCache){
-        var _latestRun=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;});
-        if(_latestRun){slideRouteMap(day,km,mn,kc,total,handleIG,handleX,wStart,wEnd,bpmVal);window._hasRouteMap=true;_routeMapGenerated=true;}
-        else{window._hasRouteMap=false;}
-      }
-      // Show/hide tab7 based on whether route map was generated
-      ['tab7','dot7','sb7'].forEach(function(xid){var xe=document.getElementById(xid);if(xe)xe.style.display=_routeMapGenerated?'':'none';});
-    }catch(mapErr){console.error('Route map error:',mapErr);window._hasRouteMap=false;}
+    // ── ROUTE MAP SLIDE (c7) — REMOVED in Chapter 02 redesign.
+    // c1 (THE ROUTE) IS the route now; no separate c7 slide. Hide the tab.
+    window._hasRouteMap=false;
+    ['tab7','dot7','sb7'].forEach(function(xid){var xe=document.getElementById(xid);if(xe)xe.style.display='none';});
     // ── CONDITIONAL SLEEP SLIDE ──
     const t4=document.getElementById('tab4');
     const d4=document.getElementById('dot4');
