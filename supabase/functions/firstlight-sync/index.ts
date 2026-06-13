@@ -27,7 +27,8 @@ function chapterDay(date: Date | string): number {
 // ── Alerting via Resend (set RESEND_API_KEY in Edge Function secrets) ──
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
 const ALERT_TO = Deno.env.get('ALERT_TO') || 'firstlightlive@gmail.com'
-const ALERT_FROM = Deno.env.get('ALERT_FROM') || 'onboarding@resend.dev'
+// firstlight.live is a Resend-verified custom domain — sender lands in inbox, not spam.
+const ALERT_FROM = Deno.env.get('ALERT_FROM') || 'mail@firstlight.live'
 async function sendAlert(subject: string, body: string) {
   if (!RESEND_API_KEY) return
   try {
