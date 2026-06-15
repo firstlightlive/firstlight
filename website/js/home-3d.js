@@ -668,12 +668,8 @@
  setHTML('ltYoga', yoga.toString());
  setHTML('ltDance', dance.toString());
  var day = getDayNum();
- var stake = getCumulativeUnclaimedHome(day);
- if (typeof formatINR === 'function') {
- setHTML('ltStake', '₹' + formatINR(stake));
- } else {
- setHTML('ltStake', '₹' + stake.toLocaleString('en-IN'));
- }
+ // Public display now shows days on record (no rupee amount surfaced — internal stake only)
+ setHTML('ltStake', day + ' DAYS ON RECORD');
  });
 
  // Wake-up time — today first, fallback to most recent

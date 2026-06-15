@@ -1030,7 +1030,7 @@ function generateCaption() {
  }
 
  // Stakes context
- caption += '₹' + unclaimed + ' defended. Day ' + dayNum + '. The streak lives.\n\n';
+ caption += 'Day ' + dayNum + '. The streak lives.\n\n';
 
  // Part 3: CTA (specific, rotating)
  const ctaIdx = dayNum % 3;
@@ -1507,7 +1507,7 @@ function copyBio() {
  const dayNum = computeStreakDay();
  const stake = formatIndianCurrency(getCurrentStake(dayNum));
  const unclaimed = formatIndianCurrency(getTotalUnclaimed(dayNum));
- const text = `Miss 1 day = ₹${stake} gone. Logged public.\n${dayNum} days. 0 misses. ₹${unclaimed} defended.\nRun + Gym + Food Code. Before 6AM. Daily.\nBLR | Every day verified public.`;
+ const text = `${dayNum} days on record. 0 misses.\nRun + Gym + Food Code. Before 6AM. Daily.\nBLR | Every day verified public.`;
  navigator.clipboard.writeText(text).then(() => showToast('BIO COPIED'));
 }
 

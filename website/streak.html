@@ -1992,7 +1992,7 @@
 
  var stake = (typeof getCurrentStake === 'function') ? getCurrentStake().toLocaleString('en-IN'): '15,000';
  var claimEl = document.getElementById('brokenClaimAmount');
- if (claimEl) claimEl.textContent = '₹' + stake + ' CLAIMABLE';
+ if (claimEl) claimEl.textContent = 'STREAK BROKEN — ON RECORD';
 
  // Update streak hero
  var heroEl = document.querySelector('.streak-hero');
@@ -2073,7 +2073,7 @@
  if (cdM) cdM.style.color = 'var(--red)';
  if (cdS) cdS.style.color = 'var(--red)';
  if (label) { label.textContent = 'STREAK BROKEN'; label.style.color = 'var(--red)'; }
- if (cdStatus) { cdStatus.textContent = '₹' + stake + ' claimable — no activity logged'; cdStatus.style.color = 'var(--red)'; }
+ if (cdStatus) { cdStatus.textContent = 'no activity logged — on record'; cdStatus.style.color = 'var(--red)'; }
  showStreakBroken();
  } else {
  // Still checking after deadline
@@ -2090,7 +2090,7 @@
  if (cdM) cdM.style.color = 'var(--red)';
  if (cdS) cdS.style.color = 'var(--red)';
  if (label) { label.textContent = 'ACTIVITY WINDOW CLOSING'; label.style.color = 'var(--red)'; }
- if (cdStatus) { cdStatus.textContent = '₹' + stake + ' at risk — log activity NOW'; cdStatus.style.color = 'var(--red)'; }
+ if (cdStatus) { cdStatus.textContent = 'log activity NOW — window closing'; cdStatus.style.color = 'var(--red)'; }
  hideStreakBroken();
  }
  // Under 6 hours (6 PM - 10 PM) + no activity = GOLD warning

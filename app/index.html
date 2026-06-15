@@ -3554,8 +3554,8 @@ function _generateInner(){
  const _food=document.querySelector('[data-key="food"]')?.classList.contains('on');
  const _run=document.querySelector('[data-key="run"]')?.classList.contains('on');
  const _gym=document.querySelector('[data-key="gym"]')?.classList.contains('on');
- if(_food&&_run&&_gym) _result='Gym done. Food code: clean. ₹'+_unclaimed+' defended.';
- else _result='₹'+_unclaimed+' defended. Day '+_day+'. The streak lives.';
+ if(_food&&_run&&_gym) _result='Gym done. Food code: clean.';
+ else _result=''. Day '+_day+'. The streak lives.';
 
  const _soar=_situation+'\n'+_obstacle+'\n'+_action+'\n'+_result;
 
@@ -3718,7 +3718,7 @@ Return ONLY the caption text.`;
  if(_fcb){
  const _stakeAmt=formatIndianCurrency(getCurrentStake(_day));
  const _totalAmt=formatIndianCurrency(getTotalAtRisk(_day));
- _fcb.textContent='\u26A1 THE COMMITMENT:\nMiss 1 day = \u20B9'+_stakeAmt+' gone. Logged public, same day.\n\n'+_day+'-day streak. \u20B9'+_totalAmt+' defended.\nSet your alarm. Check tomorrow at 6 AM.\nThe proof will be here \u2014 or the slip will.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+ _fcb.textContent='\u26A1 THE COMMITMENT:\nMiss 1 day = logged public, same day.\n\n'+_day+'-day streak. ';
  }
 
  // Alt Text — accessibility descriptions per slide
@@ -7042,7 +7042,7 @@ async function igPublishCarousel(){
  var _d2=document.getElementById('dayNum').value||'1';
  var _stk2=formatIndianCurrency(getCurrentStake(parseInt(_d2)||1));
  var _tot2=formatIndianCurrency(getTotalAtRisk(parseInt(_d2)||1));
- firstComment='\u26A1 THE COMMITMENT:\nMiss 1 day = \u20B9'+_stk2+' gone. Logged public, same day.\n\n'+_d2+'-day streak. \u20B9'+_tot2+' defended.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+ firstComment='\u26A1 THE COMMITMENT:\nLogged public, same day. Every day.\n\n'+_d2+'-day streak on record.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
  _igLog(log,'First comment auto-generated','var(--gold)');
  }
 
@@ -10288,7 +10288,7 @@ function getMilestoneType(day){
  if(ms) return{type:ms.tier,label:ms.label,emoji:ms.tier==='B3'?'👑':ms.tier==='B2'?'🏆':'🔥'};
  return null;
 }
-function generateFirstCommentBlock(day){const stake=getCurrentStake(day);const total=getTotalAtRisk(day);const stakeFormatted=formatIndianCurrency(stake);const totalFormatted=formatIndianCurrency(total);return '━━━━━━━━━━━━━━━━━━━━━━\n⚡ THE COMMITMENT:\nIf my next post isn\'t before 6 AM → ₹'+stakeFormatted+' gone. Logged public, same day.\n\n'+day+'-day streak. ₹'+totalFormatted+' defended so far.\n\nSet your alarm. Check tomorrow at 6:00 AM.\nThe proof will be here → or the slip will.\n━━━━━━━━━━━━━━━━━━━━━━';}
+function generateFirstCommentBlock(day){return '━━━━━━━━━━━━━━━━━━━━━━\n⚡ THE COMMITMENT:\nLogged public, same day. Every day.\n\n'+day+'-day streak on record.\n\nSet your alarm. Check tomorrow at 6:00 AM.\nThe proof will be here.\n━━━━━━━━━━━━━━━━━━━━━━';}
 function generateCaption(day){
  day=parseInt(day)||1;
  const stake=formatIndianCurrency(getCurrentStake(day));
@@ -10325,7 +10325,7 @@ function generateCaption(day){
  let situation='Day '+day+'.'+(wStart?' Alarm went off at '+wStart+'.':' Another morning.');
  let obstacle=sl>0&&sl<5?'Only slept '+sl+' hours. Body said no.':'The bed was warm. The road was cold.';
  let action=kmV>0?'Laced up anyway. '+kmV+' km'+(mn?' in '+mn+' min':'')+(wStart?' starting at '+wStart:'')+'.':'Got up. Showed up. Did the work.';
- let result=food&&run&&gym?'Gym done. Food code: clean. ₹'+unclaimed+' defended.':'₹'+unclaimed+' defended. Day '+day+'. The streak lives.';
+ let result=food&&run&&gym?'Gym done. Food code: clean.':''. Day '+day+'. The streak lives.';
 
  // Stats
  let stats='🍱'+(food?'✅':'❌')+' 🏃'+(run?'✅':'❌')+' 🏋️'+(gym?'✅':'❌');
@@ -10350,10 +10350,10 @@ function generateCaption(day){
  const milestone=getMilestoneType(day);
  if(milestone&&(day===14||day===21||day===30||day===50||day===100)){
  const totalF=formatIndianCurrency(getTotalAtRisk(day));
- if(day===14) return dealHook+'\n\n'+stats+'\n\nTWO WEEKS.\n\nThe alarm still sucks. My bed is still comfortable.\nBut something shifted.\n\nDay 1: I woke up to prove I could.\nDay 14: I wake up because it\'s who I am now.\n\n₹'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
- if(day===21) return dealHook+'\n\n'+stats+'\n\n21 DAYS. HABIT LOCKED.\n\nI stopped negotiating. The alarm goes off. My feet hit the floor.\n\n₹'+totalF+' defended. 21 alarms. 21 decisions. 0 excuses.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
- if(day===30) return dealHook+'\n\n'+stats+'\n\n1 MONTH. 30 days. 30 alarms. 0 excuses.\n\n₹'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
- if(day===50) return dealHook+'\n\n'+stats+'\n\n50 DAYS. HALF CENTURY.\n\n₹'+totalF+' defended.\n\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+ if(day===14) return dealHook+'\n\n'+stats+'\n\nTWO WEEKS.\n\nThe alarm still sucks. My bed is still comfortable.\nBut something shifted.\n\nDay 1: I woke up to prove I could.\nDay 14: I wake up because it\'s who I am now.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+ if(day===21) return dealHook+'\n\n'+stats+'\n\n21 DAYS. HABIT LOCKED.\n\nI stopped negotiating. The alarm goes off. My feet hit the floor.\n\n21 alarms. 21 decisions. 0 excuses.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+ if(day===30) return dealHook+'\n\n'+stats+'\n\n1 MONTH. 30 days. 30 alarms. 0 excuses.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+ if(day===50) return dealHook+'\n\n'+stats+'\n\n50 DAYS. HALF CENTURY.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
  if(day===100) return 'ON RECORD · TRIPLE DIGITS.\n\n'+stats+'\n\n100 DAYS. The pattern held.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
  }
 
@@ -10362,7 +10362,7 @@ function generateCaption(day){
  if(_msDetect){
  const totalF=formatIndianCurrency(getTotalAtRisk(day));
  const tierEmoji=_msDetect.tier==='B3'?'👑':_msDetect.tier==='B2'?'🏆':'🔥';
- return dealHook+'\n\n'+stats+'\n\n'+tierEmoji+' '+_msDetect.label+'\n\nDay '+day+'. \u20B9'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+ return dealHook+'\n\n'+stats+'\n\n'+tierEmoji+' '+_msDetect.label+'\n\nDay '+day+'. '+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
  }
 
  // Standard daily caption
