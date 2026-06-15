@@ -1,19 +1,27 @@
 {
-  "name": "First Light",
-  "short_name": "FirstLight",
-  "description": "Daily fitness accountability. ₹15,000 on the line. No end date.",
-  "start_url": "/index.html",
+  "name": "First Light — Command Center",
+  "short_name": "FL Punch",
+  "description": "Offline-first daily punch + Command Center. Tap. Save. Sync when online.",
+  "start_url": "/admin.html",
+  "scope": "/",
+  "id": "/admin.html",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0A0C10",
-  "theme_color": "#0A0C10",
+  "theme_color": "#00D4FF",
   "orientation": "portrait",
+  "categories": ["health", "lifestyle", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Punch Today",  "short_name": "Punch",   "description": "5-tap daily punch",      "url": "/admin.html#panel-daily",   "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
+    { "name": "Add Slip",     "short_name": "Slip",    "description": "Log a slip immediately", "url": "/admin.html#panel-slips",   "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
+    { "name": "Mastery",      "short_name": "Mastery", "description": "Tick today's mastery",   "url": "/admin.html#panel-mastery", "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
+    { "name": "Food Log",     "short_name": "Food",    "description": "Quick food entry",       "url": "/admin.html#panel-food",    "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] }
+  ],
+  "prefer_related_applications": false
 }
- 
