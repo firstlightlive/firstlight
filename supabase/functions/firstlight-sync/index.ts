@@ -72,6 +72,27 @@ async function supaGet(table: string, query: Record<string, string>) {
 }
 
 // ═══════════════════════════════════════════
+// MET-based calorie estimator — Strava's detail endpoint sometimes returns
+// null for phone-only ("Strava App" device) activities because there's no
+// HR sensor to read. Estimate from moving_time × MET × weight as a fallback
+// so the column is never null for completed activities.
+// ═══════════════════════════════════════════
+function estimateCalories(activityType: string, sec: number, weightKg = 70): number {
+  if (!sec || sec <= 0) return 0
+  const hours = sec / 3600
+  let MET = 5 // generic "workout" fallback
+  const t = (activityType || '').toLowerCase()
+  if (t.includes('run')) MET = 9.8         // moderate run ~8 min/km
+  else if (t.includes('walk') || t.includes('hike')) MET = 4
+  else if (t.includes('ride') || t.includes('bike') || t.includes('cycl')) MET = 8
+  else if (t.includes('swim')) MET = 8
+  else if (t.includes('yoga')) MET = 3
+  else if (t.includes('weight') || t.includes('strength')) MET = 5
+  else if (t.includes('stair')) MET = 9
+  return Math.round(MET * weightKg * hours)
+}
+
+// ═══════════════════════════════════════════
 // STRAVA SYNC
 // ═══════════════════════════════════════════
 async function syncStrava(log: string[]) {
@@ -141,6 +162,10 @@ async function syncStrava(log: string[]) {
     } catch (_e) {
       detailMisses++
     }
+    // MET fallback for phone-only activities where Strava can't compute kcal
+    if (calories === null && a.moving_time > 0) {
+      calories = estimateCalories(a.type || '', a.moving_time, 70)
+    }
 
     const row: Record<string, unknown> = {
       id: a.id, name: a.name || '', type: a.type || '',
@@ -199,9 +224,10 @@ async function backfillStravaCalories(log: string[], limit: number) {
     .is('calories_synced_at', null)
 
   // Get next batch — newest first so today's runs get fixed first if missed
+  // Also need type + moving_time for MET fallback estimation
   const { data: rows, error } = await supaAdmin
     .from('strava_activities')
-    .select('id, name, start_date_local')
+    .select('id, name, start_date_local, type, moving_time')
     .is('calories_synced_at', null)
     .order('start_date_local', { ascending: false })
     .limit(limit)
@@ -228,12 +254,19 @@ async function backfillStravaCalories(log: string[], limit: number) {
       continue
     }
     const dj = await resp.json()
-    const calories = (typeof dj.calories === 'number') ? dj.calories : null
+    let calories = (typeof dj.calories === 'number') ? dj.calories : null
     const kilojoules = (typeof dj.kilojoules === 'number') ? dj.kilojoules : null
     const deviceName = dj.device_name || null
 
-    if (calories === null) nullCalories++
-    else detailHits++
+    // MET fallback for phone-only activities
+    if (calories === null && (r as { moving_time?: number }).moving_time && (r as { moving_time?: number }).moving_time! > 0) {
+      calories = estimateCalories((r as { type?: string }).type || '', (r as { moving_time: number }).moving_time, 70)
+      nullCalories++ // count as null-from-Strava (we still backfilled it via estimate)
+    } else if (calories === null) {
+      nullCalories++
+    } else {
+      detailHits++
+    }
 
     await supaAdmin.from('strava_activities').update({
       calories,
@@ -281,6 +314,7 @@ async function syncInstagram(log: string[]) {
   }
 
   // Refresh if < 45 days
+  let daysLeftAfter = daysLeft
   if (isValid && daysLeft < 45 && daysLeft >= 0) {
     const igAppId = await getSecret('ig_app_id')
     const igAppSecret = await getSecret('ig_app_secret')
@@ -293,12 +327,28 @@ async function syncInstagram(log: string[]) {
           igToken = newToken.access_token
           await setSecret('ig_access', igToken)
           log.push('Instagram: ✅ token refreshed')
+          // Re-check days_left on the new token
+          const recheck = await fetch(
+            `https://graph.facebook.com/v21.0/debug_token?input_token=${igToken}&access_token=${igToken}`
+          ).then(r => r.json())
+          if (recheck?.data?.expires_at) {
+            daysLeftAfter = Math.floor((recheck.data.expires_at - Date.now() / 1000) / 86400)
+          }
         }
       } catch (e) {
         log.push(`Instagram: ⚠ refresh failed: ${(e as Error).message}`)
         await sendAlert('IG token refresh FAILED', `Instagram long-lived token has ${daysLeft} days remaining and refresh threw: ${(e as Error).message}. If days_left reaches 0, IG sync + daily proof publish dies. Regenerate manually at https://developers.facebook.com/tools/explorer/ and update ig_access in the secrets table.`)
       }
     }
+  }
+  // Early-warning alert when token isn't being extended properly (FB restriction symptom)
+  // — fires when post-refresh life is still under 7 days. Standard long-lived tokens get 60d back.
+  if (isValid && daysLeftAfter < 7 && daysLeftAfter >= 0) {
+    await sendAlert(
+      `IG token under-extending (${daysLeftAfter}d left)`,
+      `Facebook only granted ${daysLeftAfter}d on the latest IG token refresh — expected 60d. This is usually a symptom of account restriction (App Review pending, content flagged, or rate-limited). Daily proof publish will die in ${daysLeftAfter}d unless cleared. Action: check https://business.facebook.com/business_locked / IG account status, resolve any flags, then trigger ?action=refresh-token again. (Was: ${daysLeft}d before refresh, ${daysLeftAfter}d after.)`
+    )
+    log.push(`Instagram: ⚠ token still only ${daysLeftAfter}d after refresh — FB likely restricting`)
   }
 
   // Pull latest 10 posts
