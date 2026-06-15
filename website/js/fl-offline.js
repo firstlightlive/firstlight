@@ -149,8 +149,16 @@
       <div>Conflicts: <span id="fl-conflicts" style="color:#FF5252">0</span></div>
       <div>Last drain: <span id="fl-last-drain" style="color:#8a9aa8">—</span></div>
       <div style="margin-top:10px;display:flex;gap:6px">
-        <button id="fl-drain-btn" style="flex:1;background:#00D4FF;color:#0A0C10;border:none;padding:6px;border-radius:4px;font:600 9px 'IBM Plex Mono',monospace;letter-spacing:1px;cursor:pointer">DRAIN NOW</button>
-        <button id="fl-clear-btn" style="flex:1;background:transparent;color:#FF5252;border:1px solid rgba(255,82,82,.4);padding:6px;border-radius:4px;font:600 9px 'IBM Plex Mono',monospace;letter-spacing:1px;cursor:pointer">CLEAR LOCAL</button>
+        <button id="fl-drain-btn"     style="flex:1;background:#00D4FF;color:#0A0C10;border:none;padding:6px;border-radius:4px;font:600 9px 'IBM Plex Mono',monospace;letter-spacing:1px;cursor:pointer">DRAIN NOW</button>
+        <button id="fl-inspect-btn"   style="flex:1;background:transparent;color:#F5A623;border:1px solid rgba(245,166,35,.4);padding:6px;border-radius:4px;font:600 9px 'IBM Plex Mono',monospace;letter-spacing:1px;cursor:pointer">VIEW QUEUE</button>
+      </div>
+      <div style="margin-top:6px;display:flex;gap:6px">
+        <button id="fl-prefetch-btn" style="flex:1;background:transparent;color:#00D4FF;border:1px solid rgba(0,212,255,.4);padding:6px;border-radius:4px;font:600 9px 'IBM Plex Mono',monospace;letter-spacing:1px;cursor:pointer">WARM CACHE</button>
+        <button id="fl-clear-btn"    style="flex:1;background:transparent;color:#FF5252;border:1px solid rgba(255,82,82,.4);padding:6px;border-radius:4px;font:600 9px 'IBM Plex Mono',monospace;letter-spacing:1px;cursor:pointer">CLEAR LOCAL</button>
+      </div>
+      <div id="fl-inspector" style="display:none;margin-top:10px;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;max-height:280px;overflow-y:auto">
+        <div style="font-size:8px;letter-spacing:1.5px;color:#8a9aa8;margin-bottom:6px">QUEUE INSPECTOR</div>
+        <div id="fl-inspector-rows" style="display:flex;flex-direction:column;gap:6px"></div>
       </div>
     `;
     document.body.appendChild(panel);
@@ -158,8 +166,145 @@
     panel.querySelector('#fl-dev-id').textContent = DEVICE_ID.slice(0, 8);
     panel.querySelector('#fl-drain-btn').addEventListener('click', drainNow);
     panel.querySelector('#fl-clear-btn').addEventListener('click', clearLocal);
+    panel.querySelector('#fl-prefetch-btn').addEventListener('click', async () => {
+      const btn = panel.querySelector('#fl-prefetch-btn');
+      btn.textContent = '⏳ WARMING...';
+      await prefetchAllTables(true);
+      btn.textContent = '✓ WARMED';
+      setTimeout(() => { btn.textContent = 'WARM CACHE'; }, 1500);
+    });
+    panel.querySelector('#fl-inspect-btn').addEventListener('click', toggleInspector);
 
     return el;
+  }
+
+  // ── QUEUE INSPECTOR ──
+  let _inspectorOpen = false;
+  async function toggleInspector() {
+    _inspectorOpen = !_inspectorOpen;
+    const wrap = document.getElementById('fl-inspector');
+    if (!wrap) return;
+    wrap.style.display = _inspectorOpen ? 'block' : 'none';
+    if (_inspectorOpen) await renderInspector();
+  }
+
+  async function getQueueItems() {
+    return new Promise((res) => {
+      const req = indexedDB.open('fl-sync', 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains('writes')) db.createObjectStore('writes', { keyPath: 'id', autoIncrement: true });
+      };
+      req.onsuccess = () => {
+        try {
+          const db = req.result;
+          const t = db.transaction('writes', 'readonly');
+          const r = t.objectStore('writes').getAll();
+          r.onsuccess = () => res(r.result || []);
+          r.onerror  = () => res([]);
+        } catch (_) { res([]); }
+      };
+      req.onerror = () => res([]);
+    });
+  }
+
+  async function deleteQueueItem(id) {
+    return new Promise((res) => {
+      const req = indexedDB.open('fl-sync', 1);
+      req.onsuccess = () => {
+        try {
+          const db = req.result;
+          const t = db.transaction('writes', 'readwrite');
+          t.objectStore('writes').delete(id);
+          t.oncomplete = () => res(true);
+          t.onerror    = () => res(false);
+        } catch (_) { res(false); }
+      };
+      req.onerror = () => res(false);
+    });
+  }
+
+  async function retryOneItem(item) {
+    try {
+      const resp = await fetch(item.url, { method: item.method, headers: item.headers, body: item.body });
+      if (resp.ok || resp.status === 409) {
+        await deleteQueueItem(item.id);
+        return { ok: true };
+      }
+      return { ok: false, status: resp.status };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  function tableFromUrl(url) {
+    try {
+      const u = new URL(url);
+      const m = u.pathname.match(/\/rest\/v1\/([^?\/]+)/);
+      return m ? m[1] : u.pathname;
+    } catch (_) { return '?'; }
+  }
+  function payloadPreview(body) {
+    if (!body) return '';
+    try {
+      const j = JSON.parse(body);
+      const keys = Object.keys(j).slice(0, 4);
+      return keys.map((k) => k + ':' + String(j[k]).slice(0, 16)).join(' · ');
+    } catch (_) { return String(body).slice(0, 64); }
+  }
+
+  async function renderInspector() {
+    const rows = document.getElementById('fl-inspector-rows');
+    if (!rows) return;
+    const items = await getQueueItems();
+    rows.innerHTML = '';
+    if (!items.length) {
+      rows.innerHTML = '<div style="font-size:9px;color:#8a9aa8;padding:8px;text-align:center">Queue empty</div>';
+      return;
+    }
+    items.slice(0, 50).forEach((it) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'padding:6px 8px;background:rgba(255,255,255,0.03);border-left:2px solid #F5A623;border-radius:4px;font-size:9px;line-height:1.45';
+      const tbl = tableFromUrl(it.url);
+      const age = Math.floor((Date.now() - (it.queued_at || Date.now())) / 1000);
+      const ageStr = age < 60 ? age + 's' : age < 3600 ? Math.floor(age/60) + 'm' : Math.floor(age/3600) + 'h';
+      row.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#00D4FF;font-weight:700">${tbl}</span>
+          <span style="color:#8a9aa8;font-size:8px">${it.method} · ${ageStr}${it.attempts ? ' · ' + it.attempts + ' tries' : ''}</span>
+        </div>
+        <div style="color:#B6BFCB;margin-top:2px;word-break:break-all">${payloadPreview(it.body)}</div>
+        <div style="margin-top:5px;display:flex;gap:5px">
+          <button data-act="retry" data-id="${it.id}" style="flex:1;background:transparent;color:#00E676;border:1px solid rgba(0,230,118,.35);padding:3px;border-radius:3px;font:600 8px 'IBM Plex Mono',monospace;letter-spacing:1px;cursor:pointer">RETRY</button>
+          <button data-act="drop"  data-id="${it.id}" style="flex:1;background:transparent;color:#FF5252;border:1px solid rgba(255,82,82,.35);padding:3px;border-radius:3px;font:600 8px 'IBM Plex Mono',monospace;letter-spacing:1px;cursor:pointer">DISCARD</button>
+        </div>
+      `;
+      rows.appendChild(row);
+    });
+    if (items.length > 50) {
+      const more = document.createElement('div');
+      more.style.cssText = 'font-size:9px;color:#8a9aa8;padding:6px;text-align:center';
+      more.textContent = `+ ${items.length - 50} more not shown`;
+      rows.appendChild(more);
+    }
+    // Wire the per-row actions
+    rows.querySelectorAll('button[data-act]').forEach((b) => {
+      b.addEventListener('click', async () => {
+        const id = parseInt(b.dataset.id, 10);
+        const act = b.dataset.act;
+        b.disabled = true;
+        b.textContent = act === 'retry' ? '⏳' : '✕';
+        if (act === 'drop') {
+          await deleteQueueItem(id);
+        } else {
+          const all = await getQueueItems();
+          const item = all.find((x) => x.id === id);
+          if (item) await retryOneItem(item);
+        }
+        await renderInspector();
+        await refreshStatus();
+      });
+    });
   }
 
   function toggleStatusPanel() {
@@ -286,6 +431,71 @@
     return resp;
   }
 
+  // ── PREFETCH — warm offline cache for all sync tables ──
+  //
+  // SW caches successful GET responses by URL. We prefetch broad queries here so
+  // every module's typical read paths hit cache when offline. Fires on boot (if
+  // online) + every 'online' event + once per hour while online.
+
+  const PREFETCH_QUERIES = [
+    // table, query string, label
+    ['daily_logs',           '?select=*&order=date.desc&limit=120',                       'daily 120d'],
+    ['slips',                '?select=*&order=date.desc&limit=300',                       'slips 300'],
+    ['mastery_log',          '?select=*&order=date.desc&limit=120',                       'mastery 120d'],
+    ['sleep_log',            '?select=*&order=date.desc&limit=120',                       'sleep 120d'],
+    ['proof_archive',        '?select=*&order=date.desc&limit=120',                       'proof 120d'],
+    ['strava_activities',    '?select=*&order=start_date_local.desc&limit=500',           'strava 500'],
+    ['expense_log',          '?select=*&order=date.desc&limit=300',                       'expense 300'],
+    ['income_log',           '?select=*&order=date.desc&limit=200',                       'income 200'],
+    ['investment_log',       '?select=*&order=date.desc&limit=200',                       'investment 200'],
+    ['reading_log',          '?select=*&order=date.desc&limit=200',                       'reading 200'],
+    ['tomorrow_plan',        '?select=*&order=date.desc&limit=60',                        'tomorrow 60d'],
+    ['health_daily',         '?select=*&order=date.desc&limit=120',                       'health 120d'],
+    ['instagram_posts',      '?select=*&order=created_at.desc&limit=100',                 'ig 100'],
+    ['config',               '?select=*',                                                 'config all'],
+    ['finance_budgets',      '?select=*',                                                 'budgets'],
+    ['finance_annual_budgets','?select=*',                                                'annual budgets'],
+    ['finance_networth',     '?select=*&order=date.desc&limit=120',                       'networth 120d'],
+    ['finance_recurring',    '?select=*',                                                 'recurring'],
+    ['finance_fire_config',  '?select=*',                                                 'fire config'],
+  ];
+
+  let _lastPrefetchAt = 0;
+  const PREFETCH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+
+  async function prefetchAllTables(force) {
+    if (!navigator.onLine) return;
+    if (!force && (Date.now() - _lastPrefetchAt) < PREFETCH_INTERVAL_MS) return;
+
+    const SUPA_URL = (window.FL && window.FL.SUPABASE_URL);
+    const SUPA_KEY = (window.FL && window.FL.SUPABASE_ANON_KEY);
+    if (!SUPA_URL || !SUPA_KEY) return;
+
+    _lastPrefetchAt = Date.now();
+    let ok = 0, fail = 0;
+
+    // Run sequentially-ish (3 at a time) so we don't hammer the API.
+    const queue = [...PREFETCH_QUERIES];
+    const CONCURRENCY = 3;
+    async function worker() {
+      while (queue.length) {
+        const [table, qs, label] = queue.shift();
+        const url = `${SUPA_URL}/rest/v1/${table}${qs}`;
+        try {
+          const r = await fetch(url, {
+            headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY },
+          });
+          if (r.ok) ok++; else fail++;
+        } catch (_) { fail++; }
+      }
+    }
+    await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+    console.log(`[FL Prefetch] ${ok} ok · ${fail} fail`);
+    // notify UI
+    const ld = document.getElementById('fl-last-drain');
+    // (we reuse the same field; rename later if we add more granular telemetry)
+  }
+
   // ── REALTIME live sync (when online) ──
   //
   // Subscribes to all sync tables. Other devices' writes land in IDB + emit
@@ -350,11 +560,16 @@
     registerSW();
     refreshStatus();
     setTimeout(startRealtime, 1500);
+    // Warm offline cache once the auth gate has cleared
+    window.addEventListener('fl-unlocked', () => { setTimeout(() => prefetchAllTables(true), 800); });
+    // Also try shortly after boot in case gate is already gone
+    setTimeout(() => prefetchAllTables(false), 2500);
 
     window.addEventListener('online', () => {
       refreshStatus();
       drainNow();
       startRealtime();
+      prefetchAllTables(true);
     });
     window.addEventListener('offline', () => {
       refreshStatus();
@@ -362,7 +577,11 @@
     });
 
     // Periodic light poll — covers iOS Safari which is stingy with online events
-    setInterval(() => { if (navigator.onLine) drainNow(); refreshStatus(); }, 30000);
+    setInterval(() => {
+      if (navigator.onLine) drainNow();
+      refreshStatus();
+      prefetchAllTables(false); // honors PREFETCH_INTERVAL_MS internally
+    }, 30000);
   }
 
   if (document.readyState === 'loading') {
@@ -379,4 +598,5 @@
   window.FL.drainNow = drainNow;
   window.FL.queueSize = queueSize;
   window.FL.refreshStatus = refreshStatus;
+  window.FL.prefetchAll = (force) => prefetchAllTables(!!force);
 })();

@@ -16,6 +16,7 @@
   const SESSION_TTL_MS = 1000 * 60 * 60 * 12; // 12h grace after unlock
   const MAX_ATTEMPTS = 5;
   const LOCKOUT_MS = 1000 * 60 * 5; // 5 min lockout after 5 wrong PINs
+  const DEFAULT_PIN = '2259'; // factory PIN — user can change in Settings
 
   // ── IDB ──
   function openDB() {
@@ -344,9 +345,17 @@
   }
 
   async function runUnlockFlow(gate) {
-    const PIN_LEN = 6;
+    const isDefault = await vGet('pin_is_default');
+    const PIN_LEN = isDefault ? 4 : 6;
     document.getElementById('fl-auth-title').textContent = 'Enter PIN';
-    document.getElementById('fl-auth-sub').textContent = 'Unlock Command Center';
+    document.getElementById('fl-auth-sub').textContent = isDefault
+      ? 'Default PIN active · 4 digits'
+      : 'Unlock Command Center';
+    if (isDefault) {
+      const msg = document.getElementById('fl-setup-msg');
+      msg.style.display = 'block';
+      msg.textContent = 'Using factory PIN 2259. Change it from Settings → Security after you unlock.';
+    }
     const bio = document.getElementById('fl-bio-btn');
     let buf = '';
     renderDots(0, PIN_LEN);
@@ -397,8 +406,18 @@
     );
   }
 
+  // ── auto-seed default PIN on first run so the user can punch immediately.
+  //    They can change it later from Settings (FL.auth.changePin) or wipe via resetAll.
+  async function ensureDefaultPin() {
+    if (await pinIsSet()) return;
+    await setPin(DEFAULT_PIN);
+    await vPut('pin_is_default', true);
+    console.log('[FL Auth] Seeded default PIN (2259). Change it in Settings.');
+  }
+
   // ── boot ──
   async function gate() {
+    await ensureDefaultPin();
     if (hasFreshSession()) return; // recently unlocked, skip
     const wrap = buildGate();
     // Block scroll while gate is up
@@ -412,8 +431,7 @@
     });
     cleanup.observe(document.documentElement, { childList: true, subtree: false });
 
-    if (await pinIsSet()) await runUnlockFlow(wrap);
-    else await runSetupFlow(wrap);
+    await runUnlockFlow(wrap);
   }
 
   // ── public API ──
@@ -421,9 +439,19 @@
   window.FL.auth = {
     lock: () => { sessionStorage.removeItem(SESSION_KEY); location.reload(); },
     isUnlocked: hasFreshSession,
+    isDefaultPin: async () => !!(await vGet('pin_is_default')),
+    changePin: async (newPin) => {
+      if (!/^\d{4,8}$/.test(newPin)) throw new Error('PIN must be 4–8 digits');
+      await setPin(newPin);
+      await vPut('pin_is_default', false);
+      return true;
+    },
+    registerBiometric: biometricRegister,
+    hasBiometric: async () => !!(await vGet('biometric_cred_id')),
     resetAll: async () => {
       if (!confirm('Reset PIN + biometric? You\'ll set them again on next unlock.')) return;
-      await vPut('pin_hash', null); await vPut('pin_salt', null); await vPut('biometric_cred_id', null);
+      await vPut('pin_hash', null); await vPut('pin_salt', null);
+      await vPut('biometric_cred_id', null); await vPut('pin_is_default', null);
       sessionStorage.removeItem(SESSION_KEY);
       location.reload();
     },

@@ -3,7 +3,7 @@
 // Offline shell + Supabase queue/replay
 // ═══════════════════════════════════════════════════════
 
-const SHELL_VERSION = 'fl-shell-v3';
+const SHELL_VERSION = 'fl-shell-v4';
 const SUPA_CACHE   = 'fl-supa-reads-v3';
 const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 
@@ -11,6 +11,7 @@ const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 // shell bump invalidates everything in one shot — no stale-mix risk.
 const SHELL_ASSETS = [
   '/admin.html',
+  '/punch.html',
   '/login.html',
   '/index.html',
   '/styles.css',
