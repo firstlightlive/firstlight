@@ -162,8 +162,10 @@ async function syncStrava(log: string[]) {
     } catch (_e) {
       detailMisses++
     }
-    // MET fallback for phone-only activities where Strava can't compute kcal
-    if (calories === null && a.moving_time > 0) {
+    // MET fallback for phone-only activities where Strava can't compute kcal.
+    // Strava returns null OR 0 for these (the API is inconsistent — both occur).
+    // Treat anything <= 0 as missing and fill from MET formula.
+    if ((calories === null || calories === 0) && a.moving_time > 0) {
       calories = estimateCalories(a.type || '', a.moving_time, 70)
     }
 
@@ -258,9 +260,10 @@ async function backfillStravaCalories(log: string[], limit: number) {
     const kilojoules = (typeof dj.kilojoules === 'number') ? dj.kilojoules : null
     const deviceName = dj.device_name || null
 
-    // MET fallback for phone-only activities
-    if (calories === null && (r as { moving_time?: number }).moving_time && (r as { moving_time?: number }).moving_time! > 0) {
-      calories = estimateCalories((r as { type?: string }).type || '', (r as { moving_time: number }).moving_time, 70)
+    // MET fallback for phone-only activities — null OR 0 means missing
+    const movingTime = (r as { moving_time?: number }).moving_time
+    if ((calories === null || calories === 0) && movingTime && movingTime > 0) {
+      calories = estimateCalories((r as { type?: string }).type || '', movingTime, 70)
       nullCalories++ // count as null-from-Strava (we still backfilled it via estimate)
     } else if (calories === null) {
       nullCalories++
