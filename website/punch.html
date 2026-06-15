@@ -31,6 +31,9 @@
       --inter: 'Inter', sans-serif;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bot: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --col-max: 480px;   /* phone column */
     }
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { background: var(--bg1); color: var(--text); font-family: var(--inter); min-height: 100vh; min-height: 100dvh; }
@@ -38,7 +41,7 @@
 
     /* ── HEADER ── */
     .p-header {
-      max-width: 480px; margin: 0 auto; padding: 0 18px 16px;
+      max-width: var(--col-max); margin: 0 auto; padding: 0 18px 16px;
       display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
     }
     .p-brand {
@@ -69,7 +72,7 @@
 
     /* ── CARDS ── */
     .p-grid {
-      max-width: 480px; margin: 0 auto; padding: 0 14px; display: flex; flex-direction: column; gap: 10px;
+      max-width: var(--col-max); margin: 0 auto; padding: 0 14px; display: flex; flex-direction: column; gap: 10px;
     }
     .p-card {
       background: var(--bg2); border: 1px solid rgba(255,255,255,0.04);
@@ -196,7 +199,7 @@
       z-index: 50;
     }
     .p-cta {
-      max-width: 480px; margin: 0 auto; display: block;
+      max-width: var(--col-max); margin: 0 auto; display: block;
       background: linear-gradient(135deg, var(--cyan), #0099cc);
       color: var(--bg1); border: none; border-radius: 14px;
       padding: 18px; font-family: var(--mono); font-size: 14px; font-weight: 700;
@@ -208,6 +211,42 @@
     .p-cta.success { background: linear-gradient(135deg, var(--green), #00B85C); box-shadow: 0 8px 24px rgba(0,230,118,0.3); }
     .p-cta.error   { background: linear-gradient(135deg, var(--red), #C44545); box-shadow: 0 8px 24px rgba(255,82,82,0.3); }
     .p-cta-status { display: block; font-size: 9px; color: var(--text-muted); text-align: center; margin-top: 6px; font-family: var(--mono); letter-spacing: 1.5px; min-height: 12px; }
+
+    /* ── RESPONSIVE: iPhone SE 320–375, normal iPhones 393–430, iPad Mini 744+, iPad/desktop 1024+ ── */
+
+    /* Very narrow (iPhone SE landscape, old Android) — tighten gaps so 3-col stat rows don't wrap */
+    @media (max-width: 360px) {
+      .p-grid { padding: 0 10px; gap: 8px; }
+      .p-card { padding: 12px; }
+      .p-fields-3 { gap: 6px; }
+      .p-field input { font-size: 16px; padding: 9px; } /* 16px prevents iOS auto-zoom-in on focus */
+      .p-mast-count { font-size: 28px; }
+      .p-day { font-size: 24px; }
+    }
+
+    /* Phone landscape + small tablet portrait — widen the column a bit so cards don't feel cramped */
+    @media (min-width: 600px) {
+      :root { --col-max: 560px; }
+      .p-fields-3 { gap: 12px; }
+      .p-field input { font-size: 19px; }
+    }
+
+    /* iPad / desktop — 2-column on roomy screens so sleep+food / brahma+mastery sit side by side */
+    @media (min-width: 900px) {
+      :root { --col-max: 880px; }
+      .p-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+      .p-card:nth-child(1) { grid-column: 1 / -1; }      /* RUN spans full width — biggest card */
+      .p-card:nth-child(7) { grid-column: 1 / -1; }      /* SLIPS spans full width */
+      .p-cta-wrap > .p-cta { max-width: 600px; }
+    }
+
+    /* Very wide desktop — cap so we don't sprawl */
+    @media (min-width: 1400px) {
+      :root { --col-max: 960px; }
+    }
+
+    /* iOS standalone (installed PWA) safe-area-right when notch sticks out on landscape */
+    body { padding-left: var(--safe-left); padding-right: var(--safe-right); }
   </style>
 </head>
 <body>

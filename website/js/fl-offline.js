@@ -119,13 +119,17 @@
     el = document.createElement('div');
     el.id = 'fl-sync-status';
     el.style.cssText = `
-      position:fixed;top:14px;right:14px;z-index:9999;
+      position:fixed;
+      top:calc(14px + env(safe-area-inset-top, 0px));
+      right:calc(14px + env(safe-area-inset-right, 0px));
+      z-index:9999;
       font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.2px;
       padding:6px 10px;border-radius:14px;cursor:pointer;user-select:none;
       background:rgba(0,212,255,0.10);border:1px solid rgba(0,212,255,0.3);color:#00D4FF;
       backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
       box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:all .25s ease;
       -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+      min-height:32px;display:inline-flex;align-items:center;
     `;
     el.innerHTML = '<span id="fl-sync-dot">●</span> <span id="fl-sync-text">ONLINE · SYNCED</span>';
     el.addEventListener('click', toggleStatusPanel);
@@ -135,8 +139,14 @@
     const panel = document.createElement('div');
     panel.id = 'fl-sync-panel';
     panel.style.cssText = `
-      position:fixed;top:46px;right:14px;z-index:9998;
-      width:260px;padding:12px;border-radius:10px;
+      position:fixed;
+      top:calc(54px + env(safe-area-inset-top, 0px));
+      right:calc(14px + env(safe-area-inset-right, 0px));
+      z-index:9998;
+      width:min(260px, calc(100vw - 28px - env(safe-area-inset-right, 0px) - env(safe-area-inset-left, 0px)));
+      max-height:calc(100vh - 80px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+      overflow-y:auto;
+      padding:12px;border-radius:10px;
       background:#0F1218;border:1px solid rgba(0,212,255,0.18);color:#F0EDE5;
       font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.6;
       box-shadow:0 8px 32px rgba(0,0,0,0.5);
