@@ -260,7 +260,8 @@
       <div class="p-date" id="p-date">—</div>
     </div>
     <div class="p-menu">
-      <a href="/admin.html">CC →</a>
+      <a href="/install.html" id="p-install" style="display:none">INSTALL</a>
+      <a href="/admin.html">CC</a>
       <a id="p-lock">LOCK</a>
     </div>
   </header>
@@ -409,6 +410,13 @@
     document.getElementById('p-lock').addEventListener('click', () => {
       if (window.FL && FL.auth) FL.auth.lock();
     });
+
+    // Show INSTALL link only when NOT running as standalone PWA
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (!isStandalone) {
+      const installEl = document.getElementById('p-install');
+      if (installEl) installEl.style.display = 'inline-flex';
+    }
 
     // ── localStorage scratch — survives reload while you punch ──
     const SCRATCH_KEY = 'fl_punch_' + TODAY;

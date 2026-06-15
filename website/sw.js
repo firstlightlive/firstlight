@@ -3,7 +3,7 @@
 // Offline shell + Supabase queue/replay
 // ═══════════════════════════════════════════════════════
 
-const SHELL_VERSION = 'fl-shell-v4';
+const SHELL_VERSION = 'fl-shell-v5';
 const SUPA_CACHE   = 'fl-supa-reads-v3';
 const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 
@@ -12,6 +12,7 @@ const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 const SHELL_ASSETS = [
   '/admin.html',
   '/punch.html',
+  '/install.html',
   '/login.html',
   '/index.html',
   '/styles.css',
