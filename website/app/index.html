@@ -1824,6 +1824,13 @@ function _localDateStr(){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
+// Parse Strava start_date_local as local time (strips the misleading +00:00 suffix).
+// Reference impl lives in website/strava.html — keep these two in sync.
+function parseLocal(dateStr){
+  if(!dateStr) return new Date();
+  return new Date(dateStr.replace(/[+-]\d{2}:\d{2}$/, ''));
+}
+
 async function pullStravaLive(){
   var kmEl=document.getElementById('stravaLiveKm');
   var lblEl=document.getElementById('stravaLiveLabel');
@@ -1878,9 +1885,9 @@ async function pullStravaLive(){
       var mnF=document.getElementById('min')||document.getElementById('tmin');if(mnF&&!mnF.value)mnF.value=lmin;
       var bpmF=document.getElementById('bpm');if(bpmF&&!bpmF.value&&lbpm)bpmF.value=lbpm;
       var kcF=document.getElementById('kcal');if(kcF&&!kcF.value&&lkcal)kcF.value=lkcal;
-      // Workout start/end times
+      // Workout start/end times — parseLocal so the +00:00 suffix isn't misread as UTC
       if(latest.start_date_local){
-        var st=new Date(latest.start_date_local);
+        var st=parseLocal(latest.start_date_local);
         var startTime=String(st.getHours()).padStart(2,'0')+':'+String(st.getMinutes()).padStart(2,'0');
         var wS=document.getElementById('workoutStart');if(wS&&!wS.value)wS.value=startTime;
         var endMs=st.getTime()+(latest.elapsed_time||latest.moving_time||0)*1000;
@@ -1913,7 +1920,7 @@ async function pullStravaLive(){
     if(latest){
       document.getElementById('stravaLatestWrap').style.display='block';
       document.getElementById('stravaLatestName').textContent=latest.name||'Activity';
-      var d=new Date(latest.start_date_local);
+      var d=parseLocal(latest.start_date_local);
       document.getElementById('stravaLatestDate').textContent=d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getFullYear()+' · '+(latest.type||'');
       var dist=(parseFloat(latest.distance||0)/1000).toFixed(2);
       var mins=Math.round((latest.moving_time||0)/60);

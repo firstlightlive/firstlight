@@ -7,6 +7,12 @@
 (function () {
   'use strict';
 
+  // Parse Strava start_date_local as local time (strips +00:00 suffix that Date misreads as UTC)
+  function parseLocal(s) {
+    if (!s) return new Date();
+    return new Date(s.replace(/[+-]\d{2}:\d{2}$/, ''));
+  }
+
   // ── Wait for DOM + libs ──
   document.addEventListener('DOMContentLoaded', init);
 
@@ -581,7 +587,7 @@
         var dur = a.moving_time || 0;
         totalSec += dur;
 
-        var d = new Date(a.start_date_local);
+        var d = parseLocal(a.start_date_local);
         var di = d.getDay(); // 0=Sun
         var barIdx = di === 0 ? 6 : di - 1;
         dayBars[barIdx] += dur / 60; // minutes
@@ -1160,7 +1166,7 @@
       var cal = a.calories ? Math.round(a.calories) : null;
       var timeStr = '';
       if (a.start_date_local) {
-        var d = new Date(a.start_date_local);
+        var d = parseLocal(a.start_date_local);
         var h = d.getHours(); var m = d.getMinutes();
         var period = h < 12 ? 'AM' : 'PM';
         var h12 = h % 12 || 12;
