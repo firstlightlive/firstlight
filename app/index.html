@@ -732,6 +732,13 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
         <div style="font-family:'Rajdhani',sans-serif;font-size:48px;font-weight:900;color:#FC4C02;line-height:1" id="stravaLiveKm">— KM</div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--smoke);letter-spacing:1px;margin-top:4px" id="stravaLiveLabel">TAP TO PULL FROM STRAVA</div>
       </div>
+      <!-- Month-to-date stats — uploaded screenshot ALWAYS wins over Live Pull (photo > API) -->
+      <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div class="stat-wrap"><div class="stat-lbl">RUNS · MTD</div><input type="text" class="stat-in" id="sActs" placeholder="—" inputmode="numeric" style="border-color:rgba(252,76,2,0.25)"><div class="stat-unit">ACTIVITIES</div></div>
+        <div class="stat-wrap"><div class="stat-lbl">DISTANCE</div><input type="text" class="stat-in" id="sDist" placeholder="—" inputmode="decimal" style="border-color:rgba(252,76,2,0.25)"><div class="stat-unit">KM</div></div>
+        <div class="stat-wrap"><div class="stat-lbl">TIME</div><input type="text" class="stat-in" id="sTime" placeholder="—" inputmode="text" style="border-color:rgba(252,76,2,0.25)"><div class="stat-unit">HRS</div></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--ash);margin-top:6px;text-align:center;letter-spacing:0.5px">📸 PHOTO &gt; 🟠 API · UPLOAD A STRAVA / GARMIN / APPLE WATCH SCREENSHOT AND IT WINS</div>
       <!-- Latest Activity -->
       <div id="stravaLatestWrap" style="display:none;margin-top:12px">
         <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--smoke);letter-spacing:2px;margin-bottom:8px">LATEST ACTIVITY</div>
@@ -1885,6 +1892,21 @@ async function pullStravaLive(){
     }else{
       statusEl.textContent='No run/walk today yet — showing all-time total';statusEl.style.color='var(--ash)';
     }
+    // Month-to-date Strava totals — fill ONLY if empty (uploaded screenshot has precedence)
+    try{
+      var _ymPrefix=today.substring(0,7); // "YYYY-MM"
+      var _monthRuns=acts.filter(function(a){return a.start_date_local&&a.start_date_local.startsWith(_ymPrefix)&&a.type==='Run';});
+      if(_monthRuns.length){
+        var _mActs=_monthRuns.length;
+        var _mKm=(_monthRuns.reduce(function(s,a){return s+parseFloat(a.distance||0);},0)/1000).toFixed(1);
+        var _mSec=_monthRuns.reduce(function(s,a){return s+(a.moving_time||0);},0);
+        var _mHrs=Math.floor(_mSec/3600),_mMin=Math.floor((_mSec%3600)/60);
+        var _mTimeStr=_mHrs+'h '+_mMin+'m';
+        var _sA=document.getElementById('sActs');if(_sA&&!_sA.value.trim())_sA.value=String(_mActs);
+        var _sD=document.getElementById('sDist');if(_sD&&!_sD.value.trim())_sD.value=_mKm;
+        var _sT=document.getElementById('sTime');if(_sT&&!_sT.value.trim())_sT.value=_mTimeStr;
+      }
+    }catch(_me){console.warn('[STRAVA] MTD calc failed:',_me.message);}
     // Latest activity card — ONLY Run (no workout, no walk, no ride)
     var latest=acts.find(function(a){return a.type==='Run';});
     if(latest){
@@ -3103,13 +3125,43 @@ async function runAiScan(){
 }
 
 async function _callVisionApi(key,dataUrls){
-  const prompt=`You are reading fitness tracking screenshots from an Apple Watch runner who trains before 6AM daily.
-Examine ALL images provided. Each may be: Apple Watch run summary, iOS sleep tracker, Strava monthly stats, gym selfie with clock, weather screen, or unknown.
-Return ONLY valid JSON — no markdown, no explanation, no extra text:
+  const prompt=`You are reading fitness tracking screenshots from a runner who trains before 6 AM daily. The screenshots can come from ANY device or app:
+  · Apple Watch Workout summary (Fitness app)
+  · Garmin Connect activity detail (Fenix / Forerunner / Venu)
+  · Strava activity detail (single run) OR Strava monthly stats (You / Profile / Training calendar)
+  · COROS, Polar, Suunto, Samsung Health, Fitbit, Whoop, Oura — any GPS/fitness app
+  · iOS / Android sleep tracker, gym selfie with clock, weather screen
+
+Examine ALL images provided. Return ONLY valid JSON — no markdown, no explanation, no extra text:
 {"imageTypes":["run","sleep","gym","strava","weather","other"],"run":{"km":null,"min":null,"kcal":null,"heartRate":null,"startTime":null,"endTime":null},"sleep":{"hours":null,"bedtime":null,"wakeTime":null},"weather":{"condition":null,"tempC":null},"strava":{"monthKm":null,"monthRuns":null,"runKm":null,"runActivities":null,"runTime":null,"ytdKm":null,"longestRun":null},"workout":{"steps":null,"standHours":null,"exerciseMin":null}}
-Rules: imageTypes must have exactly one entry per image (in order). All numeric values as strings without units. Times in 24h HH:MM format. Use null for any field not clearly visible in the images.
-CRITICAL for Apple Watch run screenshots: startTime and endTime are ESSENTIAL. Look for the time range displayed on the workout summary card (e.g. "4:48 AM - 5:30 AM" or "Start 4:48" / "End 5:30"). Convert to 24h format (4:48 AM = "04:48", 5:30 PM = "17:30"). Check the top of the workout card, the summary row, or the detail fields. These times MUST be extracted if visible.
-For Strava screenshots: if multiple activity types are shown (Run/Walk/Cycle), extract from the RUN breakdown section into runKm/runActivities/runTime (e.g. "59.1","14","8h 25m"); use overall totals for monthKm/monthRuns.`;
+
+Type rules — pick ONE per image:
+· "run"    → any SINGLE workout summary (Apple Watch, Garmin Connect activity, Strava activity detail, COROS, Polar, Fitbit, etc.) → fill data.run
+· "strava" → Strava MONTHLY / AGGREGATE stats view (Profile, You tab, Training calendar with month totals) → fill data.strava
+· "sleep"  → sleep tracker → fill data.sleep
+· "weather"→ weather widget → fill data.weather
+· "gym"    → gym selfie / mirror shot → no extraction needed
+· "other"  → anything else
+
+Format rules — apply to EVERY extracted value:
+· Numbers as strings without units ("5.12", not "5.12 km", not 5.12).
+· Distance: convert miles → km (1 mi = 1.609 km). Always return km.
+· Duration single run: total minutes as integer ("42").
+· Duration monthly aggregate: original format preserved ("8h 25m").
+· Times: 24h HH:MM ("04:48", "17:30"). 4:48 AM → "04:48".
+· null for any field NOT clearly visible. NEVER guess.
+
+CRITICAL for SINGLE-RUN screenshots (Apple Watch / Garmin / Strava activity):
+· run.startTime and run.endTime — look for the time range on the card (e.g. "4:48 AM - 5:30 AM", "Start 4:48 / End 5:30", "5:14 AM" near a duration). Garmin Connect shows it under the title; Apple Watch shows it at the top; Strava shows it as "Today at 5:14 AM" or in the Details tab.
+· run.heartRate — "Avg HR", "Avg Heart Rate", or the heart icon number.
+· run.kcal — "Active Cal", "Calories", "kcal", or the flame icon number.
+
+CRITICAL for Strava MONTHLY screenshots:
+· If breakdowns by sport are shown (Run / Walk / Ride), prefer the RUN row into runKm / runActivities / runTime ("59.1","14","8h 25m").
+· Overall month totals → monthKm / monthRuns.
+· Year-to-date if visible → ytdKm. Longest run → longestRun.
+
+imageTypes array must have EXACTLY one entry per uploaded image, in the same order they were sent.`;
 
   const isGemini=key.startsWith('AIza');
   const isAnthropic=key.startsWith('sk-ant');
@@ -3151,6 +3203,7 @@ function _autoAssignPhotos(types){
     if(t==='run')_loadAiImg(f.dataUrl,'d1','i1');
     else if(t==='gym')_loadAiImg(f.dataUrl,'d2','i2');
     else if(t==='sleep')_loadAiImg(f.dataUrl,'d3','i3');
+    else if(t==='strava')_loadAiImg(f.dataUrl,'dS','iS'); // no dS in DOM — _loadAiImg gracefully skips UI; iS still flows into the reel's Strava scene
   });
 }
 
