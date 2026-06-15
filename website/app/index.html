@@ -9921,12 +9921,12 @@ async function generateReel(){
  c.fillText('WALLET SAFE.',W/2,H*0.40);
  c.fillText('FOR NOW.',W/2,H*0.40+105);
  c.shadowBlur=0;c.restore();
- // "FOLLOW TO CLAIM THE ₹15k IF I QUIT"
+ // "FOLLOW THE JOURNEY"
  if(pt>0.20){
  const _ugSA=easeOut(Math.min((pt-0.20)/0.22,1));
  c.save();c.globalAlpha=_ugSA*0.82;c.textAlign='center';
  c.font='600 24px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.72)';
- c.fillText('FOLLOW TO CLAIM THE ₹15k IF I QUIT',W/2,H*0.56);c.restore();
+ c.fillText('FOLLOW THE JOURNEY',W/2,H*0.56);c.restore();
  }
  // DAY badge — top left
  const _ugDA=easeOut(Math.min(pt*8,1));
