@@ -110,8 +110,39 @@ async function syncStrava(log: string[]) {
   log.push(`Strava: found ${activities.length} recent activities`)
 
   let synced = 0
+  let detailHits = 0, detailMisses = 0
   for (const a of activities) {
-    const row = {
+    // ─── DETAIL FETCH ─────────────────────────────────────────────
+    // Strava's list endpoint returns SummaryActivity which omits calories,
+    // kilojoules, device_name, splits, etc. Detail endpoint /activities/{id}
+    // returns DetailedActivity with those fields. One extra call per activity.
+    // Strava limit: 100 calls / 15 min, 1000 / day. Sync runs 5 new acts/day
+    // worst case → 5 extra calls. Well under cap.
+    let calories: number | null = null
+    let kilojoules: number | null = null
+    let deviceName: string | null = null
+    try {
+      const det = await fetch(`https://www.strava.com/api/v3/activities/${a.id}`, {
+        headers: { 'Authorization': `Bearer ${tokenResp.access_token}` }
+      })
+      if (det.ok) {
+        const dj = await det.json()
+        calories   = (typeof dj.calories === 'number') ? dj.calories : null
+        kilojoules = (typeof dj.kilojoules === 'number') ? dj.kilojoules : null
+        deviceName = dj.device_name || null
+        detailHits++
+      } else if (det.status === 429) {
+        log.push('Strava: rate-limited on detail fetch, skipping rest')
+        // fall through and continue with summary-only row
+        detailMisses++
+      } else {
+        detailMisses++
+      }
+    } catch (_e) {
+      detailMisses++
+    }
+
+    const row: Record<string, unknown> = {
       id: a.id, name: a.name || '', type: a.type || '',
       sport_type: a.sport_type || a.type || '',
       distance: (a.distance || 0).toFixed(2),
@@ -124,14 +155,99 @@ async function syncStrava(log: string[]) {
       max_speed: a.max_speed ? a.max_speed.toFixed(3) : null,
       average_heartrate: a.average_heartrate || null,
       max_heartrate: a.max_heartrate || null,
-      calories: a.calories || null,
+      calories,            // ← now from detail endpoint
+      kilojoules,          // ← new: ride power, null for non-rides
+      device_name: deviceName, // ← new: e.g. "Apple Watch Series 7", "Garmin Fenix 8"
+      calories_synced_at: calories !== null ? new Date().toISOString() : null,
       suffer_score: a.suffer_score || null,
       pr_count: a.pr_count || 0,
       summary_polyline: a.map ? a.map.summary_polyline : null
     }
     try { await supaUpsert('strava_activities', row, 'id'); synced++ } catch (_e) { /* skip */ }
   }
-  log.push(`Strava: ${synced}/${activities.length} synced`)
+  log.push(`Strava: ${synced}/${activities.length} synced (detail: ${detailHits} hits, ${detailMisses} misses)`)
+}
+
+// ═══════════════════════════════════════════
+// STRAVA CALORIES BACKFILL — one batch per invocation
+// ═══════════════════════════════════════════
+// Operates on rows where calories_synced_at IS NULL, ordered by recency.
+// Caller (a local loop script) keeps calling until { remaining: 0 } returns.
+// Rate-limit aware: stops early on 429 so the caller can sleep 15 min and retry.
+async function backfillStravaCalories(log: string[], limit: number) {
+  log.push(`Backfill: starting (limit ${limit})...`)
+
+  const refreshToken = await getSecret('strava_refresh')
+  const clientId = await getSecret('strava_client_id')
+  const clientSecret = await getSecret('strava_client_secret')
+  if (!refreshToken || !clientId || !clientSecret) { log.push('Backfill: missing Strava credentials'); return { processed: 0, remaining: -1, rateLimited: false } }
+
+  // Refresh token (same pattern as sync)
+  const tokenResp = await fetch('https://www.strava.com/oauth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `client_id=${clientId}&client_secret=${clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`
+  }).then(r => r.json())
+  if (!tokenResp.access_token) { log.push('Backfill: token refresh failed'); return { processed: 0, remaining: -1, rateLimited: false } }
+  await setSecret('strava_access', tokenResp.access_token)
+  await setSecret('strava_refresh', tokenResp.refresh_token)
+
+  // Count remaining first (so caller knows when to stop)
+  const { count: totalRemaining } = await supaAdmin
+    .from('strava_activities')
+    .select('id', { count: 'exact', head: true })
+    .is('calories_synced_at', null)
+
+  // Get next batch — newest first so today's runs get fixed first if missed
+  const { data: rows, error } = await supaAdmin
+    .from('strava_activities')
+    .select('id, name, start_date_local')
+    .is('calories_synced_at', null)
+    .order('start_date_local', { ascending: false })
+    .limit(limit)
+  if (error) { log.push(`Backfill: query error ${error.message}`); return { processed: 0, remaining: totalRemaining ?? -1, rateLimited: false } }
+  if (!rows || rows.length === 0) { log.push('Backfill: nothing to do'); return { processed: 0, remaining: 0, rateLimited: false } }
+
+  let processed = 0
+  let rateLimited = false
+  let detailHits = 0
+  let nullCalories = 0
+  for (const r of rows) {
+    const resp = await fetch(`https://www.strava.com/api/v3/activities/${r.id}`, {
+      headers: { 'Authorization': `Bearer ${tokenResp.access_token}` }
+    })
+    if (resp.status === 429) {
+      rateLimited = true
+      log.push(`Backfill: 429 after ${processed} rows; caller must wait 15min`)
+      break
+    }
+    if (!resp.ok) {
+      // Mark synced_at anyway so we don't keep retrying a broken id (e.g. deleted on Strava)
+      await supaAdmin.from('strava_activities').update({ calories_synced_at: new Date().toISOString() }).eq('id', r.id)
+      processed++
+      continue
+    }
+    const dj = await resp.json()
+    const calories = (typeof dj.calories === 'number') ? dj.calories : null
+    const kilojoules = (typeof dj.kilojoules === 'number') ? dj.kilojoules : null
+    const deviceName = dj.device_name || null
+
+    if (calories === null) nullCalories++
+    else detailHits++
+
+    await supaAdmin.from('strava_activities').update({
+      calories,
+      kilojoules,
+      device_name: deviceName,
+      calories_synced_at: new Date().toISOString(),
+    }).eq('id', r.id)
+
+    processed++
+  }
+
+  const newRemaining = (totalRemaining ?? 0) - processed
+  log.push(`Backfill: processed=${processed} hits=${detailHits} nullCals=${nullCalories} remaining≈${newRemaining}${rateLimited ? ' (rate-limited)' : ''}`)
+  return { processed, remaining: newRemaining, rateLimited, hits: detailHits, nullCalories }
 }
 
 // ═══════════════════════════════════════════
@@ -1111,6 +1227,13 @@ Deno.serve(async (req) => {
 
     if (action === 'refresh-token') {
       await syncInstagram(log)
+    }
+
+    if (action === 'backfill-strava-calories') {
+      const limit = parseInt(url.searchParams.get('limit') || '90', 10)
+      const result = await backfillStravaCalories(log, Math.min(Math.max(limit, 1), 100))
+      const duration = Date.now() - startTime
+      return new Response(JSON.stringify({ success: true, duration, log, ...result }), { headers })
     }
 
     const duration = Date.now() - startTime
