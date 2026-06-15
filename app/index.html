@@ -1863,9 +1863,10 @@ async function pullStravaLive(){
     kmEl.textContent=Math.round(totalKm)+' KM';
     lblEl.textContent=acts.length+' ACTIVITIES · STRAVA SYNCED';
     box.style.borderStyle='solid';box.style.borderColor='rgba(252,76,2,0.5)';box.style.background='rgba(252,76,2,0.05)';
-    // Auto-fill km/min fields from today's latest run
+    // Auto-fill km/min fields from today's latest run OR walk
     var today=_localDateStr();
-    var todayRuns=acts.filter(function(a){return a.start_date_local&&a.start_date_local.startsWith(today)&&a.type==='Run';});
+    var _RW=function(t){return t==='Run'||t==='Walk';};
+    var todayRuns=acts.filter(function(a){return a.start_date_local&&a.start_date_local.startsWith(today)&&_RW(a.type);});
     if(todayRuns.length>0){
       var latest=todayRuns[0];
       var lkm=(parseFloat(latest.distance||0)/1000).toFixed(2);
@@ -1895,7 +1896,7 @@ async function pullStravaLive(){
     // Month-to-date Strava totals — fill ONLY if empty (uploaded screenshot has precedence)
     try{
       var _ymPrefix=today.substring(0,7); // "YYYY-MM"
-      var _monthRuns=acts.filter(function(a){return a.start_date_local&&a.start_date_local.startsWith(_ymPrefix)&&a.type==='Run';});
+      var _monthRuns=acts.filter(function(a){return a.start_date_local&&a.start_date_local.startsWith(_ymPrefix)&&_RW(a.type);});
       if(_monthRuns.length){
         var _mActs=_monthRuns.length;
         var _mKm=(_monthRuns.reduce(function(s,a){return s+parseFloat(a.distance||0);},0)/1000).toFixed(1);
@@ -1907,8 +1908,8 @@ async function pullStravaLive(){
         var _sT=document.getElementById('sTime');if(_sT&&!_sT.value.trim())_sT.value=_mTimeStr;
       }
     }catch(_me){console.warn('[STRAVA] MTD calc failed:',_me.message);}
-    // Latest activity card — ONLY Run (no workout, no walk, no ride)
-    var latest=acts.find(function(a){return a.type==='Run';});
+    // Latest activity card — Run or Walk (no workout, no ride, no swim)
+    var latest=acts.find(function(a){return _RW(a.type);});
     if(latest){
       document.getElementById('stravaLatestWrap').style.display='block';
       document.getElementById('stravaLatestName').textContent=latest.name||'Activity';
@@ -1963,7 +1964,7 @@ function onStravaMapImgToggle(){
   if(!mapC)return;
   // Re-render Strava polyline if cached
   if(_stravaCache){
-    var run=_stravaCache.find(function(a){return a.type==='Run'&&a.summary_polyline;});
+    var run=_stravaCache.find(function(a){return (a.type==='Run'||a.type==='Walk')&&a.summary_polyline;});
     if(run)_renderPolylineCanvas(mapC,run.summary_polyline,mapC.offsetWidth||340,200);
   }
 }
@@ -2519,8 +2520,8 @@ function drawHeatmapPanels(c,W,H,stravaImg,stravaStats){
     _runMapImg.src=iM;
     _mapDrawn=true;
   }else if(_stravaCache&&_stravaCache.length>0){
-    var latestAct=_stravaCache.find(function(a){return a.type==='Run';});
-    var poly=latestAct.summary_polyline;
+    var latestAct=_stravaCache.find(function(a){return a.type==='Run'||a.type==='Walk';});
+    var poly=latestAct&&latestAct.summary_polyline;
     if(poly){
       var usePoly=poly.length>1500?_simplifyPolyline(poly):poly;
       var enc=encodeURIComponent(usePoly);
@@ -3975,7 +3976,7 @@ Return ONLY the caption text.`;
 // ═══ SHARED POST HELPERS (proof-first redesign · Chapter 02) ═══
 function _postLatestPolyline(){
   var sc=null;try{sc=_stravaCache;}catch(e){}if(!sc||!Array.isArray(sc))return null;
-  var r=_stravaCache.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});
+  var r=_stravaCache.find(function(a){return a&&(a.type==='Run'||a.type==='Walk')&&a.summary_polyline;});
   return r?r.summary_polyline:null;
 }
 function _postMapImgUrl(poly,w,h,accentHex){
@@ -4069,7 +4070,7 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
   // Photo source (Layer 2 module — turns on if any photo uploaded)
   const photoSrc=(typeof iT!=='undefined'&&iT)?iT:(typeof i1!=='undefined'&&i1)?i1:(typeof i2!=='undefined'&&i2)?i2:null;
   // Polyline (Layer 1 — always tries)
-  const poly=(function(){try{if(_stravaCache&&Array.isArray(_stravaCache)){var r=_stravaCache.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});if(r)return r.summary_polyline;}}catch(e){}return null;})();
+  const poly=(function(){try{if(_stravaCache&&Array.isArray(_stravaCache)){var r=_stravaCache.find(function(a){return a&&(a.type==='Run'||a.type==='Walk')&&a.summary_polyline;});if(r)return r.summary_polyline;}}catch(e){}return null;})();
 
   function fmt12local(t){if(!t)return'';var p=t.split(':');var h=+p[0],m=+p[1];return(h%12||12)+':'+String(m).padStart(2,'0')+' '+(h>=12?'PM':'AM');}
   function fmtPace(){if(!km||!mn)return'—';var p=parseFloat(mn)/parseFloat(km);if(!p||!isFinite(p))return'—';return Math.floor(p)+"'"+String(Math.round((p%1)*60)).padStart(2,'0')+'"';}
@@ -4264,7 +4265,7 @@ function slide2(day,km,mn,kc,loc,total,handleIG,handleX,wStart,wEnd,bpmVal,strav
   const W=1080,H=1350;
   const dn=parseInt(day)||1;
   const photoSrc=(typeof iT!=='undefined'&&iT)?iT:(typeof i1!=='undefined'&&i1)?i1:(typeof i2!=='undefined'&&i2)?i2:null;
-  const poly=(function(){try{if(_stravaCache&&Array.isArray(_stravaCache)){var r=_stravaCache.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});if(r)return r.summary_polyline;}}catch(e){}return null;})();
+  const poly=(function(){try{if(_stravaCache&&Array.isArray(_stravaCache)){var r=_stravaCache.find(function(a){return a&&(a.type==='Run'||a.type==='Walk')&&a.summary_polyline;});if(r)return r.summary_polyline;}}catch(e){}return null;})();
 
   function _polyPts(s){if(!s)return[];if(typeof _decodePolyline==='function')return _decodePolyline(s);var idx=0,lat=0,lng=0,pts=[];while(idx<s.length){var b,sh=0,r=0;do{b=s.charCodeAt(idx++)-63;r|=(b&0x1f)<<sh;sh+=5;}while(b>=0x20);lat+=(r&1)?~(r>>1):(r>>1);sh=0;r=0;do{b=s.charCodeAt(idx++)-63;r|=(b&0x1f)<<sh;sh+=5;}while(b>=0x20);lng+=(r&1)?~(r>>1):(r>>1);pts.push([lat/1e5,lng/1e5]);}return pts;}
   function drawPath(poly,bx,by,bw,bh,style,lineW,alpha,glow){
@@ -5831,7 +5832,7 @@ function genStoryTemplate(idx){
   function _latestPolyline(){
     var sc=null;try{sc=_stravaCache;}catch(e){}
     if(!sc||!Array.isArray(sc))return null;
-    var r=sc.find(function(a){return a&&a.type==='Run'&&a.summary_polyline;});
+    var r=sc.find(function(a){return a&&(a.type==='Run'||a.type==='Walk')&&a.summary_polyline;});
     return r?r.summary_polyline:null;
   }
   function _coverDraw(img,x,y,w,h){
@@ -6233,7 +6234,7 @@ function genStoryTemplate(idx){
       bg();
       _brandTop();
       var sc=null;try{sc=_stravaCache;}catch(e){}
-      var allRuns=(sc&&Array.isArray(sc))?sc.filter(function(a){return a&&a.type==='Run'&&a.summary_polyline;}):[];
+      var allRuns=(sc&&Array.isArray(sc))?sc.filter(function(a){return a&&(a.type==='Run'||a.type==='Walk')&&a.summary_polyline;}):[];
       var todayPoly=allRuns.length?allRuns[0].summary_polyline:null;
       var bx=60,by=200,bw=W-120,bh=H*0.55;
       // faint background runs
