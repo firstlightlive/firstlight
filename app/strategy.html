@@ -871,7 +871,7 @@ const HOOKS = [
  // Shocking Stat hooks (rotate by day)
  { type: 'SHOCKING STAT', text: '3.8 hours of sleep. 5K run. Before the sun came up.' },
  { type: 'SHOCKING STAT', text: 'Day {DAY}. Zero alarms snoozed. Rs. {COMMITMENT} on the line.' },
- { type: 'SHOCKING STAT', text: '{DAY} days. {DAY} runs. Rs. {UNCLAIMED} defended.' },
+ { type: 'SHOCKING STAT', text: '{DAY} days. {DAY} runs. 0 misses on record.' },
  { type: 'SHOCKING STAT', text: 'Woke up at 3:30 AM. Again. Day {DAY} of not quitting.' },
  // Bold Claim hooks
  { type: 'BOLD CLAIM', text: 'Day {DAY}. Zero misses. Rs. {COMMITMENT} stays mine.' },
@@ -1491,7 +1491,7 @@ function updateBio() {
  const bio = document.getElementById('bioPreview');
  bio.innerHTML = `
  <span class="bio-line gold">Miss 1 day = &#8377;${formatIndianCurrency(stake)} to a follower. Cash.</span>
- <span class="bio-line mint">${dayNum} days. 0 misses. &#8377;${formatIndianCurrency(unclaimed)} defended.</span>
+ <span class="bio-line mint">${dayNum} days. 0 misses on record.</span>
  <span class="bio-line">Run + Gym + Food Code. Before 6AM. Daily.</span>
  <span class="bio-line" style="color:var(--smoke)">BLR | Every day verified public.</span>
  `;

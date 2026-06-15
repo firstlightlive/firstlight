@@ -1047,7 +1047,7 @@ ${stats ? `<p style="font-family:'Courier New',monospace;font-size:14px;color:rg
 <p style="margin-top:24px">commitment stays mine. Streak rolls forward.</p>
 <p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Triggered when you tap PUBLISH from firstlight.live/app.</p>`,
  'PUBLISH CONFIRMATION')
- await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')} · posted · defended`, html, `Day ${dn} posted to @firstlightlive — firstlight.live`)
+ await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')} · posted · on record`, html, `Day ${dn} posted to @firstlightlive — firstlight.live`)
  return { sent: 'publish-confirm', day: dn }
 }
 
