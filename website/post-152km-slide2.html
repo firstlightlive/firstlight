@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=1080"><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}.s{width:1080px;height:1080px;position:relative;overflow:hidden;background:#050607;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* Subtle orange glow behind route */.s::before{content:'';position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;border-radius:50%;
+ background:radial-gradient(circle,rgba(252,76,2,0.04) 0%,transparent 50%);filter:blur(40px)}
+
+/* Route image */.route{position:relative;width:580px;height:580px;margin-top:-60px}.route img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 20px rgba(252,76,2,0.15)) drop-shadow(0 0 60px rgba(252,76,2,0.05))}
+
+/* Stats strip below route */.stats{display:flex;gap:0;margin-top:40px;position:relative}.stat{padding:16px 36px;text-align:center;border-right:1px solid rgba(252,76,2,0.08)}.stat:last-child{border-right:none}.stat.val{font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:300;letter-spacing:2px;
+ background:linear-gradient(180deg,rgba(255,255,255,0.8) 0%,rgba(252,76,2,0.5) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.stat.lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:6px;color:rgba(255,255,255,0.2);margin-top:8px;font-weight:400}
+
+/* Top label */.top{position:absolute;top:70px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:10px;color:rgba(252,76,2,0.3);font-weight:600}
+
+/* Bottom branding */.brand{position:absolute;bottom:60px;text-align:center}.brand.url{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:8px;color:rgba(255,255,255,0.08);font-weight:400}
+
+/* Dots */.dots{position:absolute;bottom:30px;display:flex;gap:12px}.dots span{width:4px;height:4px;border-radius:50%}.d1{background:rgba(255,255,255,0.15)}.d2{background:#FC4C02;box-shadow:0 0 6px rgba(252,76,2,0.5)}
+
+/* Film grain */.grain{position:absolute;inset:0;opacity:0.04;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}.scan{position:absolute;inset:0;pointer-events:none;opacity:0.01;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.5) 2px,transparent 4px)}
+</style></head><body>
+<div class="s">
+ <div class="top">THE ROUTE</div>
+
+ <div class="route">
+ <img src="IMG_9517.PNG" alt="152km route">
+ </div>
+
+ <div class="stats">
+ <div class="stat"><div class="val">152</div><div class="lbl">KILOMETERS</div></div>
+ <div class="stat"><div class="val">RIDE</div><div class="lbl">DISCIPLINE</div></div>
+ <div class="stat"><div class="val">NEW PR</div><div class="lbl">LONGEST RIDE</div></div>
+ </div>
+
+ <div class="brand">
+ <div class="url">FIRSTLIGHT.LIVE</div>
+ </div>
+ <div class="dots"><span class="d1"></span><span class="d2"></span></div>
+ <div class="grain"></div>
+ <div class="scan"></div>
+</div>
+</body></html>
