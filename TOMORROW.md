@@ -1,88 +1,98 @@
 # Tomorrow — resume from here
 
-## State as of 2026-06-15 evening
+> Updated 2026-06-16 evening (after RLS lockdown + revert of stake-strip).
 
-### ✅ Already done
-- **GitHub:** `860895c` is the latest commit on both `prod` and `main`. All cleanup committed + pushed.
-- **All 17 wagering / money-stake patterns are at zero in source** (₹15,000, ₹20,000, ₹15K, Rs.20,000, $200, ON THE LINE, AT STAKE, Miss = you collect, CLAIM IF I MISS, real stakes, defended, PAY ₹, TOTAL AT RISK, etc.).
-- **Tests pass on disk:** 70/70 regression + 55/55 wagering scan = 125/125.
+## Current state in one paragraph
 
-### ⚠ Deploy gap (~1 minute of work to close)
-- **Cloudflare is 3 commits behind GitHub.** Worker still serves the previous version.
-- **Wrangler is logged out** — that's why the last `wrangler deploy` failed silently last night.
-- 2 live wagering leaks remain on the deployed site until the redeploy:
-  - `FOLLOW TO CLAIM THE ₹15k IF I QUIT` — canvas-painted onto IG slide (Meta OCRs images) — **highest priority**
-  - `Rs.20,000` in admin escalation table — PIN-gated, low risk
+GitHub `prod` + `main` are at `9f260e1` (₹15K language fully restored — yesterday's strip was reverted this morning). Supabase RLS has been hard-locked: 62-table god-mode-for-anon has dropped to 13 public-by-design tables only, with finance/journal/health/brahma/mastery/sleep all returning 401 to anon. **Cloudflare worker is still 4 commits behind** because wrangler is logged out and there's a known blocker we shouldn't deploy through.
 
-## Resume sequence (3 commands)
+## 🛑 The deploy blocker
+
+After yesterday's RLS lockdown, the PWA's `FL.upsert()` writes now hit 401 on `daily_checkin`, `sleep_log`, `brahma_log`, `mastery_log` because anon INSERT/UPDATE was revoked on those tables. Deploying right now would silently break daily-punch — writes get queued in the offline write store and retry forever with 401s.
+
+**Three viable resolutions, pick one before deploy:**
+
+| Option | What | Time | Security |
+|---|---|---|---|
+| **A** | Re-grant anon INSERT/UPDATE on the 4 punch tables only — reads stay locked | 30 sec (one SQL call) | Strong-but-not-max: attacker can WRITE fake rows but can't READ data. For a personal 1-user app, acceptable. |
+| **B** | Build Edge-function write proxy + migrate FL.upsert() → POST through firstlight-sync with admin_api_key | 30–60 min | Maximum |
+| **C** | Hold deploy entirely — leave site on yesterday's "no-₹15K" version | 0 min | Same as A in effect; site temporarily shows the cleaner anti-IG-flag version |
+
+**Recommendation: A now (so daily punch works tonight) + B in next session.**
+
+The SQL for A:
+```sql
+GRANT INSERT, UPDATE ON public.daily_checkin, public.sleep_log,
+                          public.brahma_log, public.mastery_log TO anon;
+```
+Then deploy.
+
+## Resume sequence (after picking A or B)
 
 ```bash
-# 1. Re-auth wrangler (browser-based, ~30s)
-!npx wrangler login        # sign in as firstlightlive@gmail.com (account 1a48cc…)
-
-# 2. Deploy the 3 pending commits
+# 1. Either run option A (above SQL via Management API)
+#    OR finish option B (write Edge function proxy code)
+# 2. Re-auth wrangler — interactive
+!npx wrangler login           # sign in as firstlightlive@gmail.com (account 1a48cc…)
+# 3. Deploy
 cd website && npx wrangler deploy --name firstlight
-
-# 3. Verify the 2 live leaks are gone
-bash scripts/verify-no-wagering.sh
-# Expect: 55 pass · 0 fail
-# Also expect these two greps to return 0 hits:
-curl -sL "https://firstlight.live/app/index.html?cb=$RANDOM" | grep -c "FOLLOW TO CLAIM"
-curl -sL "https://firstlight.live/admin.html?cb=$RANDOM" | grep -c "Rs.20,000"
+# 4. Verify
+bash scripts/pre-deploy-check.sh
 ```
 
-## After the deploy is clean — next ask (not yet started)
+## Pending non-deploy work
 
-**User request from 2026-06-15:** "remove the Device Fortress Log breach from the daily checkin, it is creating some kind of issues"
+1. **SPF + DMARC DNS records** — add via Cloudflare DNS dashboard:
+   - `TXT @ → v=spf1 include:_spf.resend.com -all`
+   - `TXT _dmarc → v=DMARC1; p=quarantine; rua=mailto:tradeforgein@gmail.com; aspf=s; adkim=s; pct=100; fo=1`
+2. **Device Fortress Log breach removal** — original ask from yesterday, not started yet.
+3. **Token rotations**: `ghp_7aJU…1yqJ` (GitHub PAT) + `sbp_d3d1…7352` (Supabase Mgmt) — both in transcripts.
+4. **Migrate admin private-table reads through Edge function** — finance / journal / brahma / sleep / mastery panels will be empty after deploy until reads flow through the Edge function. Same path as option B above.
 
-Steps to scope it:
-```bash
-# Find where 'Device Fortress' / 'Fortress' is rendered/written
-grep -rln "Fortress\|fortress\|device.fortress" website/ app/ --include='*.html' --include='*.js' | head -10
-# Look at admin-checkin.js for any DEVICE / FORTRESS section
-grep -n "Fortress\|device" website/js/admin-checkin.js
-# Check fortress-analytics module
-ls website/js/admin-fortress*
-```
+## Audit scripts (committed under `scripts/`)
 
-User probably wants the section removed from the admin-checkin panel + any auto-punishment / log it emits.
+| Script | Purpose | Run |
+|---|---|---|
+| `test-suite.sh` | 70-check regression suite (PWA + Edge + DB + cron) | `SUPABASE_ACCESS_TOKEN=sbp_… bash scripts/test-suite.sh` |
+| `verify-no-wagering.sh` | 55-check wagering-language scan (informational — user wants ₹15K back so this will report hits) | `bash scripts/verify-no-wagering.sh` |
+| `security-audit.sh` | Full security audit (HTTP headers, secrets, auth, CSP, RLS, email, DNS) | `bash scripts/security-audit.sh` |
+| `pre-deploy-check.sh` | Comprehensive go/no-go before any deploy | `bash scripts/pre-deploy-check.sh` |
+| `strip-stake-amount.js` | Idempotent ₹-stripper (used yesterday, then reverted) — keep around | `node scripts/strip-stake-amount.js` |
+| `backfill-strava-calories.sh` | Strava calorie historical backfill (already complete; safe to re-run) | `SUPABASE_ACCESS_TOKEN=sbp_… bash scripts/backfill-strava-calories.sh` |
 
-## Pending token rotations (security)
+## RLS lockdown reference (what's now locked vs open)
 
-Both still need rotation when you have 30 seconds free:
-1. **GitHub PAT** (fingerprint `ghp_7aJU…1yqJ`, firstlightlive). Rotate: https://github.com/settings/tokens
-2. **Supabase Management** (fingerprint `sbp_d3d1…7352`). Rotate: https://supabase.com/dashboard/account/tokens
+**LOCKED to anon** (49 tables · 401 permission denied):
+- Finance: `expense_log` · `income_log` · `investment_log` · `finance_{annual_budgets,budgets,fire_config,networth,recurring}`
+- Journal: `journal_{entries,insights,notes}`
+- Voice/work: `voice_entries` · `deep_work_sessions` · `deepwork_log`
+- Audit: `auth_audit_log` · `architecture_log` · `archive_log` · `ig_api_queue`
+- Daily PII: `brahma_{log,daily,weekly,monthly}` · `sleep_log` · `daily_{checkin,logs,rituals}` · `ritual_{completions,definitions}` · `rituals_log`
+- Mastery: `mastery_{log,daily,weekly,monthly_scores,ideas}`
+- Health/body: `health_{daily,metrics,weekly}` · `body_weight` · `weekly_metrics`
+- Other: `tomorrow_plan` · `gym_{sets,workouts}` · `goals` · `goal_comments` · `ekadashi_log` · `stories_completions` · `reading_log` · `weekly_schedule` · `monthly_grids`
+- **CRITICAL**: `secrets` (locked from everyone except service_role)
+- **Catastrophic ops** (TRUNCATE / DELETE / TRIGGER / REFERENCES) revoked from anon on ALL tables
 
-Both appeared in chat transcripts during 2026-06-15. Neither was pushed to GitHub (push protection caught them).
-
-## Diagnostic — if anything looks off tomorrow
-
-```bash
-# Quick health check (no auth needed)
-bash scripts/test-suite.sh                                  # 70 checks
-bash scripts/verify-no-wagering.sh                          # 55 checks
-
-# Full health with management API
-SUPABASE_ACCESS_TOKEN=sbp_… bash scripts/test-suite.sh      # 70 checks + cron + secrets + schema
-```
+**STILL public to anon** (13 tables · public-by-design):
+- Read-only display: `proof_archive` · `slips` · `strava_activities` · `instagram_posts` · `races` · `config` · `site_config` · `site_stats`
+- Public engagement: `comments` · `comment_reactions` · `engagement_counters` · `site_visits` · `visitor_identities`
 
 ## Cloudflare deploy account
 
-- email: `firstlightlive@gmail.com`
-- account ID: `1a48cc0186adbd36df5c84fb7088146c`
-- worker name: `firstlight`
-- domain: `firstlight.live`
-- Previous (wrong) account that throws auth error 10000: `nexusnseos@gmail.com` — do NOT use
+- Cloudflare: `firstlightlive@gmail.com` · acct `1a48cc0186adbd36df5c84fb7088146c` · worker `firstlight`
+- GitHub: `firstlightlive` (use `gh auth switch -u firstlightlive`)
+- ❌ Avoid: `nexusnseos@gmail.com` (CF auth error 10000) · `tradeforgein` (different project)
 
-## Last working state
+## What's safe to leave running unattended
 
-| Surface | Status |
-|---|---|
-| GitHub (prod + main) | `860895c` ✓ |
-| Cloudflare worker | version `8669c687` (3 commits behind) ⚠ |
-| Supabase Edge function (`firstlight-sync`) | up to date · last deploy 2026-06-15 |
-| pg_cron jobs (15 total) | all active ✓ |
-| Strava sync | healthy, calories 318/318 ✓ |
-| Instagram | account still under review (token only 4d) — separate Facebook issue |
+| Surface | Status | Note |
+|---|---|---|
+| pg_cron sync jobs (15 active) | running ✓ | Strava + email + sync continue on schedule |
+| Strava → Supabase pipeline | healthy ✓ | Detail-fetch + MET calorie fallback in place |
+| 318/318 calorie data | populated ✓ | Total 123,370 kcal across AW7 + Strava App |
+| Public site at firstlight.live | live, ₹-stripped version ✓ | Will flip to ₹15K version on next deploy |
+| Supabase RLS | locked ✓ | Anon can't read private data |
+| IG sync (token at 4 days) | running on FB-rate-limited tokens ✓ | Alert fires every sync since FB account is restricted |
 
-Resume here. Browser → wrangler login → deploy → verify. Then onto Device Fortress.
+Resume tomorrow from this doc.
