@@ -1,294 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
- <meta name="theme-color" content="#0A0C10">
- <meta name="apple-mobile-web-app-capable" content="yes">
- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- <link rel="manifest" href="/manifest.json">
- <link rel="apple-touch-icon" href="/icon-512.png">
- <title>Install First Light · PWA</title>
- <link rel="preconnect" href="https://fonts.googleapis.com">
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-512.png">
+  <title>Install First Light · PWA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
 
- <style>:root {
- --bg1:#0A0C10; --bg2:#0F1218; --bg3:#161A23;
- --text:#F0EDE5; --text-dim:#B6BFCB; --text-muted:#8A95A3;
- --cyan:#00D4FF; --gold:#F5A623; --green:#00E676; --red:#FF5252;
- --mono:'IBM Plex Mono',monospace; --inter:'Inter',sans-serif;
- --safe-top:env(safe-area-inset-top,0px);
- --safe-bot:env(safe-area-inset-bottom,0px);
- }
- *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
- html,body{background:var(--bg1);color:var(--text);font-family:var(--inter);min-height:100vh;min-height:100dvh}
- body{padding-top:calc(var(--safe-top)+24px);padding-bottom:calc(var(--safe-bot)+24px)}.wrap{max-width:560px;margin:0 auto;padding:0 18px}.brand{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--cyan);font-weight:600;text-align:center;margin-bottom:10px}
- h1{font-family:var(--inter);font-size:32px;font-weight:800;letter-spacing:1px;text-align:center;margin-bottom:8px;line-height:1.2}.sub{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--text-muted);text-align:center;margin-bottom:32px;text-transform:uppercase}.detected{
- background:linear-gradient(135deg,rgba(0,212,255,0.10),rgba(0,212,255,0.03));
- border:1px solid rgba(0,212,255,0.3);border-radius:14px;
- padding:14px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;
- }.detected-emoji{font-size:30px}.detected-text{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--text-dim);line-height:1.5}.detected-text b{color:var(--cyan);font-weight:700}.install-cta{
- width:100%;background:linear-gradient(135deg,var(--cyan),#0099cc);
- color:var(--bg1);border:none;border-radius:14px;
- padding:20px;font-family:var(--mono);font-size:14px;font-weight:700;
- letter-spacing:3px;cursor:pointer;touch-action:manipulation;
- box-shadow:0 8px 24px rgba(0,212,255,0.25);transition:all.2s;
- margin-bottom:18px;
- }.install-cta:active{transform:scale(0.98);box-shadow:0 4px 12px rgba(0,212,255,0.4)}.install-cta:disabled{opacity:0.55;cursor:default;background:linear-gradient(135deg,#2a3441,#1a2230);color:var(--text-muted)}.install-cta.success{background:linear-gradient(135deg,var(--green),#00B85C);box-shadow:0 8px 24px rgba(0,230,118,0.25)}.steps-card{
- background:var(--bg2);border:1px solid rgba(255,255,255,0.04);
- border-radius:14px;padding:20px;margin-bottom:18px;
- }.steps-title{
- font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--cyan);
- font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;
- }.step{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}.step:last-child{margin-bottom:0}.step-num{
- width:28px;height:28px;border-radius:50%;
- background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.4);
- color:var(--cyan);font-family:var(--mono);font-size:12px;font-weight:700;
- display:flex;align-items:center;justify-content:center;flex-shrink:0;
- }.step-body{flex:1;font-size:14px;line-height:1.55;color:var(--text-dim)}.step-body b{color:var(--text);font-weight:600}.step-icon{display:inline-block;font-size:18px;vertical-align:middle;margin:0 4px}.step-key{
- display:inline-block;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);
- border-radius:5px;padding:1px 7px;font-family:var(--mono);font-size:12px;
- color:var(--text);margin:0 2px;
- }.alt{
- background:transparent;border:1px solid rgba(255,255,255,0.08);
- border-radius:10px;padding:12px 16px;margin-bottom:10px;
- cursor:pointer;display:flex;align-items:center;justify-content:space-between;
- transition:all.15s;touch-action:manipulation;text-decoration:none;color:inherit;
- }.alt:active{border-color:rgba(0,212,255,0.4);background:rgba(0,212,255,0.04)}.alt-label{display:flex;align-items:center;gap:12px}.alt-emoji{font-size:22px}.alt-text{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--text-dim)}.alt-text b{color:var(--text);font-weight:700;letter-spacing:1.5px}.alt-arrow{color:var(--text-muted);font-size:18px}.info{
- background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);
- border-radius:10px;padding:12px 14px;margin-bottom:18px;
- font-family:var(--mono);font-size:11px;color:var(--gold);line-height:1.5;
- }.footer{
- margin-top:32px;text-align:center;
- font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:1.5px;
- }.footer a{color:var(--cyan);text-decoration:none}
+  <style>
+    :root {
+      --bg1:#0A0C10; --bg2:#0F1218; --bg3:#161A23;
+      --text:#F0EDE5; --text-dim:#B6BFCB; --text-muted:#8A95A3;
+      --cyan:#00D4FF; --gold:#F5A623; --green:#00E676; --red:#FF5252;
+      --mono:'IBM Plex Mono',monospace; --inter:'Inter',sans-serif;
+      --safe-top:env(safe-area-inset-top,0px);
+      --safe-bot:env(safe-area-inset-bottom,0px);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{background:var(--bg1);color:var(--text);font-family:var(--inter);min-height:100vh;min-height:100dvh}
+    body{padding-top:calc(var(--safe-top)+24px);padding-bottom:calc(var(--safe-bot)+24px)}
 
- /* Native install hint pulse */
- @keyframes pulse-hint{0%,100%{opacity:0.5}50%{opacity:1}}.ios-hint-arrow{display:inline-block;animation:pulse-hint 1.6s ease-in-out infinite}
+    .wrap{max-width:560px;margin:0 auto;padding:0 18px}
+    .brand{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--cyan);font-weight:600;text-align:center;margin-bottom:10px}
+    h1{font-family:var(--inter);font-size:32px;font-weight:800;letter-spacing:1px;text-align:center;margin-bottom:8px;line-height:1.2}
+    .sub{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--text-muted);text-align:center;margin-bottom:32px;text-transform:uppercase}
 
- /* Hide platform-specific blocks until JS reveals them */.platform-block{display:none}
+    .detected{
+      background:linear-gradient(135deg,rgba(0,212,255,0.10),rgba(0,212,255,0.03));
+      border:1px solid rgba(0,212,255,0.3);border-radius:14px;
+      padding:14px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;
+    }
+    .detected-emoji{font-size:30px}
+    .detected-text{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--text-dim);line-height:1.5}
+    .detected-text b{color:var(--cyan);font-weight:700}
 
- @media(min-width:600px){
- h1{font-size:38px}.wrap{padding:0 32px}
- }
- </style>
+    .install-cta{
+      width:100%;background:linear-gradient(135deg,var(--cyan),#0099cc);
+      color:var(--bg1);border:none;border-radius:14px;
+      padding:20px;font-family:var(--mono);font-size:14px;font-weight:700;
+      letter-spacing:3px;cursor:pointer;touch-action:manipulation;
+      box-shadow:0 8px 24px rgba(0,212,255,0.25);transition:all .2s;
+      margin-bottom:18px;
+    }
+    .install-cta:active{transform:scale(0.98);box-shadow:0 4px 12px rgba(0,212,255,0.4)}
+    .install-cta:disabled{opacity:0.55;cursor:default;background:linear-gradient(135deg,#2a3441,#1a2230);color:var(--text-muted)}
+    .install-cta.success{background:linear-gradient(135deg,var(--green),#00B85C);box-shadow:0 8px 24px rgba(0,230,118,0.25)}
+
+    .steps-card{
+      background:var(--bg2);border:1px solid rgba(255,255,255,0.04);
+      border-radius:14px;padding:20px;margin-bottom:18px;
+    }
+    .steps-title{
+      font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--cyan);
+      font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;
+    }
+    .step{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
+    .step:last-child{margin-bottom:0}
+    .step-num{
+      width:28px;height:28px;border-radius:50%;
+      background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.4);
+      color:var(--cyan);font-family:var(--mono);font-size:12px;font-weight:700;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .step-body{flex:1;font-size:14px;line-height:1.55;color:var(--text-dim)}
+    .step-body b{color:var(--text);font-weight:600}
+    .step-icon{display:inline-block;font-size:18px;vertical-align:middle;margin:0 4px}
+    .step-key{
+      display:inline-block;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);
+      border-radius:5px;padding:1px 7px;font-family:var(--mono);font-size:12px;
+      color:var(--text);margin:0 2px;
+    }
+
+    .alt{
+      background:transparent;border:1px solid rgba(255,255,255,0.08);
+      border-radius:10px;padding:12px 16px;margin-bottom:10px;
+      cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+      transition:all .15s;touch-action:manipulation;text-decoration:none;color:inherit;
+    }
+    .alt:active{border-color:rgba(0,212,255,0.4);background:rgba(0,212,255,0.04)}
+    .alt-label{display:flex;align-items:center;gap:12px}
+    .alt-emoji{font-size:22px}
+    .alt-text{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--text-dim)}
+    .alt-text b{color:var(--text);font-weight:700;letter-spacing:1.5px}
+    .alt-arrow{color:var(--text-muted);font-size:18px}
+
+    .info{
+      background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);
+      border-radius:10px;padding:12px 14px;margin-bottom:18px;
+      font-family:var(--mono);font-size:11px;color:var(--gold);line-height:1.5;
+    }
+
+    .footer{
+      margin-top:32px;text-align:center;
+      font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:1.5px;
+    }
+    .footer a{color:var(--cyan);text-decoration:none}
+
+    /* Native install hint pulse */
+    @keyframes pulse-hint{0%,100%{opacity:0.5}50%{opacity:1}}
+    .ios-hint-arrow{display:inline-block;animation:pulse-hint 1.6s ease-in-out infinite}
+
+    /* Hide platform-specific blocks until JS reveals them */
+    .platform-block{display:none}
+
+    @media(min-width:600px){
+      h1{font-size:38px}
+      .wrap{padding:0 32px}
+    }
+  </style>
 </head>
 <body>
- <div class="wrap">
- <div class="brand">FIRST LIGHT</div>
- <h1>Install the app</h1>
- <div class="sub">No App Store · Works offline · Free</div>
+  <div class="wrap">
+    <div class="brand">FIRST LIGHT</div>
+    <h1>Install the app</h1>
+    <div class="sub">No App Store · Works offline · Free</div>
 
- <!-- Auto-detected platform banner -->
- <div class="detected">
- <div class="detected-emoji" id="d-emoji">📱</div>
- <div class="detected-text">
- Detected <b id="d-name">device</b><br>
- <span id="d-sub" style="font-size:9px;color:var(--text-muted)">…</span>
- </div>
- </div>
+    <!-- Auto-detected platform banner -->
+    <div class="detected">
+      <div class="detected-emoji" id="d-emoji">📱</div>
+      <div class="detected-text">
+        Detected <b id="d-name">device</b><br>
+        <span id="d-sub" style="font-size:9px;color:var(--text-muted)">…</span>
+      </div>
+    </div>
 
- <!-- Native install button (becomes active on supporting browsers via beforeinstallprompt) -->
- <button id="install-btn" class="install-cta" disabled>⚡ INSTALL THIS APP</button>
+    <!-- Native install button (becomes active on supporting browsers via beforeinstallprompt) -->
+    <button id="install-btn" class="install-cta" disabled>⚡ INSTALL THIS APP</button>
 
- <!-- iOS / iPadOS Safari (manual instructions — Apple blocks programmatic install) -->
- <div class="platform-block" id="block-ios">
- <div class="steps-card">
- <div class="steps-title">🍎 INSTALL ON iPhone / iPad</div>
- <div class="step"><div class="step-num">1</div><div class="step-body">Tap the <b>Share</b> icon <span class="step-icon">⬆️</span> in Safari's bottom bar (or top-right on iPad).</div></div>
- <div class="step"><div class="step-num">2</div><div class="step-body">Scroll down and tap <b>Add to Home Screen</b> <span class="step-icon">⊞</span></div></div>
- <div class="step"><div class="step-num">3</div><div class="step-body">Confirm the name <b>FL Punch</b> and tap <b>Add</b> (top-right).</div></div>
- <div class="step"><div class="step-num">4</div><div class="step-body">Open from your home screen — unlock with PIN <span class="step-key">2 2 5 9</span> and you're in.</div></div>
- </div>
- <div class="info">
- <b>Why no one-click install?</b> Apple intentionally blocks programmatic install on iOS — only the Safari <b>Share → Add to Home Screen</b> path works. Same for Chrome/Firefox on iOS (they're all Safari underneath).
- </div>
- </div>
+    <!-- iOS / iPadOS Safari (manual instructions — Apple blocks programmatic install) -->
+    <div class="platform-block" id="block-ios">
+      <div class="steps-card">
+        <div class="steps-title">🍎 INSTALL ON iPhone / iPad</div>
+        <div class="step"><div class="step-num">1</div><div class="step-body">Tap the <b>Share</b> icon <span class="step-icon">⬆️</span> in Safari's bottom bar (or top-right on iPad).</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body">Scroll down and tap <b>Add to Home Screen</b> <span class="step-icon">⊞</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body">Confirm the name <b>FL Punch</b> and tap <b>Add</b> (top-right).</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body">Open from your home screen — unlock with PIN <span class="step-key">2 2 5 9</span> and you're in.</div></div>
+      </div>
+      <div class="info">
+        <b>Why no one-click install?</b> Apple intentionally blocks programmatic install on iOS — only the Safari <b>Share → Add to Home Screen</b> path works. Same for Chrome/Firefox on iOS (they're all Safari underneath).
+      </div>
+    </div>
 
- <!-- Android Chrome (mostly handled by native install-btn above; this block is a fallback) -->
- <div class="platform-block" id="block-android">
- <div class="steps-card">
- <div class="steps-title">🤖 INSTALL ON Android</div>
- <div class="step"><div class="step-num">1</div><div class="step-body">Tap the <b>⚡ INSTALL THIS APP</b> button above (if active) — Chrome will pop up its install sheet.</div></div>
- <div class="step"><div class="step-num">2</div><div class="step-body">Or: tap Chrome's <b>⋮ menu</b> → <b>Install app</b>.</div></div>
- <div class="step"><div class="step-num">3</div><div class="step-body">Confirm. Icon appears on your home screen + app drawer.</div></div>
- <div class="step"><div class="step-num">4</div><div class="step-body">Open it — unlock with PIN <span class="step-key">2 2 5 9</span>.</div></div>
- </div>
- </div>
+    <!-- Android Chrome (mostly handled by native install-btn above; this block is a fallback) -->
+    <div class="platform-block" id="block-android">
+      <div class="steps-card">
+        <div class="steps-title">🤖 INSTALL ON Android</div>
+        <div class="step"><div class="step-num">1</div><div class="step-body">Tap the <b>⚡ INSTALL THIS APP</b> button above (if active) — Chrome will pop up its install sheet.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body">Or: tap Chrome's <b>⋮ menu</b> → <b>Install app</b>.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body">Confirm. Icon appears on your home screen + app drawer.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body">Open it — unlock with PIN <span class="step-key">2 2 5 9</span>.</div></div>
+      </div>
+    </div>
 
- <!-- macOS / Windows / Linux desktop -->
- <div class="platform-block" id="block-desktop">
- <div class="steps-card">
- <div class="steps-title">💻 INSTALL ON Mac / Windows / Linux</div>
- <div class="step"><div class="step-num">1</div><div class="step-body">Tap <b>⚡ INSTALL THIS APP</b> above — works in <b>Chrome, Edge, Brave, Arc, Vivaldi</b>.</div></div>
- <div class="step"><div class="step-num">2</div><div class="step-body">Or look for the install icon <span class="step-icon">⊕</span> in the address bar.</div></div>
- <div class="step"><div class="step-num">3</div><div class="step-body">App opens in its own window with the cyan header. Pin it to dock/taskbar.</div></div>
- <div class="step"><div class="step-num">4</div><div class="step-body">Unlock with PIN <span class="step-key">2 2 5 9</span>. Change it from Settings once verified.</div></div>
- </div>
- <div class="info">
- <b>Safari on Mac?</b> Safari 17+ supports Add to Dock: <b>File → Add to Dock</b>. Older Safari: open via Chrome/Edge for full PWA features.
- </div>
- </div>
+    <!-- macOS / Windows / Linux desktop -->
+    <div class="platform-block" id="block-desktop">
+      <div class="steps-card">
+        <div class="steps-title">💻 INSTALL ON Mac / Windows / Linux</div>
+        <div class="step"><div class="step-num">1</div><div class="step-body">Tap <b>⚡ INSTALL THIS APP</b> above — works in <b>Chrome, Edge, Brave, Arc, Vivaldi</b>.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body">Or look for the install icon <span class="step-icon">⊕</span> in the address bar.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body">App opens in its own window with the cyan header. Pin it to dock/taskbar.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body">Unlock with PIN <span class="step-key">2 2 5 9</span>. Change it from Settings once verified.</div></div>
+      </div>
+      <div class="info">
+        <b>Safari on Mac?</b> Safari 17+ supports Add to Dock: <b>File → Add to Dock</b>. Older Safari: open via Chrome/Edge for full PWA features.
+      </div>
+    </div>
 
- <!-- Power-user options: native binaries via PWA Builder -->
- <div class="steps-card" style="margin-top:24px">
- <div class="steps-title">📦 NATIVE INSTALLERS (advanced)</div>
- <div style="font-size:12px;color:var(--text-dim);line-height:1.55;margin-bottom:14px">
- Want a <b>real native package</b> instead of a PWA? Microsoft's PWA Builder turns this site into platform-native installers (.msix /.apk /.ipa).
- </div>
- <a href="https://www.pwabuilder.com/reportcard?site=https%3A%2F%2Ffirstlight.live" target="_blank" rel="noopener" class="alt">
- <span class="alt-label"><span class="alt-emoji">📦</span>
- <span class="alt-text">
- <b>OPEN PWA BUILDER</b><br>
- Generate Windows.msix, Android.apk, iOS.ipa
- </span>
- </span>
- <span class="alt-arrow">→</span>
- </a>
- </div>
+    <!-- Power-user options: native binaries via PWA Builder -->
+    <div class="steps-card" style="margin-top:24px">
+      <div class="steps-title">📦 NATIVE INSTALLERS (advanced)</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55;margin-bottom:14px">
+        Want a <b>real native package</b> instead of a PWA? Microsoft's PWA Builder turns this site into platform-native installers (.msix / .apk / .ipa).
+      </div>
+      <a href="https://www.pwabuilder.com/reportcard?site=https%3A%2F%2Ffirstlight.live" target="_blank" rel="noopener" class="alt">
+        <span class="alt-label"><span class="alt-emoji">📦</span>
+          <span class="alt-text">
+            <b>OPEN PWA BUILDER</b><br>
+            Generate Windows .msix, Android .apk, iOS .ipa
+          </span>
+        </span>
+        <span class="alt-arrow">→</span>
+      </a>
+    </div>
 
- <!-- Direct entry shortcuts -->
- <div class="steps-card" style="margin-top:24px">
- <div class="steps-title">🚀 ALREADY INSTALLED?</div>
- <a href="/punch.html" class="alt">
- <span class="alt-label"><span class="alt-emoji">⚡</span>
- <span class="alt-text"><b>PUNCH</b><br>Fast daily entry screen</span>
- </span>
- <span class="alt-arrow">→</span>
- </a>
- <a href="/admin.html" class="alt">
- <span class="alt-label"><span class="alt-emoji">🛠</span>
- <span class="alt-text"><b>COMMAND CENTER</b><br>Full admin app</span>
- </span>
- <span class="alt-arrow">→</span>
- </a>
- </div>
+    <!-- Direct entry shortcuts -->
+    <div class="steps-card" style="margin-top:24px">
+      <div class="steps-title">🚀 ALREADY INSTALLED?</div>
+      <a href="/punch.html" class="alt">
+        <span class="alt-label"><span class="alt-emoji">⚡</span>
+          <span class="alt-text"><b>PUNCH</b><br>Fast daily entry screen</span>
+        </span>
+        <span class="alt-arrow">→</span>
+      </a>
+      <a href="/admin.html" class="alt">
+        <span class="alt-label"><span class="alt-emoji">🛠</span>
+          <span class="alt-text"><b>COMMAND CENTER</b><br>Full admin app</span>
+        </span>
+        <span class="alt-arrow">→</span>
+      </a>
+    </div>
 
- <div class="footer">
- <a href="/">← firstlight.live</a> · <a href="https://github.com/firstlightlive/firstlight/blob/main/INSTALL.md" target="_blank">Full Install Docs</a>
- </div>
- </div>
+    <div class="footer">
+      <a href="/">← firstlight.live</a> · <a href="https://github.com/firstlightlive/firstlight/blob/main/INSTALL.md" target="_blank">Full Install Docs</a>
+    </div>
+  </div>
 
- <script>
- // ─────────────────────────────────────────────────────────────
- // Platform detection + beforeinstallprompt orchestration
- // ─────────────────────────────────────────────────────────────
- (function() {
- 'use strict';
+  <script>
+  // ─────────────────────────────────────────────────────────────
+  // Platform detection + beforeinstallprompt orchestration
+  // ─────────────────────────────────────────────────────────────
+  (function() {
+    'use strict';
 
- const ua = navigator.userAgent || '';
- const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua)); // iPadOS reports as Mac, disambiguate via touch
- const isIPad = /iPad/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua));
- const android = /Android/i.test(ua);
- const mac = /Macintosh/.test(ua) &&!ios;
- const win = /Windows/.test(ua);
- const linux = /Linux/.test(ua) &&!android;
- const safari = /Safari/.test(ua) &&!/Chrome|CriOS|FxiOS|EdgiOS/.test(ua);
- const chrome = /Chrome/.test(ua) || /CriOS/.test(ua);
- const edge = /Edg/.test(ua);
- const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const ua = navigator.userAgent || '';
+    const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua));  // iPadOS reports as Mac, disambiguate via touch
+    const isIPad = /iPad/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua));
+    const android = /Android/i.test(ua);
+    const mac = /Macintosh/.test(ua) && !ios;
+    const win = /Windows/.test(ua);
+    const linux = /Linux/.test(ua) && !android;
+    const safari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS|EdgiOS/.test(ua);
+    const chrome = /Chrome/.test(ua) || /CriOS/.test(ua);
+    const edge = /Edg/.test(ua);
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
- // Set banner
- const dEmoji = document.getElementById('d-emoji');
- const dName = document.getElementById('d-name');
- const dSub = document.getElementById('d-sub');
+    // Set banner
+    const dEmoji = document.getElementById('d-emoji');
+    const dName  = document.getElementById('d-name');
+    const dSub   = document.getElementById('d-sub');
 
- let block = null;
- if (standalone) {
- dEmoji.textContent = '✅';
- dName.textContent = 'Already installed';
- dSub.textContent = 'Running in standalone PWA mode';
- document.getElementById('install-btn').textContent = '✓ APP IS INSTALLED';
- document.getElementById('install-btn').disabled = true;
- document.getElementById('install-btn').classList.add('success');
- } else if (isIPad) {
- dEmoji.textContent = '📱';
- dName.textContent = 'iPad';
- dSub.textContent = 'iPadOS · Safari install via Share menu';
- block = 'block-ios';
- } else if (ios) {
- dEmoji.textContent = '📱';
- dName.textContent = 'iPhone';
- dSub.textContent = 'iOS · Safari install via Share menu';
- block = 'block-ios';
- } else if (android) {
- dEmoji.textContent = '🤖';
- dName.textContent = 'Android';
- dSub.textContent = chrome ? 'Chrome · One-click install supported': 'Use Chrome for best install experience';
- block = 'block-android';
- } else if (mac) {
- dEmoji.textContent = '💻';
- dName.textContent = 'macOS';
- dSub.textContent = (chrome || edge) ? 'Chrome/Edge · One-click install ready': safari ? 'Safari 17+ supports File → Add to Dock': 'Use Chrome / Edge / Brave';
- block = 'block-desktop';
- } else if (win) {
- dEmoji.textContent = '🪟';
- dName.textContent = 'Windows';
- dSub.textContent = (chrome || edge) ? 'Chrome/Edge · One-click install ready': 'Use Chrome / Edge / Brave';
- block = 'block-desktop';
- } else if (linux) {
- dEmoji.textContent = '🐧';
- dName.textContent = 'Linux';
- dSub.textContent = chrome ? 'Chrome · One-click install ready': 'Use Chrome / Edge / Brave';
- block = 'block-desktop';
- } else {
- dEmoji.textContent = '🌐';
- dName.textContent = 'Web browser';
- dSub.textContent = 'Install path depends on your browser';
- block = 'block-desktop';
- }
+    let block = null;
+    if (standalone) {
+      dEmoji.textContent = '✅';
+      dName.textContent = 'Already installed';
+      dSub.textContent = 'Running in standalone PWA mode';
+      document.getElementById('install-btn').textContent = '✓ APP IS INSTALLED';
+      document.getElementById('install-btn').disabled = true;
+      document.getElementById('install-btn').classList.add('success');
+    } else if (isIPad) {
+      dEmoji.textContent = '📱';
+      dName.textContent = 'iPad';
+      dSub.textContent = 'iPadOS · Safari install via Share menu';
+      block = 'block-ios';
+    } else if (ios) {
+      dEmoji.textContent = '📱';
+      dName.textContent = 'iPhone';
+      dSub.textContent = 'iOS · Safari install via Share menu';
+      block = 'block-ios';
+    } else if (android) {
+      dEmoji.textContent = '🤖';
+      dName.textContent = 'Android';
+      dSub.textContent = chrome ? 'Chrome · One-click install supported' : 'Use Chrome for best install experience';
+      block = 'block-android';
+    } else if (mac) {
+      dEmoji.textContent = '💻';
+      dName.textContent = 'macOS';
+      dSub.textContent = (chrome || edge) ? 'Chrome/Edge · One-click install ready' : safari ? 'Safari 17+ supports File → Add to Dock' : 'Use Chrome / Edge / Brave';
+      block = 'block-desktop';
+    } else if (win) {
+      dEmoji.textContent = '🪟';
+      dName.textContent = 'Windows';
+      dSub.textContent = (chrome || edge) ? 'Chrome/Edge · One-click install ready' : 'Use Chrome / Edge / Brave';
+      block = 'block-desktop';
+    } else if (linux) {
+      dEmoji.textContent = '🐧';
+      dName.textContent = 'Linux';
+      dSub.textContent = chrome ? 'Chrome · One-click install ready' : 'Use Chrome / Edge / Brave';
+      block = 'block-desktop';
+    } else {
+      dEmoji.textContent = '🌐';
+      dName.textContent = 'Web browser';
+      dSub.textContent = 'Install path depends on your browser';
+      block = 'block-desktop';
+    }
 
- if (block) {
- const el = document.getElementById(block);
- if (el) el.style.display = 'block';
- }
+    if (block) {
+      const el = document.getElementById(block);
+      if (el) el.style.display = 'block';
+    }
 
- // ── beforeinstallprompt: Chrome/Edge desktop + Android Chrome ──
- const installBtn = document.getElementById('install-btn');
- let deferredPrompt = null;
+    // ── beforeinstallprompt: Chrome/Edge desktop + Android Chrome ──
+    const installBtn = document.getElementById('install-btn');
+    let deferredPrompt = null;
 
- if (ios &&!standalone) {
- // iOS can't programmatically install — guide user to Share menu instead
- installBtn.textContent = 'TAP SHARE ⬆ THEN "ADD TO HOME SCREEN"';
- installBtn.disabled = true;
- // Animate a hint arrow if the share icon is visible
- } else if (!standalone) {
- installBtn.textContent = '⏳ WAITING FOR BROWSER TO ENABLE INSTALL…';
- installBtn.disabled = true;
- }
+    if (ios && !standalone) {
+      // iOS can't programmatically install — guide user to Share menu instead
+      installBtn.textContent = 'TAP SHARE ⬆ THEN "ADD TO HOME SCREEN"';
+      installBtn.disabled = true;
+      // Animate a hint arrow if the share icon is visible
+    } else if (!standalone) {
+      installBtn.textContent = '⏳ WAITING FOR BROWSER TO ENABLE INSTALL…';
+      installBtn.disabled = true;
+    }
 
- window.addEventListener('beforeinstallprompt', (e) => {
- e.preventDefault();
- deferredPrompt = e;
- installBtn.disabled = false;
- installBtn.textContent = '⚡ INSTALL FIRST LIGHT';
- });
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.disabled = false;
+      installBtn.textContent = '⚡ INSTALL FIRST LIGHT';
+    });
 
- installBtn.addEventListener('click', async () => {
- if (!deferredPrompt) return;
- installBtn.disabled = true;
- installBtn.textContent = '⏳ INSTALLING…';
- deferredPrompt.prompt();
- const { outcome } = await deferredPrompt.userChoice;
- deferredPrompt = null;
- if (outcome === 'accepted') {
- installBtn.textContent = '✓ INSTALLED';
- installBtn.classList.add('success');
- setTimeout(() => { window.location.href = '/punch.html'; }, 1200);
- } else {
- installBtn.disabled = false;
- installBtn.textContent = '⚡ INSTALL FIRST LIGHT';
- }
- });
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      installBtn.disabled = true;
+      installBtn.textContent = '⏳ INSTALLING…';
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (outcome === 'accepted') {
+        installBtn.textContent = '✓ INSTALLED';
+        installBtn.classList.add('success');
+        setTimeout(() => { window.location.href = '/punch.html'; }, 1200);
+      } else {
+        installBtn.disabled = false;
+        installBtn.textContent = '⚡ INSTALL FIRST LIGHT';
+      }
+    });
 
- // Track install completion (fires after the browser actually installs)
- window.addEventListener('appinstalled', () => {
- installBtn.textContent = '✓ INSTALLED — OPEN FROM HOME SCREEN';
- installBtn.classList.add('success');
- installBtn.disabled = true;
- });
- })();
- </script>
+    // Track install completion (fires after the browser actually installs)
+    window.addEventListener('appinstalled', () => {
+      installBtn.textContent = '✓ INSTALLED — OPEN FROM HOME SCREEN';
+      installBtn.classList.add('success');
+      installBtn.disabled = true;
+    });
+  })();
+  </script>
 </body>
 </html>

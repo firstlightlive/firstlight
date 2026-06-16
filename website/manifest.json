@@ -1,29 +1,29 @@
 {
- "name": "First Light — Command Center",
- "short_name": "FL Punch",
- "description": "Offline-first daily punch + Command Center. Tap. Save. Sync when online.",
- "start_url": "/punch.html",
- "scope": "/",
- "id": "/punch.html",
- "display": "standalone",
- "display_override": ["standalone", "minimal-ui"],
- "background_color": "#0A0C10",
- "theme_color": "#00D4FF",
- "orientation": "portrait",
- "categories": ["health", "lifestyle", "productivity"],
- "lang": "en",
- "dir": "ltr",
- "icons": [
- { "src": "icon-512.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
- { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
- { "src": "icon-512.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
- { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
- ],
- "shortcuts": [
- { "name": "Punch", "short_name": "Punch", "description": "Fast daily punch screen", "url": "/punch.html", "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
- { "name": "Command Center", "short_name": "CC", "description": "Full admin app", "url": "/admin.html", "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
- { "name": "Add Slip", "short_name": "Slip", "description": "Log a slip immediately", "url": "/admin.html#panel-slips", "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
- { "name": "Mastery", "short_name": "Mastery", "description": "Tick today's mastery", "url": "/admin.html#panel-mastery", "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] }
- ],
- "prefer_related_applications": false
+  "name": "First Light — Command Center",
+  "short_name": "FL Punch",
+  "description": "Offline-first daily punch + Command Center. Tap. Save. Sync when online.",
+  "start_url": "/punch.html",
+  "scope": "/",
+  "id": "/punch.html",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0A0C10",
+  "theme_color": "#00D4FF",
+  "orientation": "portrait",
+  "categories": ["health", "lifestyle", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Punch",          "short_name": "Punch",   "description": "Fast daily punch screen", "url": "/punch.html",            "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
+    { "name": "Command Center", "short_name": "CC",      "description": "Full admin app",          "url": "/admin.html",            "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
+    { "name": "Add Slip",       "short_name": "Slip",    "description": "Log a slip immediately",  "url": "/admin.html#panel-slips",   "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] },
+    { "name": "Mastery",        "short_name": "Mastery", "description": "Tick today's mastery",    "url": "/admin.html#panel-mastery", "icons": [{ "src": "icon-512.png", "sizes": "512x512" }] }
+  ],
+  "prefer_related_applications": false
 }

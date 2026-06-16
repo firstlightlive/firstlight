@@ -1,840 +1,1041 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta name="theme-color" content="#060810">
- <meta name="apple-mobile-web-app-capable" content="yes">
- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- <title>FIRST LIGHT - The Ironman Journey</title>
- <meta name="description" content="From Day 1 to Ironman 140.6. Training for the impossible with public accountability. Every run, ride, and swim tracked live.">
- <link rel="canonical" href="https://firstlight.live/">
- <link rel="preconnect" href="https://fonts.googleapis.com">
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="styles.css">
- <link rel="icon" type="image/png" href="icon-512.png">
- <link rel="apple-touch-icon" href="icon-512.png">
- <meta property="og:title" content="FIRST LIGHT - The Ironman Journey">
- <meta property="og:description" content="From Day 1 to Ironman 140.6. Training for the impossible with public accountability.">
- <meta property="og:image" content="https://firstlight.live/icon-512.png">
- <meta property="og:url" content="https://firstlight.live/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#060810">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>FIRST LIGHT - The Ironman Journey</title>
+  <meta name="description" content="From Day 1 to Ironman 140.6. Training for the impossible with real stakes. Every run, ride, and swim tracked live.">
+  <link rel="canonical" href="https://firstlight.live/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <meta property="og:title" content="FIRST LIGHT - The Ironman Journey">
+  <meta property="og:description" content="From Day 1 to Ironman 140.6. Training for the impossible with real stakes.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live/">
 
- <!-- CDN Libraries (loaded before body scripts) -->
- <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js"></script>
+  <!-- CDN Libraries (loaded before body scripts) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js"></script>
 
- <style>
- /* =============================================
- FIRST LIGHT 7D - DESIGN SYSTEM
- ============================================= */:root {
- --bg: #060810;
- --bg2: #0A0E18;
- --cyan: #00D4FF;
- --cyan-dim: rgba(0,212,255,0.08);
- --cyan-glow: rgba(0,212,255,0.25);
- --gold: #F5A623;
- --gold-dim: rgba(245,166,35,0.08);
- --green: #00E676;
- --green-dim: rgba(0,230,118,0.08);
- --red: #FF5252;
- --strava: #FC4C02;
- --swim-blue: #00B0FF;
- --text: #E8EDF2;
- --text-muted: #8FA0B4;
- --text-dim: #5A6B80;
- --glass: rgba(255,255,255,0.03);
- --glass-border: rgba(255,255,255,0.06);
- --glass-hover: rgba(255,255,255,0.08);
- --font-mono: 'IBM Plex Mono', monospace;
- --font-body: 'Inter', sans-serif;
- }
+  <style>
+    /* =============================================
+       FIRST LIGHT 7D - DESIGN SYSTEM
+       ============================================= */
+    :root {
+      --bg: #060810;
+      --bg2: #0A0E18;
+      --cyan: #00D4FF;
+      --cyan-dim: rgba(0,212,255,0.08);
+      --cyan-glow: rgba(0,212,255,0.25);
+      --gold: #F5A623;
+      --gold-dim: rgba(245,166,35,0.08);
+      --green: #00E676;
+      --green-dim: rgba(0,230,118,0.08);
+      --red: #FF5252;
+      --strava: #FC4C02;
+      --swim-blue: #00B0FF;
+      --text: #E8EDF2;
+      --text-muted: #8FA0B4;
+      --text-dim: #5A6B80;
+      --glass: rgba(255,255,255,0.03);
+      --glass-border: rgba(255,255,255,0.06);
+      --glass-hover: rgba(255,255,255,0.08);
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-body: 'Inter', sans-serif;
+    }
 
- /* RESET */
- *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
- html { scroll-behavior: auto; /* Lenis handles smoothing */ }
- body {
- background: var(--bg);
- color: var(--text);
- font-family: var(--font-body);
- line-height: 1.6;
- overflow-x: hidden;
- -webkit-font-smoothing: antialiased;
- }
- img { max-width:100%; display:block; }
- a { color:inherit; text-decoration:none; }
- button { font-family:inherit; cursor:pointer; border:none; background:none; }
+    /* RESET */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: auto; /* Lenis handles smoothing */ }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { max-width:100%; display:block; }
+    a { color:inherit; text-decoration:none; }
+    button { font-family:inherit; cursor:pointer; border:none; background:none; }
 
- /* Reduced motion */
- @media(prefers-reduced-motion:reduce){
- *, *::before, *::after { animation-duration:0.01ms!important; transition-duration:0.01ms!important; }
- }
+    /* Reduced motion */
+    @media(prefers-reduced-motion:reduce){
+      *, *::before, *::after { animation-duration:0.01ms!important; transition-duration:0.01ms!important; }
+    }
 
- /* =============================================
- FILM GRAIN + SCAN LINES (signature)
- ============================================= */
- body::before {
- content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.03;
- background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
- background-size: 128px 128px;
- }
- body::after {
- content:''; position:fixed; inset:0; z-index:9998; pointer-events:none;
- background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.006) 2px, rgba(255,255,255,0.006) 4px);
- }
+    /* =============================================
+       FILM GRAIN + SCAN LINES (signature)
+       ============================================= */
+    body::before {
+      content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 128px 128px;
+    }
+    body::after {
+      content:''; position:fixed; inset:0; z-index:9998; pointer-events:none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.006) 2px, rgba(255,255,255,0.006) 4px);
+    }
 
- /* Nav uses styles.css standard nav */
+    /* Nav uses styles.css standard nav */
 
- /* =============================================
- SECTION: HERO - Particle Canvas
- ============================================= */.hero-section {
- position: relative; min-height: 100vh; min-height: 100dvh;
- display: flex; align-items: center; justify-content: center;
- overflow: hidden;
- }
- #heroCanvas {
- position: absolute; top: 0; left: 0; width: 100%; height: 100%;
- z-index: 1; display: block;
- }.hero-content {
- position: relative; z-index: 2; text-align: center;
- padding: 120px 20px 80px; max-width: 800px;
- }.hero-signal {
- display: inline-flex; align-items: center; gap: 8px;
- font-family: var(--font-mono); font-size: 10px; letter-spacing: 4px;
- color: var(--green); margin-bottom: 32px;
- padding: 6px 16px; border: 1px solid rgba(0,230,118,0.2);
- border-radius: 4px; background: rgba(0,230,118,0.04);
- }.hero-signal-dot {
- width: 6px; height: 6px; border-radius: 50%; background: var(--green);
- box-shadow: 0 0 8px var(--green); animation: pulse-dot 2s ease-in-out infinite;
- }.hero-pre {
- font-family: var(--font-mono); font-size: 11px; letter-spacing: 8px;
- color: rgba(255,255,255,0.25); margin-bottom: 8px;
- }.hero-day-num {
- font-family: var(--font-mono); font-size: clamp(6rem, 18vw, 14rem);
- font-weight: 700; line-height: 0.85; color: #fff;
- text-shadow: 0 0 60px rgba(0,212,255,0.2), 0 0 120px rgba(0,212,255,0.08);
- margin-bottom: 8px;
- }.hero-subtitle {
- font-family: var(--font-mono); font-size: clamp(0.7rem, 2vw, 1rem);
- letter-spacing: 6px; color: var(--gold); font-weight: 600;
- margin-bottom: 20px;
- text-shadow: 0 0 20px rgba(245,166,35,0.3);
- }.hero-tagline {
- font-family: var(--font-body); font-size: clamp(0.85rem, 2vw, 1.1rem);
- color: rgba(255,255,255,0.6); letter-spacing: 2px; margin-bottom: 40px;
- }
- /* Wake proof in hero */.hero-wake {
- display: inline-flex; align-items: center; gap: 24px;
- padding: 18px 32px; border-radius: 14px;
- background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.15);
- backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
- box-shadow: 0 0 30px rgba(0,212,255,0.06);
- }.hero-wake-time {
- font-family: var(--font-mono); font-size: clamp(2rem, 5vw, 3rem);
- font-weight: 700; color: #fff;
- text-shadow: 0 0 30px rgba(0,212,255,0.4);
- }.hero-wake-label {
- font-family: var(--font-mono); font-size: 9px; letter-spacing: 3px;
- color: var(--cyan); text-align: left; font-weight: 600;
- }.hero-wake-check {
- font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px;
- color: var(--green); font-weight: 700;
- }.hero-scroll-cue {
- position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
- font-family: var(--font-mono); font-size: 10px; letter-spacing: 4px;
- color: rgba(255,255,255,0.15); animation: float-down 2s ease-in-out infinite;
- }
- @keyframes float-down {
- 0%,100% { transform: translateX(-50%) translateY(0); opacity:0.3; }
- 50% { transform: translateX(-50%) translateY(8px); opacity:0.6; }
- }
+    /* =============================================
+       SECTION: HERO - Particle Canvas
+       ============================================= */
+    .hero-section {
+      position: relative; min-height: 100vh; min-height: 100dvh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #heroCanvas {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1; display: block;
+    }
+    .hero-content {
+      position: relative; z-index: 2; text-align: center;
+      padding: 120px 20px 80px; max-width: 800px;
+    }
+    .hero-signal {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 4px;
+      color: var(--green); margin-bottom: 32px;
+      padding: 6px 16px; border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 4px; background: rgba(0,230,118,0.04);
+    }
+    .hero-signal-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+      box-shadow: 0 0 8px var(--green); animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .hero-pre {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 8px;
+      color: rgba(255,255,255,0.25); margin-bottom: 8px;
+    }
+    .hero-day-num {
+      font-family: var(--font-mono); font-size: clamp(6rem, 18vw, 14rem);
+      font-weight: 700; line-height: 0.85; color: #fff;
+      text-shadow: 0 0 60px rgba(0,212,255,0.2), 0 0 120px rgba(0,212,255,0.08);
+      margin-bottom: 8px;
+    }
+    .hero-subtitle {
+      font-family: var(--font-mono); font-size: clamp(0.7rem, 2vw, 1rem);
+      letter-spacing: 6px; color: var(--gold); font-weight: 600;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px rgba(245,166,35,0.3);
+    }
+    .hero-tagline {
+      font-family: var(--font-body); font-size: clamp(0.85rem, 2vw, 1.1rem);
+      color: rgba(255,255,255,0.6); letter-spacing: 2px; margin-bottom: 40px;
+    }
+    /* Wake proof in hero */
+    .hero-wake {
+      display: inline-flex; align-items: center; gap: 24px;
+      padding: 18px 32px; border-radius: 14px;
+      background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.15);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 0 30px rgba(0,212,255,0.06);
+    }
+    .hero-wake-time {
+      font-family: var(--font-mono); font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700; color: #fff;
+      text-shadow: 0 0 30px rgba(0,212,255,0.4);
+    }
+    .hero-wake-label {
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 3px;
+      color: var(--cyan); text-align: left; font-weight: 600;
+    }
+    .hero-wake-check {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px;
+      color: var(--green); font-weight: 700;
+    }
+    .hero-scroll-cue {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 4px;
+      color: rgba(255,255,255,0.15); animation: float-down 2s ease-in-out infinite;
+    }
+    @keyframes float-down {
+      0%,100% { transform: translateX(-50%) translateY(0); opacity:0.3; }
+      50% { transform: translateX(-50%) translateY(8px); opacity:0.6; }
+    }
 
- /* =============================================
- SECTION: TRAINING DASHBOARD - Bento Glass
- ============================================= */.dash-section {
- padding: 100px 0; position: relative;
- background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);
- }.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }.section-eyebrow {
- font-family: var(--font-mono); font-size: 10px; letter-spacing: 6px;
- color: var(--cyan); margin-bottom: 8px;
- }.section-heading {
- font-family: var(--font-mono); font-size: clamp(1.4rem, 4vw, 2.2rem);
- font-weight: 700; color: #fff; margin-bottom: 48px;
- letter-spacing: 1px;
- }
- /* Bento Grid */.bento-grid {
- display: grid;
- grid-template-columns: repeat(4, 1fr);
- grid-template-rows: auto auto;
- gap: 16px;
- }.bento-card {
- background: var(--glass);
- border: 1px solid var(--glass-border);
- border-radius: 16px;
- padding: 28px 24px;
- position: relative;
- overflow: hidden;
- backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
- transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
- }.bento-card:hover {
- border-color: var(--glass-hover);
- transform: translateY(-3px);
- box-shadow: 0 12px 40px rgba(0,0,0,0.3);
- }.bento-card::before {
- content:''; position:absolute; top:0; left:0; right:0; height:2px;
- border-radius: 16px 16px 0 0;
- }.bento-card--wide { grid-column: span 2; }.bento-card--run::before { background: linear-gradient(90deg, var(--strava), #FF8A50); }.bento-card--bike::before { background: linear-gradient(90deg, var(--green), #69F0AE); }.bento-card--swim::before { background: linear-gradient(90deg, var(--swim-blue), #40C4FF); }.bento-card--gym::before { background: linear-gradient(90deg, #AB47BC, #CE93D8); }.bento-card--sleep::before { background: linear-gradient(90deg, var(--cyan), #0099CC); }.bento-card--hr::before { background: linear-gradient(90deg, var(--red), #FF8A80); }.bento-card--streak::before { background: linear-gradient(90deg, var(--gold), #FFD54F); }.bento-card--week::before { background: linear-gradient(90deg, var(--cyan), var(--green)); }.bento-label {
- font-family: var(--font-mono); font-size: 10px; letter-spacing: 3px;
- font-weight: 600; margin-bottom: 16px;
- }.bento-card--run.bento-label { color: var(--strava); }.bento-card--bike.bento-label { color: var(--green); }.bento-card--swim.bento-label { color: var(--swim-blue); }.bento-card--gym.bento-label { color: #CE93D8; }.bento-card--sleep.bento-label { color: var(--cyan); }.bento-card--hr.bento-label { color: var(--red); }.bento-card--streak.bento-label { color: var(--gold); }.bento-card--week.bento-label { color: var(--cyan); }.bento-value {
- font-family: var(--font-mono); font-size: clamp(2rem, 5vw, 3rem);
- font-weight: 700; color: #fff; line-height: 1;
- font-variant-numeric: tabular-nums; margin-bottom: 8px;
- }.bento-value.unit {
- font-size: 0.4em; font-weight: 400; color: var(--text-dim);
- letter-spacing: 2px;
- }.bento-sub {
- font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
- letter-spacing: 0.5px;
- }
- /* ECG Canvas in heart rate card */.bento-ecg {
- width: 100%; height: 40px; margin-top: 12px; border-radius: 4px;
- }
- /* Sleep wave canvas */.bento-wave {
- width: 100%; height: 30px; margin-top: 12px; border-radius: 4px;
- }
- /* Week bars */.week-bars {
- display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-top: 16px;
- }.week-bar {
- flex: 1; border-radius: 4px 4px 0 0; transition: height 1s ease;
- position: relative;
- }.week-bar-label {
- position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
- font-family: var(--font-mono); font-size: 8px; color: var(--text-dim);
- letter-spacing: 1px;
- }
- @media(max-width:900px) {.bento-grid { grid-template-columns: repeat(2, 1fr); }.bento-card--wide { grid-column: span 2; }
- }
- @media(max-width:480px) {.bento-grid { grid-template-columns: 1fr; }.bento-card--wide { grid-column: span 1; }
- }
+    /* =============================================
+       SECTION: TRAINING DASHBOARD - Bento Glass
+       ============================================= */
+    .dash-section {
+      padding: 100px 0; position: relative;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .section-eyebrow {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 6px;
+      color: var(--cyan); margin-bottom: 8px;
+    }
+    .section-heading {
+      font-family: var(--font-mono); font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 700; color: #fff; margin-bottom: 48px;
+      letter-spacing: 1px;
+    }
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto auto;
+      gap: 16px;
+    }
+    .bento-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .bento-card:hover {
+      border-color: var(--glass-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .bento-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      border-radius: 16px 16px 0 0;
+    }
+    .bento-card--wide { grid-column: span 2; }
+    .bento-card--run::before { background: linear-gradient(90deg, var(--strava), #FF8A50); }
+    .bento-card--bike::before { background: linear-gradient(90deg, var(--green), #69F0AE); }
+    .bento-card--swim::before { background: linear-gradient(90deg, var(--swim-blue), #40C4FF); }
+    .bento-card--gym::before { background: linear-gradient(90deg, #AB47BC, #CE93D8); }
+    .bento-card--sleep::before { background: linear-gradient(90deg, var(--cyan), #0099CC); }
+    .bento-card--hr::before { background: linear-gradient(90deg, var(--red), #FF8A80); }
+    .bento-card--streak::before { background: linear-gradient(90deg, var(--gold), #FFD54F); }
+    .bento-card--week::before { background: linear-gradient(90deg, var(--cyan), var(--green)); }
 
- /* =============================================
- SECTION: PROGRESSION TIMELINE (Horizontal)
- ============================================= */.timeline-section {
- padding: 100px 0; min-height: 100vh;
- position: relative; overflow: hidden;
- }.timeline-track {
- display: flex; align-items: center; gap: 0;
- padding: 60px 0 80px;
- width: max-content; min-width: 100%;
- }.timeline-line {
- position: absolute; top: 50%; left: 0; right: 0; height: 2px;
- background: linear-gradient(90deg, var(--glass-border), var(--cyan), var(--gold), var(--green));
- transform: translateY(-50%);
- }.timeline-node {
- position: relative; z-index: 2; flex: 0 0 220px;
- text-align: center; padding: 0 16px;
- }.timeline-dot {
- width: 20px; height: 20px; border-radius: 50%;
- margin: 0 auto 16px; position: relative;
- transition: all 0.5s;
- }.timeline-dot--done {
- background: var(--green); box-shadow: 0 0 20px rgba(0,230,118,0.4);
- }.timeline-dot--current {
- background: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,0.5);
- animation: pulse-dot 2s ease-in-out infinite;
- }.timeline-dot--future {
- background: transparent; border: 2px solid var(--text-dim);
- }.timeline-dot--goal {
- width: 28px; height: 28px; background: var(--gold);
- box-shadow: 0 0 30px rgba(245,166,35,0.5);
- transform: rotate(45deg);
- }.timeline-day {
- font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
- color: var(--text-dim); margin-bottom: 4px;
- }.timeline-title {
- font-family: var(--font-mono); font-size: 13px; font-weight: 700;
- color: #fff; margin-bottom: 4px;
- }.timeline-desc {
- font-family: var(--font-mono); font-size: 10px; color: var(--text-dim);
- line-height: 1.4;
- }
+    .bento-label {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 3px;
+      font-weight: 600; margin-bottom: 16px;
+    }
+    .bento-card--run .bento-label { color: var(--strava); }
+    .bento-card--bike .bento-label { color: var(--green); }
+    .bento-card--swim .bento-label { color: var(--swim-blue); }
+    .bento-card--gym .bento-label { color: #CE93D8; }
+    .bento-card--sleep .bento-label { color: var(--cyan); }
+    .bento-card--hr .bento-label { color: var(--red); }
+    .bento-card--streak .bento-label { color: var(--gold); }
+    .bento-card--week .bento-label { color: var(--cyan); }
 
- /* =============================================
- SECTION: STAKES - Holographic Card
- ============================================= */.stakes-section {
- padding: 100px 0;
- display: flex; align-items: center; justify-content: center;
- min-height: 80vh;
- }.holo-card {
- position: relative; max-width: 480px; width: 90%; padding: 48px 40px;
- border-radius: 20px; text-align: center;
- background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(245,166,35,0.04));
- border: 1px solid rgba(255,255,255,0.08);
- backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
- box-shadow: 0 0 60px rgba(0,0,0,0.4), inset 0 0 60px rgba(0,212,255,0.02);
- transform-style: preserve-3d; perspective: 800px;
- transition: transform 0.1s ease-out;
- }.holo-card::before {
- content:''; position:absolute; inset:-1px; border-radius:21px;
- background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(245,166,35,0.1), rgba(0,230,118,0.1));
- z-index:-1; opacity:0.5;
- animation: holo-shift 6s ease-in-out infinite;
- }
- @keyframes holo-shift {
- 0%,100% { opacity:0.3; filter:hue-rotate(0deg); }
- 50% { opacity:0.6; filter:hue-rotate(30deg); }
- }.holo-amount {
- font-family: var(--font-mono); font-size: clamp(3rem, 10vw, 5rem);
- font-weight: 700; color: #fff;
- text-shadow: 0 0 30px rgba(255,255,255,0.1);
- margin-bottom: 8px;
- }.holo-amount.currency { font-size: 0.5em; color: var(--gold); }.holo-label {
- font-family: var(--font-mono); font-size: 12px; letter-spacing: 4px;
- color: var(--text-muted); margin-bottom: 24px;
- }.holo-stats {
- display: flex; justify-content: center; gap: 32px; margin-bottom: 24px;
- }.holo-stat {
- text-align: center;
- }.holo-stat-val {
- font-family: var(--font-mono); font-size: 20px; font-weight: 700;
- color: #fff;
- }.holo-stat-label {
- font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
- color: var(--text-dim); margin-top: 4px;
- }.holo-cta {
- display: inline-block; padding: 12px 32px; border-radius: 8px;
- font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px;
- font-weight: 700; color: var(--red); border: 1px solid rgba(255,82,82,0.3);
- background: rgba(255,82,82,0.06); transition: all 0.3s;
- -webkit-tap-highlight-color: transparent; touch-action: manipulation;
- }.holo-cta:hover {
- background: rgba(255,82,82,0.12); box-shadow: 0 0 20px rgba(255,82,82,0.2);
- }
+    .bento-value {
+      font-family: var(--font-mono); font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700; color: #fff; line-height: 1;
+      font-variant-numeric: tabular-nums; margin-bottom: 8px;
+    }
+    .bento-value .unit {
+      font-size: 0.4em; font-weight: 400; color: var(--text-dim);
+      letter-spacing: 2px;
+    }
+    .bento-sub {
+      font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+      letter-spacing: 0.5px;
+    }
+    /* ECG Canvas in heart rate card */
+    .bento-ecg {
+      width: 100%; height: 40px; margin-top: 12px; border-radius: 4px;
+    }
+    /* Sleep wave canvas */
+    .bento-wave {
+      width: 100%; height: 30px; margin-top: 12px; border-radius: 4px;
+    }
+    /* Week bars */
+    .week-bars {
+      display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-top: 16px;
+    }
+    .week-bar {
+      flex: 1; border-radius: 4px 4px 0 0; transition: height 1s ease;
+      position: relative;
+    }
+    .week-bar-label {
+      position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 8px; color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+    @media(max-width:900px) {
+      .bento-grid { grid-template-columns: repeat(2, 1fr); }
+      .bento-card--wide { grid-column: span 2; }
+    }
+    @media(max-width:480px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-card--wide { grid-column: span 1; }
+    }
 
- /* =============================================
- SECTION: WAKE-UP PROOF - Flip Clock
- ============================================= */.wake-section {
- padding: 100px 0;
- }.wake-display {
- display: flex; align-items: center; justify-content: center; gap: 32px;
- flex-wrap: wrap;
- }.wake-clock {
- display: flex; align-items: center; gap: 8px;
- }.flip-digit {
- width: 64px; height: 80px; position: relative; perspective: 400px;
- background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
- border-radius: 8px; display: flex; align-items: center; justify-content: center;
- font-family: var(--font-mono); font-size: 48px; font-weight: 700;
- color: var(--cyan); text-shadow: 0 0 15px rgba(0,212,255,0.3);
- overflow: hidden;
- }.flip-colon {
- font-family: var(--font-mono); font-size: 48px; font-weight: 700;
- color: var(--cyan); animation: blink 1s step-end infinite;
- }
- @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }.flip-period {
- font-family: var(--font-mono); font-size: 24px; font-weight: 700;
- color: var(--cyan); letter-spacing: 2px; margin-left: 8px;
- }.wake-meta {
- text-align: left;
- }.wake-meta-row {
- display: flex; align-items: center; gap: 8px;
- font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;
- color: var(--text-dim); margin-bottom: 6px;
- }.wake-meta-row.val { color: #fff; font-weight: 600; }.wake-heatmap {
- display: flex; gap: 3px; margin-top: 20px; flex-wrap: wrap; justify-content: center;
- }.wake-heatmap-cell {
- width: 14px; height: 14px; border-radius: 3px;
- transition: all 0.3s;
- }.wake-heatmap-cell:hover { transform: scale(1.4); }.whc-green { background: var(--green); box-shadow: inset 0 0 4px rgba(0,230,118,0.4); }.whc-gold { background: var(--gold); }.whc-red { background: var(--red); }.whc-empty { background: rgba(255,255,255,0.04); }.wake-no-sleep {
- margin-top: 24px; padding: 10px 20px; border-radius: 8px;
- font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px;
- color: var(--green); border: 1px solid rgba(0,230,118,0.2);
- background: rgba(0,230,118,0.04); display: inline-block;
- }
- @media(max-width:600px) {.flip-digit { width:48px; height:60px; font-size:36px; }.flip-colon { font-size:36px; }.flip-period { font-size:18px; }.wake-display { gap:20px; }
- }
+    /* =============================================
+       SECTION: PROGRESSION TIMELINE (Horizontal)
+       ============================================= */
+    .timeline-section {
+      padding: 100px 0; min-height: 100vh;
+      position: relative; overflow: hidden;
+    }
+    .timeline-track {
+      display: flex; align-items: center; gap: 0;
+      padding: 60px 0 80px;
+      width: max-content; min-width: 100%;
+    }
+    .timeline-line {
+      position: absolute; top: 50%; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--glass-border), var(--cyan), var(--gold), var(--green));
+      transform: translateY(-50%);
+    }
+    .timeline-node {
+      position: relative; z-index: 2; flex: 0 0 220px;
+      text-align: center; padding: 0 16px;
+    }
+    .timeline-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      margin: 0 auto 16px; position: relative;
+      transition: all 0.5s;
+    }
+    .timeline-dot--done {
+      background: var(--green); box-shadow: 0 0 20px rgba(0,230,118,0.4);
+    }
+    .timeline-dot--current {
+      background: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,0.5);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .timeline-dot--future {
+      background: transparent; border: 2px solid var(--text-dim);
+    }
+    .timeline-dot--goal {
+      width: 28px; height: 28px; background: var(--gold);
+      box-shadow: 0 0 30px rgba(245,166,35,0.5);
+      transform: rotate(45deg);
+    }
+    .timeline-day {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
+      color: var(--text-dim); margin-bottom: 4px;
+    }
+    .timeline-title {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+      color: #fff; margin-bottom: 4px;
+    }
+    .timeline-desc {
+      font-family: var(--font-mono); font-size: 10px; color: var(--text-dim);
+      line-height: 1.4;
+    }
 
- /* =============================================
- SECTION: MILESTONES - Adaptive Snake Grid
- Scales from 5 to 500+ milestones elegantly
- ============================================= */.ms-section { padding: 100px 0; }.ms-grid {
- display: grid;
- grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
- gap: 12px;
- max-width: 1100px; margin: 0 auto;
- }.ms-card {
- position: relative; padding: 16px 14px; border-radius: 12px;
- background: var(--glass); border: 1px solid var(--glass-border);
- backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
- transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
- overflow: hidden; cursor: default;
- }.ms-card:hover {
- border-color: rgba(255,255,255,0.12);
- transform: translateY(-4px) scale(1.02);
- box-shadow: 0 12px 40px rgba(0,0,0,0.4);
- z-index: 10;
- }.ms-card::before {
- content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
- border-radius: 12px 12px 0 0;
- }.ms-card--run::before { background: linear-gradient(90deg, var(--strava), #FF8A50); }.ms-card--bike::before { background: linear-gradient(90deg, var(--green), #69F0AE); }.ms-card--swim::before { background: linear-gradient(90deg, var(--swim-blue), #40C4FF); }.ms-card--gym::before { background: linear-gradient(90deg, #AB47BC, #CE93D8); }.ms-card--walk::before { background: linear-gradient(90deg, var(--gold), #FFD54F); }.ms-card--major {
- grid-column: span 2;
- background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(245,166,35,0.03));
- border-color: rgba(0,212,255,0.12);
- }.ms-card--major::before { background: linear-gradient(90deg, var(--cyan), var(--gold)); height: 3px; }.ms-icon {
- font-size: 20px; margin-bottom: 8px; line-height: 1;
- }.ms-title {
- font-family: var(--font-mono); font-size: 11px; font-weight: 700;
- color: #fff; line-height: 1.3; margin-bottom: 6px;
- }.ms-card--run.ms-title { color: var(--strava); }.ms-card--bike.ms-title { color: var(--green); }.ms-card--swim.ms-title { color: var(--swim-blue); }.ms-card--gym.ms-title { color: #CE93D8; }.ms-val {
- font-family: var(--font-mono); font-size: 16px; font-weight: 700;
- color: #fff; margin-bottom: 4px;
- }.ms-date {
- font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px;
- color: var(--text-dim);
- }
- /* Connecting flow lines via SVG */.ms-flow {
- position: absolute; inset: 0; pointer-events: none; z-index: 0;
- }
- /* Summary bar above grid */.ms-summary {
- display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
- margin-bottom: 40px; padding: 16px 24px;
- background: var(--glass); border: 1px solid var(--glass-border);
- border-radius: 12px;
- }.ms-summary-item {
- text-align: center;
- }.ms-summary-val {
- font-family: var(--font-mono); font-size: clamp(1.2rem, 3vw, 1.6rem);
- font-weight: 700; color: #fff;
- }.ms-summary-label {
- font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
- color: var(--text-dim); margin-top: 2px;
- }
- @media(max-width:600px) {.ms-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }.ms-card--major { grid-column: span 1; }.ms-card { padding: 12px 10px; }.ms-val { font-size: 14px; }.ms-title { font-size: 10px; }
- }
+    /* =============================================
+       SECTION: STAKES - Holographic Card
+       ============================================= */
+    .stakes-section {
+      padding: 100px 0;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 80vh;
+    }
+    .holo-card {
+      position: relative; max-width: 480px; width: 90%; padding: 48px 40px;
+      border-radius: 20px; text-align: center;
+      background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(245,166,35,0.04));
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      box-shadow: 0 0 60px rgba(0,0,0,0.4), inset 0 0 60px rgba(0,212,255,0.02);
+      transform-style: preserve-3d; perspective: 800px;
+      transition: transform 0.1s ease-out;
+    }
+    .holo-card::before {
+      content:''; position:absolute; inset:-1px; border-radius:21px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(245,166,35,0.1), rgba(0,230,118,0.1));
+      z-index:-1; opacity:0.5;
+      animation: holo-shift 6s ease-in-out infinite;
+    }
+    @keyframes holo-shift {
+      0%,100% { opacity:0.3; filter:hue-rotate(0deg); }
+      50% { opacity:0.6; filter:hue-rotate(30deg); }
+    }
+    .holo-amount {
+      font-family: var(--font-mono); font-size: clamp(3rem, 10vw, 5rem);
+      font-weight: 700; color: #fff;
+      text-shadow: 0 0 30px rgba(255,255,255,0.1);
+      margin-bottom: 8px;
+    }
+    .holo-amount .currency { font-size: 0.5em; color: var(--gold); }
+    .holo-label {
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 4px;
+      color: var(--text-muted); margin-bottom: 24px;
+    }
+    .holo-stats {
+      display: flex; justify-content: center; gap: 32px; margin-bottom: 24px;
+    }
+    .holo-stat {
+      text-align: center;
+    }
+    .holo-stat-val {
+      font-family: var(--font-mono); font-size: 20px; font-weight: 700;
+      color: #fff;
+    }
+    .holo-stat-label {
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+      color: var(--text-dim); margin-top: 4px;
+    }
+    .holo-cta {
+      display: inline-block; padding: 12px 32px; border-radius: 8px;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px;
+      font-weight: 700; color: var(--red); border: 1px solid rgba(255,82,82,0.3);
+      background: rgba(255,82,82,0.06); transition: all 0.3s;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    .holo-cta:hover {
+      background: rgba(255,82,82,0.12); box-shadow: 0 0 20px rgba(255,82,82,0.2);
+    }
 
- /* =============================================
- SECTION: TRAINING HEATMAP - Canvas
- ============================================= */.heatmap-section { padding: 100px 0; }.heatmap-wrapper {
- padding: 32px; background: var(--glass); border: 1px solid var(--glass-border);
- border-radius: 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
- overflow-x: auto;
- }
- #trainingHeatmap {
- width: 100%; height: 140px; display: block;
- }.heatmap-legend {
- display: flex; gap: 16px; justify-content: center; margin-top: 16px;
- flex-wrap: wrap;
- }.heatmap-legend-item {
- display: flex; align-items: center; gap: 6px;
- font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px;
- color: var(--text-dim);
- }.heatmap-legend-dot {
- width: 10px; height: 10px; border-radius: 2px;
- }
+    /* =============================================
+       SECTION: WAKE-UP PROOF - Flip Clock
+       ============================================= */
+    .wake-section {
+      padding: 100px 0;
+    }
+    .wake-display {
+      display: flex; align-items: center; justify-content: center; gap: 32px;
+      flex-wrap: wrap;
+    }
+    .wake-clock {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .flip-digit {
+      width: 64px; height: 80px; position: relative; perspective: 400px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 48px; font-weight: 700;
+      color: var(--cyan); text-shadow: 0 0 15px rgba(0,212,255,0.3);
+      overflow: hidden;
+    }
+    .flip-colon {
+      font-family: var(--font-mono); font-size: 48px; font-weight: 700;
+      color: var(--cyan); animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .flip-period {
+      font-family: var(--font-mono); font-size: 24px; font-weight: 700;
+      color: var(--cyan); letter-spacing: 2px; margin-left: 8px;
+    }
+    .wake-meta {
+      text-align: left;
+    }
+    .wake-meta-row {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;
+      color: var(--text-dim); margin-bottom: 6px;
+    }
+    .wake-meta-row .val { color: #fff; font-weight: 600; }
+    .wake-heatmap {
+      display: flex; gap: 3px; margin-top: 20px; flex-wrap: wrap; justify-content: center;
+    }
+    .wake-heatmap-cell {
+      width: 14px; height: 14px; border-radius: 3px;
+      transition: all 0.3s;
+    }
+    .wake-heatmap-cell:hover { transform: scale(1.4); }
+    .whc-green { background: var(--green); box-shadow: inset 0 0 4px rgba(0,230,118,0.4); }
+    .whc-gold { background: var(--gold); }
+    .whc-red { background: var(--red); }
+    .whc-empty { background: rgba(255,255,255,0.04); }
+    .wake-no-sleep {
+      margin-top: 24px; padding: 10px 20px; border-radius: 8px;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px;
+      color: var(--green); border: 1px solid rgba(0,230,118,0.2);
+      background: rgba(0,230,118,0.04); display: inline-block;
+    }
+    @media(max-width:600px) {
+      .flip-digit { width:48px; height:60px; font-size:36px; }
+      .flip-colon { font-size:36px; }
+      .flip-period { font-size:18px; }
+      .wake-display { gap:20px; }
+    }
 
- /* =============================================
- SECTION: LIFETIME STATS - Number Parade
- ============================================= */.stats-section { padding: 80px 0; }.stats-grid {
- display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
- }.stat-card {
- text-align: center; padding: 28px 12px;
- background: var(--glass); border: 1px solid var(--glass-border);
- border-radius: 12px; position: relative; overflow: hidden;
- transition: all 0.3s;
- }.stat-card:hover { transform: translateY(-3px); border-color: var(--glass-hover); }.stat-card::before {
- content:''; position:absolute; top:0; left:0; right:0; height:2px;
- }.stat-card:nth-child(1)::before { background: var(--strava); }.stat-card:nth-child(2)::before { background: var(--gold); }.stat-card:nth-child(3)::before { background: var(--green); }.stat-card:nth-child(4)::before { background: var(--swim-blue); }.stat-card:nth-child(5)::before { background: #AB47BC; }.stat-card:nth-child(6)::before { background: #26C6DA; }.stat-card:nth-child(7)::before { background: #E040FB; }.stat-card:nth-child(8)::before { background: var(--gold); }.stat-val {
- font-family: var(--font-mono); font-size: clamp(1.6rem, 4vw, 2.4rem);
- font-weight: 700; color: #fff; font-variant-numeric: tabular-nums;
- margin-bottom: 8px;
- }.stat-label {
- font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
- color: var(--text-dim);
- }
- @media(max-width:768px) {.stats-grid { grid-template-columns: repeat(4,1fr); } }
- @media(max-width:480px) {.stats-grid { grid-template-columns: repeat(2,1fr); } }
+    /* =============================================
+       SECTION: MILESTONES - Adaptive Snake Grid
+       Scales from 5 to 500+ milestones elegantly
+       ============================================= */
+    .ms-section { padding: 100px 0; }
+    .ms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .ms-card {
+      position: relative; padding: 16px 14px; border-radius: 12px;
+      background: var(--glass); border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      overflow: hidden; cursor: default;
+    }
+    .ms-card:hover {
+      border-color: rgba(255,255,255,0.12);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .ms-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      border-radius: 12px 12px 0 0;
+    }
+    .ms-card--run::before { background: linear-gradient(90deg, var(--strava), #FF8A50); }
+    .ms-card--bike::before { background: linear-gradient(90deg, var(--green), #69F0AE); }
+    .ms-card--swim::before { background: linear-gradient(90deg, var(--swim-blue), #40C4FF); }
+    .ms-card--gym::before { background: linear-gradient(90deg, #AB47BC, #CE93D8); }
+    .ms-card--walk::before { background: linear-gradient(90deg, var(--gold), #FFD54F); }
+    .ms-card--major {
+      grid-column: span 2;
+      background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(245,166,35,0.03));
+      border-color: rgba(0,212,255,0.12);
+    }
+    .ms-card--major::before { background: linear-gradient(90deg, var(--cyan), var(--gold)); height: 3px; }
+    .ms-icon {
+      font-size: 20px; margin-bottom: 8px; line-height: 1;
+    }
+    .ms-title {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      color: #fff; line-height: 1.3; margin-bottom: 6px;
+    }
+    .ms-card--run .ms-title { color: var(--strava); }
+    .ms-card--bike .ms-title { color: var(--green); }
+    .ms-card--swim .ms-title { color: var(--swim-blue); }
+    .ms-card--gym .ms-title { color: #CE93D8; }
+    .ms-val {
+      font-family: var(--font-mono); font-size: 16px; font-weight: 700;
+      color: #fff; margin-bottom: 4px;
+    }
+    .ms-date {
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px;
+      color: var(--text-dim);
+    }
+    /* Connecting flow lines via SVG */
+    .ms-flow {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    }
+    /* Summary bar above grid */
+    .ms-summary {
+      display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 40px; padding: 16px 24px;
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 12px;
+    }
+    .ms-summary-item {
+      text-align: center;
+    }
+    .ms-summary-val {
+      font-family: var(--font-mono); font-size: clamp(1.2rem, 3vw, 1.6rem);
+      font-weight: 700; color: #fff;
+    }
+    .ms-summary-label {
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+      color: var(--text-dim); margin-top: 2px;
+    }
+    @media(max-width:600px) {
+      .ms-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+      .ms-card--major { grid-column: span 1; }
+      .ms-card { padding: 12px 10px; }
+      .ms-val { font-size: 14px; }
+      .ms-title { font-size: 10px; }
+    }
 
- /* =============================================
- FOOTER
- ============================================= */.fl-footer {
- padding: 60px 0 40px; border-top: 1px solid rgba(255,255,255,0.04);
- text-align: center;
- }.fl-footer-brand {
- font-family: var(--font-mono); font-size: 12px; letter-spacing: 6px;
- color: var(--cyan); margin-bottom: 12px;
- }.fl-footer-tagline {
- font-family: var(--font-body); font-size: 13px; color: var(--text-dim);
- margin-bottom: 24px;
- }.fl-footer-links {
- display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
- margin-bottom: 24px;
- }.fl-footer-links a {
- font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
- color: var(--text-dim); transition: color 0.3s;
- -webkit-tap-highlight-color: transparent;
- }.fl-footer-links a:hover { color: var(--cyan); }.fl-footer-copy {
- font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.15);
- letter-spacing: 1px;
- }.fl-footer-day {
- font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
- letter-spacing: 2px; margin-bottom: 8px;
- }
+    /* =============================================
+       SECTION: TRAINING HEATMAP - Canvas
+       ============================================= */
+    .heatmap-section { padding: 100px 0; }
+    .heatmap-wrapper {
+      padding: 32px; background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      overflow-x: auto;
+    }
+    #trainingHeatmap {
+      width: 100%; height: 140px; display: block;
+    }
+    .heatmap-legend {
+      display: flex; gap: 16px; justify-content: center; margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .heatmap-legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px;
+      color: var(--text-dim);
+    }
+    .heatmap-legend-dot {
+      width: 10px; height: 10px; border-radius: 2px;
+    }
 
- /* =============================================
- TODAY'S ACTIVITY CARDS - Dynamic
- ============================================= */.act-card {
- background: var(--glass); border: 1px solid var(--glass-border);
- border-radius: 16px; padding: 24px 20px; position: relative; overflow: hidden;
- backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
- transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
- }.act-card:hover {
- border-color: rgba(255,255,255,0.12); transform: translateY(-3px);
- box-shadow: 0 12px 40px rgba(0,0,0,0.3);
- }.act-card::before {
- content:''; position:absolute; top:0; left:0; right:0; height:3px;
- border-radius: 16px 16px 0 0;
- }.act-card--Run::before,.act-card--VirtualRun::before { background: linear-gradient(90deg, var(--strava), #FF8A50); }.act-card--Ride::before { background: linear-gradient(90deg, var(--green), #69F0AE); }.act-card--Swim::before { background: linear-gradient(90deg, var(--swim-blue), #40C4FF); }.act-card--Walk::before,.act-card--Hike::before { background: linear-gradient(90deg, var(--gold), #FFD54F); }.act-card--Workout::before,.act-card--WeightTraining::before { background: linear-gradient(90deg, #AB47BC, #CE93D8); }.act-card--Yoga::before,.act-card--Pilates::before { background: linear-gradient(90deg, #26C6DA, #4DD0E1); }.act-card--StairStepper::before { background: linear-gradient(90deg, #FF7043, #FFAB91); }.act-card--Dance::before { background: linear-gradient(90deg, #E040FB, #EA80FC); }.act-card--Boxing::before,.act-card--MartialArts::before { background: linear-gradient(90deg, #FF1744, #FF5252); }.act-card--HIIT::before,.act-card--Crossfit::before { background: linear-gradient(90deg, #FF6D00, #FFAB40); }.act-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }.act-type {
- font-family: var(--font-mono); font-size: 10px; letter-spacing: 3px;
- font-weight: 700; display: flex; align-items: center; gap: 8px;
- }.act-card--Run.act-type,.act-card--VirtualRun.act-type { color: var(--strava); }.act-card--Ride.act-type { color: var(--green); }.act-card--Swim.act-type { color: var(--swim-blue); }.act-card--Walk.act-type,.act-card--Hike.act-type { color: var(--gold); }.act-card--Workout.act-type,.act-card--WeightTraining.act-type { color: #CE93D8; }.act-card--Yoga.act-type,.act-card--Pilates.act-type { color: #26C6DA; }.act-card--StairStepper.act-type { color: #FF7043; }.act-card--Dance.act-type { color: #E040FB; }.act-card--Boxing.act-type,.act-card--MartialArts.act-type { color: #FF1744; }.act-card--HIIT.act-type,.act-card--Crossfit.act-type { color: #FF6D00; }.act-time-badge {
- font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px;
- color: var(--text-dim); background: rgba(255,255,255,0.04);
- padding: 3px 8px; border-radius: 4px;
- }.act-metrics { display: flex; gap: 20px; flex-wrap: wrap; }.act-metric { }.act-metric-val {
- font-family: var(--font-mono); font-size: clamp(1.4rem, 3vw, 2rem);
- font-weight: 700; color: #fff; line-height: 1;
- }.act-metric-label {
- font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
- color: var(--text-dim); margin-top: 4px;
- }.act-name {
- font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
- margin-top: 12px; letter-spacing: 0.5px;
- }.today-empty {
- text-align: center; padding: 40px 20px;
- background: var(--glass); border: 1px dashed var(--glass-border);
- border-radius: 16px; grid-column: 1 / -1;
- }.today-empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }.today-empty-text {
- font-family: var(--font-mono); font-size: 12px; color: var(--text-dim);
- letter-spacing: 1px;
- }
+    /* =============================================
+       SECTION: LIFETIME STATS - Number Parade
+       ============================================= */
+    .stats-section { padding: 80px 0; }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .stat-card {
+      text-align: center; padding: 28px 12px;
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 12px; position: relative; overflow: hidden;
+      transition: all 0.3s;
+    }
+    .stat-card:hover { transform: translateY(-3px); border-color: var(--glass-hover); }
+    .stat-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    }
+    .stat-card:nth-child(1)::before { background: var(--strava); }
+    .stat-card:nth-child(2)::before { background: var(--gold); }
+    .stat-card:nth-child(3)::before { background: var(--green); }
+    .stat-card:nth-child(4)::before { background: var(--swim-blue); }
+    .stat-card:nth-child(5)::before { background: #AB47BC; }
+    .stat-card:nth-child(6)::before { background: #26C6DA; }
+    .stat-card:nth-child(7)::before { background: #E040FB; }
+    .stat-card:nth-child(8)::before { background: var(--gold); }
+    .stat-val {
+      font-family: var(--font-mono); font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700; color: #fff; font-variant-numeric: tabular-nums;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+      color: var(--text-dim);
+    }
+    @media(max-width:768px) { .stats-grid { grid-template-columns: repeat(4,1fr); } }
+    @media(max-width:480px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
 
- /* =============================================
- GSAP REVEAL HELPERS
- ============================================= */.reveal-up {
- opacity: 0; transform: translateY(40px);
- }.reveal-left {
- opacity: 0; transform: translateX(-40px);
- }.reveal-scale {
- opacity: 0; transform: scale(0.9);
- }.no-gsap.reveal-up,.no-gsap.reveal-left,.no-gsap.reveal-scale {
- opacity: 1; transform: none;
- }
- </style>
+    /* =============================================
+       FOOTER
+       ============================================= */
+    .fl-footer {
+      padding: 60px 0 40px; border-top: 1px solid rgba(255,255,255,0.04);
+      text-align: center;
+    }
+    .fl-footer-brand {
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 6px;
+      color: var(--cyan); margin-bottom: 12px;
+    }
+    .fl-footer-tagline {
+      font-family: var(--font-body); font-size: 13px; color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+    .fl-footer-links {
+      display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .fl-footer-links a {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
+      color: var(--text-dim); transition: color 0.3s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fl-footer-links a:hover { color: var(--cyan); }
+    .fl-footer-copy {
+      font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.15);
+      letter-spacing: 1px;
+    }
+    .fl-footer-day {
+      font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+      letter-spacing: 2px; margin-bottom: 8px;
+    }
+
+    /* =============================================
+       TODAY'S ACTIVITY CARDS - Dynamic
+       ============================================= */
+    .act-card {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 16px; padding: 24px 20px; position: relative; overflow: hidden;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .act-card:hover {
+      border-color: rgba(255,255,255,0.12); transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .act-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      border-radius: 16px 16px 0 0;
+    }
+    .act-card--Run::before, .act-card--VirtualRun::before { background: linear-gradient(90deg, var(--strava), #FF8A50); }
+    .act-card--Ride::before { background: linear-gradient(90deg, var(--green), #69F0AE); }
+    .act-card--Swim::before { background: linear-gradient(90deg, var(--swim-blue), #40C4FF); }
+    .act-card--Walk::before, .act-card--Hike::before { background: linear-gradient(90deg, var(--gold), #FFD54F); }
+    .act-card--Workout::before, .act-card--WeightTraining::before { background: linear-gradient(90deg, #AB47BC, #CE93D8); }
+    .act-card--Yoga::before, .act-card--Pilates::before { background: linear-gradient(90deg, #26C6DA, #4DD0E1); }
+    .act-card--StairStepper::before { background: linear-gradient(90deg, #FF7043, #FFAB91); }
+    .act-card--Dance::before { background: linear-gradient(90deg, #E040FB, #EA80FC); }
+    .act-card--Boxing::before, .act-card--MartialArts::before { background: linear-gradient(90deg, #FF1744, #FF5252); }
+    .act-card--HIIT::before, .act-card--Crossfit::before { background: linear-gradient(90deg, #FF6D00, #FFAB40); }
+    .act-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .act-type {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 3px;
+      font-weight: 700; display: flex; align-items: center; gap: 8px;
+    }
+    .act-card--Run .act-type, .act-card--VirtualRun .act-type { color: var(--strava); }
+    .act-card--Ride .act-type { color: var(--green); }
+    .act-card--Swim .act-type { color: var(--swim-blue); }
+    .act-card--Walk .act-type, .act-card--Hike .act-type { color: var(--gold); }
+    .act-card--Workout .act-type, .act-card--WeightTraining .act-type { color: #CE93D8; }
+    .act-card--Yoga .act-type, .act-card--Pilates .act-type { color: #26C6DA; }
+    .act-card--StairStepper .act-type { color: #FF7043; }
+    .act-card--Dance .act-type { color: #E040FB; }
+    .act-card--Boxing .act-type, .act-card--MartialArts .act-type { color: #FF1744; }
+    .act-card--HIIT .act-type, .act-card--Crossfit .act-type { color: #FF6D00; }
+    .act-time-badge {
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px;
+      color: var(--text-dim); background: rgba(255,255,255,0.04);
+      padding: 3px 8px; border-radius: 4px;
+    }
+    .act-metrics { display: flex; gap: 20px; flex-wrap: wrap; }
+    .act-metric { }
+    .act-metric-val {
+      font-family: var(--font-mono); font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 700; color: #fff; line-height: 1;
+    }
+    .act-metric-label {
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+      color: var(--text-dim); margin-top: 4px;
+    }
+    .act-name {
+      font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+      margin-top: 12px; letter-spacing: 0.5px;
+    }
+    .today-empty {
+      text-align: center; padding: 40px 20px;
+      background: var(--glass); border: 1px dashed var(--glass-border);
+      border-radius: 16px; grid-column: 1 / -1;
+    }
+    .today-empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+    .today-empty-text {
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    /* =============================================
+       GSAP REVEAL HELPERS
+       ============================================= */
+    .reveal-up {
+      opacity: 0; transform: translateY(40px);
+    }
+    .reveal-left {
+      opacity: 0; transform: translateX(-40px);
+    }
+    .reveal-scale {
+      opacity: 0; transform: scale(0.9);
+    }
+    .no-gsap .reveal-up, .no-gsap .reveal-left, .no-gsap .reveal-scale {
+      opacity: 1; transform: none;
+    }
+  </style>
 </head>
 <body>
 
- <!-- NAV -->
- <nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">&#9670;</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>--</span></span></a><div class="nav-links"><a href="index.html" class="nav-link active">HOME</a><a href="streak.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
- <div class="nav-mobile"><a href="index.html" class="nav-link active">HOME</a><a href="streak.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
- <script>
- (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
- </script>
+  <!-- NAV -->
+  <nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">&#9670;</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>--</span></span></a><div class="nav-links"><a href="index.html" class="nav-link active">HOME</a><a href="streak.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+  <div class="nav-mobile"><a href="index.html" class="nav-link active">HOME</a><a href="streak.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="strava.html" class="nav-link">STRAVA</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link">HOW IT WORKS</a></div>
+  <script>
+  (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
+  </script>
 
- <!-- ============================================
- HERO - Particle Universe
- ============================================ -->
- <section class="hero-section" id="hero">
- <canvas id="heroCanvas"></canvas>
- <div class="hero-content">
- <div class="hero-signal">
- <span class="hero-signal-dot"></span>
- SYSTEM ACTIVE
- </div>
- <div class="hero-pre">FIRST LIGHT</div>
- <div class="hero-day-num" id="heroDayNum">--</div>
- <div class="hero-subtitle">TRAINING FOR IRONMAN</div>
- <p class="hero-tagline">Every run. Every ride. Every swim. Tracked live. Real stakes.</p>
- <div class="hero-wake" id="heroWake">
- <div>
- <div class="hero-wake-time" id="heroWakeTime">--:--</div>
- <div class="hero-wake-label">WOKE UP TODAY</div>
- </div>
- <div>
- <div class="hero-wake-check" id="heroWakeCheck">CHECKING...</div>
- <div class="hero-wake-label">NO SLEEP UNTIL 5 PM</div>
- </div>
- </div>
- <!-- ── CHAPTER 1 LEGACY RIBBON — preserves 110-day achievement ── -->
- <style>.hero-chapter-ribbon{display:inline-flex;align-items:center;gap:10px;margin-top:24px;
- padding:10px 18px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.35);
- border-radius:6px;font:700 10px 'IBM Plex Mono',monospace;letter-spacing:3px;
- color:rgba(245,166,35,0.9);text-decoration:none;transition:all 0.25s;
- box-shadow:0 0 24px rgba(245,166,35,0.06)}.hero-chapter-ribbon:hover{background:rgba(245,166,35,0.12);border-color:rgba(245,166,35,0.6);
- transform:translateY(-1px);box-shadow:0 4px 24px rgba(245,166,35,0.15)}.hero-chapter-ribbon.ch-dot{width:6px;height:6px;border-radius:50%;background:#F5A623;
- box-shadow:0 0 10px rgba(245,166,35,0.8)}.hero-chapter-ribbon.ch-sep{color:rgba(245,166,35,0.4)}.hero-chapter-ribbon.ch-num{color:#F5A623;font-size:11px}
- @media (max-width:560px){.hero-chapter-ribbon{font-size:9px;letter-spacing:2px;padding:8px 14px;gap:6px}
- }
- </style>
- <a href="streak.html#chapter1" class="hero-chapter-ribbon">
- <span class="ch-dot"></span>
- CHAPTER 01 COMPLETE <span class="ch-sep">·</span>
- <span class="ch-num">110</span> DAYS <span class="ch-sep">·</span> CHAPTER 02 BEGINS 13 JUN
- </a>
- </div>
- <div class="hero-scroll-cue">SCROLL TO EXPLORE &#x25BC;</div>
- </section>
+  <!-- ============================================
+       HERO - Particle Universe
+       ============================================ -->
+  <section class="hero-section" id="hero">
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-signal">
+        <span class="hero-signal-dot"></span>
+        SYSTEM ACTIVE
+      </div>
+      <div class="hero-pre">FIRST LIGHT</div>
+      <div class="hero-day-num" id="heroDayNum">--</div>
+      <div class="hero-subtitle">TRAINING FOR IRONMAN</div>
+      <p class="hero-tagline">Every run. Every ride. Every swim. Tracked live. Real stakes.</p>
+      <div class="hero-wake" id="heroWake">
+        <div>
+          <div class="hero-wake-time" id="heroWakeTime">--:--</div>
+          <div class="hero-wake-label">WOKE UP TODAY</div>
+        </div>
+        <div>
+          <div class="hero-wake-check" id="heroWakeCheck">CHECKING...</div>
+          <div class="hero-wake-label">NO SLEEP UNTIL 5 PM</div>
+        </div>
+      </div>
+      <!-- ── CHAPTER 1 LEGACY RIBBON — preserves 110-day achievement ── -->
+      <style>
+        .hero-chapter-ribbon{display:inline-flex;align-items:center;gap:10px;margin-top:24px;
+          padding:10px 18px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.35);
+          border-radius:6px;font:700 10px 'IBM Plex Mono',monospace;letter-spacing:3px;
+          color:rgba(245,166,35,0.9);text-decoration:none;transition:all 0.25s;
+          box-shadow:0 0 24px rgba(245,166,35,0.06)}
+        .hero-chapter-ribbon:hover{background:rgba(245,166,35,0.12);border-color:rgba(245,166,35,0.6);
+          transform:translateY(-1px);box-shadow:0 4px 24px rgba(245,166,35,0.15)}
+        .hero-chapter-ribbon .ch-dot{width:6px;height:6px;border-radius:50%;background:#F5A623;
+          box-shadow:0 0 10px rgba(245,166,35,0.8)}
+        .hero-chapter-ribbon .ch-sep{color:rgba(245,166,35,0.4)}
+        .hero-chapter-ribbon .ch-num{color:#F5A623;font-size:11px}
+        @media (max-width:560px){
+          .hero-chapter-ribbon{font-size:9px;letter-spacing:2px;padding:8px 14px;gap:6px}
+        }
+      </style>
+      <a href="streak.html#chapter1" class="hero-chapter-ribbon">
+        <span class="ch-dot"></span>
+        CHAPTER 01 COMPLETE <span class="ch-sep">·</span>
+        <span class="ch-num">110</span> DAYS <span class="ch-sep">·</span> CHAPTER 02 BEGINS 13 JUN
+      </a>
+    </div>
+    <div class="hero-scroll-cue">SCROLL TO EXPLORE &#x25BC;</div>
+  </section>
 
- <!-- ============================================
- TRAINING DASHBOARD - Bento Glass Grid
- ============================================ -->
- <section class="dash-section" id="dashboard">
- <div class="container">
- <div class="section-eyebrow reveal-up">THIS WEEK</div>
- <h2 class="section-heading reveal-up">Training Dashboard</h2>
+  <!-- ============================================
+       TRAINING DASHBOARD - Bento Glass Grid
+       ============================================ -->
+  <section class="dash-section" id="dashboard">
+    <div class="container">
+      <div class="section-eyebrow reveal-up">THIS WEEK</div>
+      <h2 class="section-heading reveal-up">Training Dashboard</h2>
 
- <div class="bento-grid">
- <!-- Weekly Volume (wide) -->
- <div class="bento-card bento-card--week bento-card--wide reveal-up">
- <div class="bento-label">WEEKLY VOLUME</div>
- <div class="bento-value" id="weekHours">0<span class="unit"> HRS</span></div>
- <div class="bento-sub" id="weekSummary">Loading training data...</div>
- <div class="week-bars" id="weekBars">
- <div class="week-bar" style="height:0%;background:var(--strava)"><span class="week-bar-label">M</span></div>
- <div class="week-bar" style="height:0%;background:var(--green)"><span class="week-bar-label">T</span></div>
- <div class="week-bar" style="height:0%;background:var(--cyan)"><span class="week-bar-label">W</span></div>
- <div class="week-bar" style="height:0%;background:var(--strava)"><span class="week-bar-label">T</span></div>
- <div class="week-bar" style="height:0%;background:var(--green)"><span class="week-bar-label">F</span></div>
- <div class="week-bar" style="height:0%;background:#AB47BC"><span class="week-bar-label">S</span></div>
- <div class="week-bar" style="height:0%;background:var(--swim-blue)"><span class="week-bar-label">S</span></div>
- </div>
- </div>
+      <div class="bento-grid">
+        <!-- Weekly Volume (wide) -->
+        <div class="bento-card bento-card--week bento-card--wide reveal-up">
+          <div class="bento-label">WEEKLY VOLUME</div>
+          <div class="bento-value" id="weekHours">0<span class="unit"> HRS</span></div>
+          <div class="bento-sub" id="weekSummary">Loading training data...</div>
+          <div class="week-bars" id="weekBars">
+            <div class="week-bar" style="height:0%;background:var(--strava)"><span class="week-bar-label">M</span></div>
+            <div class="week-bar" style="height:0%;background:var(--green)"><span class="week-bar-label">T</span></div>
+            <div class="week-bar" style="height:0%;background:var(--cyan)"><span class="week-bar-label">W</span></div>
+            <div class="week-bar" style="height:0%;background:var(--strava)"><span class="week-bar-label">T</span></div>
+            <div class="week-bar" style="height:0%;background:var(--green)"><span class="week-bar-label">F</span></div>
+            <div class="week-bar" style="height:0%;background:#AB47BC"><span class="week-bar-label">S</span></div>
+            <div class="week-bar" style="height:0%;background:var(--swim-blue)"><span class="week-bar-label">S</span></div>
+          </div>
+        </div>
 
- <!-- Streak -->
- <div class="bento-card bento-card--streak reveal-up">
- <div class="bento-label">STREAK</div>
- <div class="bento-value" id="streakDays">--</div>
- <div class="bento-sub">consecutive days</div>
- </div>
+        <!-- Streak -->
+        <div class="bento-card bento-card--streak reveal-up">
+          <div class="bento-label">STREAK</div>
+          <div class="bento-value" id="streakDays">--</div>
+          <div class="bento-sub">consecutive days</div>
+        </div>
 
- <!-- Sleep -->
- <div class="bento-card bento-card--sleep reveal-up">
- <div class="bento-label">SLEEP</div>
- <div class="bento-value" id="sleepHrs">--<span class="unit"> HRS</span></div>
- <div class="bento-sub">Target: 6h via Garmin</div>
- <canvas class="bento-wave" id="sleepWave"></canvas>
- </div>
+        <!-- Sleep -->
+        <div class="bento-card bento-card--sleep reveal-up">
+          <div class="bento-label">SLEEP</div>
+          <div class="bento-value" id="sleepHrs">--<span class="unit"> HRS</span></div>
+          <div class="bento-sub">Target: 6h via Garmin</div>
+          <canvas class="bento-wave" id="sleepWave"></canvas>
+        </div>
 
- <!-- Heart Rate -->
- <div class="bento-card bento-card--hr reveal-up">
- <div class="bento-label">RESTING HR</div>
- <div class="bento-value" id="restHR">--<span class="unit"> BPM</span></div>
- <div class="bento-sub">Garmin fēnix 8</div>
- <canvas class="bento-ecg" id="ecgCanvas"></canvas>
- </div>
- </div>
+        <!-- Heart Rate -->
+        <div class="bento-card bento-card--hr reveal-up">
+          <div class="bento-label">RESTING HR</div>
+          <div class="bento-value" id="restHR">--<span class="unit"> BPM</span></div>
+          <div class="bento-sub">Garmin fēnix 8</div>
+          <canvas class="bento-ecg" id="ecgCanvas"></canvas>
+        </div>
+      </div>
 
- <!-- WEEKLY 100KM TARGET -->
- <div style="margin-top:48px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;padding:28px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;opacity:1;transform:none">
- <div style="position:relative;width:120px;height:120px">
- <svg viewBox="0 0 120 120" style="width:120px;height:120px;transform:rotate(-90deg)">
- <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
- <circle id="weekGaugeArc" cx="60" cy="60" r="52" fill="none" stroke="url(#weekGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 327" style="transition:stroke-dasharray 1.5s ease"/>
- <defs><linearGradient id="weekGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FC4C02"/><stop offset="100%" stop-color="#00E676"/></linearGradient></defs>
- </svg>
- <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
- <div id="weekGaugePct" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:#fff">0%</div>
- <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim)">OF 100 KM</div>
- </div>
- </div>
- <div>
- <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:4px;color:var(--text-dim);margin-bottom:8px">WEEKLY TARGET</div>
- <div id="weekGaugeKm" style="font-family:var(--font-mono);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:700;color:#fff">0 <span style="font-size:0.6em;color:var(--text-dim)">/ 100 KM</span></div>
- <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
- <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--strava)"><span id="weekGaugeRun">0</span> km run</div>
- <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--green)"><span id="weekGaugeRide">0</span> km ride</div>
- <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold)"><span id="weekGaugeWalk">0</span> km walk</div>
- <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--swim-blue)"><span id="weekGaugeSwim">0</span> km swim (x10)</div>
- </div>
- <div style="margin-top:8px"><span id="weekGaugeDeficit" style="font-family:var(--font-mono);font-size:0.7rem;font-weight:700;color:var(--green)">On track</span></div>
- </div>
- </div>
+      <!-- WEEKLY 100KM TARGET -->
+      <div style="margin-top:48px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;padding:28px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;opacity:1;transform:none">
+        <div style="position:relative;width:120px;height:120px">
+          <svg viewBox="0 0 120 120" style="width:120px;height:120px;transform:rotate(-90deg)">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+            <circle id="weekGaugeArc" cx="60" cy="60" r="52" fill="none" stroke="url(#weekGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 327" style="transition:stroke-dasharray 1.5s ease"/>
+            <defs><linearGradient id="weekGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FC4C02"/><stop offset="100%" stop-color="#00E676"/></linearGradient></defs>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div id="weekGaugePct" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:#fff">0%</div>
+            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-dim)">OF 100 KM</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:4px;color:var(--text-dim);margin-bottom:8px">WEEKLY TARGET</div>
+          <div id="weekGaugeKm" style="font-family:var(--font-mono);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:700;color:#fff">0 <span style="font-size:0.6em;color:var(--text-dim)">/ 100 KM</span></div>
+          <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--strava)"><span id="weekGaugeRun">0</span> km run</div>
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--green)"><span id="weekGaugeRide">0</span> km ride</div>
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold)"><span id="weekGaugeWalk">0</span> km walk</div>
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--swim-blue)"><span id="weekGaugeSwim">0</span> km swim (x10)</div>
+          </div>
+          <div style="margin-top:8px"><span id="weekGaugeDeficit" style="font-family:var(--font-mono);font-size:0.7rem;font-weight:700;color:var(--green)">On track</span></div>
+        </div>
+      </div>
 
- <!-- TODAY'S ACTIVITIES — dynamically populated from Strava -->
- <div class="section-eyebrow" style="margin-top:48px;opacity:1;transform:none">TODAY'S ACTIVITIES</div>
- <div id="todayActivities" style="display:grid;grid-template-columns:1fr;grid-auto-rows:auto;gap:16px;margin-top:16px">
- <div class="bento-card" style="grid-column:1/-1;text-align:center;padding:32px;opacity:1;transform:none">
- <div class="bento-sub">Loading today's Strava activities...</div>
- </div>
- </div>
+      <!-- TODAY'S ACTIVITIES — dynamically populated from Strava -->
+      <div class="section-eyebrow" style="margin-top:48px;opacity:1;transform:none">TODAY'S ACTIVITIES</div>
+      <div id="todayActivities" style="display:grid;grid-template-columns:1fr;grid-auto-rows:auto;gap:16px;margin-top:16px">
+        <div class="bento-card" style="grid-column:1/-1;text-align:center;padding:32px;opacity:1;transform:none">
+          <div class="bento-sub">Loading today's Strava activities...</div>
+        </div>
+      </div>
 
- <!-- YESTERDAY'S ACTIVITIES — dynamically populated from Strava -->
- <div class="section-eyebrow" style="margin-top:48px;opacity:1;transform:none;color:var(--text-dim)">YESTERDAY'S ACTIVITIES</div>
- <div id="yesterdayActivities" style="display:grid;grid-template-columns:1fr;grid-auto-rows:auto;gap:16px;margin-top:16px">
- <div class="bento-card" style="grid-column:1/-1;text-align:center;padding:32px;opacity:1;transform:none">
- <div class="bento-sub">Loading yesterday's Strava activities...</div>
- </div>
- </div>
- </div>
- </section>
+      <!-- YESTERDAY'S ACTIVITIES — dynamically populated from Strava -->
+      <div class="section-eyebrow" style="margin-top:48px;opacity:1;transform:none;color:var(--text-dim)">YESTERDAY'S ACTIVITIES</div>
+      <div id="yesterdayActivities" style="display:grid;grid-template-columns:1fr;grid-auto-rows:auto;gap:16px;margin-top:16px">
+        <div class="bento-card" style="grid-column:1/-1;text-align:center;padding:32px;opacity:1;transform:none">
+          <div class="bento-sub">Loading yesterday's Strava activities...</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
- <!-- ============================================
- THE STAKES - Holographic Card
- ============================================ -->
- <section class="stakes-section" id="stakes">
- <div class="holo-card reveal-scale" id="holoCard">
- <div class="holo-amount"><span id="stakeAmount" style="font-size:0.55em;letter-spacing:6px">EVERY DAY</span></div>
- <div class="holo-label">PUBLIC ACCOUNTABILITY · NO END DATE</div>
- <div class="holo-stats">
- <div class="holo-stat">
- <div class="holo-stat-val" id="totalRisk">--</div>
- <div class="holo-stat-label">DAYS ON RECORD</div>
- </div>
- <div class="holo-stat">
- <div class="holo-stat-val" style="color:var(--green)">0</div>
- <div class="holo-stat-label">DAYS MISSED</div>
- </div>
- <div class="holo-stat">
- <div class="holo-stat-val" style="color:var(--green)">100%</div>
- <div class="holo-stat-label">COMPLETION</div>
- </div>
- </div>
- <a href="accountability.html" class="holo-cta">VIEW THE RECORD</a>
- <div style="margin-top:20px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;line-height:1.8;max-width:360px;text-align:center">
- WEEKLY: 100 km minimum (all sports)<br>
- DEFICIT &gt; 50 km = claimable + punishment km<br>
- SLIPS ARE IMMUTABLE — NO DELETE, NO EDIT
- </div>
- </div>
- </section>
+  <!-- ============================================
+       THE STAKES - Holographic Card
+       ============================================ -->
+  <section class="stakes-section" id="stakes">
+    <div class="holo-card reveal-scale" id="holoCard">
+      <div class="holo-amount"><span class="currency">&#8377;</span><span id="stakeAmount">15,000</span></div>
+      <div class="holo-label">PER ZERO-ACTIVITY DAY</div>
+      <div class="holo-stats">
+        <div class="holo-stat">
+          <div class="holo-stat-val" id="totalRisk">--</div>
+          <div class="holo-stat-label">TOTAL AT RISK</div>
+        </div>
+        <div class="holo-stat">
+          <div class="holo-stat-val" style="color:var(--green)">0</div>
+          <div class="holo-stat-label">DAYS MISSED</div>
+        </div>
+        <div class="holo-stat">
+          <div class="holo-stat-val" style="color:var(--green)">100%</div>
+          <div class="holo-stat-label">COMPLETION</div>
+        </div>
+      </div>
+      <a href="accountability.html" class="holo-cta">CLAIM IF I MISS</a>
+      <div style="margin-top:20px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;line-height:1.8;max-width:360px;text-align:center">
+        WEEKLY: 100 km minimum (all sports)<br>
+        DEFICIT &gt; 50 km = ₹15,000 claimable + punishment km<br>
+        SLIPS ARE IMMUTABLE — NO DELETE, NO EDIT
+      </div>
+    </div>
+  </section>
 
- <!-- ============================================
- WAKE-UP PROOF - Flip Clock
- ============================================ -->
- <section class="wake-section" id="wake">
- <div class="container">
- <div class="section-eyebrow reveal-up" style="text-align:center">ACCOUNTABILITY</div>
- <h2 class="section-heading reveal-up" style="text-align:center">Wake-Up Proof</h2>
- <p class="reveal-up" style="text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text-dim);letter-spacing:1px;margin-bottom:48px">Auto-detected by Garmin + Strava GPS. Before 6 AM or it doesn't count.</p>
+  <!-- ============================================
+       WAKE-UP PROOF - Flip Clock
+       ============================================ -->
+  <section class="wake-section" id="wake">
+    <div class="container">
+      <div class="section-eyebrow reveal-up" style="text-align:center">ACCOUNTABILITY</div>
+      <h2 class="section-heading reveal-up" style="text-align:center">Wake-Up Proof</h2>
+      <p class="reveal-up" style="text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text-dim);letter-spacing:1px;margin-bottom:48px">Auto-detected by Garmin + Strava GPS. Before 6 AM or it doesn't count.</p>
 
- <div class="wake-display reveal-scale">
- <div class="wake-clock">
- <div class="flip-digit" id="wakeH1">0</div>
- <div class="flip-digit" id="wakeH2">4</div>
- <div class="flip-colon">:</div>
- <div class="flip-digit" id="wakeM1">1</div>
- <div class="flip-digit" id="wakeM2">2</div>
- <div class="flip-period" id="wakePeriod">AM</div>
- </div>
- <div class="wake-meta">
- <div class="wake-meta-row">30-DAY AVG: <span class="val" id="wakeAvg">--:--</span></div>
- <div class="wake-meta-row">BEST: <span class="val" id="wakeBest">--:--</span></div>
- <div class="wake-meta-row">WORST: <span class="val" id="wakeWorst">--:--</span></div>
- </div>
- </div>
+      <div class="wake-display reveal-scale">
+        <div class="wake-clock">
+          <div class="flip-digit" id="wakeH1">0</div>
+          <div class="flip-digit" id="wakeH2">4</div>
+          <div class="flip-colon">:</div>
+          <div class="flip-digit" id="wakeM1">1</div>
+          <div class="flip-digit" id="wakeM2">2</div>
+          <div class="flip-period" id="wakePeriod">AM</div>
+        </div>
+        <div class="wake-meta">
+          <div class="wake-meta-row">30-DAY AVG: <span class="val" id="wakeAvg">--:--</span></div>
+          <div class="wake-meta-row">BEST: <span class="val" id="wakeBest">--:--</span></div>
+          <div class="wake-meta-row">WORST: <span class="val" id="wakeWorst">--:--</span></div>
+        </div>
+      </div>
 
- <div class="wake-heatmap reveal-up" id="wakeHeatmap">
- <!-- 30 cells rendered by JS -->
- </div>
+      <div class="wake-heatmap reveal-up" id="wakeHeatmap">
+        <!-- 30 cells rendered by JS -->
+      </div>
 
- <div style="text-align:center">
- <div class="wake-no-sleep reveal-up">NO SLEEP UNTIL 5 PM &mdash; VERIFIED</div>
- </div>
- </div>
- </section>
+      <div style="text-align:center">
+        <div class="wake-no-sleep reveal-up">NO SLEEP UNTIL 5 PM &mdash; VERIFIED</div>
+      </div>
+    </div>
+  </section>
 
- <!-- ============================================
- RACE CALENDAR - Road to Ironman
- ============================================ -->
- <section class="ms-section" id="milestones">
- <div class="container">
- <div class="section-eyebrow reveal-up" style="text-align:center">JOURNEY</div>
- <h2 class="section-heading reveal-up" style="text-align:center">Milestones Achieved</h2>
- <p class="reveal-up" style="text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-bottom:40px">Auto-computed from real Strava GPS data. Every card is earned.</p>
+  <!-- ============================================
+       RACE CALENDAR - Road to Ironman
+       ============================================ -->
+  <section class="ms-section" id="milestones">
+    <div class="container">
+      <div class="section-eyebrow reveal-up" style="text-align:center">JOURNEY</div>
+      <h2 class="section-heading reveal-up" style="text-align:center">Milestones Achieved</h2>
+      <p class="reveal-up" style="text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-bottom:40px">Auto-computed from real Strava GPS data. Every card is earned.</p>
 
- <!-- Summary bar -->
- <div class="ms-summary reveal-up">
- <div class="ms-summary-item"><div class="ms-summary-val" style="color:var(--strava)" id="progLongestRun">--</div><div class="ms-summary-label">LONGEST RUN</div></div>
- <div class="ms-summary-item"><div class="ms-summary-val" style="color:var(--green)" id="progLongestRide">--</div><div class="ms-summary-label">LONGEST RIDE</div></div>
- <div class="ms-summary-item"><div class="ms-summary-val" style="color:var(--swim-blue)" id="progLongestSwim">--</div><div class="ms-summary-label">LONGEST SWIM</div></div>
- <div class="ms-summary-item"><div class="ms-summary-val" style="color:var(--gold)" id="progTotal">--</div><div class="ms-summary-label">MILESTONES</div></div>
- </div>
+      <!-- Summary bar -->
+      <div class="ms-summary reveal-up">
+        <div class="ms-summary-item"><div class="ms-summary-val" style="color:var(--strava)" id="progLongestRun">--</div><div class="ms-summary-label">LONGEST RUN</div></div>
+        <div class="ms-summary-item"><div class="ms-summary-val" style="color:var(--green)" id="progLongestRide">--</div><div class="ms-summary-label">LONGEST RIDE</div></div>
+        <div class="ms-summary-item"><div class="ms-summary-val" style="color:var(--swim-blue)" id="progLongestSwim">--</div><div class="ms-summary-label">LONGEST SWIM</div></div>
+        <div class="ms-summary-item"><div class="ms-summary-val" style="color:var(--gold)" id="progTotal">--</div><div class="ms-summary-label">MILESTONES</div></div>
+      </div>
 
- <!-- Milestone grid (rendered by JS) -->
- <div class="ms-grid" id="msGrid">
- <div style="grid-column:1/-1;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);padding:40px;text-align:center">Loading milestones from Strava...</div>
- </div>
- </div>
- </section>
+      <!-- Milestone grid (rendered by JS) -->
+      <div class="ms-grid" id="msGrid">
+        <div style="grid-column:1/-1;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);padding:40px;text-align:center">Loading milestones from Strava...</div>
+      </div>
+    </div>
+  </section>
 
- <!-- ============================================
- TRAINING HEATMAP
- ============================================ -->
- <section class="heatmap-section" id="heatmap">
- <div class="container">
- <div class="section-eyebrow reveal-up">TRAINING LOG</div>
- <h2 class="section-heading reveal-up">Activity Heatmap</h2>
- <div class="heatmap-wrapper reveal-up">
- <canvas id="trainingHeatmap"></canvas>
- </div>
- <div class="heatmap-legend reveal-up">
- <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:rgba(255,255,255,0.04)"></div>REST</div>
- <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:var(--strava)"></div>RUN</div>
- <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:var(--green)"></div>BIKE</div>
- <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:var(--swim-blue)"></div>SWIM</div>
- <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:#AB47BC"></div>GYM</div>
- <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:var(--gold)"></div>WALK</div>
- </div>
- </div>
- </section>
+  <!-- ============================================
+       TRAINING HEATMAP
+       ============================================ -->
+  <section class="heatmap-section" id="heatmap">
+    <div class="container">
+      <div class="section-eyebrow reveal-up">TRAINING LOG</div>
+      <h2 class="section-heading reveal-up">Activity Heatmap</h2>
+      <div class="heatmap-wrapper reveal-up">
+        <canvas id="trainingHeatmap"></canvas>
+      </div>
+      <div class="heatmap-legend reveal-up">
+        <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:rgba(255,255,255,0.04)"></div>REST</div>
+        <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:var(--strava)"></div>RUN</div>
+        <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:var(--green)"></div>BIKE</div>
+        <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:var(--swim-blue)"></div>SWIM</div>
+        <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:#AB47BC"></div>GYM</div>
+        <div class="heatmap-legend-item"><div class="heatmap-legend-dot" style="background:var(--gold)"></div>WALK</div>
+      </div>
+    </div>
+  </section>
 
- <!-- ============================================
- LIFETIME STATS
- ============================================ -->
- <section class="stats-section" id="lifetime">
- <div class="container">
- <div class="section-eyebrow reveal-up" style="text-align:center">LIFETIME</div>
- <h2 class="section-heading reveal-up" style="text-align:center;margin-bottom:40px">The Numbers</h2>
- <div class="stats-grid">
- <div class="stat-card reveal-up"><div class="stat-val" id="ltRun">--</div><div class="stat-label">KM RUN</div></div>
- <div class="stat-card reveal-up"><div class="stat-val" id="ltWalk">--</div><div class="stat-label">KM WALKED</div></div>
- <div class="stat-card reveal-up"><div class="stat-val" id="ltBike">--</div><div class="stat-label">KM CYCLED</div></div>
- <div class="stat-card reveal-up"><div class="stat-val" id="ltSwim">--</div><div class="stat-label">KM SWUM</div></div>
- <div class="stat-card reveal-up"><div class="stat-val" id="ltGym">--</div><div class="stat-label">GYM SESSIONS</div></div>
- <div class="stat-card reveal-up"><div class="stat-val" id="ltYoga">--</div><div class="stat-label">YOGA / PILATES</div></div>
- <div class="stat-card reveal-up"><div class="stat-val" id="ltDance">--</div><div class="stat-label">DANCE</div></div>
- <div class="stat-card reveal-up"><div class="stat-val" id="ltStake" style="color:var(--gold)">--</div><div class="stat-label">LOCKED IN</div></div>
- </div>
- </div>
- </section>
+  <!-- ============================================
+       LIFETIME STATS
+       ============================================ -->
+  <section class="stats-section" id="lifetime">
+    <div class="container">
+      <div class="section-eyebrow reveal-up" style="text-align:center">LIFETIME</div>
+      <h2 class="section-heading reveal-up" style="text-align:center;margin-bottom:40px">The Numbers</h2>
+      <div class="stats-grid">
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltRun">--</div><div class="stat-label">KM RUN</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltWalk">--</div><div class="stat-label">KM WALKED</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltBike">--</div><div class="stat-label">KM CYCLED</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltSwim">--</div><div class="stat-label">KM SWUM</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltGym">--</div><div class="stat-label">GYM SESSIONS</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltYoga">--</div><div class="stat-label">YOGA / PILATES</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltDance">--</div><div class="stat-label">DANCE</div></div>
+        <div class="stat-card reveal-up"><div class="stat-val" id="ltStake" style="color:var(--gold)">--</div><div class="stat-label">AT STAKE</div></div>
+      </div>
+    </div>
+  </section>
 
- <!-- ============================================
- FOOTER
- ============================================ -->
- <footer class="fl-footer">
- <div class="container">
- <div class="fl-footer-brand">&#9670; FIRST LIGHT</div>
- <div class="fl-footer-day">Still going. Day <span id="footDay">--</span>.</div>
- <div class="fl-footer-tagline">From Day 1 to Ironman 140.6. Real stakes. Real data. No shortcuts.</div>
- <div class="fl-footer-links">
- <a href="index.html">STREAK PAGE</a>
- <a href="https://www.instagram.com/firstlightlive" target="_blank" rel="noopener">INSTAGRAM</a>
- <a href="https://strava.app.link/jxGRExHXo2b" target="_blank" rel="noopener">STRAVA</a>
- <a href="story.html">MY STORY</a>
- <a href="about.html">ABOUT</a>
- </div>
- <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div>
- <div class="fl-footer-copy">&copy; 2026 Anupam Kumar</div>
- </div>
- </footer>
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer class="fl-footer">
+    <div class="container">
+      <div class="fl-footer-brand">&#9670; FIRST LIGHT</div>
+      <div class="fl-footer-day">Still going. Day <span id="footDay">--</span>.</div>
+      <div class="fl-footer-tagline">From Day 1 to Ironman 140.6. Real stakes. Real data. No shortcuts.</div>
+      <div class="fl-footer-links">
+        <a href="index.html">STREAK PAGE</a>
+        <a href="https://www.instagram.com/firstlightlive" target="_blank" rel="noopener">INSTAGRAM</a>
+        <a href="https://strava.app.link/jxGRExHXo2b" target="_blank" rel="noopener">STRAVA</a>
+        <a href="story.html">MY STORY</a>
+        <a href="about.html">ABOUT</a>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div>
+      <div class="fl-footer-copy">&copy; 2026 Anupam Kumar</div>
+    </div>
+  </footer>
 
- <!-- Scripts -->
- <script src="js/config.js"></script>
- <script src="app.js?v=20260613a"></script>
- <script src="js/home-3d.js?v=20260613a"></script>
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="app.js?v=20260613a"></script>
+  <script src="js/home-3d.js?v=20260613a"></script>
 
 </body>
 </html>

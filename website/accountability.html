@@ -1,115 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta name="theme-color" content="#0A0C10">
- <meta name="apple-mobile-web-app-capable" content="yes">
- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- <title>FIRST LIGHT — Accountability Ledger</title>
- <meta name="description" content="Every slip. Every penalty. Every proof. Nothing hidden. The public accountability ledger of First Light.">
- <meta name="keywords" content="public accountability, immutable ledger, fitness penalty, 20km walk penalty, discipline consequences, no excuses">
- <meta name="robots" content="index, follow">
- <link rel="canonical" href="https://firstlight.live/accountability.html">
- <link rel="preconnect" href="https://fonts.googleapis.com">
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="styles.css">
- <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js"></script>
- <style>:root {
- --bg:#030608; --mono:'IBM Plex Mono',monospace; --body:'Inter',sans-serif;
- --red:#FF5252; --green:#00E676; --gold:#F5A623; --cyan:#00D4FF; --strava:#FC4C02;
- --dim:#5A6B80; --glass:rgba(10,14,24,0.6); --border:rgba(255,255,255,0.06);
- --border-hover:rgba(255,255,255,0.12);
- }
- body { background:var(--bg)!important; overflow-x:hidden; }
- #accParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
- body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.018;
- background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
- background-size:128px 128px; }.page { position:relative; z-index:2; }.container { max-width:900px; margin:0 auto; padding:0 24px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>FIRST LIGHT — Accountability Ledger</title>
+  <meta name="description" content="Every slip. Every penalty. Every proof. Nothing hidden. The public accountability ledger of First Light.">
+  <meta name="keywords" content="public accountability, immutable ledger, fitness penalty, 20km walk penalty, discipline consequences, no excuses">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://firstlight.live/accountability.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js"></script>
+  <style>
+    :root {
+      --bg:#030608; --mono:'IBM Plex Mono',monospace; --body:'Inter',sans-serif;
+      --red:#FF5252; --green:#00E676; --gold:#F5A623; --cyan:#00D4FF; --strava:#FC4C02;
+      --dim:#5A6B80; --glass:rgba(10,14,24,0.6); --border:rgba(255,255,255,0.06);
+      --border-hover:rgba(255,255,255,0.12);
+    }
+    body { background:var(--bg)!important; overflow-x:hidden; }
+    #accParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.018;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:128px 128px; }
+    .page { position:relative; z-index:2; }
+    .container { max-width:900px; margin:0 auto; padding:0 24px; }
 
- /* ═══ HERO ═══ */.hero { min-height:100vh; display:flex; align-items:center; justify-content:center;
- text-align:center; padding:120px 24px 80px; position:relative; }.hero::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
- width:900px; height:900px; border-radius:50%;
- background:radial-gradient(circle, rgba(255,82,82,0.06) 0%, rgba(245,166,35,0.03) 35%, transparent 65%);
- pointer-events:none; animation:pulse 12s ease-in-out infinite; }
- @keyframes pulse { 0%,100%{opacity:0.4;transform:translate(-50%,-50%) scale(1)} 50%{opacity:0.7;transform:translate(-50%,-50%) scale(1.15)} }.hero-badge { font-family:var(--mono); font-size:9px; letter-spacing:6px; color:var(--red);
- padding:6px 18px; border:1px solid rgba(255,82,82,0.25); border-radius:4px; display:inline-block; margin-bottom:28px; }.hero h1 { font-family:var(--mono); font-size:clamp(2.8rem,9vw,5rem); font-weight:700;
- letter-spacing:0.15em; color:#fff; line-height:0.9; margin-bottom:20px;
- text-shadow:0 0 100px rgba(255,82,82,0.12); }.hero-sub { font-family:var(--body); color:var(--dim); font-size:clamp(0.9rem,2.5vw,1.05rem);
- letter-spacing:0.04em; max-width:520px; margin:0 auto; line-height:1.8; }.hero-quote { font-family:var(--mono); font-size:0.75rem; color:rgba(255,255,255,0.25);
- font-style:italic; margin-top:32px; letter-spacing:0.04em; }.hero-scroll { position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
- font-family:var(--mono); font-size:9px; letter-spacing:4px; color:rgba(255,255,255,0.15);
- animation:bob 2s ease-in-out infinite; }
- @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+    /* ═══ HERO ═══ */
+    .hero { min-height:100vh; display:flex; align-items:center; justify-content:center;
+      text-align:center; padding:120px 24px 80px; position:relative; }
+    .hero::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      width:900px; height:900px; border-radius:50%;
+      background:radial-gradient(circle, rgba(255,82,82,0.06) 0%, rgba(245,166,35,0.03) 35%, transparent 65%);
+      pointer-events:none; animation:pulse 12s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:0.4;transform:translate(-50%,-50%) scale(1)} 50%{opacity:0.7;transform:translate(-50%,-50%) scale(1.15)} }
+    .hero-badge { font-family:var(--mono); font-size:9px; letter-spacing:6px; color:var(--red);
+      padding:6px 18px; border:1px solid rgba(255,82,82,0.25); border-radius:4px; display:inline-block; margin-bottom:28px; }
+    .hero h1 { font-family:var(--mono); font-size:clamp(2.8rem,9vw,5rem); font-weight:700;
+      letter-spacing:0.15em; color:#fff; line-height:0.9; margin-bottom:20px;
+      text-shadow:0 0 100px rgba(255,82,82,0.12); }
+    .hero-sub { font-family:var(--body); color:var(--dim); font-size:clamp(0.9rem,2.5vw,1.05rem);
+      letter-spacing:0.04em; max-width:520px; margin:0 auto; line-height:1.8; }
+    .hero-quote { font-family:var(--mono); font-size:0.75rem; color:rgba(255,255,255,0.25);
+      font-style:italic; margin-top:32px; letter-spacing:0.04em; }
+    .hero-scroll { position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
+      font-family:var(--mono); font-size:9px; letter-spacing:4px; color:rgba(255,255,255,0.15);
+      animation:bob 2s ease-in-out infinite; }
+    @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
 
- /* ═══ Section System ═══ */.s-eyebrow { font-family:var(--mono); font-size:9px; letter-spacing:6px;
- color:var(--dim); text-align:center; margin-bottom:8px; text-transform:uppercase; }.s-heading { font-family:var(--mono); font-size:clamp(1.3rem,3.5vw,2rem);
- font-weight:700; letter-spacing:0.1em; color:#fff; text-align:center; margin-bottom:16px; }.s-desc { font-family:var(--mono); font-size:0.75rem; color:var(--dim);
- text-align:center; max-width:500px; margin:0 auto 48px; line-height:1.7; }
+    /* ═══ Section System ═══ */
+    .s-eyebrow { font-family:var(--mono); font-size:9px; letter-spacing:6px;
+      color:var(--dim); text-align:center; margin-bottom:8px; text-transform:uppercase; }
+    .s-heading { font-family:var(--mono); font-size:clamp(1.3rem,3.5vw,2rem);
+      font-weight:700; letter-spacing:0.1em; color:#fff; text-align:center; margin-bottom:16px; }
+    .s-desc { font-family:var(--mono); font-size:0.75rem; color:var(--dim);
+      text-align:center; max-width:500px; margin:0 auto 48px; line-height:1.7; }
 
- /* ═══ Stats Strip ═══ */.stats { display:grid; grid-template-columns:repeat(6,1fr); gap:2px; max-width:1000px; margin:0 auto;
- background:var(--border); border-radius:16px; overflow:hidden; }.stat { text-align:center; padding:28px 12px; background:var(--bg); position:relative; }.stat:first-child { border-radius:16px 0 0 16px; }.stat:last-child { border-radius:0 16px 16px 0; }.stat-val { font-family:var(--mono); font-size:clamp(1.5rem,4vw,2.2rem);
- font-weight:700; margin-bottom:4px; font-variant-numeric:tabular-nums; }.stat-label { font-family:var(--mono); font-size:8px; letter-spacing:2.5px; color:var(--dim); }
- @media(max-width:600px) {.stats { grid-template-columns:repeat(3,1fr); border-radius:12px; }.stat:first-child,.stat:last-child { border-radius:0; }.stat { padding:20px 8px; }.stat-val { font-size:1.3rem; } }
+    /* ═══ Stats Strip ═══ */
+    .stats { display:grid; grid-template-columns:repeat(6,1fr); gap:2px; max-width:1000px; margin:0 auto;
+      background:var(--border); border-radius:16px; overflow:hidden; }
+    .stat { text-align:center; padding:28px 12px; background:var(--bg); position:relative; }
+    .stat:first-child { border-radius:16px 0 0 16px; }
+    .stat:last-child { border-radius:0 16px 16px 0; }
+    .stat-val { font-family:var(--mono); font-size:clamp(1.5rem,4vw,2.2rem);
+      font-weight:700; margin-bottom:4px; font-variant-numeric:tabular-nums; }
+    .stat-label { font-family:var(--mono); font-size:8px; letter-spacing:2.5px; color:var(--dim); }
+    @media(max-width:600px) { .stats { grid-template-columns:repeat(3,1fr); border-radius:12px; }
+      .stat:first-child,.stat:last-child { border-radius:0; }
+      .stat { padding:20px 8px; } .stat-val { font-size:1.3rem; } }
 
- /* ═══ Rules Card ═══ */.rules-card { max-width:700px; margin:48px auto 0; padding:32px; background:var(--glass);
- border:1px solid var(--border); border-radius:16px; backdrop-filter:blur(20px);
- -webkit-backdrop-filter:blur(20px); position:relative; overflow:hidden; }.rules-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
- background:linear-gradient(90deg, var(--gold), var(--red), var(--gold)); opacity:0.4; }.rules-title { font-family:var(--mono); font-size:0.6rem; letter-spacing:4px; color:var(--gold);
- font-weight:700; margin-bottom:20px; }.rules-row { display:flex; gap:12px; margin-bottom:10px; align-items:baseline; }.rules-key { font-family:var(--mono); font-size:0.7rem; font-weight:700; color:#fff;
- min-width:70px; flex-shrink:0; }.rules-val { font-family:var(--mono); font-size:0.7rem; color:var(--dim); line-height:1.7; }.rules-danger { color:var(--red); font-weight:700; }
+    /* ═══ Rules Card ═══ */
+    .rules-card { max-width:700px; margin:48px auto 0; padding:32px; background:var(--glass);
+      border:1px solid var(--border); border-radius:16px; backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px); position:relative; overflow:hidden; }
+    .rules-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg, var(--gold), var(--red), var(--gold)); opacity:0.4; }
+    .rules-title { font-family:var(--mono); font-size:0.6rem; letter-spacing:4px; color:var(--gold);
+      font-weight:700; margin-bottom:20px; }
+    .rules-row { display:flex; gap:12px; margin-bottom:10px; align-items:baseline; }
+    .rules-key { font-family:var(--mono); font-size:0.7rem; font-weight:700; color:#fff;
+      min-width:70px; flex-shrink:0; }
+    .rules-val { font-family:var(--mono); font-size:0.7rem; color:var(--dim); line-height:1.7; }
+    .rules-danger { color:var(--red); font-weight:700; }
 
- /* ═══ Ledger ═══ */.ledger { max-width:900px; margin:0 auto; padding:0 24px 80px; }.ledger-status { font-family:var(--mono); font-size:0.6rem; letter-spacing:2px; color:var(--dim);
- padding:4px 14px; border:1px solid var(--border); border-radius:4px; display:inline-block; }.ledger-filter { display:flex; gap:8px; justify-content:center; margin-bottom:32px; flex-wrap:wrap; }.filter-btn { font-family:var(--mono); font-size:0.6rem; letter-spacing:1.5px; font-weight:600;
- padding:6px 16px; border-radius:20px; border:1px solid var(--border); background:transparent;
- color:var(--dim); cursor:pointer; transition:all 0.3s; -webkit-tap-highlight-color:transparent; }.filter-btn:hover,.filter-btn.active { background:rgba(255,255,255,0.06); color:#fff; border-color:var(--border-hover); }.filter-btn[data-f="pending"].active { border-color:rgba(255,82,82,0.3); color:var(--red); }.filter-btn[data-f="cleared"].active { border-color:rgba(0,230,118,0.3); color:var(--green); }
+    /* ═══ Ledger ═══ */
+    .ledger { max-width:900px; margin:0 auto; padding:0 24px 80px; }
+    .ledger-status { font-family:var(--mono); font-size:0.6rem; letter-spacing:2px; color:var(--dim);
+      padding:4px 14px; border:1px solid var(--border); border-radius:4px; display:inline-block; }
+    .ledger-filter { display:flex; gap:8px; justify-content:center; margin-bottom:32px; flex-wrap:wrap; }
+    .filter-btn { font-family:var(--mono); font-size:0.6rem; letter-spacing:1.5px; font-weight:600;
+      padding:6px 16px; border-radius:20px; border:1px solid var(--border); background:transparent;
+      color:var(--dim); cursor:pointer; transition:all 0.3s; -webkit-tap-highlight-color:transparent; }
+    .filter-btn:hover, .filter-btn.active { background:rgba(255,255,255,0.06); color:#fff; border-color:var(--border-hover); }
+    .filter-btn[data-f="pending"].active { border-color:rgba(255,82,82,0.3); color:var(--red); }
+    .filter-btn[data-f="cleared"].active { border-color:rgba(0,230,118,0.3); color:var(--green); }
 
- /* ═══ Slip Card — Compact Timeline ═══ */.slip { display:grid; grid-template-columns:56px 1fr; gap:0; margin-bottom:0; position:relative; }.slip-timeline { display:flex; flex-direction:column; align-items:center; padding-top:4px; }.slip-dot { width:12px; height:12px; border-radius:50%; border:2px solid var(--dim); flex-shrink:0;
- position:relative; z-index:1; }.slip-dot.pending { border-color:var(--red); background:rgba(255,82,82,0.3); box-shadow:0 0 8px rgba(255,82,82,0.2); }.slip-dot.cleared { border-color:var(--green); background:rgba(0,230,118,0.3); }.slip-line { width:2px; flex:1; background:linear-gradient(180deg,var(--border),transparent); margin-top:4px; }.slip-body { padding:0 0 32px 0; }.slip-card { background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:22px 24px;
- backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
- transition:all 0.35s cubic-bezier(0.4,0,0.2,1); position:relative; overflow:hidden; }.slip-card:hover { border-color:var(--border-hover); transform:translateY(-2px);
- box-shadow:0 8px 32px rgba(0,0,0,0.25); }.slip-card.pending { border-left:3px solid var(--red); }.slip-card.cleared { border-left:3px solid var(--green); }.slip-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px;
- background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent); }.slip-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px; }.slip-date { font-family:var(--mono); font-size:0.7rem; color:var(--dim); letter-spacing:0.06em; }.slip-badge { font-family:var(--mono); font-size:0.55rem; font-weight:700; letter-spacing:1.5px;
- padding:3px 10px; border-radius:3px; text-transform:uppercase; }.slip-badge.body { background:rgba(0,212,255,0.08); color:var(--cyan); }.slip-badge.fortress { background:rgba(255,82,82,0.08); color:var(--red); }.slip-badge.sadhana { background:rgba(245,166,35,0.08); color:var(--gold); }.slip-badge.discipline { background:rgba(171,71,188,0.08); color:#CE93D8; }.slip-category { font-family:var(--mono); font-size:0.75rem; color:var(--dim); margin-bottom:10px; }.slip-penalty-bar { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:8px;
- margin-top:8px; flex-wrap:wrap; }.slip-penalty-bar.p { background:rgba(255,82,82,0.04); border:1px solid rgba(255,82,82,0.12); }.slip-penalty-bar.c { background:rgba(0,230,118,0.04); border:1px solid rgba(0,230,118,0.12); }.slip-status-pill { font-family:var(--mono); font-size:0.6rem; font-weight:700; letter-spacing:1.5px;
- padding:4px 12px; border-radius:4px; }.slip-status-pill.pending { background:rgba(255,82,82,0.12); color:var(--red); }.slip-status-pill.cleared { background:rgba(0,230,118,0.12); color:var(--green); }.slip-km { font-family:var(--mono); font-size:0.75rem; color:var(--dim); }.slip-km strong { color:#fff; }.slip-esc { font-family:var(--mono); font-size:0.65rem; margin-top:6px; }.slip-proof { margin-top:10px; padding:10px 14px; background:rgba(0,230,118,0.03);
- border:1px solid rgba(0,230,118,0.08); border-radius:8px; }.slip-proof-label { font-family:var(--mono); font-size:0.6rem; letter-spacing:1.5px; color:var(--green); margin-bottom:2px; }.slip-proof-km { font-family:var(--mono); font-size:1rem; font-weight:700; color:var(--green); }.slip-proof a { font-family:var(--mono); font-size:0.7rem; color:var(--cyan); text-decoration:none; }.slip-meta { font-family:var(--mono); font-size:0.6rem; color:var(--dim); margin-top:4px; }
- @media(max-width:480px) {.slip { grid-template-columns:36px 1fr; }.slip-card { padding:16px 18px; } }
+    /* ═══ Slip Card — Compact Timeline ═══ */
+    .slip { display:grid; grid-template-columns:56px 1fr; gap:0; margin-bottom:0; position:relative; }
+    .slip-timeline { display:flex; flex-direction:column; align-items:center; padding-top:4px; }
+    .slip-dot { width:12px; height:12px; border-radius:50%; border:2px solid var(--dim); flex-shrink:0;
+      position:relative; z-index:1; }
+    .slip-dot.pending { border-color:var(--red); background:rgba(255,82,82,0.3); box-shadow:0 0 8px rgba(255,82,82,0.2); }
+    .slip-dot.cleared { border-color:var(--green); background:rgba(0,230,118,0.3); }
+    .slip-line { width:2px; flex:1; background:linear-gradient(180deg,var(--border),transparent); margin-top:4px; }
+    .slip-body { padding:0 0 32px 0; }
+    .slip-card { background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:22px 24px;
+      backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      transition:all 0.35s cubic-bezier(0.4,0,0.2,1); position:relative; overflow:hidden; }
+    .slip-card:hover { border-color:var(--border-hover); transform:translateY(-2px);
+      box-shadow:0 8px 32px rgba(0,0,0,0.25); }
+    .slip-card.pending { border-left:3px solid var(--red); }
+    .slip-card.cleared { border-left:3px solid var(--green); }
+    .slip-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent); }
+    .slip-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
+    .slip-date { font-family:var(--mono); font-size:0.7rem; color:var(--dim); letter-spacing:0.06em; }
+    .slip-badge { font-family:var(--mono); font-size:0.55rem; font-weight:700; letter-spacing:1.5px;
+      padding:3px 10px; border-radius:3px; text-transform:uppercase; }
+    .slip-badge.body { background:rgba(0,212,255,0.08); color:var(--cyan); }
+    .slip-badge.fortress { background:rgba(255,82,82,0.08); color:var(--red); }
+    .slip-badge.sadhana { background:rgba(245,166,35,0.08); color:var(--gold); }
+    .slip-badge.discipline { background:rgba(171,71,188,0.08); color:#CE93D8; }
+    .slip-category { font-family:var(--mono); font-size:0.75rem; color:var(--dim); margin-bottom:10px; }
+    .slip-penalty-bar { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:8px;
+      margin-top:8px; flex-wrap:wrap; }
+    .slip-penalty-bar.p { background:rgba(255,82,82,0.04); border:1px solid rgba(255,82,82,0.12); }
+    .slip-penalty-bar.c { background:rgba(0,230,118,0.04); border:1px solid rgba(0,230,118,0.12); }
+    .slip-status-pill { font-family:var(--mono); font-size:0.6rem; font-weight:700; letter-spacing:1.5px;
+      padding:4px 12px; border-radius:4px; }
+    .slip-status-pill.pending { background:rgba(255,82,82,0.12); color:var(--red); }
+    .slip-status-pill.cleared { background:rgba(0,230,118,0.12); color:var(--green); }
+    .slip-km { font-family:var(--mono); font-size:0.75rem; color:var(--dim); }
+    .slip-km strong { color:#fff; }
+    .slip-esc { font-family:var(--mono); font-size:0.65rem; margin-top:6px; }
+    .slip-proof { margin-top:10px; padding:10px 14px; background:rgba(0,230,118,0.03);
+      border:1px solid rgba(0,230,118,0.08); border-radius:8px; }
+    .slip-proof-label { font-family:var(--mono); font-size:0.6rem; letter-spacing:1.5px; color:var(--green); margin-bottom:2px; }
+    .slip-proof-km { font-family:var(--mono); font-size:1rem; font-weight:700; color:var(--green); }
+    .slip-proof a { font-family:var(--mono); font-size:0.7rem; color:var(--cyan); text-decoration:none; }
+    .slip-meta { font-family:var(--mono); font-size:0.6rem; color:var(--dim); margin-top:4px; }
+    @media(max-width:480px) { .slip { grid-template-columns:36px 1fr; }
+      .slip-card { padding:16px 18px; } }
 
- /* ═══ Tamper-proof ═══ */.tamper-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:40px; }.t-card { background:var(--glass); border:1px solid var(--border); border-radius:12px;
- padding:20px; position:relative; overflow:hidden; transition:all 0.3s; }.t-card:hover { border-color:var(--border-hover); transform:translateY(-2px); }.t-num { position:absolute; top:10px; right:12px; font-family:var(--mono);
- font-size:1.8rem; font-weight:700; color:rgba(255,255,255,0.03); }.t-icon { font-size:16px; margin-bottom:6px; }.t-title { font-family:var(--mono); font-size:0.6rem; font-weight:700; letter-spacing:1.5px; margin-bottom:4px; }.t-desc { font-family:var(--mono); font-size:0.65rem; color:var(--dim); line-height:1.6; }
- @media(max-width:768px) {.tamper-grid { grid-template-columns:repeat(2,1fr); } }
- @media(max-width:480px) {.tamper-grid { grid-template-columns:1fr; } }
+    /* ═══ Tamper-proof ═══ */
+    .tamper-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:40px; }
+    .t-card { background:var(--glass); border:1px solid var(--border); border-radius:12px;
+      padding:20px; position:relative; overflow:hidden; transition:all 0.3s; }
+    .t-card:hover { border-color:var(--border-hover); transform:translateY(-2px); }
+    .t-num { position:absolute; top:10px; right:12px; font-family:var(--mono);
+      font-size:1.8rem; font-weight:700; color:rgba(255,255,255,0.03); }
+    .t-icon { font-size:16px; margin-bottom:6px; }
+    .t-title { font-family:var(--mono); font-size:0.6rem; font-weight:700; letter-spacing:1.5px; margin-bottom:4px; }
+    .t-desc { font-family:var(--mono); font-size:0.65rem; color:var(--dim); line-height:1.6; }
+    @media(max-width:768px) { .tamper-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:480px) { .tamper-grid { grid-template-columns:1fr; } }
 
- /* ═══ Punchline ═══ */.punchline { text-align:center; padding:40px 28px; background:linear-gradient(135deg,rgba(0,212,255,0.02),rgba(255,82,82,0.02));
- border:1px solid var(--border); border-radius:16px; position:relative; overflow:hidden; margin-bottom:48px; }.punchline::before { content:''; position:absolute; top:-1px; left:15%; right:15%; height:2px;
- background:linear-gradient(90deg,transparent,var(--red),var(--gold),var(--cyan),var(--green),transparent); opacity:0.3; }
+    /* ═══ Punchline ═══ */
+    .punchline { text-align:center; padding:40px 28px; background:linear-gradient(135deg,rgba(0,212,255,0.02),rgba(255,82,82,0.02));
+      border:1px solid var(--border); border-radius:16px; position:relative; overflow:hidden; margin-bottom:48px; }
+    .punchline::before { content:''; position:absolute; top:-1px; left:15%; right:15%; height:2px;
+      background:linear-gradient(90deg,transparent,var(--red),var(--gold),var(--cyan),var(--green),transparent); opacity:0.3; }
 
- /* ═══ Escalation ═══ */.esc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }.esc-card { padding:18px; border-radius:10px; text-align:center; }.esc-val { font-family:var(--mono); font-size:1.3rem; font-weight:700; }.esc-label { font-family:var(--mono); font-size:0.55rem; color:var(--dim); letter-spacing:1px; margin-bottom:4px; }.esc-sub { font-family:var(--mono); font-size:0.55rem; color:var(--dim); margin-top:2px; }
- @media(max-width:480px) {.esc-grid { grid-template-columns:1fr; } }
+    /* ═══ Escalation ═══ */
+    .esc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+    .esc-card { padding:18px; border-radius:10px; text-align:center; }
+    .esc-val { font-family:var(--mono); font-size:1.3rem; font-weight:700; }
+    .esc-label { font-family:var(--mono); font-size:0.55rem; color:var(--dim); letter-spacing:1px; margin-bottom:4px; }
+    .esc-sub { font-family:var(--mono); font-size:0.55rem; color:var(--dim); margin-top:2px; }
+    @media(max-width:480px) { .esc-grid { grid-template-columns:1fr; } }
 
- /* ═══ GSAP — with CSS fallback ═══ */.reveal { opacity:0; transform:translateY(25px); }.reveal-scale { opacity:0; transform:scale(0.96); }.no-gsap.reveal,.no-gsap.reveal-scale { opacity:1; transform:none; }
+    /* ═══ GSAP — with CSS fallback ═══ */
+    .reveal { opacity:0; transform:translateY(25px); }
+    .reveal-scale { opacity:0; transform:scale(0.96); }
+    .no-gsap .reveal, .no-gsap .reveal-scale { opacity:1; transform:none; }
 
- /* ═══ Empty State ═══ */.empty { text-align:center; padding:80px 20px; }.empty-icon { font-size:48px; margin-bottom:16px; opacity:0.3; }.empty-text { font-family:var(--mono); font-size:0.85rem; color:var(--dim); letter-spacing:1px; }.empty-sub { font-family:var(--mono); font-size:0.7rem; color:var(--green); margin-top:8px; }
- </style>
- <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
- <link rel="icon" type="image/png" href="icon-512.png">
- <link rel="apple-touch-icon" href="icon-512.png">
- <link rel="manifest" href="manifest.json">
- <meta property="og:title" content="FIRST LIGHT — Accountability Ledger">
- <meta property="og:description" content="Every slip. Every penalty. Every proof. Nothing hidden. Nothing faked.">
- <meta property="og:image" content="https://firstlight.live/icon-512.png">
- <meta property="og:url" content="https://firstlight.live/accountability.html">
- <meta property="og:type" content="website">
- <meta name="twitter:card" content="summary_large_image">
- <meta name="twitter:title" content="FIRST LIGHT — Accountability Ledger">
- <meta name="twitter:description" content="Every slip. Every penalty. Every proof. Nothing hidden. Immutable by design.">
- <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
+    /* ═══ Empty State ═══ */
+    .empty { text-align:center; padding:80px 20px; }
+    .empty-icon { font-size:48px; margin-bottom:16px; opacity:0.3; }
+    .empty-text { font-family:var(--mono); font-size:0.85rem; color:var(--dim); letter-spacing:1px; }
+    .empty-sub { font-family:var(--mono); font-size:0.7rem; color:var(--green); margin-top:8px; }
+  </style>
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:title" content="FIRST LIGHT — Accountability Ledger">
+  <meta property="og:description" content="Every slip. Every penalty. Every proof. Nothing hidden. Nothing faked.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live/accountability.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FIRST LIGHT — Accountability Ledger">
+  <meta name="twitter:description" content="Every slip. Every penalty. Every proof. Nothing hidden. Immutable by design.">
+  <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
 </head>
 <body>
 
@@ -125,531 +216,532 @@
 <div class="page">
 
 <!-- ═══════════════════════════════════════
- 1. HERO — Clean, dramatic, no clutter
- ═══════════════════════════════════════ -->
+     1. HERO — Clean, dramatic, no clutter
+     ═══════════════════════════════════════ -->
 <section class="hero">
- <div>
- <div class="hero-badge reveal">PUBLIC RECORD</div>
- <h1 class="reveal">ACCOUNT<br>ABILITY</h1>
- <p class="hero-sub reveal">Every slip recorded. Every penalty enforced. Every proof verified.<br>Nothing hidden. Nothing faked. The internet is the witness.</p>
- <div class="hero-quote reveal">"The credibility comes not from perfection — but from consequences completed."</div>
- </div>
- <div class="hero-scroll">SCROLL</div>
+  <div>
+    <div class="hero-badge reveal">PUBLIC RECORD</div>
+    <h1 class="reveal">ACCOUNT<br>ABILITY</h1>
+    <p class="hero-sub reveal">Every slip recorded. Every penalty enforced. Every proof verified.<br>Nothing hidden. Nothing faked. The internet is the witness.</p>
+    <div class="hero-quote reveal">"The credibility comes not from perfection — but from consequences completed."</div>
+  </div>
+  <div class="hero-scroll">SCROLL</div>
 </section>
 
 <!-- ═══════════════════════════════════════
- 2. STATS — First data the visitor sees
- ═══════════════════════════════════════ -->
+     2. STATS — First data the visitor sees
+     ═══════════════════════════════════════ -->
 <section style="padding:0 24px 48px">
- <div class="stats reveal-scale">
- <div class="stat"><div class="stat-val" style="color:var(--red)" id="accTotalSlips">0</div><div class="stat-label">TOTAL SLIPS</div></div>
- <div class="stat"><div class="stat-val" style="color:var(--green)" id="accCleared">0</div><div class="stat-label">CLEARED</div></div>
- <div class="stat"><div class="stat-val" style="color:var(--gold)" id="accPending">0</div><div class="stat-label">PENDING</div></div>
- <div class="stat"><div class="stat-val" style="color:var(--cyan)" id="accTotalKm">0</div><div class="stat-label">PENALTY KM</div></div>
- <div class="stat"><div class="stat-val" style="color:var(--cyan)" id="accStreakDays"><span data-day>—</span></div><div class="stat-label">STREAK DAYS</div></div>
- <div class="stat"><div class="stat-val" style="color:var(--green)" id="accFortress">0</div><div class="stat-label">PHONE BREACHES</div></div>
- </div>
+  <div class="stats reveal-scale">
+    <div class="stat"><div class="stat-val" style="color:var(--red)" id="accTotalSlips">0</div><div class="stat-label">TOTAL SLIPS</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)" id="accCleared">0</div><div class="stat-label">CLEARED</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--gold)" id="accPending">0</div><div class="stat-label">PENDING</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--cyan)" id="accTotalKm">0</div><div class="stat-label">PENALTY KM</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--cyan)" id="accStreakDays"><span data-day>—</span></div><div class="stat-label">STREAK DAYS</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)" id="accFortress">0</div><div class="stat-label">PHONE BREACHES</div></div>
+  </div>
 
- <!-- Active Rules — compact, below stats -->
- <div class="rules-card reveal">
- <div class="rules-title">ACTIVE RULES — CHAPTER 02 · FROM 13 JUN 2026</div>
- <div class="rules-row"><div class="rules-key">DAILY</div><div class="rules-val">5 km run before 6:00 AM local time, Strava-verified. Miss = claimable.</div></div>
- <div class="rules-row"><div class="rules-key">WEEKLY</div><div class="rules-val">100 km minimum across all sports (Mon–Sun). Swim 1 km = 10 km equivalent.</div></div>
- <div class="rules-row"><div class="rules-key">DEFICIT</div><div class="rules-val">≤ 50 km carries to next week. <span class="rules-danger">&gt; 50 km = + deficit × 2 punishment km.</span></div></div>
- <div class="rules-row"><div class="rules-key">CLAIM</div><div class="rules-val">First person to spot a miss → via UPI within 24 hours.</div></div>
- <div class="rules-row"><div class="rules-key">CHECK-IN</div><div class="rules-val">Daily check-in must happen every day. Missed check-in = <span class="rules-danger">20 km walk auto-fine</span>. No record = a miss. Enforced from 13 JUN 2026.</div></div>
- <div class="rules-row"><div class="rules-key">DEVICE</div><div class="rules-val">The home is device-free. Phone inside = <span class="rules-danger">10 km walk per 30 minutes</span> kept in the room. Self-logged, every incident public below.</div></div>
- <div class="rules-row"><div class="rules-key" style="color:var(--red)">TAMPER</div><div class="rules-val">Slips are immutable. No delete. No edit. The system is stronger than any weak moment.</div></div>
- </div>
+  <!-- Active Rules — compact, below stats -->
+  <div class="rules-card reveal">
+    <div class="rules-title">ACTIVE RULES — CHAPTER 02 · FROM 13 JUN 2026</div>
+    <div class="rules-row"><div class="rules-key">DAILY</div><div class="rules-val">5 km run before 6:00 AM local time, Strava-verified. Miss = ₹15,000 claimable.</div></div>
+    <div class="rules-row"><div class="rules-key">WEEKLY</div><div class="rules-val">100 km minimum across all sports (Mon–Sun). Swim 1 km = 10 km equivalent.</div></div>
+    <div class="rules-row"><div class="rules-key">DEFICIT</div><div class="rules-val">≤ 50 km carries to next week. <span class="rules-danger">&gt; 50 km = ₹15,000 + deficit × 2 punishment km.</span></div></div>
+    <div class="rules-row"><div class="rules-key">CLAIM</div><div class="rules-val">First person to spot a miss → ₹15,000 via UPI within 24 hours.</div></div>
+    <div class="rules-row"><div class="rules-key">CHECK-IN</div><div class="rules-val">Daily check-in must happen every day. Missed check-in = <span class="rules-danger">20 km walk auto-fine</span>. No record = a miss. Enforced from 13 JUN 2026.</div></div>
+    <div class="rules-row"><div class="rules-key">DEVICE</div><div class="rules-val">The home is device-free. Phone inside = <span class="rules-danger">10 km walk per 30 minutes</span> kept in the room. Self-logged, every incident public below.</div></div>
+    <div class="rules-row"><div class="rules-key" style="color:var(--red)">TAMPER</div><div class="rules-val">Slips are immutable. No delete. No edit. The system is stronger than any weak moment.</div></div>
+  </div>
 </section>
 
 <!-- ═══════════════════════════════════════
- 3. LEDGER — The main event
- ═══════════════════════════════════════ -->
+     3. LEDGER — The main event
+     ═══════════════════════════════════════ -->
 <!-- ═══ DEVICE FORTRESS ═══ -->
 <section style="padding:56px 24px 0">
- <div style="max-width:900px;margin:0 auto">
- <div class="rules-card reveal" style="border-color:rgba(255,82,82,0.18)">
- <div class="rules-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
- <span>DEVICE FORTRESS — THE PHONE STAYS OUT</span>
- <span id="fortressStatus" style="font-size:0.55rem;letter-spacing:2px;color:var(--green)">HOLDING</span>
- </div>
- <div style="font-family:'Inter',sans-serif;font-size:0.8rem;color:var(--text-dim);line-height:1.6;margin:10px 0 18px">
- The home is device-free. Every time the phone comes inside, the breach is logged here — permanently.
- <span style="color:var(--red)">10 km walk fine per 30 minutes</span> the phone stays in the room. No exceptions, no edits, no deletes.
- </div>
- <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:16px">
- <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border-radius:8px 0 0 8px">
- <div id="fortressCount" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--green)">0</div>
- <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">BREACHES</div>
- </div>
- <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02)">
- <div id="fortressKm" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--gold)">0</div>
- <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">FINED KM</div>
- </div>
- <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0">
- <div id="fortressLast" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--cyan)">—</div>
- <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">LAST BREACH</div>
- </div>
- </div>
- <div id="fortressList"></div>
- </div>
- </div>
+  <div style="max-width:900px;margin:0 auto">
+    <div class="rules-card reveal" style="border-color:rgba(255,82,82,0.18)">
+      <div class="rules-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <span>DEVICE FORTRESS — THE PHONE STAYS OUT</span>
+        <span id="fortressStatus" style="font-size:0.55rem;letter-spacing:2px;color:var(--green)">HOLDING</span>
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:0.8rem;color:var(--text-dim);line-height:1.6;margin:10px 0 18px">
+        The home is device-free. Every time the phone comes inside, the breach is logged here — permanently.
+        <span style="color:var(--red)">10 km walk fine per 30 minutes</span> the phone stays in the room. No exceptions, no edits, no deletes.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:16px">
+        <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border-radius:8px 0 0 8px">
+          <div id="fortressCount" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--green)">0</div>
+          <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">BREACHES</div>
+        </div>
+        <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02)">
+          <div id="fortressKm" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--gold)">0</div>
+          <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">FINED KM</div>
+        </div>
+        <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0">
+          <div id="fortressLast" style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:1.5rem;font-weight:700;color:var(--cyan)">—</div>
+          <div style="font-family:var(--mono,'IBM Plex Mono'),monospace;font-size:0.5rem;letter-spacing:1.5px;color:var(--text-dim);margin-top:4px">LAST BREACH</div>
+        </div>
+      </div>
+      <div id="fortressList"></div>
+    </div>
+  </div>
 </section>
 
 <section style="padding:60px 0 0">
- <div class="s-eyebrow reveal">IMMUTABLE RECORD</div>
- <div class="s-heading reveal">Slip Ledger</div>
- <div style="text-align:center;margin-bottom:16px">
- <span id="accLiveStatus" class="ledger-status">LOADING...</span>
- </div>
- <div class="ledger-filter" id="accFilter">
- <button class="filter-btn active" data-f="all" onclick="filterSlips('all')">ALL</button>
- <button class="filter-btn" data-f="pending" onclick="filterSlips('pending')">PENDING</button>
- <button class="filter-btn" data-f="cleared" onclick="filterSlips('cleared')">CLEARED</button>
- </div>
+  <div class="s-eyebrow reveal">IMMUTABLE RECORD</div>
+  <div class="s-heading reveal">Slip Ledger</div>
+  <div style="text-align:center;margin-bottom:16px">
+    <span id="accLiveStatus" class="ledger-status">LOADING...</span>
+  </div>
+  <div class="ledger-filter" id="accFilter">
+    <button class="filter-btn active" data-f="all" onclick="filterSlips('all')">ALL</button>
+    <button class="filter-btn" data-f="pending" onclick="filterSlips('pending')">PENDING</button>
+    <button class="filter-btn" data-f="cleared" onclick="filterSlips('cleared')">CLEARED</button>
+  </div>
 </section>
 
 <div class="ledger" id="accContainer">
- <div class="empty" id="accEmpty">
- <div class="empty-icon">◆</div>
- <div class="empty-text">ZERO SLIPS RECORDED</div>
- <div class="empty-sub">The streak is clean. The covenant is unbroken.</div>
- </div>
+  <div class="empty" id="accEmpty">
+    <div class="empty-icon">◆</div>
+    <div class="empty-text">ZERO SLIPS RECORDED</div>
+    <div class="empty-sub">The streak is clean. The covenant is unbroken.</div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════
- 4. ARCHITECTURE — Why it can't be faked
- ═══════════════════════════════════════ -->
+     4. ARCHITECTURE — Why it can't be faked
+     ═══════════════════════════════════════ -->
 <section style="padding:80px 0">
- <div class="container">
- <div class="s-eyebrow reveal">ARCHITECTURE</div>
- <div class="s-heading reveal">Why This Can't Be Faked</div>
- <div class="s-desc reveal">8 enforcement layers. Server-side validation. GPS-verified proof.</div>
+  <div class="container">
+    <div class="s-eyebrow reveal">ARCHITECTURE</div>
+    <div class="s-heading reveal">Why This Can't Be Faked</div>
+    <div class="s-desc reveal">8 enforcement layers. Server-side validation. GPS-verified proof.</div>
 
- <div class="tamper-grid">
- <div class="t-card reveal"><div class="t-num">01</div><div class="t-icon">🗑️</div><div class="t-title" style="color:var(--red)">DELETE BLOCKED</div><div class="t-desc">Database trigger raises an exception on ANY delete attempt. Permanent.</div></div>
- <div class="t-card reveal"><div class="t-num">02</div><div class="t-icon">🔒</div><div class="t-title" style="color:var(--gold)">FIELDS FROZEN</div><div class="t-desc">Date, rule, category — all locked at creation. Server rejects modifications.</div></div>
- <div class="t-card reveal"><div class="t-num">03</div><div class="t-icon">📡</div><div class="t-title" style="color:var(--cyan)">GPS VERIFIED</div><div class="t-desc">Distance from Strava API — not the browser. Server pulls truth from GPS.</div></div>
- <div class="t-card reveal"><div class="t-num">04</div><div class="t-icon">🛰️</div><div class="t-title" style="color:var(--green)">DATA LOCKED</div><div class="t-desc">Only automated sync writes Strava data. No human can modify it.</div></div>
- <div class="t-card reveal"><div class="t-num">05</div><div class="t-icon">⏰</div><div class="t-title" style="color:#E040FB">SERVER CLOCK</div><div class="t-desc">Escalation computed by database clock. Device time changes do nothing.</div></div>
- <div class="t-card reveal"><div class="t-num">06</div><div class="t-icon">📅</div><div class="t-title" style="color:var(--strava)">DATE ENFORCED</div><div class="t-desc">Activity must occur on or after the slip date. No old walks allowed.</div></div>
- <div class="t-card reveal"><div class="t-num">07</div><div class="t-icon">1️⃣</div><div class="t-title">ONE = ONE</div><div class="t-desc">Unique index prevents one activity from clearing multiple penalties.</div></div>
- <div class="t-card reveal"><div class="t-num">08</div><div class="t-icon">⬆️</div><div class="t-title" style="color:var(--red)">ONE-WAY</div><div class="t-desc">PENDING → CLEARED only. Once cleared, never reverted. Forward only.</div></div>
- </div>
+    <div class="tamper-grid">
+      <div class="t-card reveal"><div class="t-num">01</div><div class="t-icon">🗑️</div><div class="t-title" style="color:var(--red)">DELETE BLOCKED</div><div class="t-desc">Database trigger raises an exception on ANY delete attempt. Permanent.</div></div>
+      <div class="t-card reveal"><div class="t-num">02</div><div class="t-icon">🔒</div><div class="t-title" style="color:var(--gold)">FIELDS FROZEN</div><div class="t-desc">Date, rule, category — all locked at creation. Server rejects modifications.</div></div>
+      <div class="t-card reveal"><div class="t-num">03</div><div class="t-icon">📡</div><div class="t-title" style="color:var(--cyan)">GPS VERIFIED</div><div class="t-desc">Distance from Strava API — not the browser. Server pulls truth from GPS.</div></div>
+      <div class="t-card reveal"><div class="t-num">04</div><div class="t-icon">🛰️</div><div class="t-title" style="color:var(--green)">DATA LOCKED</div><div class="t-desc">Only automated sync writes Strava data. No human can modify it.</div></div>
+      <div class="t-card reveal"><div class="t-num">05</div><div class="t-icon">⏰</div><div class="t-title" style="color:#E040FB">SERVER CLOCK</div><div class="t-desc">Escalation computed by database clock. Device time changes do nothing.</div></div>
+      <div class="t-card reveal"><div class="t-num">06</div><div class="t-icon">📅</div><div class="t-title" style="color:var(--strava)">DATE ENFORCED</div><div class="t-desc">Activity must occur on or after the slip date. No old walks allowed.</div></div>
+      <div class="t-card reveal"><div class="t-num">07</div><div class="t-icon">1️⃣</div><div class="t-title">ONE = ONE</div><div class="t-desc">Unique index prevents one activity from clearing multiple penalties.</div></div>
+      <div class="t-card reveal"><div class="t-num">08</div><div class="t-icon">⬆️</div><div class="t-title" style="color:var(--red)">ONE-WAY</div><div class="t-desc">PENDING → CLEARED only. Once cleared, never reverted. Forward only.</div></div>
+    </div>
 
- <!-- Punchline -->
- <div class="punchline reveal-scale">
- <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:4px;color:var(--dim);margin-bottom:14px">THE ONLY WAY TO CHEAT</div>
- <div style="font-family:var(--mono);font-size:clamp(1rem,3vw,1.4rem);font-weight:700;color:#fff;line-height:1.8;margin-bottom:12px">
- Hack Strava's GPS satellites.<br><span style="color:var(--red)">That's it. There is no other way.</span>
- </div>
- <div style="font-family:var(--mono);font-size:0.65rem;color:var(--dim);line-height:1.8">
- The admin built the system. The system now controls the admin.<br>
- <span style="color:var(--green);font-weight:700">Walk the punishment. Let the GPS prove it.</span>
- </div>
- </div>
+    <!-- Punchline -->
+    <div class="punchline reveal-scale">
+      <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:4px;color:var(--dim);margin-bottom:14px">THE ONLY WAY TO CHEAT</div>
+      <div style="font-family:var(--mono);font-size:clamp(1rem,3vw,1.4rem);font-weight:700;color:#fff;line-height:1.8;margin-bottom:12px">
+        Hack Strava's GPS satellites.<br><span style="color:var(--red)">That's it. There is no other way.</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.65rem;color:var(--dim);line-height:1.8">
+        The admin built the system. The system now controls the admin.<br>
+        <span style="color:var(--green);font-weight:700">Walk the punishment. Let the GPS prove it.</span>
+      </div>
+    </div>
 
- <!-- Escalation -->
- <div style="margin-top:40px;padding:24px;background:var(--glass);border:1px solid rgba(255,82,82,0.1);border-radius:14px;backdrop-filter:blur(16px)">
- <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:4px;color:var(--red);font-weight:700;margin-bottom:16px;text-align:center">PENALTY ESCALATION</div>
- <div class="esc-grid">
- <div class="esc-card" style="background:rgba(245,166,35,0.05);border:1px solid rgba(245,166,35,0.1);border-radius:10px">
- <div class="esc-label">DAY 1-7</div><div class="esc-val" style="color:var(--gold)">20 KM</div><div class="esc-sub">Grace period</div>
- </div>
- <div class="esc-card" style="background:rgba(255,82,82,0.05);border:1px solid rgba(255,82,82,0.1);border-radius:10px">
- <div class="esc-label">DAY 8+</div><div class="esc-val" style="color:var(--red)">+3 KM/DAY</div><div class="esc-sub">Escalating daily</div>
- </div>
- <div class="esc-card" style="background:rgba(255,82,82,0.07);border:1px solid rgba(255,82,82,0.15);border-radius:10px">
- <div class="esc-label">CAP</div><div class="esc-val" style="color:var(--red)">70 KM</div><div class="esc-sub">Then cascade spawns</div>
- </div>
- </div>
- <div style="font-family:var(--mono);font-size:0.6rem;color:var(--dim);text-align:center;line-height:1.8">
- Cycling = 0.5x (double distance). Walk/Run = 1x. Cap hit → 70km freezes + new 25km penalty spawns.
- </div>
- </div>
- </div>
+    <!-- Escalation -->
+    <div style="margin-top:40px;padding:24px;background:var(--glass);border:1px solid rgba(255,82,82,0.1);border-radius:14px;backdrop-filter:blur(16px)">
+      <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:4px;color:var(--red);font-weight:700;margin-bottom:16px;text-align:center">PENALTY ESCALATION</div>
+      <div class="esc-grid">
+        <div class="esc-card" style="background:rgba(245,166,35,0.05);border:1px solid rgba(245,166,35,0.1);border-radius:10px">
+          <div class="esc-label">DAY 1-7</div><div class="esc-val" style="color:var(--gold)">20 KM</div><div class="esc-sub">Grace period</div>
+        </div>
+        <div class="esc-card" style="background:rgba(255,82,82,0.05);border:1px solid rgba(255,82,82,0.1);border-radius:10px">
+          <div class="esc-label">DAY 8+</div><div class="esc-val" style="color:var(--red)">+3 KM/DAY</div><div class="esc-sub">Escalating daily</div>
+        </div>
+        <div class="esc-card" style="background:rgba(255,82,82,0.07);border:1px solid rgba(255,82,82,0.15);border-radius:10px">
+          <div class="esc-label">CAP</div><div class="esc-val" style="color:var(--red)">70 KM</div><div class="esc-sub">Then cascade spawns</div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--dim);text-align:center;line-height:1.8">
+        Cycling = 0.5x (double distance). Walk/Run = 1x. Cap hit → 70km freezes + new 25km penalty spawns.
+      </div>
+    </div>
+  </div>
 </section>
 
-</div><!--.page -->
+</div><!-- .page -->
 
 <!-- FOOTER -->
-<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0.774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24.774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
+<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
 
 <script src="js/config.js"></script>
 <script src="app.js?v=20260613a"></script>
 <script>
 // ── Filter buttons ──
 function filterSlips(type) {
- document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.f === type); });
- document.querySelectorAll('.slip').forEach(function(s) {
- if (type === 'all') { s.style.display = ''; return; }
- var card = s.querySelector('.slip-card');
- s.style.display = (card && card.classList.contains(type)) ? '': 'none';
- });
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.f === type); });
+  document.querySelectorAll('.slip').forEach(function(s) {
+    if (type === 'all') { s.style.display = ''; return; }
+    var card = s.querySelector('.slip-card');
+    s.style.display = (card && card.classList.contains(type)) ? '' : 'none';
+  });
 }
 
 (function() {
- var PENALTY_MAP = {
- food_violation: { base_km: 20, desc: 'walk — no shortcuts' },
- missed_run: { base_km: 20, desc: 'walk — the run you skipped, multiplied' },
- brahmacharya_gate: { base_km: 50, desc: 'walk + run OR cycling (2x)' },
- device_at_home: { base_km: 20, desc: 'walk — the fortress was breached' },
- missed_diary: { base_km: 20, desc: 'walk — the record matters' },
- 'DISCIPLINE VIOLATION':{ base_km: 25, desc: 'walk OR 50 km cycling — day was never sealed' }
- };
- var DEFAULT_PENALTY = { base_km: 25, desc: 'walk OR 50 km cycling' };
- var ESC = { GRACE: 7, DAILY: 3, CAP: 70, CASCADE_BASE: 25, CYCLE_MULT: 2 };
+  var PENALTY_MAP = {
+    food_violation:        { base_km: 20, desc: 'walk — no shortcuts' },
+    missed_run:            { base_km: 20, desc: 'walk — the run you skipped, multiplied' },
+    brahmacharya_gate:     { base_km: 50, desc: 'walk + run OR cycling (2x)' },
+    device_at_home:        { base_km: 20, desc: 'walk — the fortress was breached' },
+    missed_diary:          { base_km: 20, desc: 'walk — the record matters' },
+    'DISCIPLINE VIOLATION':{ base_km: 25, desc: 'walk OR 50 km cycling — day was never sealed' }
+  };
+  var DEFAULT_PENALTY = { base_km: 25, desc: 'walk OR 50 km cycling' };
+  var ESC = { GRACE: 7, DAILY: 3, CAP: 70, CASCADE_BASE: 25, CYCLE_MULT: 2 };
 
- function calcEscalatedKm(slip) {
- if (slip.penalty_status === 'cleared') return parseFloat(slip.proof_km) || 0;
- var base = (slip.cascade_level && slip.cascade_level > 0) ? ESC.CASCADE_BASE: (PENALTY_MAP[slip.category] || DEFAULT_PENALTY).base_km;
- // Device breaches carry a computed fine (10 km / 30 min) — stored on the slip, overrides category base
- if (slip.category === 'device_at_home' && slip.penalty_km &&!slip.cascade_level) base = parseFloat(slip.penalty_km);
- var ist = (typeof getNowIST === 'function') ? getNowIST(): new Date();
- var slipDate = new Date(slip.date + 'T00:00:00+05:30');
- var days = Math.floor((ist.getTime() - slipDate.getTime()) / 86400000);
- var overdue = Math.max(0, days - ESC.GRACE);
- return Math.min(base + overdue * ESC.DAILY, ESC.CAP);
- }
+  function calcEscalatedKm(slip) {
+    if (slip.penalty_status === 'cleared') return parseFloat(slip.proof_km) || 0;
+    var base = (slip.cascade_level && slip.cascade_level > 0) ? ESC.CASCADE_BASE : (PENALTY_MAP[slip.category] || DEFAULT_PENALTY).base_km;
+    // Device breaches carry a computed fine (10 km / 30 min) — stored on the slip, overrides category base
+    if (slip.category === 'device_at_home' && slip.penalty_km && !slip.cascade_level) base = parseFloat(slip.penalty_km);
+    var ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+    var slipDate = new Date(slip.date + 'T00:00:00+05:30');
+    var days = Math.floor((ist.getTime() - slipDate.getTime()) / 86400000);
+    var overdue = Math.max(0, days - ESC.GRACE);
+    return Math.min(base + overdue * ESC.DAILY, ESC.CAP);
+  }
 
- var _lastSlipCount = 0;
- var _pollTimer = null;
+  var _lastSlipCount = 0;
+  var _pollTimer = null;
 
- async function loadSlips() {
- updateLiveStatus('LOADING...');
- var slips = null;
- var localSlips = [];
- try { localSlips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) { localSlips = []; }
+  async function loadSlips() {
+    updateLiveStatus('LOADING...');
+    var slips = null;
+    var localSlips = [];
+    try { localSlips = JSON.parse(localStorage.getItem('fl_slips') || '[]'); } catch(e) { localSlips = []; }
 
- if (typeof SB!== 'undefined' && SB.init()) {
- try {
- slips = await sbFetch('slips', 'GET', null, '?select=id,date,rule,category,penalty,penalty_km,description,penalty_status,proof_km,proof_strava_url,proof_strava_activity_id,cleared_at,created_at,cascade_level,parent_slip_id,client_id&order=date.desc,created_at.desc');
- if (slips && Array.isArray(slips)) {
- var sbIds = new Set(slips.map(function(s) { return s.id; }));
- var localOnly = localSlips.filter(function(s) { return s.id &&!sbIds.has(s.id); });
- if (localOnly.length > 0) {
- slips = slips.concat(localOnly);
- slips.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
- updateLiveStatus('LIVE — SUPABASE + ' + localOnly.length + ' LOCAL');
- } else {
- updateLiveStatus('LIVE — SUPABASE');
- }
- } else { slips = null; }
- } catch(e) {
- console.warn('[Accountability] Supabase fetch failed:', e.message);
- updateLiveStatus('ERROR — RETRYING...');
- slips = null;
- }
- }
+    if (typeof SB !== 'undefined' && SB.init()) {
+      try {
+        slips = await sbFetch('slips', 'GET', null, '?select=id,date,rule,category,penalty,penalty_km,description,penalty_status,proof_km,proof_strava_url,proof_strava_activity_id,cleared_at,created_at,cascade_level,parent_slip_id,client_id&order=date.desc,created_at.desc');
+        if (slips && Array.isArray(slips)) {
+          var sbIds = new Set(slips.map(function(s) { return s.id; }));
+          var localOnly = localSlips.filter(function(s) { return s.id && !sbIds.has(s.id); });
+          if (localOnly.length > 0) {
+            slips = slips.concat(localOnly);
+            slips.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+            updateLiveStatus('LIVE — SUPABASE + ' + localOnly.length + ' LOCAL');
+          } else {
+            updateLiveStatus('LIVE — SUPABASE');
+          }
+        } else { slips = null; }
+      } catch(e) {
+        console.warn('[Accountability] Supabase fetch failed:', e.message);
+        updateLiveStatus('ERROR — RETRYING...');
+        slips = null;
+      }
+    }
 
- if (!slips) {
- slips = localSlips;
- slips.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
- updateLiveStatus('OFFLINE — LOCAL CACHE');
- }
+    if (!slips) {
+      slips = localSlips;
+      slips.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+      updateLiveStatus('OFFLINE — LOCAL CACHE');
+    }
 
- if (!slips || slips.length === 0) {
- updateLiveStatus(slips ? 'LIVE — NO SLIPS': 'OFFLINE');
- }
+    if (!slips || slips.length === 0) {
+      updateLiveStatus(slips ? 'LIVE — NO SLIPS' : 'OFFLINE');
+    }
 
- slips = slips.filter(function(s) { return!s.date || s.date < '2030-01-01'; });
- slips = addVirtualCascades(slips);
- renderSlips(slips);
- _lastSlipCount = slips.length;
- }
+    slips = slips.filter(function(s) { return !s.date || s.date < '2030-01-01'; });
+    slips = addVirtualCascades(slips);
+    renderSlips(slips);
+    _lastSlipCount = slips.length;
+  }
 
- function addVirtualCascades(slips) {
- var extras = [];
- slips.forEach(function(s) {
- if (s.penalty_status === 'cleared') return;
- var km = calcEscalatedKm(s);
- if (km < ESC.CAP) return;
- var parentRef = s.client_id || s.id;
- var hasCascade = slips.some(function(c) { return c.parent_slip_id === parentRef; }) ||
- extras.some(function(c) { return c.parent_slip_id === parentRef; });
- if (hasCascade) return;
- extras.push({
- id: 'virt_cascade_' + parentRef, date: new Date().toISOString().split('T')[0],
- rule: s.rule, category: s.category, penalty_status: 'pending',
- parent_slip_id: parentRef, cascade_level: (s.cascade_level || 0) + 1,
- created_at: new Date().toISOString()
- });
- });
- return slips.concat(extras);
- }
+  function addVirtualCascades(slips) {
+    var extras = [];
+    slips.forEach(function(s) {
+      if (s.penalty_status === 'cleared') return;
+      var km = calcEscalatedKm(s);
+      if (km < ESC.CAP) return;
+      var parentRef = s.client_id || s.id;
+      var hasCascade = slips.some(function(c) { return c.parent_slip_id === parentRef; }) ||
+                       extras.some(function(c) { return c.parent_slip_id === parentRef; });
+      if (hasCascade) return;
+      extras.push({
+        id: 'virt_cascade_' + parentRef, date: new Date().toISOString().split('T')[0],
+        rule: s.rule, category: s.category, penalty_status: 'pending',
+        parent_slip_id: parentRef, cascade_level: (s.cascade_level || 0) + 1,
+        created_at: new Date().toISOString()
+      });
+    });
+    return slips.concat(extras);
+  }
 
- function renderFortress(slips) {
- var breaches = slips.filter(function(s) {
- return (s.rule === 'Phone Inside Home' || s.category === 'device_at_home') &&!(s.id && String(s.id).indexOf('virt_') === 0);
- });
- var count = breaches.length;
- var totalKm = breaches.reduce(function(sum, s) {
- return sum + (s.penalty_status === 'cleared' ? (parseFloat(s.proof_km) || 0): (parseFloat(s.penalty_km) || 20));
- }, 0);
- var last = breaches.length ? breaches.reduce(function(a, b) { return (a.date || '') > (b.date || '') ? a: b; }).date: null;
+  function renderFortress(slips) {
+    var breaches = slips.filter(function(s) {
+      return (s.rule === 'Phone Inside Home' || s.category === 'device_at_home') &&
+             !(s.id && String(s.id).indexOf('virt_') === 0);
+    });
+    var count = breaches.length;
+    var totalKm = breaches.reduce(function(sum, s) {
+      return sum + (s.penalty_status === 'cleared' ? (parseFloat(s.proof_km) || 0) : (parseFloat(s.penalty_km) || 20));
+    }, 0);
+    var last = breaches.length ? breaches.reduce(function(a, b) { return (a.date || '') > (b.date || '') ? a : b; }).date : null;
 
- var countEl = document.getElementById('fortressCount');
- var kmEl = document.getElementById('fortressKm');
- var lastEl = document.getElementById('fortressLast');
- var statusEl = document.getElementById('fortressStatus');
- var statEl = document.getElementById('accFortress');
- var listEl = document.getElementById('fortressList');
+    var countEl = document.getElementById('fortressCount');
+    var kmEl = document.getElementById('fortressKm');
+    var lastEl = document.getElementById('fortressLast');
+    var statusEl = document.getElementById('fortressStatus');
+    var statEl = document.getElementById('accFortress');
+    var listEl = document.getElementById('fortressList');
 
- if (countEl) { countEl.textContent = count; countEl.style.color = count === 0 ? 'var(--green)': 'var(--red)'; }
- if (kmEl) kmEl.textContent = Math.round(totalKm);
- if (lastEl) lastEl.textContent = last ? last.substring(5).split('-').reverse().join('/'): '—';
- if (statusEl) {
- statusEl.textContent = count === 0 ? 'HOLDING': 'BREACHED ×' + count;
- statusEl.style.color = count === 0 ? 'var(--green)': 'var(--red)';
- }
- if (statEl) { statEl.textContent = count; statEl.style.color = count === 0 ? 'var(--green)': 'var(--red)'; }
+    if (countEl) { countEl.textContent = count; countEl.style.color = count === 0 ? 'var(--green)' : 'var(--red)'; }
+    if (kmEl) kmEl.textContent = Math.round(totalKm);
+    if (lastEl) lastEl.textContent = last ? last.substring(5).split('-').reverse().join('/') : '—';
+    if (statusEl) {
+      statusEl.textContent = count === 0 ? 'HOLDING' : 'BREACHED ×' + count;
+      statusEl.style.color = count === 0 ? 'var(--green)' : 'var(--red)';
+    }
+    if (statEl) { statEl.textContent = count; statEl.style.color = count === 0 ? 'var(--green)' : 'var(--red)'; }
 
- if (listEl) {
- if (!count) {
- listEl.innerHTML = '<div style="text-align:center;padding:18px;font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;letter-spacing:2px;color:var(--green);background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.12);border-radius:10px">◆ ZERO BREACHES — THE FORTRESS HOLDS</div>';
- } else {
- listEl.innerHTML = breaches.slice(0, 20).map(function(s) {
- var cleared = s.penalty_status === 'cleared';
- var km = cleared ? (parseFloat(s.proof_km) || 0): (parseFloat(s.penalty_km) || 20);
- var desc = s.description || 'Phone was inside the home.';
- var mins = (desc.match(/(\d+)\s*minutes/) || [])[1];
- return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;background:rgba(255,82,82,' + (cleared ? '0.03': '0.06') + ');border:1px solid rgba(255,82,82,' + (cleared ? '0.08': '0.18') + ');border-radius:8px;flex-wrap:wrap">' +
- '<span style="font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;color:#fff;letter-spacing:1px">' + (s.date || '?') + (mins ? ' · ' + mins + ' MIN INSIDE': '') + '</span>' +
- '<span style="font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;font-weight:700;letter-spacing:1px;color:' + (cleared ? 'var(--green)': 'var(--red)') + '">' + Math.round(km) + ' KM ' + (cleared ? '✓ SERVED': 'OWED') + '</span></div>';
- }).join('');
- }
- }
- }
+    if (listEl) {
+      if (!count) {
+        listEl.innerHTML = '<div style="text-align:center;padding:18px;font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;letter-spacing:2px;color:var(--green);background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.12);border-radius:10px">◆ ZERO BREACHES — THE FORTRESS HOLDS</div>';
+      } else {
+        listEl.innerHTML = breaches.slice(0, 20).map(function(s) {
+          var cleared = s.penalty_status === 'cleared';
+          var km = cleared ? (parseFloat(s.proof_km) || 0) : (parseFloat(s.penalty_km) || 20);
+          var desc = s.description || 'Phone was inside the home.';
+          var mins = (desc.match(/(\d+)\s*minutes/) || [])[1];
+          return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;background:rgba(255,82,82,' + (cleared ? '0.03' : '0.06') + ');border:1px solid rgba(255,82,82,' + (cleared ? '0.08' : '0.18') + ');border-radius:8px;flex-wrap:wrap">' +
+            '<span style="font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;color:#fff;letter-spacing:1px">' + (s.date || '?') + (mins ? ' · ' + mins + ' MIN INSIDE' : '') + '</span>' +
+            '<span style="font-family:var(--mono,\'IBM Plex Mono\'),monospace;font-size:0.65rem;font-weight:700;letter-spacing:1px;color:' + (cleared ? 'var(--green)' : 'var(--red)') + '">' + Math.round(km) + ' KM ' + (cleared ? '✓ SERVED' : 'OWED') + '</span></div>';
+        }).join('');
+      }
+    }
+  }
 
- function renderSlips(slips) {
- renderFortress(slips);
- var total = slips.length;
- var clearedCount = 0, pendingCount = 0, totalPenaltyKm = 0;
- var pendingSlips = [], clearedSlips = [];
+  function renderSlips(slips) {
+    renderFortress(slips);
+    var total = slips.length;
+    var clearedCount = 0, pendingCount = 0, totalPenaltyKm = 0;
+    var pendingSlips = [], clearedSlips = [];
 
- slips.forEach(function(s) {
- if (s.penalty_status === 'cleared') {
- clearedCount++; totalPenaltyKm += parseFloat(s.proof_km) || 0; clearedSlips.push(s);
- } else {
- pendingCount++; totalPenaltyKm += calcEscalatedKm(s); pendingSlips.push(s);
- }
- });
+    slips.forEach(function(s) {
+      if (s.penalty_status === 'cleared') {
+        clearedCount++; totalPenaltyKm += parseFloat(s.proof_km) || 0; clearedSlips.push(s);
+      } else {
+        pendingCount++; totalPenaltyKm += calcEscalatedKm(s); pendingSlips.push(s);
+      }
+    });
 
- document.getElementById('accTotalSlips').textContent = total;
- document.getElementById('accCleared').textContent = clearedCount;
- document.getElementById('accPending').textContent = pendingCount;
- document.getElementById('accTotalKm').textContent = Math.round(totalPenaltyKm);
+    document.getElementById('accTotalSlips').textContent = total;
+    document.getElementById('accCleared').textContent = clearedCount;
+    document.getElementById('accPending').textContent = pendingCount;
+    document.getElementById('accTotalKm').textContent = Math.round(totalPenaltyKm);
 
- var container = document.getElementById('accContainer');
- var emptyEl = document.getElementById('accEmpty');
+    var container = document.getElementById('accContainer');
+    var emptyEl = document.getElementById('accEmpty');
 
- if (total === 0) { if (emptyEl) emptyEl.style.display = 'block'; return; }
- if (emptyEl) emptyEl.style.display = 'none';
+    if (total === 0) { if (emptyEl) emptyEl.style.display = 'block'; return; }
+    if (emptyEl) emptyEl.style.display = 'none';
 
- var html = '';
+    var html = '';
 
- // Pending alert
- if (pendingCount > 0) {
- var totalPendingKm = 0;
- pendingSlips.forEach(function(s) { totalPendingKm += calcEscalatedKm(s); });
- html += '<div style="background:linear-gradient(135deg,rgba(255,82,82,0.06),rgba(255,82,82,0.02));border:2px solid rgba(255,82,82,0.2);border-radius:14px;padding:24px;margin-bottom:32px;text-align:center">';
- html += '<div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:4px;color:var(--red);font-weight:700;margin-bottom:6px">ACTIVE PUNISHMENT</div>';
- html += '<div style="font-family:var(--mono);font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;color:#fff">' + pendingCount + ' PENDING</div>';
- html += '<div style="font-family:var(--mono);font-size:1rem;color:var(--red);font-weight:700;margin-top:4px">' + Math.round(totalPendingKm) + ' KM REQUIRED</div>';
- html += '</div>';
- }
+    // Pending alert
+    if (pendingCount > 0) {
+      var totalPendingKm = 0;
+      pendingSlips.forEach(function(s) { totalPendingKm += calcEscalatedKm(s); });
+      html += '<div style="background:linear-gradient(135deg,rgba(255,82,82,0.06),rgba(255,82,82,0.02));border:2px solid rgba(255,82,82,0.2);border-radius:14px;padding:24px;margin-bottom:32px;text-align:center">';
+      html += '<div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:4px;color:var(--red);font-weight:700;margin-bottom:6px">ACTIVE PUNISHMENT</div>';
+      html += '<div style="font-family:var(--mono);font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;color:#fff">' + pendingCount + ' PENDING</div>';
+      html += '<div style="font-family:var(--mono);font-size:1rem;color:var(--red);font-weight:700;margin-top:4px">' + Math.round(totalPendingKm) + ' KM REQUIRED</div>';
+      html += '</div>';
+    }
 
- // Pending section
- if (pendingCount > 0) {
- html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:0 56px 0 0">';
- html += '<div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:3px;color:var(--red)">PENDING · ' + pendingCount + '</div>';
- html += '<div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(255,82,82,0.25),transparent)"></div></div>';
- pendingSlips.forEach(function(s) { html += renderSlip(s); });
- }
+    // Pending section
+    if (pendingCount > 0) {
+      html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:0 56px 0 0">';
+      html += '<div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:3px;color:var(--red)">PENDING · ' + pendingCount + '</div>';
+      html += '<div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(255,82,82,0.25),transparent)"></div></div>';
+      pendingSlips.forEach(function(s) { html += renderSlip(s); });
+    }
 
- // Cleared section
- if (clearedCount > 0) {
- html += '<div style="display:flex;align-items:center;gap:10px;margin:40px 0 20px;padding:0 56px 0 0">';
- html += '<div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:3px;color:var(--green)">CLEARED · ' + clearedCount + '</div>';
- html += '<div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(0,230,118,0.2),transparent)"></div></div>';
- clearedSlips.forEach(function(s) { html += renderSlip(s); });
- }
+    // Cleared section
+    if (clearedCount > 0) {
+      html += '<div style="display:flex;align-items:center;gap:10px;margin:40px 0 20px;padding:0 56px 0 0">';
+      html += '<div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:3px;color:var(--green)">CLEARED · ' + clearedCount + '</div>';
+      html += '<div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(0,230,118,0.2),transparent)"></div></div>';
+      clearedSlips.forEach(function(s) { html += renderSlip(s); });
+    }
 
- container.innerHTML = html;
- }
+    container.innerHTML = html;
+  }
 
- function renderSlip(s) {
- var isPending = s.penalty_status!== 'cleared';
- var ruleLabel = (s.rule || '').toUpperCase() + ' SLIP';
- var ruleBadgeClass = (s.rule || 'body').toLowerCase();
- if (ruleBadgeClass!== 'body' && ruleBadgeClass!== 'fortress' && ruleBadgeClass!== 'sadhana') ruleBadgeClass = 'discipline';
- var isFortressPrivate = (s.category === 'brahmacharya_gate');
- var categoryLabel = isFortressPrivate ? 'FORTRESS VIOLATION': (s.category || '').replace(/_/g, ' ').toUpperCase();
- var penaltyInfo = PENALTY_MAP[s.category] || DEFAULT_PENALTY;
- var currentKm = calcEscalatedKm(s);
- var cyclingKm = currentKm * ESC.CYCLE_MULT;
+  function renderSlip(s) {
+    var isPending = s.penalty_status !== 'cleared';
+    var ruleLabel = (s.rule || '').toUpperCase() + ' SLIP';
+    var ruleBadgeClass = (s.rule || 'body').toLowerCase();
+    if (ruleBadgeClass !== 'body' && ruleBadgeClass !== 'fortress' && ruleBadgeClass !== 'sadhana') ruleBadgeClass = 'discipline';
+    var isFortressPrivate = (s.category === 'brahmacharya_gate');
+    var categoryLabel = isFortressPrivate ? 'FORTRESS VIOLATION' : (s.category || '').replace(/_/g, ' ').toUpperCase();
+    var penaltyInfo = PENALTY_MAP[s.category] || DEFAULT_PENALTY;
+    var currentKm = calcEscalatedKm(s);
+    var cyclingKm = currentKm * ESC.CYCLE_MULT;
 
- var html = '<div class="slip">';
- html += '<div class="slip-timeline"><div class="slip-dot ' + (isPending ? 'pending': 'cleared') + '"></div><div class="slip-line"></div></div>';
- html += '<div class="slip-body"><div class="slip-card ' + (isPending ? 'pending': 'cleared') + '">';
+    var html = '<div class="slip">';
+    html += '<div class="slip-timeline"><div class="slip-dot ' + (isPending ? 'pending' : 'cleared') + '"></div><div class="slip-line"></div></div>';
+    html += '<div class="slip-body"><div class="slip-card ' + (isPending ? 'pending' : 'cleared') + '">';
 
- // Head
- html += '<div class="slip-head">';
- html += '<div class="slip-date">' + (s.date || '') + ' · DAY ' + getDayForDate(s.date, s.day_number) + '</div>';
- html += '<span class="slip-badge ' + ruleBadgeClass + '">' + ruleLabel + '</span>';
- html += '</div>';
+    // Head
+    html += '<div class="slip-head">';
+    html += '<div class="slip-date">' + (s.date || '') + ' · DAY ' + getDayForDate(s.date, s.day_number) + '</div>';
+    html += '<span class="slip-badge ' + ruleBadgeClass + '">' + ruleLabel + '</span>';
+    html += '</div>';
 
- // Category
- html += '<div class="slip-category">' + categoryLabel + '</div>';
+    // Category
+    html += '<div class="slip-category">' + categoryLabel + '</div>';
 
- // Penalty bar
- html += '<div class="slip-penalty-bar ' + (isPending ? 'p': 'c') + '">';
- html += '<span class="slip-status-pill ' + (isPending ? 'pending': 'cleared') + '">' + (isPending ? 'PENDING': 'CLEARED') + '</span>';
- if (isPending) {
- html += '<span class="slip-km">PENALTY: <strong>' + currentKm + ' KM</strong> walk/run or ' + cyclingKm + ' km cycling</span>';
- } else {
- html += '<span class="slip-km">' + penaltyInfo.base_km + ' km ' + penaltyInfo.desc + '</span>';
- if (s.proof_km) html += '<span class="slip-km" style="margin-left:auto;color:var(--green);font-weight:700">' + s.proof_km + ' km done</span>';
- }
- html += '</div>';
+    // Penalty bar
+    html += '<div class="slip-penalty-bar ' + (isPending ? 'p' : 'c') + '">';
+    html += '<span class="slip-status-pill ' + (isPending ? 'pending' : 'cleared') + '">' + (isPending ? 'PENDING' : 'CLEARED') + '</span>';
+    if (isPending) {
+      html += '<span class="slip-km">PENALTY: <strong>' + currentKm + ' KM</strong> walk/run or ' + cyclingKm + ' km cycling</span>';
+    } else {
+      html += '<span class="slip-km">' + penaltyInfo.base_km + ' km ' + penaltyInfo.desc + '</span>';
+      if (s.proof_km) html += '<span class="slip-km" style="margin-left:auto;color:var(--green);font-weight:700">' + s.proof_km + ' km done</span>';
+    }
+    html += '</div>';
 
- // Escalation info
- if (isPending) {
- var _ist = (typeof getNowIST === 'function') ? getNowIST(): new Date();
- var daysElapsed = Math.floor((_ist.getTime() - new Date(s.date + 'T00:00:00+05:30').getTime()) / 86400000);
- var daysLeft = Math.max(0, ESC.GRACE - daysElapsed);
- if (daysLeft > 0) {
- html += '<div class="slip-esc" style="color:var(--gold)">' + daysLeft + ' day' + (daysLeft!== 1 ? 's': '') + ' before escalation (+' + ESC.DAILY + ' km/day)</div>';
- } else if (currentKm >= ESC.CAP) {
- html += '<div class="slip-esc" style="color:var(--red);font-weight:700">CAPPED AT ' + ESC.CAP + ' KM — cascade active</div>';
- } else {
- html += '<div class="slip-esc" style="color:var(--red)">ESCALATING: +' + ESC.DAILY + ' km/day until ' + ESC.CAP + ' km cap</div>';
- }
- if (s.cascade_level) html += '<div class="slip-meta">CASCADE LEVEL ' + s.cascade_level + '</div>';
- }
+    // Escalation info
+    if (isPending) {
+      var _ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+      var daysElapsed = Math.floor((_ist.getTime() - new Date(s.date + 'T00:00:00+05:30').getTime()) / 86400000);
+      var daysLeft = Math.max(0, ESC.GRACE - daysElapsed);
+      if (daysLeft > 0) {
+        html += '<div class="slip-esc" style="color:var(--gold)">' + daysLeft + ' day' + (daysLeft !== 1 ? 's' : '') + ' before escalation (+' + ESC.DAILY + ' km/day)</div>';
+      } else if (currentKm >= ESC.CAP) {
+        html += '<div class="slip-esc" style="color:var(--red);font-weight:700">CAPPED AT ' + ESC.CAP + ' KM — cascade active</div>';
+      } else {
+        html += '<div class="slip-esc" style="color:var(--red)">ESCALATING: +' + ESC.DAILY + ' km/day until ' + ESC.CAP + ' km cap</div>';
+      }
+      if (s.cascade_level) html += '<div class="slip-meta">CASCADE LEVEL ' + s.cascade_level + '</div>';
+    }
 
- // Proof
- if (!isPending && s.proof_km) {
- html += '<div class="slip-proof">';
- html += '<div class="slip-proof-label">VERIFIED</div>';
- html += '<div class="slip-proof-km">' + s.proof_km + ' km</div>';
- if (s.proof_strava_url) html += '<a href="' + s.proof_strava_url + '" target="_blank">View Strava Route →</a>';
- if (s.cleared_at) html += '<div class="slip-meta">Cleared: ' + new Date(s.cleared_at).toLocaleDateString() + '</div>';
- html += '</div>';
- }
+    // Proof
+    if (!isPending && s.proof_km) {
+      html += '<div class="slip-proof">';
+      html += '<div class="slip-proof-label">VERIFIED</div>';
+      html += '<div class="slip-proof-km">' + s.proof_km + ' km</div>';
+      if (s.proof_strava_url) html += '<a href="' + s.proof_strava_url + '" target="_blank">View Strava Route →</a>';
+      if (s.cleared_at) html += '<div class="slip-meta">Cleared: ' + new Date(s.cleared_at).toLocaleDateString() + '</div>';
+      html += '</div>';
+    }
 
- // Days counter
- if (isPending) {
- var _ist2 = (typeof getNowIST === 'function') ? getNowIST(): new Date();
- var daysAgo = Math.floor((_ist2.getTime() - new Date(s.date + 'T00:00:00+05:30').getTime()) / 86400000);
- html += '<div class="slip-meta">Day ' + daysAgo + ' since slip</div>';
- }
+    // Days counter
+    if (isPending) {
+      var _ist2 = (typeof getNowIST === 'function') ? getNowIST() : new Date();
+      var daysAgo = Math.floor((_ist2.getTime() - new Date(s.date + 'T00:00:00+05:30').getTime()) / 86400000);
+      html += '<div class="slip-meta">Day ' + daysAgo + ' since slip</div>';
+    }
 
- html += '</div></div></div>';
- return html;
- }
+    html += '</div></div></div>';
+    return html;
+  }
 
- function getDayForDate(dateStr, storedDayNum) {
- // Prefer immutable day_number stored at slip creation time
- // (preserves historical Chapter 1 day numbers after STREAK_START changes for Chapter 2)
- if (storedDayNum!= null &&!isNaN(storedDayNum)) return storedDayNum;
- if (!dateStr) return '?';
- var start = new Date((FL.STREAK_START || '2026-06-13') + 'T00:00:00+05:30');
- var target = new Date(dateStr);
- return Math.floor((target - start) / 86400000) + 1;
- }
+  function getDayForDate(dateStr, storedDayNum) {
+    // Prefer immutable day_number stored at slip creation time
+    // (preserves historical Chapter 1 day numbers after STREAK_START changes for Chapter 2)
+    if (storedDayNum != null && !isNaN(storedDayNum)) return storedDayNum;
+    if (!dateStr) return '?';
+    var start = new Date((FL.STREAK_START || '2026-06-13') + 'T00:00:00+05:30');
+    var target = new Date(dateStr);
+    return Math.floor((target - start) / 86400000) + 1;
+  }
 
- function updateLiveStatus(text) {
- var el = document.getElementById('accLiveStatus');
- if (el) el.textContent = text;
- }
+  function updateLiveStatus(text) {
+    var el = document.getElementById('accLiveStatus');
+    if (el) el.textContent = text;
+  }
 
- function startPolling() {
- if (_pollTimer) clearInterval(_pollTimer);
- _pollTimer = setInterval(async function() {
- if (typeof SB === 'undefined' ||!SB.init()) return;
- try {
- var result = await sbFetch('slips', 'GET', null, '?select=id&limit=1&order=created_at.desc');
- if (result && Array.isArray(result)) {
- var countResult = await sbFetch('slips', 'GET', null, '?select=id');
- if (countResult && Array.isArray(countResult) && countResult.length!== _lastSlipCount) loadSlips();
- }
- } catch(e) {}
- }, 15000);
- }
+  function startPolling() {
+    if (_pollTimer) clearInterval(_pollTimer);
+    _pollTimer = setInterval(async function() {
+      if (typeof SB === 'undefined' || !SB.init()) return;
+      try {
+        var result = await sbFetch('slips', 'GET', null, '?select=id&limit=1&order=created_at.desc');
+        if (result && Array.isArray(result)) {
+          var countResult = await sbFetch('slips', 'GET', null, '?select=id');
+          if (countResult && Array.isArray(countResult) && countResult.length !== _lastSlipCount) loadSlips();
+        }
+      } catch(e) {}
+    }, 15000);
+  }
 
- (function cleanupAutoSlips() {
- try {
- var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
- var cleaned = slips.filter(function(s) { return!s.id ||!s.id.endsWith('_auto'); });
- if (cleaned.length!== slips.length) localStorage.setItem('fl_slips', JSON.stringify(cleaned));
- } catch(e) {}
- })();
+  (function cleanupAutoSlips() {
+    try {
+      var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
+      var cleaned = slips.filter(function(s) { return !s.id || !s.id.endsWith('_auto'); });
+      if (cleaned.length !== slips.length) localStorage.setItem('fl_slips', JSON.stringify(cleaned));
+    } catch(e) {}
+  })();
 
- loadSlips();
- startPolling();
- document.addEventListener('visibilitychange', function() { if (!document.hidden) loadSlips(); });
+  loadSlips();
+  startPolling();
+  document.addEventListener('visibilitychange', function() { if (!document.hidden) loadSlips(); });
 })();
 
 // ── Lenis smooth scroll ──
-if (typeof Lenis!== 'undefined') {
- var lenis = new Lenis({ duration: 1.2, easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); } });
- function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
- requestAnimationFrame(raf);
+if (typeof Lenis !== 'undefined') {
+  var lenis = new Lenis({ duration: 1.2, easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); } });
+  function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
 }
 
 // ── GSAP reveals ──
-if (typeof gsap!== 'undefined' && typeof ScrollTrigger!== 'undefined') {
- try {
- gsap.registerPlugin(ScrollTrigger);
- gsap.utils.toArray('.reveal').forEach(function(el) {
- gsap.to(el, { opacity:1, y:0, duration:0.7, ease:'power3.out',
- scrollTrigger: { trigger:el, start:'top 90%', toggleActions:'play none none none' } });
- });
- gsap.utils.toArray('.reveal-scale').forEach(function(el) {
- gsap.to(el, { opacity:1, scale:1, duration:0.7, ease:'back.out(1.4)',
- scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
- });
- } catch(e) { document.body.classList.add('no-gsap'); }
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+  try {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal').forEach(function(el) {
+      gsap.to(el, { opacity:1, y:0, duration:0.7, ease:'power3.out',
+        scrollTrigger: { trigger:el, start:'top 90%', toggleActions:'play none none none' } });
+    });
+    gsap.utils.toArray('.reveal-scale').forEach(function(el) {
+      gsap.to(el, { opacity:1, scale:1, duration:0.7, ease:'back.out(1.4)',
+        scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
+    });
+  } catch(e) { document.body.classList.add('no-gsap'); }
 } else {
- document.body.classList.add('no-gsap');
+  document.body.classList.add('no-gsap');
 }
 
 // ── Three.js particles ──
 (function(){
- if (typeof THREE === 'undefined') return;
- var canvas = document.getElementById('accParticles');
- if (!canvas) return;
- try {
- var w = window.innerWidth, h = window.innerHeight;
- canvas.width = w; canvas.height = h;
- var scene = new THREE.Scene();
- var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
- camera.position.z = 6;
- var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
- renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
- renderer.setClearColor(0x000000, 0);
- var count = w < 768 ? 1500: 3000;
- var geo = new THREE.BufferGeometry();
- var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
- var c1 = new THREE.Color(0xFF5252), c2 = new THREE.Color(0xF5A623), c3 = new THREE.Color(0x333333);
- for (var i=0;i<count;i++) {
- pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
- var rnd=Math.random(); var c = rnd<0.15?c1:rnd<0.3?c2:c3;
- cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
- }
- geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
- geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
- var mat = new THREE.PointsMaterial({size:1.2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.25, depthWrite:false});
- var pts = new THREE.Points(geo, mat);
- scene.add(pts);
- var clock = new THREE.Clock();
- function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.006; pts.rotation.x=Math.sin(t*0.003)*0.1; renderer.render(scene, camera); }
- animate();
- window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
- window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.08, 1 - (window.scrollY||0)/1200); });
- } catch(e) { canvas.style.display='none'; }
+  if (typeof THREE === 'undefined') return;
+  var canvas = document.getElementById('accParticles');
+  if (!canvas) return;
+  try {
+    var w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
+    camera.position.z = 6;
+    var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
+    renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setClearColor(0x000000, 0);
+    var count = w < 768 ? 1500 : 3000;
+    var geo = new THREE.BufferGeometry();
+    var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
+    var c1 = new THREE.Color(0xFF5252), c2 = new THREE.Color(0xF5A623), c3 = new THREE.Color(0x333333);
+    for (var i=0;i<count;i++) {
+      pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
+      var rnd=Math.random(); var c = rnd<0.15?c1:rnd<0.3?c2:c3;
+      cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    var mat = new THREE.PointsMaterial({size:1.2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.25, depthWrite:false});
+    var pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    var clock = new THREE.Clock();
+    function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.006; pts.rotation.x=Math.sin(t*0.003)*0.1; renderer.render(scene, camera); }
+    animate();
+    window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
+    window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.08, 1 - (window.scrollY||0)/1200); });
+  } catch(e) { canvas.style.display='none'; }
 })();
 </script>
 

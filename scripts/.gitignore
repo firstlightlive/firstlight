@@ -1,5 +1,0 @@
-.strava_*
-.ig_*
-.env
-*.secret
-*.log

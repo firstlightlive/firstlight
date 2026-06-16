@@ -5,170 +5,196 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Day 111 — Post</title>
 <style>
- @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
 
- * { margin:0; padding:0; box-sizing:border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; }
 
- /* ═══ SLIDE 1 — THE NUMBER ═══ */.slide-1 {
- width:1080px; height:1080px; background:#030608; display:flex;
- align-items:center; justify-content:center; position:relative; overflow:hidden;
- }.slide-1::before {
- content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
- width:800px; height:800px; border-radius:50%;
- background:radial-gradient(circle, rgba(252,76,2,0.06) 0%, rgba(245,166,35,0.03) 30%, transparent 60%);
- }.slide-1.day {
- font-family:'IBM Plex Mono',monospace; font-size:280px; font-weight:700;
- color:#fff; letter-spacing:-8px; line-height:0.85; position:relative;
- text-shadow: 0 0 120px rgba(252,76,2,0.15);
- }.slide-1.label {
- position:absolute; top:120px; left:50%; transform:translateX(-50%);
- font-family:'IBM Plex Mono',monospace; font-size:14px; letter-spacing:8px;
- color:rgba(255,255,255,0.25);
- }.slide-1.sub {
- position:absolute; bottom:140px; left:50%; transform:translateX(-50%);
- font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:6px;
- color:rgba(255,255,255,0.2); text-align:center; line-height:2.2;
- }.slide-1.dot {
- position:absolute; bottom:80px; left:50%; transform:translateX(-50%);
- width:6px; height:6px; border-radius:50%; background:#FC4C02;
- box-shadow: 0 0 20px rgba(252,76,2,0.6);
- }
+  /* ═══ SLIDE 1 — THE NUMBER ═══ */
+  .slide-1 {
+    width:1080px; height:1080px; background:#030608; display:flex;
+    align-items:center; justify-content:center; position:relative; overflow:hidden;
+  }
+  .slide-1::before {
+    content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:800px; height:800px; border-radius:50%;
+    background:radial-gradient(circle, rgba(252,76,2,0.06) 0%, rgba(245,166,35,0.03) 30%, transparent 60%);
+  }
+  .slide-1 .day {
+    font-family:'IBM Plex Mono',monospace; font-size:280px; font-weight:700;
+    color:#fff; letter-spacing:-8px; line-height:0.85; position:relative;
+    text-shadow: 0 0 120px rgba(252,76,2,0.15);
+  }
+  .slide-1 .label {
+    position:absolute; top:120px; left:50%; transform:translateX(-50%);
+    font-family:'IBM Plex Mono',monospace; font-size:14px; letter-spacing:8px;
+    color:rgba(255,255,255,0.25);
+  }
+  .slide-1 .sub {
+    position:absolute; bottom:140px; left:50%; transform:translateX(-50%);
+    font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:6px;
+    color:rgba(255,255,255,0.2); text-align:center; line-height:2.2;
+  }
+  .slide-1 .dot {
+    position:absolute; bottom:80px; left:50%; transform:translateX(-50%);
+    width:6px; height:6px; border-radius:50%; background:#FC4C02;
+    box-shadow: 0 0 20px rgba(252,76,2,0.6);
+  }
 
- /* ═══ SLIDE 2 — NEW ERA ═══ */.slide-2 {
- width:1080px; height:1080px; background:#030608; display:flex;
- flex-direction:column; align-items:center; justify-content:center;
- position:relative; overflow:hidden; padding:80px;
- }.slide-2::before {
- content:''; position:absolute; top:0; left:0; right:0; height:2px;
- background:linear-gradient(90deg, transparent 10%, #FC4C02 50%, transparent 90%);
- opacity:0.4;
- }.slide-2.era-label {
- font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:8px;
- color:#FC4C02; margin-bottom:48px; padding:8px 20px;
- border:1px solid rgba(252,76,2,0.25); border-radius:4px;
- }.slide-2.era-title {
- font-family:'IBM Plex Mono',monospace; font-size:48px; font-weight:700;
- color:#fff; letter-spacing:4px; text-align:center; line-height:1.3;
- margin-bottom:60px;
- }.slide-2.era-rules {
- text-align:center; font-family:'IBM Plex Mono',monospace; font-size:16px;
- color:rgba(255,255,255,0.4); letter-spacing:3px; line-height:3;
- }.slide-2.era-rules strong { color:#fff; font-weight:600; }.slide-2.brand {
- position:absolute; bottom:60px; font-family:'IBM Plex Mono',monospace;
- font-size:10px; letter-spacing:6px; color:rgba(255,255,255,0.12);
- }
+  /* ═══ SLIDE 2 — NEW ERA ═══ */
+  .slide-2 {
+    width:1080px; height:1080px; background:#030608; display:flex;
+    flex-direction:column; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; padding:80px;
+  }
+  .slide-2::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent 10%, #FC4C02 50%, transparent 90%);
+    opacity:0.4;
+  }
+  .slide-2 .era-label {
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:8px;
+    color:#FC4C02; margin-bottom:48px; padding:8px 20px;
+    border:1px solid rgba(252,76,2,0.25); border-radius:4px;
+  }
+  .slide-2 .era-title {
+    font-family:'IBM Plex Mono',monospace; font-size:48px; font-weight:700;
+    color:#fff; letter-spacing:4px; text-align:center; line-height:1.3;
+    margin-bottom:60px;
+  }
+  .slide-2 .era-rules {
+    text-align:center; font-family:'IBM Plex Mono',monospace; font-size:16px;
+    color:rgba(255,255,255,0.4); letter-spacing:3px; line-height:3;
+  }
+  .slide-2 .era-rules strong { color:#fff; font-weight:600; }
+  .slide-2 .brand {
+    position:absolute; bottom:60px; font-family:'IBM Plex Mono',monospace;
+    font-size:10px; letter-spacing:6px; color:rgba(255,255,255,0.12);
+  }
 
- /* ═══ SLIDE 3 — THE PROOF ═══ */.slide-3 {
- width:1080px; height:1080px; background:#030608; display:flex;
- flex-direction:column; align-items:center; justify-content:center;
- position:relative; overflow:hidden; gap:40px;
- }.slide-3.proof-label {
- font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:8px;
- color:rgba(255,255,255,0.2);
- }.slide-3.proof-grid {
- display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px; max-width:800px;
- }.slide-3.proof-card {
- text-align:center; padding:40px 20px;
- border:1px solid rgba(255,255,255,0.04); border-radius:16px;
- background:rgba(255,255,255,0.02);
- }.slide-3.proof-val {
- font-family:'IBM Plex Mono',monospace; font-size:42px; font-weight:700; color:#fff;
- }.slide-3.proof-unit {
- font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:3px;
- color:rgba(255,255,255,0.3); margin-top:8px;
- }.slide-3.proof-bot {
- font-family:'IBM Plex Mono',monospace; font-size:12px;
- color:rgba(255,255,255,0.15); letter-spacing:4px;
- }
+  /* ═══ SLIDE 3 — THE PROOF ═══ */
+  .slide-3 {
+    width:1080px; height:1080px; background:#030608; display:flex;
+    flex-direction:column; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; gap:40px;
+  }
+  .slide-3 .proof-label {
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:8px;
+    color:rgba(255,255,255,0.2);
+  }
+  .slide-3 .proof-grid {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px; max-width:800px;
+  }
+  .slide-3 .proof-card {
+    text-align:center; padding:40px 20px;
+    border:1px solid rgba(255,255,255,0.04); border-radius:16px;
+    background:rgba(255,255,255,0.02);
+  }
+  .slide-3 .proof-val {
+    font-family:'IBM Plex Mono',monospace; font-size:42px; font-weight:700; color:#fff;
+  }
+  .slide-3 .proof-unit {
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:3px;
+    color:rgba(255,255,255,0.3); margin-top:8px;
+  }
+  .slide-3 .proof-bot {
+    font-family:'IBM Plex Mono',monospace; font-size:12px;
+    color:rgba(255,255,255,0.15); letter-spacing:4px;
+  }
 
- /* ═══ SLIDE 4 — CTA ═══ */.slide-4 {
- width:1080px; height:1080px; background:#030608; display:flex;
- flex-direction:column; align-items:center; justify-content:center;
- position:relative; overflow:hidden; text-align:center; padding:100px;
- }.slide-4::after {
- content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
- background:linear-gradient(90deg, transparent 10%, #00E676 50%, transparent 90%);
- opacity:0.3;
- }.slide-4.cta-diamond {
- font-size:12px; color:rgba(255,255,255,0.1); margin-bottom:60px; letter-spacing:20px;
- }.slide-4.cta-text {
- font-family:'IBM Plex Mono',monospace; font-size:28px; font-weight:300;
- color:rgba(255,255,255,0.5); letter-spacing:3px; line-height:2.2;
- }.slide-4.cta-text em {
- color:#fff; font-style:normal; font-weight:600;
- }.slide-4.cta-url {
- position:absolute; bottom:80px; font-family:'IBM Plex Mono',monospace;
- font-size:14px; letter-spacing:6px; color:rgba(252,76,2,0.5);
- }
+  /* ═══ SLIDE 4 — CTA ═══ */
+  .slide-4 {
+    width:1080px; height:1080px; background:#030608; display:flex;
+    flex-direction:column; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; text-align:center; padding:100px;
+  }
+  .slide-4::after {
+    content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent 10%, #00E676 50%, transparent 90%);
+    opacity:0.3;
+  }
+  .slide-4 .cta-diamond {
+    font-size:12px; color:rgba(255,255,255,0.1); margin-bottom:60px; letter-spacing:20px;
+  }
+  .slide-4 .cta-text {
+    font-family:'IBM Plex Mono',monospace; font-size:28px; font-weight:300;
+    color:rgba(255,255,255,0.5); letter-spacing:3px; line-height:2.2;
+  }
+  .slide-4 .cta-text em {
+    color:#fff; font-style:normal; font-weight:600;
+  }
+  .slide-4 .cta-url {
+    position:absolute; bottom:80px; font-family:'IBM Plex Mono',monospace;
+    font-size:14px; letter-spacing:6px; color:rgba(252,76,2,0.5);
+  }
 </style>
 </head>
 <body style="background:#111;display:flex;flex-direction:column;align-items:center;gap:40px;padding:40px">
 
 <!-- SLIDE 1 — Just the number -->
 <div class="slide-1">
- <div class="label">FIRST LIGHT</div>
- <div class="day">111</div>
- <div class="sub">NEW ERA BEGINS</div>
- <div class="dot"></div>
+  <div class="label">FIRST LIGHT</div>
+  <div class="day">111</div>
+  <div class="sub">NEW ERA BEGINS</div>
+  <div class="dot"></div>
 </div>
 
 <!-- SLIDE 2 — What changed -->
 <div class="slide-2">
- <div class="era-label">FROM DAY 111</div>
- <div class="era-title">HARDER<br>TRAINING.<br>SAME ALARM.</div>
- <div class="era-rules">
- <strong>150 KM</strong> EVERY WEEK<br>
- <strong>3:15 AM</strong> EVERY DAY<br>
- <strong>ON RECORD</strong><br>
- <strong>IRONMAN</strong> IS THE TARGET
- </div>
- <div class="brand">◆ FIRST LIGHT</div>
+  <div class="era-label">FROM DAY 111</div>
+  <div class="era-title">HARDER<br>TRAINING.<br>SAME ALARM.</div>
+  <div class="era-rules">
+    <strong>150 KM</strong> EVERY WEEK<br>
+    <strong>3:15 AM</strong> EVERY DAY<br>
+    <strong>₹5,000</strong> ON THE LINE<br>
+    <strong>IRONMAN</strong> IS THE TARGET
+  </div>
+  <div class="brand">◆ FIRST LIGHT</div>
 </div>
 
 <!-- SLIDE 3 — Numbers (no context, just proof) -->
 <div class="slide-3">
- <div class="proof-label">110 DAYS OF PROOF</div>
- <div class="proof-grid">
- <div class="proof-card">
- <div class="proof-val" style="color:#FC4C02">615</div>
- <div class="proof-unit">KM RUN</div>
- </div>
- <div class="proof-card">
- <div class="proof-val" style="color:#00D4FF">309</div>
- <div class="proof-unit">KM CYCLED</div>
- </div>
- <div class="proof-card">
- <div class="proof-val" style="color:#F5A623">2:07</div>
- <div class="proof-unit">HALF MARATHON</div>
- </div>
- <div class="proof-card">
- <div class="proof-val" style="color:#00E676">3:15</div>
- <div class="proof-unit">AVG WAKE</div>
- </div>
- <div class="proof-card">
- <div class="proof-val" style="color:#AB47BC">303</div>
- <div class="proof-unit">ACTIVITIES</div>
- </div>
- <div class="proof-card">
- <div class="proof-val" style="color:#FF5252">0</div>
- <div class="proof-unit">DAYS MISSED</div>
- </div>
- </div>
- <div class="proof-bot">STRAVA + APPLE WATCH VERIFIED</div>
+  <div class="proof-label">110 DAYS OF PROOF</div>
+  <div class="proof-grid">
+    <div class="proof-card">
+      <div class="proof-val" style="color:#FC4C02">615</div>
+      <div class="proof-unit">KM RUN</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-val" style="color:#00D4FF">309</div>
+      <div class="proof-unit">KM CYCLED</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-val" style="color:#F5A623">2:07</div>
+      <div class="proof-unit">HALF MARATHON</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-val" style="color:#00E676">3:15</div>
+      <div class="proof-unit">AVG WAKE</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-val" style="color:#AB47BC">303</div>
+      <div class="proof-unit">ACTIVITIES</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-val" style="color:#FF5252">0</div>
+      <div class="proof-unit">DAYS MISSED</div>
+    </div>
+  </div>
+  <div class="proof-bot">STRAVA + APPLE WATCH VERIFIED</div>
 </div>
 
 <!-- SLIDE 4 — Silent CTA -->
 <div class="slide-4">
- <div class="cta-diamond">◆ ◆ ◆</div>
- <div class="cta-text">
- <em>No announcements.</em><br>
- Just proof.<br><br>
- <em>No motivation.</em><br>
- Just systems.<br><br>
- <em>No finish line.</em><br>
- Just forward.
- </div>
- <div class="cta-url">FIRSTLIGHT.LIVE</div>
+  <div class="cta-diamond">◆ ◆ ◆</div>
+  <div class="cta-text">
+    <em>No announcements.</em><br>
+    Just proof.<br><br>
+    <em>No motivation.</em><br>
+    Just systems.<br><br>
+    <em>No finish line.</em><br>
+    Just forward.
+  </div>
+  <div class="cta-url">FIRSTLIGHT.LIVE</div>
 </div>
 
 </body>

@@ -1,628 +1,702 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
- <meta name="theme-color" content="#0A0C10">
- <meta name="apple-mobile-web-app-capable" content="yes">
- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- <meta name="apple-mobile-web-app-title" content="FL Punch">
- <meta name="mobile-web-app-capable" content="yes">
- <link rel="manifest" href="/manifest.json">
- <link rel="apple-touch-icon" href="/icon-512.png">
- <title>FL · Punch</title>
- <link rel="preconnect" href="https://fonts.googleapis.com">
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FL Punch">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-512.png">
+  <title>FL · Punch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
 
- <style>:root {
- --bg1: #0A0C10;
- --bg2: #0F1218;
- --bg3: #161A23;
- --text: #F0EDE5;
- --text-dim: #B6BFCB;
- --text-muted: #8A95A3;
- --cyan: #00D4FF;
- --gold: #F5A623;
- --green: #00E676;
- --red: #FF5252;
- --mono: 'IBM Plex Mono', monospace;
- --inter: 'Inter', sans-serif;
- --safe-top: env(safe-area-inset-top, 0px);
- --safe-bot: env(safe-area-inset-bottom, 0px);
- --safe-left: env(safe-area-inset-left, 0px);
- --safe-right: env(safe-area-inset-right, 0px);
- --col-max: 480px; /* phone column */
- }
- * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
- html, body { background: var(--bg1); color: var(--text); font-family: var(--inter); min-height: 100vh; min-height: 100dvh; }
- body { padding-top: calc(var(--safe-top) + 14px); padding-bottom: calc(var(--safe-bot) + 100px); }
+  <style>
+    :root {
+      --bg1: #0A0C10;
+      --bg2: #0F1218;
+      --bg3: #161A23;
+      --text: #F0EDE5;
+      --text-dim: #B6BFCB;
+      --text-muted: #8A95A3;
+      --cyan: #00D4FF;
+      --gold: #F5A623;
+      --green: #00E676;
+      --red: #FF5252;
+      --mono: 'IBM Plex Mono', monospace;
+      --inter: 'Inter', sans-serif;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --col-max: 480px;   /* phone column */
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { background: var(--bg1); color: var(--text); font-family: var(--inter); min-height: 100vh; min-height: 100dvh; }
+    body { padding-top: calc(var(--safe-top) + 14px); padding-bottom: calc(var(--safe-bot) + 100px); }
 
- /* ── HEADER ── */.p-header {
- max-width: var(--col-max); margin: 0 auto; padding: 0 18px 16px;
- display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
- }.p-brand {
- font-family: var(--mono); font-size: 9px; font-weight: 600;
- letter-spacing: 4px; color: var(--cyan); margin-bottom: 6px;
- }.p-day {
- font-family: var(--mono); font-size: 28px; font-weight: 700;
- letter-spacing: 2px; color: var(--text); display: flex; align-items: baseline; gap: 8px;
- }.p-day-label { font-size: 10px; color: var(--text-muted); letter-spacing: 3px; }.p-date {
- font-family: var(--mono); font-size: 10px; color: var(--text-muted);
- letter-spacing: 1.5px; margin-top: 2px;
- }.p-menu {
- display: flex; gap: 8px; margin-top: 4px;
- }.p-menu a {
- font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
- color: var(--text-muted); text-decoration: none; padding: 0 14px;
- min-height: 44px; min-width: 44px;
- display: inline-flex; align-items: center; justify-content: center;
- border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
- transition: all.2s; cursor: pointer;
- }.p-menu a:active { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+    /* ── HEADER ── */
+    .p-header {
+      max-width: var(--col-max); margin: 0 auto; padding: 0 18px 16px;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    }
+    .p-brand {
+      font-family: var(--mono); font-size: 9px; font-weight: 600;
+      letter-spacing: 4px; color: var(--cyan); margin-bottom: 6px;
+    }
+    .p-day {
+      font-family: var(--mono); font-size: 28px; font-weight: 700;
+      letter-spacing: 2px; color: var(--text); display: flex; align-items: baseline; gap: 8px;
+    }
+    .p-day-label { font-size: 10px; color: var(--text-muted); letter-spacing: 3px; }
+    .p-date {
+      font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+      letter-spacing: 1.5px; margin-top: 2px;
+    }
+    .p-menu {
+      display: flex; gap: 8px; margin-top: 4px;
+    }
+    .p-menu a {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+      color: var(--text-muted); text-decoration: none; padding: 0 14px;
+      min-height: 44px; min-width: 44px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+      transition: all .2s; cursor: pointer;
+    }
+    .p-menu a:active { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.3); color: var(--cyan); }
 
- /* ── CARDS ── */.p-grid {
- max-width: var(--col-max); margin: 0 auto; padding: 0 14px; display: flex; flex-direction: column; gap: 10px;
- }.p-card {
- background: var(--bg2); border: 1px solid rgba(255,255,255,0.04);
- border-radius: 14px; padding: 14px; position: relative;
- }.p-card-head {
- display: flex; align-items: center; justify-content: space-between;
- margin-bottom: 11px;
- }.p-card-title {
- font-family: var(--mono); font-size: 10px; font-weight: 600;
- letter-spacing: 2px; color: var(--text);
- display: flex; align-items: center; gap: 8px;
- }.p-card-emoji { font-size: 16px; }.p-card-meta { font-family: var(--mono); font-size: 9px; color: var(--text-muted); }.p-saved-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 6px; transition: all.25s; opacity: 0; }.p-saved-dot.on { opacity: 1; }
+    /* ── CARDS ── */
+    .p-grid {
+      max-width: var(--col-max); margin: 0 auto; padding: 0 14px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .p-card {
+      background: var(--bg2); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 14px; padding: 14px; position: relative;
+    }
+    .p-card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 11px;
+    }
+    .p-card-title {
+      font-family: var(--mono); font-size: 10px; font-weight: 600;
+      letter-spacing: 2px; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .p-card-emoji { font-size: 16px; }
+    .p-card-meta { font-family: var(--mono); font-size: 9px; color: var(--text-muted); }
+    .p-saved-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 6px; transition: all .25s; opacity: 0; }
+    .p-saved-dot.on { opacity: 1; }
 
- /* ── INPUT GRID ── */.p-fields-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }.p-fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }.p-field {
- display: flex; flex-direction: column; gap: 4px;
- }.p-field label {
- font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--text-muted);
- }.p-field input,.p-field select {
- background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
- border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 18px; font-weight: 500;
- color: var(--text); width: 100%; outline: none; -webkit-appearance: none; appearance: none;
- transition: border-color.2s, background.2s; text-align: center;
- }.p-field input:focus,.p-field select:focus {
- border-color: var(--cyan); background: rgba(0,212,255,0.05);
- }.p-field input[type="time"] { letter-spacing: 1px; font-size: 16px; }
+    /* ── INPUT GRID ── */
+    .p-fields-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .p-fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .p-field {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .p-field label {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--text-muted);
+    }
+    .p-field input, .p-field select {
+      background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 18px; font-weight: 500;
+      color: var(--text); width: 100%; outline: none; -webkit-appearance: none; appearance: none;
+      transition: border-color .2s, background .2s; text-align: center;
+    }
+    .p-field input:focus, .p-field select:focus {
+      border-color: var(--cyan); background: rgba(0,212,255,0.05);
+    }
+    .p-field input[type="time"] { letter-spacing: 1px; font-size: 16px; }
 
- /* ── TOGGLE BUTTONS ── */.p-toggles {
- display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
- }.p-tog {
- background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
- border-radius: 10px; padding: 13px 10px;
- font-family: var(--mono); font-size: 10px; font-weight: 600;
- letter-spacing: 1.5px; color: var(--text-dim); cursor: pointer;
- text-align: center; transition: all.2s; touch-action: manipulation;
- }.p-tog:active { transform: scale(0.97); }.p-tog.on-good { background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: var(--green); }.p-tog.on-warn { background: rgba(245,166,35,0.15); border-color: rgba(245,166,35,0.4); color: var(--gold); }.p-tog.on-bad { background: rgba(255,82,82,0.15); border-color: rgba(255,82,82,0.4); color: var(--red); }
+    /* ── TOGGLE BUTTONS ── */
+    .p-toggles {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+    }
+    .p-tog {
+      background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 13px 10px;
+      font-family: var(--mono); font-size: 10px; font-weight: 600;
+      letter-spacing: 1.5px; color: var(--text-dim); cursor: pointer;
+      text-align: center; transition: all .2s; touch-action: manipulation;
+    }
+    .p-tog:active { transform: scale(0.97); }
+    .p-tog.on-good { background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: var(--green); }
+    .p-tog.on-warn { background: rgba(245,166,35,0.15); border-color: rgba(245,166,35,0.4); color: var(--gold); }
+    .p-tog.on-bad  { background: rgba(255,82,82,0.15); border-color: rgba(255,82,82,0.4); color: var(--red); }
 
- /* ── MASTERY ── */.p-mast-count {
- font-family: var(--mono); font-size: 36px; font-weight: 700;
- color: var(--cyan); text-align: center; margin-bottom: 6px; letter-spacing: 1px;
- }.p-mast-of { font-size: 16px; color: var(--text-muted); }.p-mast-bar { background: var(--bg3); border-radius: 6px; height: 8px; overflow: hidden; margin-bottom: 10px; }.p-mast-bar-fill { background: linear-gradient(90deg, var(--cyan), var(--green)); height: 100%; transition: width.3s; }.p-mast-row { display: flex; gap: 8px; align-items: center; }.p-mast-input {
- flex: 1; background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
- border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 18px; font-weight: 500;
- color: var(--text); text-align: center; outline: none;
- }.p-mast-all {
- background: linear-gradient(135deg, var(--cyan), #0099cc); color: var(--bg1); border: none;
- border-radius: 8px; padding: 11px 16px; font-family: var(--mono); font-size: 10px; font-weight: 700;
- letter-spacing: 1.5px; cursor: pointer; touch-action: manipulation;
- }.p-mast-all:active { transform: scale(0.96); }
+    /* ── MASTERY ── */
+    .p-mast-count {
+      font-family: var(--mono); font-size: 36px; font-weight: 700;
+      color: var(--cyan); text-align: center; margin-bottom: 6px; letter-spacing: 1px;
+    }
+    .p-mast-of { font-size: 16px; color: var(--text-muted); }
+    .p-mast-bar { background: var(--bg3); border-radius: 6px; height: 8px; overflow: hidden; margin-bottom: 10px; }
+    .p-mast-bar-fill { background: linear-gradient(90deg, var(--cyan), var(--green)); height: 100%; transition: width .3s; }
+    .p-mast-row { display: flex; gap: 8px; align-items: center; }
+    .p-mast-input {
+      flex: 1; background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 18px; font-weight: 500;
+      color: var(--text); text-align: center; outline: none;
+    }
+    .p-mast-all {
+      background: linear-gradient(135deg, var(--cyan), #0099cc); color: var(--bg1); border: none;
+      border-radius: 8px; padding: 11px 16px; font-family: var(--mono); font-size: 10px; font-weight: 700;
+      letter-spacing: 1.5px; cursor: pointer; touch-action: manipulation;
+    }
+    .p-mast-all:active { transform: scale(0.96); }
 
- /* ── SLIP ── */.p-slip-add {
- background: rgba(255,82,82,0.10); border: 1px solid rgba(255,82,82,0.3);
- color: var(--red); border-radius: 10px; padding: 13px;
- font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 2px;
- width: 100%; cursor: pointer; touch-action: manipulation;
- }.p-slip-add:active { transform: scale(0.98); }.p-slip-form { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }.p-slip-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }.p-slip-input,.p-slip-select {
- background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
- border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 14px;
- color: var(--text); outline: none; width: 100%; -webkit-appearance: none; appearance: none;
- }.p-slip-input:focus { border-color: var(--red); }.p-slip-save {
- background: var(--red); color: var(--bg1); border: none;
- border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 11px; font-weight: 700;
- letter-spacing: 2px; cursor: pointer; touch-action: manipulation;
- }.p-slip-list {
- margin-top: 10px; display: flex; flex-direction: column; gap: 6px;
- }.p-slip-item {
- display: flex; justify-content: space-between; align-items: center;
- padding: 8px 10px; background: rgba(255,82,82,0.06);
- border-radius: 6px; font-family: var(--mono); font-size: 10px; color: var(--text-dim);
- }.p-slip-rm { color: var(--red); cursor: pointer; font-size: 14px; padding: 2px 6px; }
+    /* ── SLIP ── */
+    .p-slip-add {
+      background: rgba(255,82,82,0.10); border: 1px solid rgba(255,82,82,0.3);
+      color: var(--red); border-radius: 10px; padding: 13px;
+      font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 2px;
+      width: 100%; cursor: pointer; touch-action: manipulation;
+    }
+    .p-slip-add:active { transform: scale(0.98); }
+    .p-slip-form { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .p-slip-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .p-slip-input, .p-slip-select {
+      background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 14px;
+      color: var(--text); outline: none; width: 100%; -webkit-appearance: none; appearance: none;
+    }
+    .p-slip-input:focus { border-color: var(--red); }
+    .p-slip-save {
+      background: var(--red); color: var(--bg1); border: none;
+      border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; cursor: pointer; touch-action: manipulation;
+    }
+    .p-slip-list {
+      margin-top: 10px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .p-slip-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 10px; background: rgba(255,82,82,0.06);
+      border-radius: 6px; font-family: var(--mono); font-size: 10px; color: var(--text-dim);
+    }
+    .p-slip-rm { color: var(--red); cursor: pointer; font-size: 14px; padding: 2px 6px; }
 
- /* ── STRAVA PULL HINT ── */.p-strava {
- background: linear-gradient(135deg, rgba(252,76,2,0.10), rgba(252,76,2,0.03));
- border: 1px solid rgba(252,76,2,0.25); color: #FC4C02;
- border-radius: 10px; padding: 11px; margin-top: 10px;
- font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
- width: 100%; cursor: pointer; touch-action: manipulation;
- display: flex; align-items: center; justify-content: center; gap: 8px;
- }.p-strava:active { transform: scale(0.98); }
+    /* ── STRAVA PULL HINT ── */
+    .p-strava {
+      background: linear-gradient(135deg, rgba(252,76,2,0.10), rgba(252,76,2,0.03));
+      border: 1px solid rgba(252,76,2,0.25); color: #FC4C02;
+      border-radius: 10px; padding: 11px; margin-top: 10px;
+      font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
+      width: 100%; cursor: pointer; touch-action: manipulation;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .p-strava:active { transform: scale(0.98); }
 
- /* ── PUNCH BUTTON ── */.p-cta-wrap {
- position: fixed; bottom: 0; left: 0; right: 0;
- padding: 14px 18px calc(var(--safe-bot) + 14px);
- background: linear-gradient(to top, var(--bg1) 75%, transparent);
- z-index: 50;
- }.p-cta {
- max-width: var(--col-max); margin: 0 auto; display: block;
- background: linear-gradient(135deg, var(--cyan), #0099cc);
- color: var(--bg1); border: none; border-radius: 14px;
- padding: 18px; font-family: var(--mono); font-size: 14px; font-weight: 700;
- letter-spacing: 4px; width: 100%; cursor: pointer; touch-action: manipulation;
- box-shadow: 0 8px 24px rgba(0,212,255,0.25);
- transition: all.2s;
- }.p-cta:active { transform: scale(0.98); box-shadow: 0 4px 12px rgba(0,212,255,0.4); }.p-cta.success { background: linear-gradient(135deg, var(--green), #00B85C); box-shadow: 0 8px 24px rgba(0,230,118,0.3); }.p-cta.error { background: linear-gradient(135deg, var(--red), #C44545); box-shadow: 0 8px 24px rgba(255,82,82,0.3); }.p-cta-status { display: block; font-size: 9px; color: var(--text-muted); text-align: center; margin-top: 6px; font-family: var(--mono); letter-spacing: 1.5px; min-height: 12px; }
+    /* ── PUNCH BUTTON ── */
+    .p-cta-wrap {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      padding: 14px 18px calc(var(--safe-bot) + 14px);
+      background: linear-gradient(to top, var(--bg1) 75%, transparent);
+      z-index: 50;
+    }
+    .p-cta {
+      max-width: var(--col-max); margin: 0 auto; display: block;
+      background: linear-gradient(135deg, var(--cyan), #0099cc);
+      color: var(--bg1); border: none; border-radius: 14px;
+      padding: 18px; font-family: var(--mono); font-size: 14px; font-weight: 700;
+      letter-spacing: 4px; width: 100%; cursor: pointer; touch-action: manipulation;
+      box-shadow: 0 8px 24px rgba(0,212,255,0.25);
+      transition: all .2s;
+    }
+    .p-cta:active { transform: scale(0.98); box-shadow: 0 4px 12px rgba(0,212,255,0.4); }
+    .p-cta.success { background: linear-gradient(135deg, var(--green), #00B85C); box-shadow: 0 8px 24px rgba(0,230,118,0.3); }
+    .p-cta.error   { background: linear-gradient(135deg, var(--red), #C44545); box-shadow: 0 8px 24px rgba(255,82,82,0.3); }
+    .p-cta-status { display: block; font-size: 9px; color: var(--text-muted); text-align: center; margin-top: 6px; font-family: var(--mono); letter-spacing: 1.5px; min-height: 12px; }
 
- /* ── RESPONSIVE: iPhone SE 320–375, normal iPhones 393–430, iPad Mini 744+, iPad/desktop 1024+ ── */
+    /* ── RESPONSIVE: iPhone SE 320–375, normal iPhones 393–430, iPad Mini 744+, iPad/desktop 1024+ ── */
 
- /* Very narrow (iPhone SE landscape, old Android) — tighten gaps so 3-col stat rows don't wrap */
- @media (max-width: 360px) {.p-grid { padding: 0 10px; gap: 8px; }.p-card { padding: 12px; }.p-fields-3 { gap: 6px; }.p-field input { font-size: 16px; padding: 9px; } /* 16px prevents iOS auto-zoom-in on focus */.p-mast-count { font-size: 28px; }.p-day { font-size: 24px; }
- }
+    /* Very narrow (iPhone SE landscape, old Android) — tighten gaps so 3-col stat rows don't wrap */
+    @media (max-width: 360px) {
+      .p-grid { padding: 0 10px; gap: 8px; }
+      .p-card { padding: 12px; }
+      .p-fields-3 { gap: 6px; }
+      .p-field input { font-size: 16px; padding: 9px; } /* 16px prevents iOS auto-zoom-in on focus */
+      .p-mast-count { font-size: 28px; }
+      .p-day { font-size: 24px; }
+    }
 
- /* Phone landscape + small tablet portrait — widen the column a bit so cards don't feel cramped */
- @media (min-width: 600px) {:root { --col-max: 560px; }.p-fields-3 { gap: 12px; }.p-field input { font-size: 19px; }
- }
+    /* Phone landscape + small tablet portrait — widen the column a bit so cards don't feel cramped */
+    @media (min-width: 600px) {
+      :root { --col-max: 560px; }
+      .p-fields-3 { gap: 12px; }
+      .p-field input { font-size: 19px; }
+    }
 
- /* iPad / desktop — 2-column on roomy screens so sleep+food / brahma+mastery sit side by side */
- @media (min-width: 900px) {:root { --col-max: 880px; }.p-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }.p-card:nth-child(1) { grid-column: 1 / -1; } /* RUN spans full width — biggest card */.p-card:nth-child(7) { grid-column: 1 / -1; } /* SLIPS spans full width */.p-cta-wrap >.p-cta { max-width: 600px; }
- }
+    /* iPad / desktop — 2-column on roomy screens so sleep+food / brahma+mastery sit side by side */
+    @media (min-width: 900px) {
+      :root { --col-max: 880px; }
+      .p-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+      .p-card:nth-child(1) { grid-column: 1 / -1; }      /* RUN spans full width — biggest card */
+      .p-card:nth-child(7) { grid-column: 1 / -1; }      /* SLIPS spans full width */
+      .p-cta-wrap > .p-cta { max-width: 600px; }
+    }
 
- /* Very wide desktop — cap so we don't sprawl */
- @media (min-width: 1400px) {:root { --col-max: 960px; }
- }
+    /* Very wide desktop — cap so we don't sprawl */
+    @media (min-width: 1400px) {
+      :root { --col-max: 960px; }
+    }
 
- /* iOS standalone (installed PWA) safe-area-right when notch sticks out on landscape */
- body { padding-left: var(--safe-left); padding-right: var(--safe-right); }
- </style>
+    /* iOS standalone (installed PWA) safe-area-right when notch sticks out on landscape */
+    body { padding-left: var(--safe-left); padding-right: var(--safe-right); }
+  </style>
 </head>
 <body>
- <header class="p-header">
- <div>
- <div class="p-brand">FIRST LIGHT · PUNCH</div>
- <div class="p-day">
- <span id="p-day-num">—</span>
- <span class="p-day-label">DAY</span>
- </div>
- <div class="p-date" id="p-date">—</div>
- </div>
- <div class="p-menu">
- <a href="/install.html" id="p-install" style="display:none">INSTALL</a>
- <a href="/admin.html">CC</a>
- <a id="p-lock">LOCK</a>
- </div>
- </header>
+  <header class="p-header">
+    <div>
+      <div class="p-brand">FIRST LIGHT · PUNCH</div>
+      <div class="p-day">
+        <span id="p-day-num">—</span>
+        <span class="p-day-label">DAY</span>
+      </div>
+      <div class="p-date" id="p-date">—</div>
+    </div>
+    <div class="p-menu">
+      <a href="/install.html" id="p-install" style="display:none">INSTALL</a>
+      <a href="/admin.html">CC</a>
+      <a id="p-lock">LOCK</a>
+    </div>
+  </header>
 
- <div class="p-grid">
+  <div class="p-grid">
 
- <!-- RUN / WALK -->
- <section class="p-card">
- <div class="p-card-head">
- <div class="p-card-title"><span class="p-card-emoji">🏃</span> RUN · WALK</div>
- <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-run"></span><span id="p-run-meta"></span></div>
- </div>
- <div class="p-fields-3">
- <div class="p-field"><label>KM</label><input id="p-km" inputmode="decimal" placeholder="5.06"></div>
- <div class="p-field"><label>MIN</label><input id="p-min" inputmode="numeric" placeholder="54"></div>
- <div class="p-field"><label>KCAL</label><input id="p-kcal" inputmode="numeric" placeholder="380"></div>
- </div>
- <div class="p-fields-3" style="margin-top:8px">
- <div class="p-field"><label>BPM</label><input id="p-bpm" inputmode="numeric" placeholder="104"></div>
- <div class="p-field"><label>START</label><input id="p-start" type="time"></div>
- <div class="p-field"><label>END</label><input id="p-end" type="time"></div>
- </div>
- <button class="p-strava" id="p-strava-btn">⚡ PULL FROM STRAVA</button>
- </section>
+    <!-- RUN / WALK -->
+    <section class="p-card">
+      <div class="p-card-head">
+        <div class="p-card-title"><span class="p-card-emoji">🏃</span> RUN · WALK</div>
+        <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-run"></span><span id="p-run-meta"></span></div>
+      </div>
+      <div class="p-fields-3">
+        <div class="p-field"><label>KM</label><input id="p-km" inputmode="decimal" placeholder="5.06"></div>
+        <div class="p-field"><label>MIN</label><input id="p-min" inputmode="numeric" placeholder="54"></div>
+        <div class="p-field"><label>KCAL</label><input id="p-kcal" inputmode="numeric" placeholder="380"></div>
+      </div>
+      <div class="p-fields-3" style="margin-top:8px">
+        <div class="p-field"><label>BPM</label><input id="p-bpm" inputmode="numeric" placeholder="104"></div>
+        <div class="p-field"><label>START</label><input id="p-start" type="time"></div>
+        <div class="p-field"><label>END</label><input id="p-end" type="time"></div>
+      </div>
+      <button class="p-strava" id="p-strava-btn">⚡ PULL FROM STRAVA</button>
+    </section>
 
- <!-- SLEEP -->
- <section class="p-card">
- <div class="p-card-head">
- <div class="p-card-title"><span class="p-card-emoji">💤</span> SLEEP</div>
- <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-sleep"></span></div>
- </div>
- <div class="p-fields-3">
- <div class="p-field"><label>HOURS</label><input id="p-sleep" inputmode="decimal" placeholder="6.5"></div>
- <div class="p-field"><label>BEDTIME</label><input id="p-bedtime" type="time"></div>
- <div class="p-field"><label>WAKE</label><input id="p-wake" type="time"></div>
- </div>
- </section>
+    <!-- SLEEP -->
+    <section class="p-card">
+      <div class="p-card-head">
+        <div class="p-card-title"><span class="p-card-emoji">💤</span> SLEEP</div>
+        <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-sleep"></span></div>
+      </div>
+      <div class="p-fields-3">
+        <div class="p-field"><label>HOURS</label><input id="p-sleep" inputmode="decimal" placeholder="6.5"></div>
+        <div class="p-field"><label>BEDTIME</label><input id="p-bedtime" type="time"></div>
+        <div class="p-field"><label>WAKE</label><input id="p-wake" type="time"></div>
+      </div>
+    </section>
 
- <!-- FOOD CODE -->
- <section class="p-card">
- <div class="p-card-head">
- <div class="p-card-title"><span class="p-card-emoji">🍱</span> FOOD CODE</div>
- <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-food"></span></div>
- </div>
- <div class="p-toggles" id="p-food-toggles">
- <button class="p-tog" data-val="clean">CLEAN</button>
- <button class="p-tog" data-val="warn">WARN</button>
- <button class="p-tog" data-val="broken">BROKEN</button>
- </div>
- </section>
+    <!-- FOOD CODE -->
+    <section class="p-card">
+      <div class="p-card-head">
+        <div class="p-card-title"><span class="p-card-emoji">🍱</span> FOOD CODE</div>
+        <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-food"></span></div>
+      </div>
+      <div class="p-toggles" id="p-food-toggles">
+        <button class="p-tog" data-val="clean">CLEAN</button>
+        <button class="p-tog" data-val="warn">WARN</button>
+        <button class="p-tog" data-val="broken">BROKEN</button>
+      </div>
+    </section>
 
- <!-- BRAHMA -->
- <section class="p-card">
- <div class="p-card-head">
- <div class="p-card-title"><span class="p-card-emoji">🧘</span> BRAHMACHARYA</div>
- <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-brahma"></span></div>
- </div>
- <div class="p-toggles" id="p-brahma-toggles">
- <button class="p-tog" data-val="clean">CLEAN</button>
- <button class="p-tog" data-val="urge">URGE</button>
- <button class="p-tog" data-val="break">BREAK</button>
- </div>
- <div class="p-fields-2" style="margin-top:8px">
- <div class="p-field"><label>URGE LEVEL 0–10</label><input id="p-urge" inputmode="numeric" placeholder="0"></div>
- <div class="p-field"><label>NOTE</label><input id="p-brahma-note" placeholder=""></div>
- </div>
- </section>
+    <!-- BRAHMA -->
+    <section class="p-card">
+      <div class="p-card-head">
+        <div class="p-card-title"><span class="p-card-emoji">🧘</span> BRAHMACHARYA</div>
+        <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-brahma"></span></div>
+      </div>
+      <div class="p-toggles" id="p-brahma-toggles">
+        <button class="p-tog" data-val="clean">CLEAN</button>
+        <button class="p-tog" data-val="urge">URGE</button>
+        <button class="p-tog" data-val="break">BREAK</button>
+      </div>
+      <div class="p-fields-2" style="margin-top:8px">
+        <div class="p-field"><label>URGE LEVEL 0–10</label><input id="p-urge" inputmode="numeric" placeholder="0"></div>
+        <div class="p-field"><label>NOTE</label><input id="p-brahma-note" placeholder=""></div>
+      </div>
+    </section>
 
- <!-- MASTERY -->
- <section class="p-card">
- <div class="p-card-head">
- <div class="p-card-title"><span class="p-card-emoji">📿</span> MASTERY</div>
- <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-mast"></span></div>
- </div>
- <div class="p-mast-count"><span id="p-mast-num">0</span><span class="p-mast-of">/25</span></div>
- <div class="p-mast-bar"><div class="p-mast-bar-fill" id="p-mast-fill" style="width:0%"></div></div>
- <div class="p-mast-row">
- <input class="p-mast-input" id="p-mast-input" inputmode="numeric" placeholder="0–25">
- <button class="p-mast-all" id="p-mast-all">✓ ALL 25</button>
- </div>
- </section>
+    <!-- MASTERY -->
+    <section class="p-card">
+      <div class="p-card-head">
+        <div class="p-card-title"><span class="p-card-emoji">📿</span> MASTERY</div>
+        <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-mast"></span></div>
+      </div>
+      <div class="p-mast-count"><span id="p-mast-num">0</span><span class="p-mast-of">/25</span></div>
+      <div class="p-mast-bar"><div class="p-mast-bar-fill" id="p-mast-fill" style="width:0%"></div></div>
+      <div class="p-mast-row">
+        <input class="p-mast-input" id="p-mast-input" inputmode="numeric" placeholder="0–25">
+        <button class="p-mast-all" id="p-mast-all">✓ ALL 25</button>
+      </div>
+    </section>
 
- <!-- SLIPS -->
- <section class="p-card">
- <div class="p-card-head">
- <div class="p-card-title"><span class="p-card-emoji">⚠</span> SLIPS</div>
- <div class="p-card-meta"><span id="p-slip-count">0</span> added</div>
- </div>
- <button class="p-slip-add" id="p-slip-add-btn">+ ADD SLIP</button>
- <div class="p-slip-form" id="p-slip-form" hidden>
- <div class="p-slip-row">
- <select class="p-slip-select" id="p-slip-type">
- <option value="run">RUN MISSED</option>
- <option value="food">FOOD BROKEN</option>
- <option value="sleep">SLEEP &lt; 6h</option>
- <option value="brahma">BRAHMA BREAK</option>
- <option value="mastery">MASTERY MISS</option>
- <option value="other">OTHER</option>
- </select>
- <input class="p-slip-input" id="p-slip-amount" inputmode="numeric" placeholder="₹15000">
- </div>
- <input class="p-slip-input" id="p-slip-reason" placeholder="What broke? (one line)">
- <div style="display:flex;gap:8px">
- <button class="p-slip-save" id="p-slip-save" style="flex:1">SAVE SLIP</button>
- <button class="p-slip-save" id="p-slip-cancel" style="flex:0 0 80px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-muted)">CANCEL</button>
- </div>
- </div>
- <div class="p-slip-list" id="p-slip-list"></div>
- </section>
- </div>
+    <!-- SLIPS -->
+    <section class="p-card">
+      <div class="p-card-head">
+        <div class="p-card-title"><span class="p-card-emoji">⚠</span> SLIPS</div>
+        <div class="p-card-meta"><span id="p-slip-count">0</span> added</div>
+      </div>
+      <button class="p-slip-add" id="p-slip-add-btn">+ ADD SLIP</button>
+      <div class="p-slip-form" id="p-slip-form" hidden>
+        <div class="p-slip-row">
+          <select class="p-slip-select" id="p-slip-type">
+            <option value="run">RUN MISSED</option>
+            <option value="food">FOOD BROKEN</option>
+            <option value="sleep">SLEEP &lt; 6h</option>
+            <option value="brahma">BRAHMA BREAK</option>
+            <option value="mastery">MASTERY MISS</option>
+            <option value="other">OTHER</option>
+          </select>
+          <input class="p-slip-input" id="p-slip-amount" inputmode="numeric" placeholder="₹15000">
+        </div>
+        <input class="p-slip-input" id="p-slip-reason" placeholder="What broke? (one line)">
+        <div style="display:flex;gap:8px">
+          <button class="p-slip-save" id="p-slip-save" style="flex:1">SAVE SLIP</button>
+          <button class="p-slip-save" id="p-slip-cancel" style="flex:0 0 80px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text-muted)">CANCEL</button>
+        </div>
+      </div>
+      <div class="p-slip-list" id="p-slip-list"></div>
+    </section>
+  </div>
 
- <div class="p-cta-wrap">
- <button class="p-cta" id="p-cta">⚡ PUNCH IT IN</button>
- <span class="p-cta-status" id="p-cta-status">&nbsp;</span>
- </div>
+  <div class="p-cta-wrap">
+    <button class="p-cta" id="p-cta">⚡ PUNCH IT IN</button>
+    <span class="p-cta-status" id="p-cta-status">&nbsp;</span>
+  </div>
 
- <script src="/js/config.js"></script>
- <script src="/js/fl-auth.js?v=20260615b"></script>
- <script src="/js/fl-offline.js?v=20260615b"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/fl-auth.js?v=20260615b"></script>
+  <script src="/js/fl-offline.js?v=20260615b"></script>
 
- <script>
- // ── PUNCH HARNESS ─────────────────────────────────
- (function() {
- 'use strict';
+  <script>
+  // ── PUNCH HARNESS ─────────────────────────────────
+  (function() {
+    'use strict';
 
- // Local date (no UTC shift)
- function todayStr() {
- const d = new Date();
- return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
- }
+    // Local date (no UTC shift)
+    function todayStr() {
+      const d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
 
- // Chapter 2 starts 2026-06-13 = Day 1
- const STREAK_START = '2026-06-13';
- function dayNum(dateStr) {
- const today = new Date(dateStr + 'T00:00:00');
- const start = new Date(STREAK_START + 'T00:00:00');
- return Math.floor((today - start) / 86400000) + 1;
- }
+    // Chapter 2 starts 2026-06-13 = Day 1
+    const STREAK_START = '2026-06-13';
+    function dayNum(dateStr) {
+      const today = new Date(dateStr + 'T00:00:00');
+      const start = new Date(STREAK_START + 'T00:00:00');
+      return Math.floor((today - start) / 86400000) + 1;
+    }
 
- const TODAY = todayStr();
- const DAY = dayNum(TODAY);
- document.getElementById('p-day-num').textContent = DAY;
- document.getElementById('p-date').textContent = TODAY;
+    const TODAY = todayStr();
+    const DAY = dayNum(TODAY);
+    document.getElementById('p-day-num').textContent = DAY;
+    document.getElementById('p-date').textContent = TODAY;
 
- // Lock button → wipes session + reload
- document.getElementById('p-lock').addEventListener('click', () => {
- if (window.FL && FL.auth) FL.auth.lock();
- });
+    // Lock button → wipes session + reload
+    document.getElementById('p-lock').addEventListener('click', () => {
+      if (window.FL && FL.auth) FL.auth.lock();
+    });
 
- // Show INSTALL link only when NOT running as standalone PWA
- const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
- if (!isStandalone) {
- const installEl = document.getElementById('p-install');
- if (installEl) installEl.style.display = 'inline-flex';
- }
+    // Show INSTALL link only when NOT running as standalone PWA
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (!isStandalone) {
+      const installEl = document.getElementById('p-install');
+      if (installEl) installEl.style.display = 'inline-flex';
+    }
 
- // ── localStorage scratch — survives reload while you punch ──
- const SCRATCH_KEY = 'fl_punch_' + TODAY;
- function readScratch() {
- try { return JSON.parse(localStorage.getItem(SCRATCH_KEY) || '{}'); } catch (e) { return {}; }
- }
- function writeScratch(patch) {
- const cur = readScratch();
- Object.assign(cur, patch);
- localStorage.setItem(SCRATCH_KEY, JSON.stringify(cur));
- }
+    // ── localStorage scratch — survives reload while you punch ──
+    const SCRATCH_KEY = 'fl_punch_' + TODAY;
+    function readScratch() {
+      try { return JSON.parse(localStorage.getItem(SCRATCH_KEY) || '{}'); } catch (e) { return {}; }
+    }
+    function writeScratch(patch) {
+      const cur = readScratch();
+      Object.assign(cur, patch);
+      localStorage.setItem(SCRATCH_KEY, JSON.stringify(cur));
+    }
 
- // ── Hydrate inputs from scratch ──
- function hydrate() {
- const s = readScratch();
- ['p-km','p-min','p-kcal','p-bpm','p-start','p-end','p-sleep','p-bedtime','p-wake','p-urge','p-brahma-note','p-mast-input'].forEach(id => { const el = document.getElementById(id); if (el && s[id]!= null) el.value = s[id]; });
- if (s.food) setToggle('p-food-toggles', s.food);
- if (s.brahma) setToggle('p-brahma-toggles', s.brahma);
- if (s.mastery_count!= null) updateMastery(s.mastery_count);
- renderSlips();
- }
+    // ── Hydrate inputs from scratch ──
+    function hydrate() {
+      const s = readScratch();
+      ['p-km','p-min','p-kcal','p-bpm','p-start','p-end','p-sleep','p-bedtime','p-wake','p-urge','p-brahma-note','p-mast-input']
+        .forEach(id => { const el = document.getElementById(id); if (el && s[id] != null) el.value = s[id]; });
+      if (s.food) setToggle('p-food-toggles', s.food);
+      if (s.brahma) setToggle('p-brahma-toggles', s.brahma);
+      if (s.mastery_count != null) updateMastery(s.mastery_count);
+      renderSlips();
+    }
 
- // ── Field auto-save ──
- ['p-km','p-min','p-kcal','p-bpm','p-start','p-end','p-sleep','p-bedtime','p-wake','p-urge','p-brahma-note','p-mast-input'].forEach(id => {
- const el = document.getElementById(id); if (!el) return;
- el.addEventListener('input', () => {
- writeScratch({ [id]: el.value });
- flashSaved(id);
- if (id === 'p-mast-input') updateMastery(parseInt(el.value) || 0);
- });
- });
+    // ── Field auto-save ──
+    ['p-km','p-min','p-kcal','p-bpm','p-start','p-end','p-sleep','p-bedtime','p-wake','p-urge','p-brahma-note','p-mast-input']
+      .forEach(id => {
+        const el = document.getElementById(id); if (!el) return;
+        el.addEventListener('input', () => {
+          writeScratch({ [id]: el.value });
+          flashSaved(id);
+          if (id === 'p-mast-input') updateMastery(parseInt(el.value) || 0);
+        });
+      });
 
- function flashSaved(id) {
- const map = {
- 'p-km':'p-saved-run','p-min':'p-saved-run','p-kcal':'p-saved-run','p-bpm':'p-saved-run','p-start':'p-saved-run','p-end':'p-saved-run',
- 'p-sleep':'p-saved-sleep','p-bedtime':'p-saved-sleep','p-wake':'p-saved-sleep',
- 'p-urge':'p-saved-brahma','p-brahma-note':'p-saved-brahma',
- 'p-mast-input':'p-saved-mast',
- };
- const dot = document.getElementById(map[id]);
- if (dot) { dot.classList.add('on'); setTimeout(() => dot.classList.remove('on'), 600); }
- }
+    function flashSaved(id) {
+      const map = {
+        'p-km':'p-saved-run','p-min':'p-saved-run','p-kcal':'p-saved-run','p-bpm':'p-saved-run','p-start':'p-saved-run','p-end':'p-saved-run',
+        'p-sleep':'p-saved-sleep','p-bedtime':'p-saved-sleep','p-wake':'p-saved-sleep',
+        'p-urge':'p-saved-brahma','p-brahma-note':'p-saved-brahma',
+        'p-mast-input':'p-saved-mast',
+      };
+      const dot = document.getElementById(map[id]);
+      if (dot) { dot.classList.add('on'); setTimeout(() => dot.classList.remove('on'), 600); }
+    }
 
- // ── Toggle groups ──
- function setupToggles(wrapId, valKey) {
- const wrap = document.getElementById(wrapId);
- wrap.querySelectorAll('.p-tog').forEach(btn => {
- btn.addEventListener('click', () => {
- wrap.querySelectorAll('.p-tog').forEach(b => b.classList.remove('on-good','on-warn','on-bad'));
- const v = btn.dataset.val;
- btn.classList.add(v === 'clean' ? 'on-good': v === 'warn' || v === 'urge' ? 'on-warn': 'on-bad');
- writeScratch({ [valKey]: v });
- const dot = document.getElementById('p-saved-' + valKey);
- if (dot) { dot.classList.add('on'); setTimeout(() => dot.classList.remove('on'), 600); }
- });
- });
- }
- function setToggle(wrapId, val) {
- const wrap = document.getElementById(wrapId);
- const btn = wrap.querySelector(`[data-val="${val}"]`);
- if (btn) {
- wrap.querySelectorAll('.p-tog').forEach(b => b.classList.remove('on-good','on-warn','on-bad'));
- btn.classList.add(val === 'clean' ? 'on-good': val === 'warn' || val === 'urge' ? 'on-warn': 'on-bad');
- }
- }
- setupToggles('p-food-toggles', 'food');
- setupToggles('p-brahma-toggles', 'brahma');
+    // ── Toggle groups ──
+    function setupToggles(wrapId, valKey) {
+      const wrap = document.getElementById(wrapId);
+      wrap.querySelectorAll('.p-tog').forEach(btn => {
+        btn.addEventListener('click', () => {
+          wrap.querySelectorAll('.p-tog').forEach(b => b.classList.remove('on-good','on-warn','on-bad'));
+          const v = btn.dataset.val;
+          btn.classList.add(v === 'clean' ? 'on-good' : v === 'warn' || v === 'urge' ? 'on-warn' : 'on-bad');
+          writeScratch({ [valKey]: v });
+          const dot = document.getElementById('p-saved-' + valKey);
+          if (dot) { dot.classList.add('on'); setTimeout(() => dot.classList.remove('on'), 600); }
+        });
+      });
+    }
+    function setToggle(wrapId, val) {
+      const wrap = document.getElementById(wrapId);
+      const btn = wrap.querySelector(`[data-val="${val}"]`);
+      if (btn) {
+        wrap.querySelectorAll('.p-tog').forEach(b => b.classList.remove('on-good','on-warn','on-bad'));
+        btn.classList.add(val === 'clean' ? 'on-good' : val === 'warn' || val === 'urge' ? 'on-warn' : 'on-bad');
+      }
+    }
+    setupToggles('p-food-toggles', 'food');
+    setupToggles('p-brahma-toggles', 'brahma');
 
- // ── Mastery ──
- function updateMastery(n) {
- n = Math.max(0, Math.min(25, n || 0));
- document.getElementById('p-mast-num').textContent = n;
- document.getElementById('p-mast-fill').style.width = (n / 25 * 100) + '%';
- writeScratch({ mastery_count: n });
- }
- document.getElementById('p-mast-all').addEventListener('click', () => {
- document.getElementById('p-mast-input').value = '25';
- updateMastery(25);
- flashSaved('p-mast-input');
- });
+    // ── Mastery ──
+    function updateMastery(n) {
+      n = Math.max(0, Math.min(25, n || 0));
+      document.getElementById('p-mast-num').textContent = n;
+      document.getElementById('p-mast-fill').style.width = (n / 25 * 100) + '%';
+      writeScratch({ mastery_count: n });
+    }
+    document.getElementById('p-mast-all').addEventListener('click', () => {
+      document.getElementById('p-mast-input').value = '25';
+      updateMastery(25);
+      flashSaved('p-mast-input');
+    });
 
- // ── Strava pull (simple — uses cached data) ──
- document.getElementById('p-strava-btn').addEventListener('click', async () => {
- const btn = document.getElementById('p-strava-btn');
- const orig = btn.textContent;
- btn.textContent = '⏳ PULLING...';
- try {
- const SUPA = window.FL.SUPABASE_URL, KEY = window.FL.SUPABASE_ANON_KEY;
- const url = `${SUPA}/rest/v1/strava_activities?select=*&order=start_date_local.desc&limit=10`;
- const r = await fetch(url, { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY } });
- const acts = await r.json();
- const RW = t => t === 'Run' || t === 'Walk';
- const today = acts.find(a => a.start_date_local && a.start_date_local.startsWith(TODAY) && RW(a.type));
- if (!today) { btn.textContent = '⚠ NO RUN/WALK TODAY'; setTimeout(() => btn.textContent = orig, 2400); return; }
- document.getElementById('p-km').value = (today.distance / 1000).toFixed(2);
- document.getElementById('p-min').value = Math.round(today.moving_time / 60);
- if (today.kilojoules) document.getElementById('p-kcal').value = Math.round(today.kilojoules / 4.184);
- if (today.average_heartrate) document.getElementById('p-bpm').value = Math.round(today.average_heartrate);
- ['p-km','p-min','p-kcal','p-bpm'].forEach(id => {
- const el = document.getElementById(id); writeScratch({ [id]: el.value });
- });
- flashSaved('p-km');
- btn.textContent = '✓ FILLED · ' + today.type.toUpperCase();
- setTimeout(() => btn.textContent = orig, 2200);
- } catch (e) {
- btn.textContent = '⚠ OFFLINE — TYPE MANUALLY';
- setTimeout(() => btn.textContent = orig, 2400);
- }
- });
+    // ── Strava pull (simple — uses cached data) ──
+    document.getElementById('p-strava-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('p-strava-btn');
+      const orig = btn.textContent;
+      btn.textContent = '⏳ PULLING...';
+      try {
+        const SUPA = window.FL.SUPABASE_URL, KEY = window.FL.SUPABASE_ANON_KEY;
+        const url = `${SUPA}/rest/v1/strava_activities?select=*&order=start_date_local.desc&limit=10`;
+        const r = await fetch(url, { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY } });
+        const acts = await r.json();
+        const RW = t => t === 'Run' || t === 'Walk';
+        const today = acts.find(a => a.start_date_local && a.start_date_local.startsWith(TODAY) && RW(a.type));
+        if (!today) { btn.textContent = '⚠ NO RUN/WALK TODAY'; setTimeout(() => btn.textContent = orig, 2400); return; }
+        document.getElementById('p-km').value = (today.distance / 1000).toFixed(2);
+        document.getElementById('p-min').value = Math.round(today.moving_time / 60);
+        if (today.kilojoules) document.getElementById('p-kcal').value = Math.round(today.kilojoules / 4.184);
+        if (today.average_heartrate) document.getElementById('p-bpm').value = Math.round(today.average_heartrate);
+        ['p-km','p-min','p-kcal','p-bpm'].forEach(id => {
+          const el = document.getElementById(id); writeScratch({ [id]: el.value });
+        });
+        flashSaved('p-km');
+        btn.textContent = '✓ FILLED · ' + today.type.toUpperCase();
+        setTimeout(() => btn.textContent = orig, 2200);
+      } catch (e) {
+        btn.textContent = '⚠ OFFLINE — TYPE MANUALLY';
+        setTimeout(() => btn.textContent = orig, 2400);
+      }
+    });
 
- // ── Slip handling ──
- function getSlips() {
- try { return JSON.parse(localStorage.getItem('fl_punch_slips_' + TODAY) || '[]'); } catch (e) { return []; }
- }
- function saveSlips(arr) {
- localStorage.setItem('fl_punch_slips_' + TODAY, JSON.stringify(arr));
- document.getElementById('p-slip-count').textContent = arr.length;
- }
- function renderSlips() {
- const list = getSlips();
- document.getElementById('p-slip-count').textContent = list.length;
- const wrap = document.getElementById('p-slip-list');
- wrap.innerHTML = '';
- list.forEach((s, i) => {
- const item = document.createElement('div');
- item.className = 'p-slip-item';
- item.innerHTML = `<span>${s.type.toUpperCase()} · ₹${s.amount || '15000'} · ${(s.reason || '').slice(0,40)}</span><span class="p-slip-rm" data-i="${i}">✕</span>`;
- wrap.appendChild(item);
- });
- wrap.querySelectorAll('.p-slip-rm').forEach(el => {
- el.addEventListener('click', () => {
- const i = parseInt(el.dataset.i);
- const arr = getSlips(); arr.splice(i, 1); saveSlips(arr); renderSlips();
- });
- });
- }
- document.getElementById('p-slip-add-btn').addEventListener('click', () => {
- const form = document.getElementById('p-slip-form');
- form.hidden =!form.hidden;
- });
- document.getElementById('p-slip-cancel').addEventListener('click', () => {
- document.getElementById('p-slip-form').hidden = true;
- });
- document.getElementById('p-slip-save').addEventListener('click', () => {
- const type = document.getElementById('p-slip-type').value;
- const amount = document.getElementById('p-slip-amount').value || '15000';
- const reason = document.getElementById('p-slip-reason').value.trim();
- if (!reason) { alert('Add a reason'); return; }
- const arr = getSlips();
- arr.push({ id: crypto.randomUUID(), type, amount, reason, ts: Date.now() });
- saveSlips(arr);
- renderSlips();
- document.getElementById('p-slip-reason').value = '';
- document.getElementById('p-slip-amount').value = '';
- document.getElementById('p-slip-form').hidden = true;
- });
+    // ── Slip handling ──
+    function getSlips() {
+      try { return JSON.parse(localStorage.getItem('fl_punch_slips_' + TODAY) || '[]'); } catch (e) { return []; }
+    }
+    function saveSlips(arr) {
+      localStorage.setItem('fl_punch_slips_' + TODAY, JSON.stringify(arr));
+      document.getElementById('p-slip-count').textContent = arr.length;
+    }
+    function renderSlips() {
+      const list = getSlips();
+      document.getElementById('p-slip-count').textContent = list.length;
+      const wrap = document.getElementById('p-slip-list');
+      wrap.innerHTML = '';
+      list.forEach((s, i) => {
+        const item = document.createElement('div');
+        item.className = 'p-slip-item';
+        item.innerHTML = `<span>${s.type.toUpperCase()} · ₹${s.amount || '15000'} · ${(s.reason || '').slice(0,40)}</span><span class="p-slip-rm" data-i="${i}">✕</span>`;
+        wrap.appendChild(item);
+      });
+      wrap.querySelectorAll('.p-slip-rm').forEach(el => {
+        el.addEventListener('click', () => {
+          const i = parseInt(el.dataset.i);
+          const arr = getSlips(); arr.splice(i, 1); saveSlips(arr); renderSlips();
+        });
+      });
+    }
+    document.getElementById('p-slip-add-btn').addEventListener('click', () => {
+      const form = document.getElementById('p-slip-form');
+      form.hidden = !form.hidden;
+    });
+    document.getElementById('p-slip-cancel').addEventListener('click', () => {
+      document.getElementById('p-slip-form').hidden = true;
+    });
+    document.getElementById('p-slip-save').addEventListener('click', () => {
+      const type = document.getElementById('p-slip-type').value;
+      const amount = document.getElementById('p-slip-amount').value || '15000';
+      const reason = document.getElementById('p-slip-reason').value.trim();
+      if (!reason) { alert('Add a reason'); return; }
+      const arr = getSlips();
+      arr.push({ id: crypto.randomUUID(), type, amount, reason, ts: Date.now() });
+      saveSlips(arr);
+      renderSlips();
+      document.getElementById('p-slip-reason').value = '';
+      document.getElementById('p-slip-amount').value = '';
+      document.getElementById('p-slip-form').hidden = true;
+    });
 
- // ── PUNCH IT IN ──
- async function punchIn() {
- const cta = document.getElementById('p-cta');
- const status = document.getElementById('p-cta-status');
- const v = (id) => document.getElementById(id).value.trim();
- const s = readScratch();
+    // ── PUNCH IT IN ──
+    async function punchIn() {
+      const cta = document.getElementById('p-cta');
+      const status = document.getElementById('p-cta-status');
+      const v = (id) => document.getElementById(id).value.trim();
+      const s = readScratch();
 
- cta.disabled = true; cta.textContent = '⏳ PUNCHING...'; cta.classList.remove('success','error');
- status.textContent = 'Writing to Supabase...';
+      cta.disabled = true; cta.textContent = '⏳ PUNCHING...'; cta.classList.remove('success','error');
+      status.textContent = 'Writing to Supabase...';
 
- const upserts = [];
+      const upserts = [];
 
- // 1. daily_checkin — run + sleep + food + brahma + mastery summary
- const checkinPayload = {
- date: TODAY,
- run_km: parseFloat(v('p-km')) || null,
- run_min: parseInt(v('p-min')) || null,
- run_kcal: parseInt(v('p-kcal')) || null,
- run_bpm: parseInt(v('p-bpm')) || null,
- run_start: v('p-start') || null,
- run_end: v('p-end') || null,
- sleep_hrs: parseFloat(v('p-sleep')) || null,
- food_status: s.food || null,
- brahma_clean: s.brahma === 'clean',
- urge: parseInt(v('p-urge')) || 0,
- mastery_count: parseInt(v('p-mast-input')) || 0,
- punch_source: 'punch.html',
- };
- upserts.push(['daily_checkin', checkinPayload]);
+      // 1. daily_checkin — run + sleep + food + brahma + mastery summary
+      const checkinPayload = {
+        date: TODAY,
+        run_km: parseFloat(v('p-km')) || null,
+        run_min: parseInt(v('p-min')) || null,
+        run_kcal: parseInt(v('p-kcal')) || null,
+        run_bpm: parseInt(v('p-bpm')) || null,
+        run_start: v('p-start') || null,
+        run_end: v('p-end') || null,
+        sleep_hrs: parseFloat(v('p-sleep')) || null,
+        food_status: s.food || null,
+        brahma_clean: s.brahma === 'clean',
+        urge: parseInt(v('p-urge')) || 0,
+        mastery_count: parseInt(v('p-mast-input')) || 0,
+        punch_source: 'punch.html',
+      };
+      upserts.push(['daily_checkin', checkinPayload]);
 
- // 2. sleep_log — separate clean table
- if (v('p-sleep') || v('p-bedtime') || v('p-wake')) {
- upserts.push(['sleep_log', {
- date: TODAY,
- sleep_hours: parseFloat(v('p-sleep')) || null,
- bedtime: v('p-bedtime') || null,
- wake_time: v('p-wake') || null,
- }]);
- }
+      // 2. sleep_log — separate clean table
+      if (v('p-sleep') || v('p-bedtime') || v('p-wake')) {
+        upserts.push(['sleep_log', {
+          date: TODAY,
+          sleep_hours: parseFloat(v('p-sleep')) || null,
+          bedtime: v('p-bedtime') || null,
+          wake_time: v('p-wake') || null,
+        }]);
+      }
 
- // 3. brahma_log — daily detail
- if (s.brahma) {
- upserts.push(['brahma_log', {
- date: TODAY,
- data: JSON.stringify({
- status: s.brahma,
- urge: parseInt(v('p-urge')) || 0,
- note: v('p-brahma-note'),
- }),
- }]);
- }
+      // 3. brahma_log — daily detail
+      if (s.brahma) {
+        upserts.push(['brahma_log', {
+          date: TODAY,
+          data: JSON.stringify({
+            status: s.brahma,
+            urge: parseInt(v('p-urge')) || 0,
+            note: v('p-brahma-note'),
+          }),
+        }]);
+      }
 
- // 4. mastery_log — daily count
- const mastCount = parseInt(v('p-mast-input')) || 0;
- if (mastCount > 0) {
- upserts.push(['mastery_log', {
- date: TODAY,
- items: JSON.stringify({ done_count: mastCount, total: 25, via: 'punch' }),
- }]);
- }
+      // 4. mastery_log — daily count
+      const mastCount = parseInt(v('p-mast-input')) || 0;
+      if (mastCount > 0) {
+        upserts.push(['mastery_log', {
+          date: TODAY,
+          items: JSON.stringify({ done_count: mastCount, total: 25, via: 'punch' }),
+        }]);
+      }
 
- // 5. slips — one row each
- const slips = getSlips();
- slips.forEach(slip => {
- upserts.push(['slips', {
- id: slip.id,
- date: TODAY,
- type: slip.type,
- reason: slip.reason,
- amount: parseInt(slip.amount) || 15000,
- source: 'punch.html',
- }]);
- });
+      // 5. slips — one row each
+      const slips = getSlips();
+      slips.forEach(slip => {
+        upserts.push(['slips', {
+          id: slip.id,
+          date: TODAY,
+          type: slip.type,
+          reason: slip.reason,
+          amount: parseInt(slip.amount) || 15000,
+          source: 'punch.html',
+        }]);
+      });
 
- // Fire writes via FL.upsert (offline-aware, LWW envelope)
- let ok = 0, fail = 0, queued = 0;
- for (const [table, row] of upserts) {
- try {
- const r = await FL.upsert(table, row, { onConflict: row.id ? 'id': 'date' });
- if (r.status === 202) queued++;
- else if (r.ok) ok++;
- else fail++;
- } catch (e) {
- fail++;
- }
- }
+      // Fire writes via FL.upsert (offline-aware, LWW envelope)
+      let ok = 0, fail = 0, queued = 0;
+      for (const [table, row] of upserts) {
+        try {
+          const r = await FL.upsert(table, row, { onConflict: row.id ? 'id' : 'date' });
+          if (r.status === 202) queued++;
+          else if (r.ok) ok++;
+          else fail++;
+        } catch (e) {
+          fail++;
+        }
+      }
 
- const total = upserts.length;
- const offline =!navigator.onLine || queued > 0;
- cta.disabled = false;
- cta.classList.add(fail > 0 ? 'error': 'success');
- cta.textContent = fail > 0 ? '⚠ ' + fail + '/' + total + ' FAILED': offline ? '✓ QUEUED ' + total + ' · WILL SYNC': '✓ ' + total + ' SAVED · ONLINE';
- status.textContent = fail > 0 ? 'Retry from CC > Sync panel': offline ? 'Tap status pill to drain': 'Synced to Supabase';
+      const total = upserts.length;
+      const offline = !navigator.onLine || queued > 0;
+      cta.disabled = false;
+      cta.classList.add(fail > 0 ? 'error' : 'success');
+      cta.textContent = fail > 0 ? '⚠ ' + fail + '/' + total + ' FAILED' : offline ? '✓ QUEUED ' + total + ' · WILL SYNC' : '✓ ' + total + ' SAVED · ONLINE';
+      status.textContent = fail > 0 ? 'Retry from CC > Sync panel' : offline ? 'Tap status pill to drain' : 'Synced to Supabase';
 
- // Clear scratch + slips on full success
- if (fail === 0) {
- localStorage.removeItem(SCRATCH_KEY);
- localStorage.removeItem('fl_punch_slips_' + TODAY);
- setTimeout(() => {
- cta.classList.remove('success');
- cta.textContent = '⚡ PUNCH IT IN';
- status.textContent = ' ';
- // Hydrate from cleared state
- hydrate();
- ['p-km','p-min','p-kcal','p-bpm','p-start','p-end','p-sleep','p-bedtime','p-wake','p-urge','p-brahma-note','p-mast-input'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
- document.querySelectorAll('.p-tog').forEach(b => b.classList.remove('on-good','on-warn','on-bad'));
- updateMastery(0);
- }, 3500);
- }
- }
- document.getElementById('p-cta').addEventListener('click', punchIn);
+      // Clear scratch + slips on full success
+      if (fail === 0) {
+        localStorage.removeItem(SCRATCH_KEY);
+        localStorage.removeItem('fl_punch_slips_' + TODAY);
+        setTimeout(() => {
+          cta.classList.remove('success');
+          cta.textContent = '⚡ PUNCH IT IN';
+          status.textContent = ' ';
+          // Hydrate from cleared state
+          hydrate();
+          ['p-km','p-min','p-kcal','p-bpm','p-start','p-end','p-sleep','p-bedtime','p-wake','p-urge','p-brahma-note','p-mast-input']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+          document.querySelectorAll('.p-tog').forEach(b => b.classList.remove('on-good','on-warn','on-bad'));
+          updateMastery(0);
+        }, 3500);
+      }
+    }
+    document.getElementById('p-cta').addEventListener('click', punchIn);
 
- // Boot — wait for auth gate then hydrate
- function start() { hydrate(); }
- if (document.getElementById('fl-auth-gate')) {
- window.addEventListener('fl-unlocked', start);
- } else {
- start();
- }
- })();
- </script>
+    // Boot — wait for auth gate then hydrate
+    function start() { hydrate(); }
+    if (document.getElementById('fl-auth-gate')) {
+      window.addEventListener('fl-unlocked', start);
+    } else {
+      start();
+    }
+  })();
+  </script>
 </body>
 </html>

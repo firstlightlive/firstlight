@@ -1,86 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta name="theme-color" content="#0A0C10">
- <meta name="apple-mobile-web-app-capable" content="yes">
- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- <title>The Iron Covenant — FIRST LIGHT</title>
- <meta name="description" content="The 5 disciplines and 25 rules that govern every day. The Iron Covenant of First Light.">
- <meta name="keywords" content="discipline rules, iron covenant, fitness rules, morning protocol, food code, digital fortress, accountability system">
- <meta name="robots" content="index, follow">
- <link rel="canonical" href="https://firstlight.live/covenant.html">
- <link rel="preconnect" href="https://fonts.googleapis.com">
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="styles.css">
- <!-- CDN Libraries -->
- <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
- <style>
- /* THE IRON COVENANT — 7D CODEX */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0C10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>The Iron Covenant — FIRST LIGHT</title>
+  <meta name="description" content="The 5 disciplines and 25 rules that govern every day. The Iron Covenant of First Light.">
+  <meta name="keywords" content="discipline rules, iron covenant, fitness rules, morning protocol, food code, digital fortress, accountability system">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://firstlight.live/covenant.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- CDN Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <style>
+    /* THE IRON COVENANT — 7D CODEX */
 
- body { background:#030608!important; }
- #cvParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    body { background:#030608 !important; }
+    #cvParticles { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
- body::before {
- content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.02;
- background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
- background-size:128px 128px;
- }
- body::after {
- content:''; position:fixed; inset:0; z-index:9998; pointer-events:none;
- background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,212,255,0.004) 4px, rgba(0,212,255,0.004) 8px);
- }
+    body::before {
+      content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:128px 128px;
+    }
+    body::after {
+      content:''; position:fixed; inset:0; z-index:9998; pointer-events:none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,212,255,0.004) 4px, rgba(0,212,255,0.004) 8px);
+    }
 
- @keyframes border-rotate { 0% { --border-angle:0deg; } 100% { --border-angle:360deg; } }
- @property --border-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
- @keyframes penalty-pulse { 0%,100% { box-shadow:0 0 8px rgba(255,82,82,0.1); } 50% { box-shadow:0 0 24px rgba(255,82,82,0.25); } }
- @keyframes gold-shimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
- @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.3; } }.reveal { opacity:0; transform:translateY(24px); transition:opacity 0.8s cubic-bezier(0.22,1,0.36,1),transform 0.8s cubic-bezier(0.22,1,0.36,1); }.reveal.visible { opacity:1; transform:translateY(0); }
+    @keyframes border-rotate { 0% { --border-angle:0deg; } 100% { --border-angle:360deg; } }
+    @property --border-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+    @keyframes penalty-pulse { 0%,100% { box-shadow:0 0 8px rgba(255,82,82,0.1); } 50% { box-shadow:0 0 24px rgba(255,82,82,0.25); } }
+    @keyframes gold-shimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+    @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.8s cubic-bezier(0.22,1,0.36,1),transform 0.8s cubic-bezier(0.22,1,0.36,1); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
 
- /* ── HERO ── */.cv-hero { position:relative; padding:clamp(100px,15vw,180px) 0 clamp(48px,8vw,72px); text-align:center; overflow:hidden; }.cv-hero::before { content:''; position:absolute; top:10%; left:50%; transform:translateX(-50%); width:700px; height:500px; background:radial-gradient(ellipse,rgba(0,212,255,0.05) 0%,transparent 65%); pointer-events:none; }.cv-hero-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; letter-spacing:6px; color:var(--cyan); opacity:0.5; margin-bottom:20px; }.cv-hero h1 { font-family:'Playfair Display',Georgia,serif; font-size:clamp(3rem,10vw,7rem); font-weight:900; color:#fff; letter-spacing:clamp(4px,1vw,16px); line-height:1.0; margin:0 0 28px; text-shadow:0 0 100px rgba(0,212,255,0.06); }.cv-hero-rule { width:100px; height:1px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); margin:0 auto 20px; }.cv-hero-sub { font-family:'IBM Plex Mono',monospace; font-size:clamp(0.62rem,1.5vw,0.82rem); color:rgba(255,255,255,0.3); letter-spacing:3px; }
+    /* ── HERO ── */
+    .cv-hero { position:relative; padding:clamp(100px,15vw,180px) 0 clamp(48px,8vw,72px); text-align:center; overflow:hidden; }
+    .cv-hero::before { content:''; position:absolute; top:10%; left:50%; transform:translateX(-50%); width:700px; height:500px; background:radial-gradient(ellipse,rgba(0,212,255,0.05) 0%,transparent 65%); pointer-events:none; }
+    .cv-hero-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; letter-spacing:6px; color:var(--cyan); opacity:0.5; margin-bottom:20px; }
+    .cv-hero h1 { font-family:'Playfair Display',Georgia,serif; font-size:clamp(3rem,10vw,7rem); font-weight:900; color:#fff; letter-spacing:clamp(4px,1vw,16px); line-height:1.0; margin:0 0 28px; text-shadow:0 0 100px rgba(0,212,255,0.06); }
+    .cv-hero-rule { width:100px; height:1px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); margin:0 auto 20px; }
+    .cv-hero-sub { font-family:'IBM Plex Mono',monospace; font-size:clamp(0.62rem,1.5vw,0.82rem); color:rgba(255,255,255,0.3); letter-spacing:3px; }
 
- /* Stats bar */.cv-stats-bar { display:flex; max-width:680px; margin:36px auto 0; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; }.cv-stat-item { flex:1; padding:18px 10px; text-align:center; border-right:1px solid rgba(255,255,255,0.05); }.cv-stat-item:last-child { border-right:none; }.cv-stat-val { font-family:'IBM Plex Mono',monospace; font-size:clamp(1rem,2.5vw,1.5rem); font-weight:700; color:#fff; line-height:1; }.cv-stat-label { font-family:'IBM Plex Mono',monospace; font-size:0.45rem; letter-spacing:1.5px; color:rgba(255,255,255,0.22); margin-top:6px; }
+    /* Stats bar */
+    .cv-stats-bar { display:flex; max-width:680px; margin:36px auto 0; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; overflow:hidden; }
+    .cv-stat-item { flex:1; padding:18px 10px; text-align:center; border-right:1px solid rgba(255,255,255,0.05); }
+    .cv-stat-item:last-child { border-right:none; }
+    .cv-stat-val { font-family:'IBM Plex Mono',monospace; font-size:clamp(1rem,2.5vw,1.5rem); font-weight:700; color:#fff; line-height:1; }
+    .cv-stat-label { font-family:'IBM Plex Mono',monospace; font-size:0.45rem; letter-spacing:1.5px; color:rgba(255,255,255,0.22); margin-top:6px; }
 
- /* Sticky discipline nav */.cv-nav { position:sticky; top:60px; z-index:100; background:rgba(10,12,16,0.94); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid rgba(255,255,255,0.05); }.cv-nav-inner { display:flex; gap:6px; overflow-x:auto; padding:10px 20px; -webkit-overflow-scrolling:touch; scrollbar-width:none; max-width:960px; margin:0 auto; }.cv-nav-inner::-webkit-scrollbar { display:none; }.cv-nav-pill { flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:0.5rem; letter-spacing:1.5px; font-weight:700; padding:7px 14px; border-radius:20px; text-decoration:none; border:1px solid rgba(255,255,255,0.07); color:rgba(255,255,255,0.35); background:transparent; transition:all 0.2s; white-space:nowrap; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }.cv-pill-food:hover { color:#FF5252; border-color:#FF5252; background:rgba(255,82,82,0.06); }.cv-pill-body:hover { color:#FC4C02; border-color:#FC4C02; background:rgba(252,76,2,0.06); }.cv-pill-fort:hover { color:#00D4FF; border-color:#00D4FF; background:rgba(0,212,255,0.06); }.cv-pill-spirit:hover { color:#F5A623; border-color:#F5A623; background:rgba(245,166,35,0.06); }.cv-pill-cmd:hover { color:#AB47BC; border-color:#AB47BC; background:rgba(171,71,188,0.06); }
+    /* Sticky discipline nav */
+    .cv-nav { position:sticky; top:60px; z-index:100; background:rgba(10,12,16,0.94); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid rgba(255,255,255,0.05); }
+    .cv-nav-inner { display:flex; gap:6px; overflow-x:auto; padding:10px 20px; -webkit-overflow-scrolling:touch; scrollbar-width:none; max-width:960px; margin:0 auto; }
+    .cv-nav-inner::-webkit-scrollbar { display:none; }
+    .cv-nav-pill { flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:0.5rem; letter-spacing:1.5px; font-weight:700; padding:7px 14px; border-radius:20px; text-decoration:none; border:1px solid rgba(255,255,255,0.07); color:rgba(255,255,255,0.35); background:transparent; transition:all 0.2s; white-space:nowrap; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+    .cv-pill-food:hover   { color:#FF5252; border-color:#FF5252; background:rgba(255,82,82,0.06); }
+    .cv-pill-body:hover   { color:#FC4C02; border-color:#FC4C02; background:rgba(252,76,2,0.06); }
+    .cv-pill-fort:hover   { color:#00D4FF; border-color:#00D4FF; background:rgba(0,212,255,0.06); }
+    .cv-pill-spirit:hover { color:#F5A623; border-color:#F5A623; background:rgba(245,166,35,0.06); }
+    .cv-pill-cmd:hover    { color:#AB47BC; border-color:#AB47BC; background:rgba(171,71,188,0.06); }
 
- /* Discipline sections */.cv-section { position:relative; z-index:2; padding:clamp(56px,8vw,88px) 0; border-bottom:1px solid rgba(255,255,255,0.04); overflow:hidden; }.cv-section:last-of-type { border-bottom:none; }.cv-accent { position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 2px 2px 0; }.cv-watermark { position:absolute; right:-15px; top:-20px; font-family:'Playfair Display',Georgia,serif; font-size:clamp(8rem,20vw,14rem); font-weight:900; line-height:1; color:#fff; opacity:0.03; pointer-events:none; user-select:none; }.cv-section-header { display:flex; align-items:flex-start; gap:18px; margin-bottom:28px; position:relative; z-index:1; padding-left:16px; }.cv-disc-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }.cv-disc-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:0.5rem; letter-spacing:3px; font-weight:700; margin-bottom:4px; }.cv-disc-name { font-family:'IBM Plex Mono',monospace; font-size:clamp(1rem,2.4vw,1.4rem); font-weight:700; color:#fff; letter-spacing:3px; }.cv-disc-sub { font-family:'IBM Plex Mono',monospace; font-size:0.55rem; color:rgba(255,255,255,0.22); margin-top:4px; letter-spacing:1px; }
+    /* Discipline sections */
+    .cv-section { position:relative; z-index:2; padding:clamp(56px,8vw,88px) 0; border-bottom:1px solid rgba(255,255,255,0.04); overflow:hidden; }
+    .cv-section:last-of-type { border-bottom:none; }
+    .cv-accent { position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:0 2px 2px 0; }
+    .cv-watermark { position:absolute; right:-15px; top:-20px; font-family:'Playfair Display',Georgia,serif; font-size:clamp(8rem,20vw,14rem); font-weight:900; line-height:1; color:#fff; opacity:0.03; pointer-events:none; user-select:none; }
+    .cv-section-header { display:flex; align-items:flex-start; gap:18px; margin-bottom:28px; position:relative; z-index:1; padding-left:16px; }
+    .cv-disc-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+    .cv-disc-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:0.5rem; letter-spacing:3px; font-weight:700; margin-bottom:4px; }
+    .cv-disc-name { font-family:'IBM Plex Mono',monospace; font-size:clamp(1rem,2.4vw,1.4rem); font-weight:700; color:#fff; letter-spacing:3px; }
+    .cv-disc-sub { font-family:'IBM Plex Mono',monospace; font-size:0.55rem; color:rgba(255,255,255,0.22); margin-top:4px; letter-spacing:1px; }
 
- /* Rules */.cv-rules { display:flex; flex-direction:column; gap:2px; position:relative; z-index:1; padding-left:16px; }.cv-rule { display:grid; grid-template-columns:56px 1fr; gap:16px; align-items:baseline; padding:12px 16px; border-radius:8px; border-left:2px solid transparent; transition:all 0.3s cubic-bezier(0.22,1,0.36,1); }.cv-rule:hover { background:rgba(255,255,255,0.02); }.cv-rule-num { font-family:'IBM Plex Mono',monospace; font-size:0.56rem; font-weight:700; letter-spacing:0.5px; opacity:0.6; white-space:nowrap; }.cv-rule-text { font-family:'IBM Plex Mono',monospace; font-size:clamp(12px,1.5vw,13.5px); color:rgba(255,255,255,0.6); line-height:1.8; }
- /* Per-discipline hover border */.cv-section--food.cv-rule:hover { border-left-color:#FF5252; }.cv-section--body.cv-rule:hover { border-left-color:#FC4C02; }.cv-section--fort.cv-rule:hover { border-left-color:#00D4FF; }.cv-section--spirit.cv-rule:hover { border-left-color:#F5A623; }.cv-section--cmd.cv-rule:hover { border-left-color:#AB47BC; }
+    /* Rules */
+    .cv-rules { display:flex; flex-direction:column; gap:2px; position:relative; z-index:1; padding-left:16px; }
+    .cv-rule { display:grid; grid-template-columns:56px 1fr; gap:16px; align-items:baseline; padding:12px 16px; border-radius:8px; border-left:2px solid transparent; transition:all 0.3s cubic-bezier(0.22,1,0.36,1); }
+    .cv-rule:hover { background:rgba(255,255,255,0.02); }
+    .cv-rule-num { font-family:'IBM Plex Mono',monospace; font-size:0.56rem; font-weight:700; letter-spacing:0.5px; opacity:0.6; white-space:nowrap; }
+    .cv-rule-text { font-family:'IBM Plex Mono',monospace; font-size:clamp(12px,1.5vw,13.5px); color:rgba(255,255,255,0.6); line-height:1.8; }
+    /* Per-discipline hover border */
+    .cv-section--food .cv-rule:hover   { border-left-color:#FF5252; }
+    .cv-section--body .cv-rule:hover   { border-left-color:#FC4C02; }
+    .cv-section--fort .cv-rule:hover   { border-left-color:#00D4FF; }
+    .cv-section--spirit .cv-rule:hover { border-left-color:#F5A623; }
+    .cv-section--cmd .cv-rule:hover    { border-left-color:#AB47BC; }
 
- /* Penalty */.cv-penalty { margin:24px 0 0 16px; padding:18px 22px; background:rgba(255,82,82,0.03); border:1px solid rgba(255,82,82,0.18); border-radius:12px; position:relative; z-index:1; animation:penalty-pulse 3.5s ease-in-out infinite; }.cv-penalty-label { font-family:'IBM Plex Mono',monospace; font-size:0.5rem; letter-spacing:3px; color:#FF5252; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }.cv-penalty-dot { width:7px; height:7px; border-radius:50%; background:#FF5252; box-shadow:0 0 6px rgba(255,82,82,0.7); animation:pulse-dot 1.5s ease-in-out infinite; flex-shrink:0; }.cv-penalty-text { font-family:'IBM Plex Mono',monospace; font-size:clamp(12px,1.5vw,13px); color:rgba(255,82,82,0.75); line-height:1.7; }
+    /* Penalty */
+    .cv-penalty { margin:24px 0 0 16px; padding:18px 22px; background:rgba(255,82,82,0.03); border:1px solid rgba(255,82,82,0.18); border-radius:12px; position:relative; z-index:1; animation:penalty-pulse 3.5s ease-in-out infinite; }
+    .cv-penalty-label { font-family:'IBM Plex Mono',monospace; font-size:0.5rem; letter-spacing:3px; color:#FF5252; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .cv-penalty-dot { width:7px; height:7px; border-radius:50%; background:#FF5252; box-shadow:0 0 6px rgba(255,82,82,0.7); animation:pulse-dot 1.5s ease-in-out infinite; flex-shrink:0; }
+    .cv-penalty-text { font-family:'IBM Plex Mono',monospace; font-size:clamp(12px,1.5vw,13px); color:rgba(255,82,82,0.75); line-height:1.7; }
 
- /* Clause */.cv-clause { position:relative; margin:20px 0 0 16px; padding:22px 24px; border-radius:12px; background:rgba(0,0,0,0.35); border:1px solid transparent; background-clip:padding-box; z-index:1; }.cv-clause::before { content:''; position:absolute; inset:-1px; border-radius:13px; padding:1px; background:conic-gradient(from var(--border-angle,0deg),rgba(252,76,2,0.35),rgba(0,212,255,0.2),rgba(245,166,35,0.25),rgba(252,76,2,0.35)); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; animation:border-rotate 6s linear infinite; pointer-events:none; }.cv-clause--cyan::before { background:conic-gradient(from var(--border-angle,0deg),rgba(0,212,255,0.4),rgba(245,166,35,0.15),rgba(0,230,118,0.2),rgba(0,212,255,0.4)); }.cv-clause-label { font-family:'IBM Plex Mono',monospace; font-size:0.5rem; letter-spacing:3px; font-weight:700; margin-bottom:14px; }
+    /* Clause */
+    .cv-clause { position:relative; margin:20px 0 0 16px; padding:22px 24px; border-radius:12px; background:rgba(0,0,0,0.35); border:1px solid transparent; background-clip:padding-box; z-index:1; }
+    .cv-clause::before { content:''; position:absolute; inset:-1px; border-radius:13px; padding:1px; background:conic-gradient(from var(--border-angle,0deg),rgba(252,76,2,0.35),rgba(0,212,255,0.2),rgba(245,166,35,0.25),rgba(252,76,2,0.35)); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; animation:border-rotate 6s linear infinite; pointer-events:none; }
+    .cv-clause--cyan::before { background:conic-gradient(from var(--border-angle,0deg),rgba(0,212,255,0.4),rgba(245,166,35,0.15),rgba(0,230,118,0.2),rgba(0,212,255,0.4)); }
+    .cv-clause-label { font-family:'IBM Plex Mono',monospace; font-size:0.5rem; letter-spacing:3px; font-weight:700; margin-bottom:14px; }
 
- /* Declaration */.cv-declaration { padding:clamp(60px,10vw,100px) 0; }.cv-decl-title { font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.3rem,3.5vw,2.2rem); font-weight:900; color:#fff; text-align:center; letter-spacing:8px; margin-bottom:48px; text-transform:uppercase; }.cv-oath { border:1px solid rgba(245,166,35,0.07); border-radius:16px; overflow:hidden; }.cv-oath-line { display:grid; grid-template-columns:84px 1fr; padding:22px 28px; gap:20px; align-items:baseline; border-bottom:1px solid rgba(245,166,35,0.05); transition:background 0.3s; }.cv-oath-line:last-child { border-bottom:none; }.cv-oath-line:hover { background:rgba(245,166,35,0.015); }.cv-oath-num { font-family:'Playfair Display',Georgia,serif; font-size:0.72rem; font-weight:700; letter-spacing:2px; color:var(--gold); opacity:0.7; text-transform:uppercase; }.cv-oath-text { font-family:'IBM Plex Mono',monospace; font-size:clamp(12px,1.5vw,14px); color:rgba(255,255,255,0.7); line-height:1.75; }
+    /* Declaration */
+    .cv-declaration { padding:clamp(60px,10vw,100px) 0; }
+    .cv-decl-title { font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.3rem,3.5vw,2.2rem); font-weight:900; color:#fff; text-align:center; letter-spacing:8px; margin-bottom:48px; text-transform:uppercase; }
+    .cv-oath { border:1px solid rgba(245,166,35,0.07); border-radius:16px; overflow:hidden; }
+    .cv-oath-line { display:grid; grid-template-columns:84px 1fr; padding:22px 28px; gap:20px; align-items:baseline; border-bottom:1px solid rgba(245,166,35,0.05); transition:background 0.3s; }
+    .cv-oath-line:last-child { border-bottom:none; }
+    .cv-oath-line:hover { background:rgba(245,166,35,0.015); }
+    .cv-oath-num { font-family:'Playfair Display',Georgia,serif; font-size:0.72rem; font-weight:700; letter-spacing:2px; color:var(--gold); opacity:0.7; text-transform:uppercase; }
+    .cv-oath-text { font-family:'IBM Plex Mono',monospace; font-size:clamp(12px,1.5vw,14px); color:rgba(255,255,255,0.7); line-height:1.75; }
 
- /* Ikigai */.cv-ikigai { text-align:center; padding:clamp(48px,8vw,80px) 0 32px; max-width:740px; margin:0 auto; }.cv-ikigai p { font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.05rem,2.4vw,1.55rem); font-style:italic; line-height:1.9; background:linear-gradient(90deg,var(--gold) 0%,#FFD700 25%,#FFA500 50%,#FFD700 75%,var(--gold) 100%); background-size:200% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:gold-shimmer 6s linear infinite; }
+    /* Ikigai */
+    .cv-ikigai { text-align:center; padding:clamp(48px,8vw,80px) 0 32px; max-width:740px; margin:0 auto; }
+    .cv-ikigai p { font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.05rem,2.4vw,1.55rem); font-style:italic; line-height:1.9; background:linear-gradient(90deg,var(--gold) 0%,#FFD700 25%,#FFA500 50%,#FFD700 75%,var(--gold) 100%); background-size:200% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:gold-shimmer 6s linear infinite; }
 
- /* Signed */.cv-signed { text-align:center; padding:24px 0 80px; }.cv-signed-date { font-family:'IBM Plex Mono',monospace; font-size:0.55rem; letter-spacing:4px; color:rgba(255,255,255,0.12); margin-bottom:12px; }.cv-signed-name { font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.1rem,2.8vw,1.7rem); font-weight:700; color:rgba(255,255,255,0.2); letter-spacing:8px; }
+    /* Signed */
+    .cv-signed { text-align:center; padding:24px 0 80px; }
+    .cv-signed-date { font-family:'IBM Plex Mono',monospace; font-size:0.55rem; letter-spacing:4px; color:rgba(255,255,255,0.12); margin-bottom:12px; }
+    .cv-signed-name { font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.1rem,2.8vw,1.7rem); font-weight:700; color:rgba(255,255,255,0.2); letter-spacing:8px; }
 
- @media print {
- body::before,body::after,.nav,.nav-mobile,.footer,.cv-nav { display:none!important; }.reveal { opacity:1!important; transform:none!important; }.cv-clause::before,.cv-accent { display:none; }
- }
- @media (max-width:480px) {.cv-watermark { font-size:6rem; right:-10px; }.cv-section-header,.cv-rules { padding-left:0; }.cv-clause,.cv-penalty { margin-left:0; padding:16px 14px; }.cv-rule { grid-template-columns:48px 1fr; gap:10px; }.cv-oath-line { grid-template-columns:60px 1fr; padding:16px 16px; gap:12px; }.cv-stats-bar { flex-wrap:wrap; }.cv-stat-item { min-width:50%; }
- }
- </style>
- <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
- <link rel="icon" type="image/png" href="icon-512.png">
- <link rel="apple-touch-icon" href="icon-512.png">
- <link rel="manifest" href="manifest.json">
- <meta property="og:title" content="The Iron Covenant — FIRST LIGHT">
- <meta property="og:description" content="5 disciplines. 25 rules. The code that governs every day.">
- <meta property="og:image" content="https://firstlight.live/icon-512.png">
- <meta property="og:url" content="https://firstlight.live/covenant.html">
- <meta property="og:type" content="website">
- <meta name="twitter:card" content="summary_large_image">
- <meta name="twitter:title" content="The Iron Covenant — FIRST LIGHT">
- <meta name="twitter:description" content="5 disciplines. 25 rules. The code that governs every day.">
- <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
+    @media print {
+      body::before,body::after,.nav,.nav-mobile,.footer,.cv-nav { display:none !important; }
+      .reveal { opacity:1 !important; transform:none !important; }
+      .cv-clause::before,.cv-accent { display:none; }
+    }
+    @media (max-width:480px) {
+      .cv-watermark { font-size:6rem; right:-10px; }
+      .cv-section-header,.cv-rules { padding-left:0; }
+      .cv-clause,.cv-penalty { margin-left:0; padding:16px 14px; }
+      .cv-rule { grid-template-columns:48px 1fr; gap:10px; }
+      .cv-oath-line { grid-template-columns:60px 1fr; padding:16px 16px; gap:12px; }
+      .cv-stats-bar { flex-wrap:wrap; }
+      .cv-stat-item { min-width:50%; }
+    }
+  </style>
+  <script>(function(){var t=localStorage.getItem("fl_theme");if(t&&t!=="auto"&&t!=="dark")document.documentElement.setAttribute("data-theme",t)})()</script>
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:title" content="The Iron Covenant — FIRST LIGHT">
+  <meta property="og:description" content="5 disciplines. 25 rules. The code that governs every day.">
+  <meta property="og:image" content="https://firstlight.live/icon-512.png">
+  <meta property="og:url" content="https://firstlight.live/covenant.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Iron Covenant — FIRST LIGHT">
+  <meta name="twitter:description" content="5 disciplines. 25 rules. The code that governs every day.">
+  <meta name="twitter:image" content="https://firstlight.live/icon-512.png">
 </head>
 <body>
 
@@ -95,262 +166,262 @@
 
 <!-- HERO -->
 <div class="cv-hero reveal" style="position:relative;z-index:2">
- <div class="container">
- <div class="cv-hero-eyebrow">THE COVENANT · FIRST LIGHT · SINCE FEB 10, 2026</div>
- <h1>THE IRON<br>COVENANT</h1>
- <div class="cv-hero-rule"></div>
- <div class="cv-hero-sub">4 DISCIPLINES · 20 RULES · ₹<span data-stake-daily>15,000</span> PER DAY LOCKED IN</div>
- <div class="cv-stats-bar">
- <div class="cv-stat-item">
- <div class="cv-stat-val" data-day>—</div>
- <div class="cv-stat-label">DAYS HONORED</div>
- </div>
- <div class="cv-stat-item">
- <div class="cv-stat-val" style="color:var(--gold)" data-unclaimed>—</div>
- <div class="cv-stat-label">₹ UNCLAIMED</div>
- </div>
- <div class="cv-stat-item">
- <div class="cv-stat-val" style="color:var(--green)">0</div>
- <div class="cv-stat-label">VIOLATIONS</div>
- </div>
- <div class="cv-stat-item">
- <div class="cv-stat-val" style="color:rgba(255,255,255,0.25)">∞</div>
- <div class="cv-stat-label">END DATE</div>
- </div>
- </div>
- </div>
+  <div class="container">
+    <div class="cv-hero-eyebrow">THE COVENANT · FIRST LIGHT · SINCE FEB 10, 2026</div>
+    <h1>THE IRON<br>COVENANT</h1>
+    <div class="cv-hero-rule"></div>
+    <div class="cv-hero-sub">4 DISCIPLINES · 20 RULES · ₹<span data-stake-daily>15,000</span> PER DAY AT STAKE</div>
+    <div class="cv-stats-bar">
+      <div class="cv-stat-item">
+        <div class="cv-stat-val" data-day>—</div>
+        <div class="cv-stat-label">DAYS HONORED</div>
+      </div>
+      <div class="cv-stat-item">
+        <div class="cv-stat-val" style="color:var(--gold)" data-unclaimed>—</div>
+        <div class="cv-stat-label">₹ UNCLAIMED</div>
+      </div>
+      <div class="cv-stat-item">
+        <div class="cv-stat-val" style="color:var(--green)">0</div>
+        <div class="cv-stat-label">VIOLATIONS</div>
+      </div>
+      <div class="cv-stat-item">
+        <div class="cv-stat-val" style="color:rgba(255,255,255,0.25)">∞</div>
+        <div class="cv-stat-label">END DATE</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- DISCIPLINE NAV -->
 <nav class="cv-nav" aria-label="Disciplines">
- <div class="cv-nav-inner">
- <a href="#cv-food" class="cv-nav-pill cv-pill-food">01 · FOOD CODE</a>
- <a href="#cv-body" class="cv-nav-pill cv-pill-body">02 · MORNING PROTOCOL</a>
- <a href="#cv-fort" class="cv-nav-pill cv-pill-fort">03 · DIGITAL FORTRESS</a>
- <a href="#cv-cmd" class="cv-nav-pill cv-pill-cmd">04 · COMMAND CENTER</a>
- </div>
+  <div class="cv-nav-inner">
+    <a href="#cv-food"   class="cv-nav-pill cv-pill-food">01 · FOOD CODE</a>
+    <a href="#cv-body"   class="cv-nav-pill cv-pill-body">02 · MORNING PROTOCOL</a>
+    <a href="#cv-fort"   class="cv-nav-pill cv-pill-fort">03 · DIGITAL FORTRESS</a>
+    <a href="#cv-cmd"    class="cv-nav-pill cv-pill-cmd">04 · COMMAND CENTER</a>
+  </div>
 </nav>
 
 <main class="container">
 
- <!-- ── 01 FOOD CODE ── -->
- <section class="cv-section cv-section--food reveal" id="cv-food">
- <div class="cv-accent" style="background:#FF5252"></div>
- <div class="cv-watermark">01</div>
- <div class="cv-section-header">
- <div class="cv-disc-icon" style="background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.18)">🥗</div>
- <div>
- <div class="cv-disc-eyebrow" style="color:#FF5252">DISCIPLINE 01</div>
- <div class="cv-disc-name">FOOD CODE</div>
- <div class="cv-disc-sub">ZERO TOLERANCE · 6 PROHIBITIONS · PERMANENT</div>
- </div>
- </div>
- <div class="cv-rules">
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.1</span><span class="cv-rule-text">No frying — zero fried food, no exceptions</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.2</span><span class="cv-rule-text">No sugar — raw fruits only; no juices, no sweets, no desserts</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.3</span><span class="cv-rule-text">No alcohol — complete abstinence, no social exceptions</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.4</span><span class="cv-rule-text">No smoking — lifetime prohibition</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.5</span><span class="cv-rule-text">No cold drinks — no carbonated beverages of any kind</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.6</span><span class="cv-rule-text">No junk food — processed, packaged, or fast food</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.7</span><span class="cv-rule-text"><strong style="color:#fff">No Biryani</strong> — all forms: Hyderabadi, Lucknowi, Dum, Chicken, Mutton, Egg. No exceptions. No "just one plate."</span></div>
- </div>
- <div class="cv-penalty">
- <div class="cv-penalty-label"><span class="cv-penalty-dot"></span>VIOLATION PENALTY</div>
- <div class="cv-penalty-text">20 km walk — GPS verified via Strava, uploaded as public proof. No exceptions.<br><a href="accountability.html" style="color:#FF5252;text-decoration:underline">View the public ledger →</a></div>
- </div>
- </section>
+  <!-- ── 01 FOOD CODE ── -->
+  <section class="cv-section cv-section--food reveal" id="cv-food">
+    <div class="cv-accent" style="background:#FF5252"></div>
+    <div class="cv-watermark">01</div>
+    <div class="cv-section-header">
+      <div class="cv-disc-icon" style="background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.18)">🥗</div>
+      <div>
+        <div class="cv-disc-eyebrow" style="color:#FF5252">DISCIPLINE 01</div>
+        <div class="cv-disc-name">FOOD CODE</div>
+        <div class="cv-disc-sub">ZERO TOLERANCE · 6 PROHIBITIONS · PERMANENT</div>
+      </div>
+    </div>
+    <div class="cv-rules">
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.1</span><span class="cv-rule-text">No frying — zero fried food, no exceptions</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.2</span><span class="cv-rule-text">No sugar — raw fruits only; no juices, no sweets, no desserts</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.3</span><span class="cv-rule-text">No alcohol — complete abstinence, no social exceptions</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.4</span><span class="cv-rule-text">No smoking — lifetime prohibition</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.5</span><span class="cv-rule-text">No cold drinks — no carbonated beverages of any kind</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.6</span><span class="cv-rule-text">No junk food — processed, packaged, or fast food</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FF5252">§ 1.7</span><span class="cv-rule-text"><strong style="color:#fff">No Biryani</strong> — all forms: Hyderabadi, Lucknowi, Dum, Chicken, Mutton, Egg. No exceptions. No "just one plate."</span></div>
+    </div>
+    <div class="cv-penalty">
+      <div class="cv-penalty-label"><span class="cv-penalty-dot"></span>VIOLATION PENALTY</div>
+      <div class="cv-penalty-text">20 km walk — GPS verified via Strava, uploaded as public proof. No exceptions.<br><a href="accountability.html" style="color:#FF5252;text-decoration:underline">View the public ledger →</a></div>
+    </div>
+  </section>
 
- <!-- ── 02 MORNING PROTOCOL ── -->
- <section class="cv-section cv-section--body reveal" id="cv-body">
- <div class="cv-accent" style="background:#FC4C02"></div>
- <div class="cv-watermark">02</div>
- <div class="cv-section-header">
- <div class="cv-disc-icon" style="background:rgba(252,76,2,0.08);border:1px solid rgba(252,76,2,0.18)">🏃</div>
- <div>
- <div class="cv-disc-eyebrow" style="color:#FC4C02">DISCIPLINE 02</div>
- <div class="cv-disc-name">MORNING PROTOCOL</div>
- <div class="cv-disc-sub">GPS VERIFIED · EVERY DAY · ZERO REST DAYS</div>
- </div>
- </div>
- <div class="cv-rules">
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.1</span><span class="cv-rule-text">Wake before 3:30 AM — Brahma Muhurta, the sacred pre-dawn window (3:00–5:30 AM)</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.2</span><span class="cv-rule-text"><strong style="color:#fff">5 km morning run — completed before 6:00 AM LOCAL time</strong> (wherever in the world). Strava-verified. Miss = stake paid.</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.3</span><span class="cv-rule-text"><strong style="color:#fff">Weekly target: 100 km minimum</strong> across all sports (Mon–Sun). Swim 1 km = 10 km equivalent. Deficit carries forward.</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.4</span><span class="cv-rule-text"><strong style="color:var(--red)">Deficit &gt; 50 km = PENALTY:</strong> claimable + deficit × 2 punishment km (immutable slip). First claim wins.</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.5</span><span class="cv-rule-text">Garmin + Strava verified — GPS proof on every activity. <a href="strava.html" style="color:var(--cyan)">View live data →</a></span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.6</span><span class="cv-rule-text"><strong style="color:#fff">No break clause — miss does NOT reset the streak.</strong> The stake is paid (, immutable slip), the day is marked, the streak continues. Resume next morning from where you left off.</span></div>
- </div>
- <div class="cv-clause">
- <div class="cv-clause-label" style="color:#FC4C02">RACE DAY CLAUSE</div>
- <div class="cv-rules" style="padding-left:0">
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.1</span><span class="cv-rule-text">Applies to Ultra, Marathon, Half Marathon, or any registered race starting before 6:00 AM</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.2</span><span class="cv-rule-text">BIB number uploaded to <a href="marathon.html" style="color:var(--cyan)">Races page</a> and posted on <a href="https://www.instagram.com/firstlightlive" style="color:#E1306C" target="_blank">Instagram</a> before race day as public proof</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.3</span><span class="cv-rule-text">The race counts as the day's run — no separate morning run required</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.4</span><span class="cv-rule-text">If race starts after 6:00 AM — <strong style="color:#fff">regular 5 km morning run must still happen before the race</strong>. No exceptions.</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.5</span><span class="cv-rule-text">Running is never excused. The post timing gets flexibility. The run does not.</span></div>
- </div>
- </div>
- <div class="cv-clause cv-clause--cyan">
- <div class="cv-clause-label" style="color:var(--cyan)">FLIGHT TRAVEL CLAUSE — RED-EYE WINDOW</div>
- <div class="cv-rules" style="padding-left:0">
- <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.1</span><span class="cv-rule-text">If flight departs between <strong style="color:#fff">00:30 AM and 06:00 AM</strong> — morning run window is physically impossible</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.2</span><span class="cv-rule-text">Upon landing — walk <strong style="color:#fff">5 km from the airport</strong>, GPS verified via Strava. No cab until walk is done.</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.3</span><span class="cv-rule-text">Walk must happen immediately after landing — no hotel first, no delays</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.4</span><span class="cv-rule-text">Instagram post can be delayed until after the walk is uploaded</span></div>
- </div>
- </div>
- </section>
+  <!-- ── 02 MORNING PROTOCOL ── -->
+  <section class="cv-section cv-section--body reveal" id="cv-body">
+    <div class="cv-accent" style="background:#FC4C02"></div>
+    <div class="cv-watermark">02</div>
+    <div class="cv-section-header">
+      <div class="cv-disc-icon" style="background:rgba(252,76,2,0.08);border:1px solid rgba(252,76,2,0.18)">🏃</div>
+      <div>
+        <div class="cv-disc-eyebrow" style="color:#FC4C02">DISCIPLINE 02</div>
+        <div class="cv-disc-name">MORNING PROTOCOL</div>
+        <div class="cv-disc-sub">GPS VERIFIED · EVERY DAY · ZERO REST DAYS</div>
+      </div>
+    </div>
+    <div class="cv-rules">
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.1</span><span class="cv-rule-text">Wake before 3:30 AM — Brahma Muhurta, the sacred pre-dawn window (3:00–5:30 AM)</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.2</span><span class="cv-rule-text"><strong style="color:#fff">5 km morning run — completed before 6:00 AM LOCAL time</strong> (wherever in the world). Strava-verified. Miss = ₹15,000 stake paid.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.3</span><span class="cv-rule-text"><strong style="color:#fff">Weekly target: 100 km minimum</strong> across all sports (Mon–Sun). Swim 1 km = 10 km equivalent. Deficit carries forward.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.4</span><span class="cv-rule-text"><strong style="color:var(--red)">Deficit &gt; 50 km = PENALTY:</strong> ₹15,000 claimable + deficit × 2 punishment km (immutable slip). First claim wins.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.5</span><span class="cv-rule-text">Garmin + Strava verified — GPS proof on every activity. <a href="strava.html" style="color:var(--cyan)">View live data →</a></span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.6</span><span class="cv-rule-text"><strong style="color:#fff">No break clause — miss does NOT reset the streak.</strong> The stake is paid (₹15,000, immutable slip), the day is marked, the streak continues. Resume next morning from where you left off.</span></div>
+    </div>
+    <div class="cv-clause">
+      <div class="cv-clause-label" style="color:#FC4C02">RACE DAY CLAUSE</div>
+      <div class="cv-rules" style="padding-left:0">
+        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.1</span><span class="cv-rule-text">Applies to Ultra, Marathon, Half Marathon, or any registered race starting before 6:00 AM</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.2</span><span class="cv-rule-text">BIB number uploaded to <a href="marathon.html" style="color:var(--cyan)">Races page</a> and posted on <a href="https://www.instagram.com/firstlightlive" style="color:#E1306C" target="_blank">Instagram</a> before race day as public proof</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.3</span><span class="cv-rule-text">The race counts as the day's run — no separate morning run required</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.4</span><span class="cv-rule-text">If race starts after 6:00 AM — <strong style="color:#fff">regular 5 km morning run must still happen before the race</strong>. No exceptions.</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.5</span><span class="cv-rule-text">Running is never excused. The post timing gets flexibility. The run does not.</span></div>
+      </div>
+    </div>
+    <div class="cv-clause cv-clause--cyan">
+      <div class="cv-clause-label" style="color:var(--cyan)">FLIGHT TRAVEL CLAUSE — RED-EYE WINDOW</div>
+      <div class="cv-rules" style="padding-left:0">
+        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.1</span><span class="cv-rule-text">If flight departs between <strong style="color:#fff">00:30 AM and 06:00 AM</strong> — morning run window is physically impossible</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.2</span><span class="cv-rule-text">Upon landing — walk <strong style="color:#fff">5 km from the airport</strong>, GPS verified via Strava. No cab until walk is done.</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.3</span><span class="cv-rule-text">Walk must happen immediately after landing — no hotel first, no delays</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.4</span><span class="cv-rule-text">Instagram post can be delayed until after the walk is uploaded</span></div>
+      </div>
+    </div>
+  </section>
 
- <!-- ── 03 DIGITAL FORTRESS ── -->
- <section class="cv-section cv-section--fort reveal" id="cv-fort">
- <div class="cv-accent" style="background:#00D4FF"></div>
- <div class="cv-watermark">03</div>
- <div class="cv-section-header">
- <div class="cv-disc-icon" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.18)">🏰</div>
- <div>
- <div class="cv-disc-eyebrow" style="color:#00D4FF">DISCIPLINE 03</div>
- <div class="cv-disc-name">DIGITAL FORTRESS</div>
- <div class="cv-disc-sub">DEVICE DISCIPLINE · DEEP FOCUS · PROTECTED HOURS</div>
- </div>
- </div>
- <div class="cv-rules">
- <div class="cv-rule"><span class="cv-rule-num" style="color:#00D4FF">§ 3.1</span><span class="cv-rule-text">No device enters the home — phone stays in the car. No exceptions.</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#00D4FF">§ 3.2</span><span class="cv-rule-text">No social media before morning protocol is complete</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#00D4FF">§ 3.3</span><span class="cv-rule-text">Zero notifications during deep work blocks — complete digital silence</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#00D4FF">§ 3.4</span><span class="cv-rule-text">Laptop stays at office — never brought home</span></div>
- </div>
- </section>
+  <!-- ── 03 DIGITAL FORTRESS ── -->
+  <section class="cv-section cv-section--fort reveal" id="cv-fort">
+    <div class="cv-accent" style="background:#00D4FF"></div>
+    <div class="cv-watermark">03</div>
+    <div class="cv-section-header">
+      <div class="cv-disc-icon" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.18)">🏰</div>
+      <div>
+        <div class="cv-disc-eyebrow" style="color:#00D4FF">DISCIPLINE 03</div>
+        <div class="cv-disc-name">DIGITAL FORTRESS</div>
+        <div class="cv-disc-sub">DEVICE DISCIPLINE · DEEP FOCUS · PROTECTED HOURS</div>
+      </div>
+    </div>
+    <div class="cv-rules">
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#00D4FF">§ 3.1</span><span class="cv-rule-text">No device enters the home — phone stays in the car. No exceptions.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#00D4FF">§ 3.2</span><span class="cv-rule-text">No social media before morning protocol is complete</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#00D4FF">§ 3.3</span><span class="cv-rule-text">Zero notifications during deep work blocks — complete digital silence</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#00D4FF">§ 3.4</span><span class="cv-rule-text">Laptop stays at office — never brought home</span></div>
+    </div>
+  </section>
 
- <!-- ── 04 COMMAND CENTER ── -->
- <section class="cv-section cv-section--cmd reveal" id="cv-cmd">
- <div class="cv-accent" style="background:#AB47BC"></div>
- <div class="cv-watermark">04</div>
- <div class="cv-section-header">
- <div class="cv-disc-icon" style="background:rgba(171,71,188,0.08);border:1px solid rgba(171,71,188,0.18)">⚡</div>
- <div>
- <div class="cv-disc-eyebrow" style="color:#AB47BC">DISCIPLINE 04</div>
- <div class="cv-disc-name">COMMAND CENTER</div>
- <div class="cv-disc-sub">FULLY AUTOMATED · IMMUTABLE RECORDS · THE SYSTEM WATCHES</div>
- </div>
- </div>
- <div class="cv-rules">
- <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.1</span><span class="cv-rule-text">Every metric tracked — sleep, run, gym, food, mood, rituals, deep work</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.2</span><span class="cv-rule-text">93+ daily rituals across morning, midday, and evening — each one checked off</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.3</span><span class="cv-rule-text">Strava + Instagram auto-synced daily — no manual intervention required</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.4</span><span class="cv-rule-text">Historical data is permanently locked — even admin cannot modify past records</span></div>
- <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.5</span><span class="cv-rule-text">No day goes unrecorded. The system is the witness. The ledger is immutable.</span></div>
- </div>
- </section>
+  <!-- ── 04 COMMAND CENTER ── -->
+  <section class="cv-section cv-section--cmd reveal" id="cv-cmd">
+    <div class="cv-accent" style="background:#AB47BC"></div>
+    <div class="cv-watermark">04</div>
+    <div class="cv-section-header">
+      <div class="cv-disc-icon" style="background:rgba(171,71,188,0.08);border:1px solid rgba(171,71,188,0.18)">⚡</div>
+      <div>
+        <div class="cv-disc-eyebrow" style="color:#AB47BC">DISCIPLINE 04</div>
+        <div class="cv-disc-name">COMMAND CENTER</div>
+        <div class="cv-disc-sub">FULLY AUTOMATED · IMMUTABLE RECORDS · THE SYSTEM WATCHES</div>
+      </div>
+    </div>
+    <div class="cv-rules">
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.1</span><span class="cv-rule-text">Every metric tracked — sleep, run, gym, food, mood, rituals, deep work</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.2</span><span class="cv-rule-text">93+ daily rituals across morning, midday, and evening — each one checked off</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.3</span><span class="cv-rule-text">Strava + Instagram auto-synced daily — no manual intervention required</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.4</span><span class="cv-rule-text">Historical data is permanently locked — even admin cannot modify past records</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#AB47BC">§ 5.5</span><span class="cv-rule-text">No day goes unrecorded. The system is the witness. The ledger is immutable.</span></div>
+    </div>
+  </section>
 
- <!-- ── THE DECLARATION ── -->
- <section class="cv-declaration reveal">
- <div class="cv-decl-title">The First Light Declaration</div>
- <div class="cv-oath">
- <div class="cv-oath-line reveal"><span class="cv-oath-num">ONE</span><span class="cv-oath-text">I wake before the sun. Every day. No negotiation.</span></div>
- <div class="cv-oath-line reveal"><span class="cv-oath-num">TWO</span><span class="cv-oath-text">I train every day. Run. Ride. Swim. Walk. Gym. No zero days.</span></div>
- <div class="cv-oath-line reveal"><span class="cv-oath-num">THREE</span><span class="cv-oath-text">I hit 100 km every week. Deficit carries. Exceed 50 km and the penalty is real.</span></div>
- <div class="cv-oath-line reveal"><span class="cv-oath-num">FOUR</span><span class="cv-oath-text">I follow the food code. Six rules. Zero tolerance.</span></div>
- <div class="cv-oath-line reveal"><span class="cv-oath-num">FIVE</span><span class="cv-oath-text">I document everything. The Command Center tracks it. The <a href="accountability.html" style="color:var(--cyan)">Accountability Ledger</a> is public. Historical records are immutable — even I cannot change them.</span></div>
- <div class="cv-oath-line reveal"><span class="cv-oath-num">SIX</span><span class="cv-oath-text">I stake ₹<span data-stake-daily>15,000</span> every single day. Miss once and a stranger collects. <span style="color:var(--gold)">₹<span data-unclaimed>—</span></span> unclaimed so far.</span></div>
- <div class="cv-oath-line reveal"><span class="cv-oath-num">SEVEN</span><span class="cv-oath-text">I control my devices. They do not control me.</span></div>
- <div class="cv-oath-line reveal"><span class="cv-oath-num">EIGHT</span><span class="cv-oath-text">I honour the spiritual disciplines. Japa. Nasya. Brahma Muhurta.</span></div>
- <div class="cv-oath-line reveal"><span class="cv-oath-num">NINE</span><span class="cv-oath-text">I am not trying to win. I am refusing to stop.</span></div>
- </div>
- </section>
+  <!-- ── THE DECLARATION ── -->
+  <section class="cv-declaration reveal">
+    <div class="cv-decl-title">The First Light Declaration</div>
+    <div class="cv-oath">
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">ONE</span><span class="cv-oath-text">I wake before the sun. Every day. No negotiation.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">TWO</span><span class="cv-oath-text">I train every day. Run. Ride. Swim. Walk. Gym. No zero days.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">THREE</span><span class="cv-oath-text">I hit 100 km every week. Deficit carries. Exceed 50 km and the penalty is real.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">FOUR</span><span class="cv-oath-text">I follow the food code. Six rules. Zero tolerance.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">FIVE</span><span class="cv-oath-text">I document everything. The Command Center tracks it. The <a href="accountability.html" style="color:var(--cyan)">Accountability Ledger</a> is public. Historical records are immutable — even I cannot change them.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">SIX</span><span class="cv-oath-text">I stake ₹<span data-stake-daily>15,000</span> every single day. Miss once and a stranger collects. <span style="color:var(--gold)">₹<span data-unclaimed>—</span></span> unclaimed so far.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">SEVEN</span><span class="cv-oath-text">I control my devices. They do not control me.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">EIGHT</span><span class="cv-oath-text">I honour the spiritual disciplines. Japa. Nasya. Brahma Muhurta.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">NINE</span><span class="cv-oath-text">I am not trying to win. I am refusing to stop.</span></div>
+    </div>
+  </section>
 
- <!-- IKIGAI -->
- <div class="cv-ikigai reveal">
- <p>"This is not a challenge. This is not a phase. This is the architecture of the man I am building — one morning at a time."</p>
- </div>
+  <!-- IKIGAI -->
+  <div class="cv-ikigai reveal">
+    <p>"This is not a challenge. This is not a phase. This is the architecture of the man I am building — one morning at a time."</p>
+  </div>
 
- <!-- SIGNED -->
- <div class="cv-signed reveal">
- <div class="cv-signed-date">BOUND SINCE · FEB 10, 2026 · FIRSTLIGHT.LIVE</div>
- <div class="cv-signed-name">ANUPAM KUMAR</div>
- <div style="margin-top:24px;text-align:center">
- <button class="btn btn-outline" id="cvPrintBtn">PRINT / SAVE PDF</button>
- </div>
- </div>
+  <!-- SIGNED -->
+  <div class="cv-signed reveal">
+    <div class="cv-signed-date">BOUND SINCE · FEB 10, 2026 · FIRSTLIGHT.LIVE</div>
+    <div class="cv-signed-name">ANUPAM KUMAR</div>
+    <div style="margin-top:24px;text-align:center">
+      <button class="btn btn-outline" id="cvPrintBtn">PRINT / SAVE PDF</button>
+    </div>
+  </div>
 
 </main>
 
 <!-- Scroll reveal + print -->
 <script>
 (function(){
- var els = document.querySelectorAll('.reveal');
- if (!('IntersectionObserver' in window)) { els.forEach(function(e){ e.classList.add('visible'); }); return; }
- var io = new IntersectionObserver(function(entries){
- entries.forEach(function(entry){
- if (entry.isIntersecting) { entry.target.classList.add('visible'); io.unobserve(entry.target); }
- });
- }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
- els.forEach(function(el){ io.observe(el); });
- var pb = document.getElementById('cvPrintBtn');
- if (pb) pb.addEventListener('click', function(){ window.print(); });
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(function(e){ e.classList.add('visible'); }); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); io.unobserve(entry.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(function(el){ io.observe(el); });
+  var pb = document.getElementById('cvPrintBtn');
+  if (pb) pb.addEventListener('click', function(){ window.print(); });
 })();
 </script>
 
-<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0.774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24.774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
+<footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
 
 <script src="js/config.js"></script>
 <script src="app.js?v=20260613a"></script>
 <script>
 (function(){
- // GSAP reveals
- if (typeof gsap!== 'undefined' && typeof ScrollTrigger!== 'undefined') {
- gsap.registerPlugin(ScrollTrigger);
- gsap.utils.toArray('.reveal').forEach(function(el) {
- gsap.to(el, { opacity:1, y:0, duration:0.8, ease:'power3.out',
- scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
- });
- gsap.utils.toArray('.cv-rule').forEach(function(el, i) {
- gsap.from(el, { opacity:0, x:-20, duration:0.4, delay:i*0.04, ease:'power2.out',
- scrollTrigger: { trigger:el, start:'top 92%', toggleActions:'play none none none' } });
- });
- gsap.utils.toArray('.cv-oath-line').forEach(function(el, i) {
- gsap.from(el, { opacity:0, y:15, duration:0.5, delay:i*0.08, ease:'power2.out',
- scrollTrigger: { trigger:el, start:'top 90%', toggleActions:'play none none none' } });
- });
- } else {
- var obs = new IntersectionObserver(function(entries) {
- entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
- }, { threshold:0.1 });
- document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
- }
+  // GSAP reveals
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal').forEach(function(el) {
+      gsap.to(el, { opacity:1, y:0, duration:0.8, ease:'power3.out',
+        scrollTrigger: { trigger:el, start:'top 88%', toggleActions:'play none none none' } });
+    });
+    gsap.utils.toArray('.cv-rule').forEach(function(el, i) {
+      gsap.from(el, { opacity:0, x:-20, duration:0.4, delay:i*0.04, ease:'power2.out',
+        scrollTrigger: { trigger:el, start:'top 92%', toggleActions:'play none none none' } });
+    });
+    gsap.utils.toArray('.cv-oath-line').forEach(function(el, i) {
+      gsap.from(el, { opacity:0, y:15, duration:0.5, delay:i*0.08, ease:'power2.out',
+        scrollTrigger: { trigger:el, start:'top 90%', toggleActions:'play none none none' } });
+    });
+  } else {
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold:0.1 });
+    document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+  }
 
- // THREE.JS PARTICLES — deep space with cyan + gold
- if (typeof THREE === 'undefined') return;
- var canvas = document.getElementById('cvParticles');
- if (!canvas) return;
- try {
- var w = window.innerWidth, h = window.innerHeight;
- canvas.width = w; canvas.height = h;
- var scene = new THREE.Scene();
- var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
- camera.position.z = 6;
- var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
- renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
- renderer.setClearColor(0x000000, 0);
- var count = w < 768 ? 1500: 4000;
- var geo = new THREE.BufferGeometry();
- var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
- var c1 = new THREE.Color(0x00D4FF), c2 = new THREE.Color(0xF5A623), c3 = new THREE.Color(0x555555);
- for (var i=0;i<count;i++) {
- pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
- var rnd=Math.random(); var c = rnd<0.3?c1:rnd<0.5?c2:c3;
- cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
- }
- geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
- geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
- var mat = new THREE.PointsMaterial({size:1.2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.35, depthWrite:false});
- var pts = new THREE.Points(geo, mat);
- scene.add(pts);
- var clock = new THREE.Clock();
- function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.01; pts.rotation.x=Math.sin(t*0.005)*0.02; renderer.render(scene, camera); }
- animate();
- window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
- window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.1, 1 - (window.scrollY||0)/2000); });
- } catch(e) { canvas.style.display='none'; }
+  // THREE.JS PARTICLES — deep space with cyan + gold
+  if (typeof THREE === 'undefined') return;
+  var canvas = document.getElementById('cvParticles');
+  if (!canvas) return;
+  try {
+    var w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 1000);
+    camera.position.z = 6;
+    var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:false});
+    renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setClearColor(0x000000, 0);
+    var count = w < 768 ? 1500 : 4000;
+    var geo = new THREE.BufferGeometry();
+    var pos = new Float32Array(count*3), cols = new Float32Array(count*3);
+    var c1 = new THREE.Color(0x00D4FF), c2 = new THREE.Color(0xF5A623), c3 = new THREE.Color(0x555555);
+    for (var i=0;i<count;i++) {
+      pos[i*3]=(Math.random()-0.5)*16; pos[i*3+1]=(Math.random()-0.5)*16; pos[i*3+2]=(Math.random()-0.5)*10;
+      var rnd=Math.random(); var c = rnd<0.3?c1:rnd<0.5?c2:c3;
+      cols[i*3]=c.r; cols[i*3+1]=c.g; cols[i*3+2]=c.b;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    var mat = new THREE.PointsMaterial({size:1.2, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.35, depthWrite:false});
+    var pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    var clock = new THREE.Clock();
+    function animate() { requestAnimationFrame(animate); var t=clock.getElapsedTime(); pts.rotation.y=t*0.01; pts.rotation.x=Math.sin(t*0.005)*0.02; renderer.render(scene, camera); }
+    animate();
+    window.addEventListener('resize', function(){ w=window.innerWidth; h=window.innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
+    window.addEventListener('scroll', function(){ canvas.style.opacity = Math.max(0.1, 1 - (window.scrollY||0)/2000); });
+  } catch(e) { canvas.style.display='none'; }
 })();
 </script>
 </body>
