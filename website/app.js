@@ -2481,13 +2481,33 @@ async function updateDaysMissed() {
   var el = document.getElementById('daysMissed');
   if (!el) return;
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
-  // Only count Chapter 2 slips (from STREAK_START onwards)
-  var streakStart = new Date(FL_DEFAULTS.STREAK_START);
+
+  // Chapter dates
+  var streakStart = new Date(FL_DEFAULTS.STREAK_START); // 2026-06-13
+  var chapter1End = new Date('2026-06-12');
+
+  // Count slips per chapter
+  var chapter1Slips = slips.filter(function(slip) {
+    var slipDate = new Date(slip.date);
+    return slipDate <= chapter1End;
+  });
   var chapter2Slips = slips.filter(function(slip) {
     var slipDate = new Date(slip.date);
     return slipDate >= streakStart;
   });
+
+  // Update main counter (Chapter 2 only)
   el.textContent = chapter2Slips.length || '0';
+
+  // Update phase breakdown if elements exist
+  updatePhaseBreakdown(chapter1Slips.length, chapter2Slips.length);
+}
+
+function updatePhaseBreakdown(ch1Count, ch2Count) {
+  var ch1El = document.getElementById('phase1Missed');
+  var ch2El = document.getElementById('phase2Missed');
+  if (ch1El) ch1El.textContent = ch1Count || '0';
+  if (ch2El) ch2El.textContent = ch2Count || '0';
 }
 
 async function updateClaimedAmount() {

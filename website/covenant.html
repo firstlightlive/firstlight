@@ -207,6 +207,78 @@
   </div>
 </div>
 
+<!-- PHASE BREAKDOWN SECTION -->
+<div style="margin-top: 56px; padding: 0 20px;">
+  <h2 style="font-family: var(--font-mono); font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 32px; text-transform: uppercase; background: linear-gradient(135deg, #00D4FF 0%, #F5A623 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">PHASE ACCOUNTABILITY</h2>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 48px;">
+    <!-- PHASE 1: FIRST LIGHT CHAPTER -->
+    <div style="background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(0,212,255,0.02) 100%); border: 1.5px solid rgba(0,212,255,0.15); border-radius: 16px; padding: 28px; backdrop-filter: blur(10px); transition: all 0.3s ease;">
+      <div style="font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; margin-bottom: 16px;">PHASE 1 — CHAPTER 1</div>
+      <div style="font-family: var(--font-mono); font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">FEB 10 — JUN 8, 2026</div>
+      <div style="font-family: var(--font-mono); font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 20px;">110 Days</div>
+      <div style="font-family: var(--font-mono); font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; color: var(--green); text-shadow: 0 0 20px rgba(0,229,160,0.5); margin-bottom: 8px;" id="phase1Missed">0</div>
+      <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.5); text-transform: uppercase;">Days Missed</div>
+    </div>
+
+    <!-- PHASE 2: IRON COVENANT -->
+    <div style="background: linear-gradient(135deg, rgba(255,68,68,0.08) 0%, rgba(245,166,35,0.04) 100%); border: 1.5px solid rgba(255,68,68,0.2); border-radius: 16px; padding: 28px; backdrop-filter: blur(10px); transition: all 0.3s ease;">
+      <div style="font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #FF6666; text-transform: uppercase; margin-bottom: 16px;">PHASE 2 — ACTIVE NOW</div>
+      <div style="font-family: var(--font-mono); font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">JUN 13, 2026 — ∞</div>
+      <div style="font-family: var(--font-mono); font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 20px; font-style: italic;">No End Date</div>
+      <div style="font-family: var(--font-mono); font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; color: #FF4444; text-shadow: 0 0 20px rgba(255,68,68,0.5); margin-bottom: 8px;" id="phase2Missed">0</div>
+      <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.5); text-transform: uppercase;">Days Missed (Current)</div>
+    </div>
+  </div>
+</div>
+
+<!-- CLAIMS SECTION -->
+<div style="margin-top: 56px; padding: 0 20px; border-top: 2px solid rgba(0,212,255,0.1);">
+  <h2 style="font-family: var(--font-mono); font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 800; letter-spacing: -1px; margin: 32px 0; text-transform: uppercase; background: linear-gradient(135deg, #FF4444 0%, #F5A623 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">CLAIM IMPACT</h2>
+
+  <p style="font-family: var(--font-body); color: rgba(255,255,255,0.7); margin-bottom: 32px; font-size: 14px; line-height: 1.6;">
+    When a day is missed, ₹15,000 becomes claimable. Followers can claim it for personal use or donate to charity. This creates accountability through shared responsibility.
+  </p>
+
+  <div class="claims-grid">
+    <!-- CLAIM CARD TEMPLATE -->
+    <div class="claim-card">
+      <div class="claim-day">DAY 5 · JUN 17</div>
+      <div class="claim-status open">OPEN TO CLAIM</div>
+      <div class="claim-amount">₹15,000</div>
+      <div class="claim-action">
+        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 12px;">How would you claim this?</div>
+        <button class="claim-button" onclick="alert('Link to claim form')">CLAIM THIS</button>
+      </div>
+    </div>
+
+    <!-- ADDITIONAL CLAIM CARDS CAN BE ADDED HERE -->
+  </div>
+
+  <!-- CLAIMS IMPACT SUMMARY -->
+  <div class="claims-impact" style="margin-top: 40px;">
+    <div class="impact-title">Claims Dashboard</div>
+    <div class="impact-stats">
+      <div class="impact-stat">
+        <div class="impact-stat-value" id="totalClaimable">₹15,000</div>
+        <div class="impact-stat-label">Total Claimable</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-value" id="totalClaimed">₹0</div>
+        <div class="impact-stat-label">Already Claimed</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-value" id="charityDonated">₹0</div>
+        <div class="impact-stat-label">To Charity</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-value" id="activeClaimCount">1</div>
+        <div class="impact-stat-label">Active Claims</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- DISCIPLINE NAV -->
 <nav class="cv-nav" aria-label="Disciplines">
   <div class="cv-nav-inner">
