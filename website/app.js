@@ -2401,6 +2401,8 @@ function _runInit() {
   setTimeout(updateVisitorCounter, 1000);
   // Update days missed counter
   setTimeout(updateDaysMissed, 500);
+  // Update claimed amount display
+  setTimeout(updateClaimedAmount, 1500);
 }
 
 // Run immediately if DOM is ready, otherwise wait
@@ -2480,4 +2482,20 @@ async function updateDaysMissed() {
   if (!el) return;
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
   el.textContent = slips.length || '0';
+}
+
+async function updateClaimedAmount() {
+  var el = document.getElementById('claimedAmount');
+  if (!el) return;
+  try {
+    if (!window.supabase) return;
+    var { data } = await supabase.from('claims').select('status, amount');
+    if (!data) return;
+    var claimed = data
+      .filter(c => c.status === 'claimed' || c.status === 'paid_to_charity')
+      .reduce((sum, c) => sum + (c.amount || 0), 0);
+    el.textContent = (claimed > 0 ? '₹' : '') + claimed.toLocaleString('en-IN');
+  } catch (e) {
+    console.warn('[Claims] Count error:', e);
+  }
 }
