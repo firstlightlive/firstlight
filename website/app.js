@@ -2632,10 +2632,14 @@ async function updateClaimedAmount() {
     }, 0);
 
     // Total at stake = number of days in Chapter 2 × stake per day (₹15,000)
-    // NOT the sum of claim amounts
-    var stakePerDay = FL_DEFAULTS.STAKE_PER_DAY || 15000;
-    var total = chapter2Claims.length * stakePerDay;  // 6 days × ₹15,000 = ₹90,000
+    // Calculate days from date range, NOT from claims count
+    var streakStartDate = new Date(streakStart + 'T00:00:00');
+    var todayDate = new Date();
+    var daysInChapter2 = Math.floor((todayDate - streakStartDate) / (1000 * 60 * 60 * 24)) + 1;
+    var stakePerDay = 15000;  // Fixed stake for Chapter 2
+    var total = daysInChapter2 * stakePerDay;  // e.g., 6 days × ₹15,000 = ₹90,000
     var unclaimed = total - claimed;  // ₹90,000 - ₹15,000 = ₹75,000
+    console.log('[Claims] Days calculation: from', streakStart, 'to today =', daysInChapter2, 'days. Total:', total);
 
     console.log('[Claims] ===== CALCULATION RESULTS =====');
     console.log('[Claims] Total claims (Ch2 only):', total);
