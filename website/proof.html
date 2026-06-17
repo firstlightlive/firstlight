@@ -460,6 +460,9 @@
         // Stake: live chapter accumulates; closed chapters show CLOSED
         var stake = ch.live ? ((typeof getCumulativeUnclaimed === 'function') ? getCumulativeUnclaimed(dayIn) : dayIn * 15000) : null;
 
+        // Claimed amount: cumulative for this chapter
+        var claimedAmount = ch.live ? 0 : null; // Placeholder for claimed calculation
+
         return {
           day: dayIn,
           chapter: ch.id,
@@ -477,6 +480,7 @@
           hrNum: r.avg_hr ? parseFloat(r.avg_hr) : null,
           food: r.food_clean !== false,
           unclaimed: stake,
+          claimed: claimedAmount,
           source: r.run_source === 'strava' ? 'Strava ✓' : 'Watch',
           // Keep for charts — per-sport + total
           runKmNum: runKm,
@@ -612,6 +616,7 @@
           '<td>'+(r.hr || '—')+'</td>'+
           '<td>'+(r.food ? '<span class="check">✓</span>' : '<span class="miss">✗</span>')+'</td>'+
           '<td style="color:var(--gold)">'+(r.unclaimed==null ? '<span style="color:var(--text-dim);font-size:0.65rem">CLOSED</span>' : '₹'+formatINR(r.unclaimed))+'</td>'+
+          '<td style="color:var(--cyan)">'+(r.claimed==null ? '<span style="color:var(--text-dim);font-size:0.65rem">CLOSED</span>' : '₹'+formatINR(r.claimed))+'</td>'+
           '<td style="color:'+(r.source==='Strava ✓'?'var(--green)':'var(--text-dim)')+'">'+r.source+'</td>'+
         '</tr>';
       }).join('');
@@ -673,9 +678,9 @@
 
     /* ── CSV EXPORT ── */
     document.getElementById('exportCsv').addEventListener('click', function(){
-      var csv = 'CHAPTER,DAY,DATE,SLEEP,SPORTS,DISTANCE,DURATION,AVG HR,FOOD,UNCLAIMED,SOURCE\n';
+      var csv = 'CHAPTER,DAY,DATE,SLEEP,SPORTS,DISTANCE,DURATION,AVG HR,FOOD,UNCLAIMED,CLAIMED,SOURCE\n';
       allRows.forEach(function(r){
-        csv += 'C'+r.chapter+','+r.day+','+r.date+','+r.sleep+','+r.sports+','+r.distance+','+r.duration+','+r.hr+','+(r.food?'YES':'NO')+','+(r.unclaimed==null?'CLOSED':r.unclaimed)+','+r.source+'\n';
+        csv += 'C'+r.chapter+','+r.day+','+r.date+','+r.sleep+','+r.sports+','+r.distance+','+r.duration+','+r.hr+','+(r.food?'YES':'NO')+','+(r.unclaimed==null?'CLOSED':r.unclaimed)+','+(r.claimed==null?'CLOSED':r.claimed)+','+r.source+'\n';
       });
       var blob = new Blob([csv], {type:'text/csv'});
       var a = document.createElement('a');
