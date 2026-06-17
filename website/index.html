@@ -907,6 +907,33 @@
           <div class="holo-stat-label">COMPLETION</div>
         </div>
       </div>
+
+      <!-- CLAIMED vs UNCLAIMED BREAKDOWN -->
+      <div style="margin-top:40px; padding-top:40px; border-top: 1px solid rgba(0,212,255,0.1); max-width:400px; margin-left:auto; margin-right:auto;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+          <div style="text-align:center; padding:12px; background:rgba(0,212,255,0.05); border-radius:8px;">
+            <div style="font-family:var(--font-mono); font-size:clamp(1.2rem, 3vw, 1.6rem); font-weight:800; color:#00D4FF; margin-bottom:4px;" id="homeClaimedBreakdown">₹0</div>
+            <div style="font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,0.5); text-transform:uppercase;">CLAIMED</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:rgba(245,166,35,0.05); border-radius:8px;">
+            <div style="font-family:var(--font-mono); font-size:clamp(1.2rem, 3vw, 1.6rem); font-weight:800; color:#F5A623; margin-bottom:4px;" id="homeUnclaimedBreakdown">₹15,000</div>
+            <div style="font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,0.5); text-transform:uppercase;">UNCLAIMED</div>
+          </div>
+        </div>
+
+        <!-- Visual Breakdown Bar -->
+        <div style="height:6px; background:rgba(255,255,255,0.05); border-radius:99px; overflow:hidden; box-shadow:0 0 15px rgba(0,212,255,0.2) inset; margin-bottom:8px;">
+          <div style="display:grid; grid-template-columns:var(--claimed-pct, 0%) var(--unclaimed-pct, 100%); height:100%;">
+            <div style="background:linear-gradient(90deg, #00D4FF, #00B8FF); box-shadow:0 0 15px rgba(0,212,255,0.4);"></div>
+            <div style="background:linear-gradient(90deg, #F5A623, #E8941C); box-shadow:0 0 15px rgba(245,166,35,0.4);"></div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:var(--claimed-pct, 0%) var(--unclaimed-pct, 100%); gap:0; font-family:var(--font-mono); font-size:9px; font-weight:600; color:rgba(255,255,255,0.5);">
+          <div id="homeClaimedLabel" style="text-align:left;">CLAIMED 0%</div>
+          <div id="homeUnclaimedLabel" style="text-align:right;">UNCLAIMED 100%</div>
+        </div>
+      </div>
+
       <a href="accountability.html" class="holo-cta">CLAIM IF I MISS</a>
       <div style="margin-top:20px;font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;line-height:1.8;max-width:360px;text-align:center">
         WEEKLY: 100 km minimum (all sports)<br>

@@ -2569,21 +2569,47 @@ async function updateClaimedAmount() {
 }
 
 function updateBreakdownVisualization(claimed, unclaimed, total) {
-  if (total === 0) return;
+  if (total === 0) {
+    // If no claims, show 0% claimed, 100% unclaimed
+    var claimedPct = 0;
+    var unclaimedPct = 100;
+  } else {
+    var claimedPct = Math.round((claimed / total) * 100);
+    var unclaimedPct = 100 - claimedPct;
+  }
 
-  var claimedPct = Math.round((claimed / total) * 100);
-  var unclaimedPct = 100 - claimedPct;
-
-  // Update CSS variables for breakdown bar
+  // Update CSS variables for covenant breakdown bar
   var card = document.querySelector('.accountability-card');
   if (card) {
     card.style.setProperty('--claimed-pct', claimedPct + '%');
     card.style.setProperty('--unclaimed-pct', unclaimedPct + '%');
   }
 
-  // Update breakdown labels
+  // Update covenant breakdown labels
   var claimedLabel = document.getElementById('claimedLabel');
   var unclaimedLabel = document.getElementById('unclaimedLabel');
   if (claimedLabel) claimedLabel.textContent = 'CLAIMED ' + claimedPct + '%';
   if (unclaimedLabel) unclaimedLabel.textContent = 'UNCLAIMED ' + unclaimedPct + '%';
+
+  // Update home hero breakdown
+  var homeClaimedBreakdown = document.querySelector('[id="homeClaimedBreakdown"]');
+  var homeUnclaimedBreakdown = document.querySelector('[id="homeUnclaimedBreakdown"]');
+  if (homeClaimedBreakdown || homeUnclaimedBreakdown) {
+    // Update CSS variables for home breakdown bar
+    var homeBreakdownStyle = document.createElement('style');
+    homeBreakdownStyle.textContent = ':root { --claimed-pct: ' + claimedPct + '%; --unclaimed-pct: ' + unclaimedPct + '%; }';
+    if (!document.querySelector('#homeBreakdownStyle')) {
+      homeBreakdownStyle.id = 'homeBreakdownStyle';
+      document.head.appendChild(homeBreakdownStyle);
+    }
+
+    if (homeClaimedBreakdown) homeClaimedBreakdown.textContent = (claimed > 0 ? '₹' : '₹') + claimed.toLocaleString('en-IN');
+    if (homeUnclaimedBreakdown) homeUnclaimedBreakdown.textContent = '₹' + unclaimed.toLocaleString('en-IN');
+  }
+
+  // Update home breakdown labels
+  var homeClaimedLabel = document.getElementById('homeClaimedLabel');
+  var homeUnclaimedLabel = document.getElementById('homeUnclaimedLabel');
+  if (homeClaimedLabel) homeClaimedLabel.textContent = 'CLAIMED ' + claimedPct + '%';
+  if (homeUnclaimedLabel) homeUnclaimedLabel.textContent = 'UNCLAIMED ' + unclaimedPct + '%';
 }
