@@ -247,11 +247,12 @@ body::before{
 @media(max-width:768px){body::before{display:none}}
 body>*{position:relative;z-index:1}
 
-/* ── ACCESSIBILITY: Reduced motion ── */
+/* ── ACCESSIBILITY: Reduced motion + no-gsap fallback ── */
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
   .reveal{opacity:1!important;transform:none!important}
 }
+.no-gsap .reveal{opacity:1!important;transform:none!important}
 
 /* ── NAVIGATION ── */
 .nav{

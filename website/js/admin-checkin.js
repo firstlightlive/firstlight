@@ -685,9 +685,9 @@ async function checkMissedRunPunishment() {
       return;
     }
 
-    // Check strava_activities for a run before 6:15 AM IST today
+    // Check strava_activities for a run before 6:00 AM IST today (T00:30:00 UTC)
     var runs = await sbFetch('strava_activities', 'GET', null,
-      '?type=eq.Run&start_date_local=gte.' + today + 'T00:00:00&start_date_local=lt.' + today + 'T06:15:00&select=id,name,distance,start_date_local&limit=1');
+      '?type=eq.Run&start_date_local=gte.' + today + 'T00:00:00&start_date_local=lt.' + today + 'T00:30:00&select=id,name,distance,start_date_local&limit=1');
 
     // CRITICAL: if network failed (null returned), do NOT penalise — bail safely
     if (runs === null || runs === undefined) {
