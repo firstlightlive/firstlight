@@ -4,9 +4,9 @@
 
 var TAGS = {
   niche: ['#5amrunner','#morningrunner','#runstreak','#publicaccountability','#dailydiscipline','#morningdiscipline','#noexcusesrunning','#earlymorningrun','#5kchallenge','#fitnessaccountability'],
-  medium: ['#disciplineovermotivation','#runningcommunity','#consistencyiskey','#gymlife','#morningroutine','#earlymorningworkout','#runnersofinstagram'],
+  medium: ['#disciplineovermotivation','#runningcommunity','#consistencyiskey','#morningroutine','#earlymorningworkout','#runnersofinstagram'],
   branded: ['#firstlightlive','#ironcovenantchallenge'],
-  location: ['#bangalorerunners','#bengalurufitness','#blrrunners','#bangalorefitness','#whitefieldgym']
+  location: ['#bangalorerunners','#bengalurufitness','#blrrunners','#bangalorefitness','#whitefieldruns']
 };
 var selectedTags = [];
 
@@ -113,7 +113,7 @@ function adjustCounter(id, delta) {
 function copyBio() {
   var day = getDayNumber();
   var unclaimed = '₹' + formatINR(getUnclaimed(day));
-  var bio = 'Miss 1 day = ₹15,000 to a follower. Cash.\n' + day + ' days. 0 misses. ' + unclaimed + ' unclaimed.\nRun + Gym + Food Code. Before 6AM. Daily.\nBLR | Follow to collect if I fail.';
+  var bio = 'Miss 1 day = ₹15,000 to a follower. Cash.\n' + day + ' days. 0 misses. ' + unclaimed + ' unclaimed.\nRun + Food Code. Before 6AM. Daily.\nBLR | Follow to collect if I fail.';
   navigator.clipboard.writeText(bio).then(function() {
     var btn = document.querySelector('[onclick="copyBio()"]');
     btn.classList.add('copied'); btn.textContent = 'COPIED ✓';

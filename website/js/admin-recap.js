@@ -153,8 +153,8 @@
     }
   };
 
-  var sportIcons = { Run: 'RUN', Ride: 'RIDE', Swim: 'SWIM', Walk: 'WALK', Workout: 'GYM', WeightTraining: 'GYM', VirtualRun: 'RUN', Yoga: 'YOGA' };
-  var sportColors = { Run: '#FC4C02', Ride: '#00D4FF', Swim: '#6EE7B7', Walk: '#F5A623', Workout: '#C084FC', WeightTraining: '#C084FC', VirtualRun: '#FC4C02' };
+  var sportIcons = { Run: 'RUN', Ride: 'RIDE', Swim: 'SWIM', Walk: 'WALK', VirtualRun: 'RUN', Yoga: 'YOGA' };
+  var sportColors = { Run: '#FC4C02', Ride: '#00D4FF', Swim: '#6EE7B7', Walk: '#F5A623', VirtualRun: '#FC4C02' };
 
   // ── Fetch Strava Data ──
   function fetchActivities(startDate, endDate, cb) {
