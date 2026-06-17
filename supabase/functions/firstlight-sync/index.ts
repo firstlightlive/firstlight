@@ -1174,6 +1174,35 @@ async function preflight() {
 }
 
 // ═══════════════════════════════════════════
+// ADMIN READ/WRITE PROXY — for locked tables
+// ═══════════════════════════════════════════
+async function adminRead(body: Record<string, unknown>) {
+  const { table, select = '*', eq, limit = 100, order } = body as any
+  if (!table) throw new Error('Missing table name')
+
+  let q = supaAdmin.from(table).select(select)
+  if (eq) {
+    const [col, val] = (eq as string).split(':')
+    q = q.eq(col, val)
+  }
+  if (order) q = q.order(order.split(':')[0], { ascending: order.includes('asc') })
+  if (limit) q = q.limit(Math.min(limit, 1000))
+
+  const { data, error } = await q
+  if (error) throw error
+  return { success: true, data }
+}
+
+async function adminWrite(body: Record<string, unknown>) {
+  const { table, data, onConflict = 'id' } = body as any
+  if (!table || !data) throw new Error('Missing table or data')
+
+  const { error } = await supaAdmin.from(table).upsert(data, { onConflict })
+  if (error) throw error
+  return { success: true, message: `Upserted into ${table}` }
+}
+
+// ═══════════════════════════════════════════
 // MAIN HANDLER
 // ═══════════════════════════════════════════
 Deno.serve(async (req) => {
@@ -1202,6 +1231,20 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }), { headers })
   }
 
+  // Data deletion callback — Meta/Facebook compliance
+  if (action === 'delete-user-data') {
+    try {
+      const body = await req.json()
+      console.log('Data deletion request received:', body)
+      return new Response(JSON.stringify({
+        url: 'https://firstlight.live/privacy.html',
+        confirmation_code: body.signed_request ? 'acknowledged' : 'error'
+      }), { headers })
+    } catch (_e) {
+      return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400, headers })
+    }
+  }
+
   // Health ingest — uses its own secret
   if (action === 'health-ingest') {
     const webhookSecret = await getSecret('health_webhook_secret')
@@ -1221,6 +1264,28 @@ Deno.serve(async (req) => {
   // All other actions require admin key
   if (!isAuthed) {
     return new Response(JSON.stringify({ error: 'Unauthorized — missing or invalid API key' }), { status: 403, headers })
+  }
+
+  // Admin read proxy — for locked tables
+  if (action === 'admin-read') {
+    try {
+      const body = await req.json()
+      const result = await adminRead(body)
+      return new Response(JSON.stringify(result), { headers })
+    } catch (e) {
+      return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers })
+    }
+  }
+
+  // Admin write proxy — for locked tables
+  if (action === 'admin-write') {
+    try {
+      const body = await req.json()
+      const result = await adminWrite(body)
+      return new Response(JSON.stringify(result), { headers })
+    } catch (e) {
+      return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers })
+    }
   }
 
   try {

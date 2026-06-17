@@ -1,0 +1,14 @@
+{
+  "name": "firstlight-sync",
+  "version": "2.0.0",
+  "description": "FirstLight daily sync — Strava + Instagram + Proof Archive + GCS Upload",
+  "main": "index.js",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.4.0",
+    "@google-cloud/storage": "^7.19.0",
+    "google-auth-library": "^9.15.0"
+  }
+}

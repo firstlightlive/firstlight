@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FirstLight App Icon</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1024px;
+            height: 1024px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0A0C10 0%, #1a1d2e 100%);
+            font-family: 'IBM Plex Mono', monospace;
+            overflow: hidden;
+        }
+        .icon {
+            width: 900px;
+            height: 900px;
+            border-radius: 200px;
+            background: linear-gradient(135deg, #0a0c10 0%, #1a1d2e 100%);
+            border: 2px solid #00D4FF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 60px rgba(0, 212, 255, 0.2), inset 0 0 60px rgba(245, 166, 35, 0.05);
+        }
+        .icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        .symbol {
+            font-size: 240px;
+            color: #00D4FF;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 30px;
+            text-shadow: 0 0 40px rgba(0, 212, 255, 0.4);
+        }
+        .text {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            font-size: 24px;
+            letter-spacing: 2px;
+            color: #F5A623;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div class="icon">
+        <div class="content">
+            <div class="symbol">◆</div>
+            <div class="text">FIRST</div>
+            <div class="text" style="color: #F5A623;">LIGHT</div>
+            <div class="tagline">3:15 AM</div>
+        </div>
+    </div>
+</body>
+</html>
