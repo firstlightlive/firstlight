@@ -2631,8 +2631,11 @@ async function updateClaimedAmount() {
       return sum + (c.amount || 0);
     }, 0);
 
-    var total = chapter2Claims.reduce((sum, c) => sum + (c.amount || 0), 0);
-    var unclaimed = total - claimed;
+    // Total at stake = number of days in Chapter 2 × stake per day (₹15,000)
+    // NOT the sum of claim amounts
+    var stakePerDay = FL_DEFAULTS.STAKE_PER_DAY || 15000;
+    var total = chapter2Claims.length * stakePerDay;  // 6 days × ₹15,000 = ₹90,000
+    var unclaimed = total - claimed;  // ₹90,000 - ₹15,000 = ₹75,000
 
     console.log('[Claims] ===== CALCULATION RESULTS =====');
     console.log('[Claims] Total claims (Ch2 only):', total);
@@ -2706,4 +2709,12 @@ function updateBreakdownVisualization(claimed, unclaimed, total) {
   var homeUnclaimedLabel = document.getElementById('homeUnclaimedLabel');
   if (homeClaimedLabel) homeClaimedLabel.textContent = 'CLAIMED ' + claimedPct + '%';
   if (homeUnclaimedLabel) homeUnclaimedLabel.textContent = 'UNCLAIMED ' + unclaimedPct + '%';
+
+  // Update data-unclaimed displays (streak page, evidence page, etc)
+  document.querySelectorAll('[data-unclaimed]').forEach(function(el) {
+    el.textContent = unclaimed.toLocaleString('en-IN');
+  });
+  document.querySelectorAll('[data-unclaimed-plain]').forEach(function(el) {
+    el.textContent = unclaimed.toLocaleString('en-IN');
+  });
 }
