@@ -2529,7 +2529,8 @@ function updatePhaseBreakdown(ch1Count, ch2Count) {
 
 async function updateClaimedAmount() {
   var el = document.getElementById('claimedAmount');
-  if (!el) return;
+  var heroEl = document.getElementById('claimedAmountHero');
+  if (!el && !heroEl) return;
   try {
     if (!window.supabase) return;
     var { data } = await supabase.from('claims').select('claim_date, status, amount');
@@ -2548,7 +2549,13 @@ async function updateClaimedAmount() {
     var total = chapter2Claims.reduce((sum, c) => sum + (c.amount || 0), 0);
     var unclaimed = total - claimed;
 
-    el.textContent = (claimed > 0 ? '₹' : '') + claimed.toLocaleString('en-IN');
+    var displayText = (claimed > 0 ? '₹' : '') + claimed.toLocaleString('en-IN');
+
+    // Update covenant page display
+    if (el) el.textContent = displayText;
+
+    // Update hero section on dashboard
+    if (heroEl) heroEl.textContent = displayText;
 
     // Update breakdown visualization
     updateBreakdownVisualization(claimed, unclaimed, total);
