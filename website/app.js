@@ -2481,7 +2481,13 @@ async function updateDaysMissed() {
   var el = document.getElementById('daysMissed');
   if (!el) return;
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
-  el.textContent = slips.length || '0';
+  // Only count Chapter 2 slips (from STREAK_START onwards)
+  var streakStart = new Date(FL_DEFAULTS.STREAK_START);
+  var chapter2Slips = slips.filter(function(slip) {
+    var slipDate = new Date(slip.date);
+    return slipDate >= streakStart;
+  });
+  el.textContent = chapter2Slips.length || '0';
 }
 
 async function updateClaimedAmount() {
@@ -2489,12 +2495,20 @@ async function updateClaimedAmount() {
   if (!el) return;
   try {
     if (!window.supabase) return;
-    var { data } = await supabase.from('claims').select('status, amount');
+    var { data } = await supabase.from('claims').select('claim_date, status, amount');
     if (!data) return;
-    var claimed = data
+
+    // Only count Chapter 2 claims (from STREAK_START onwards)
+    var streakStart = new Date(FL_DEFAULTS.STREAK_START);
+    var chapter2Claims = data.filter(function(c) {
+      var claimDate = c.claim_date ? new Date(c.claim_date) : new Date();
+      return claimDate >= streakStart;
+    });
+
+    var claimed = chapter2Claims
       .filter(c => c.status === 'claimed' || c.status === 'paid_to_charity')
       .reduce((sum, c) => sum + (c.amount || 0), 0);
-    var total = data.reduce((sum, c) => sum + (c.amount || 0), 0);
+    var total = chapter2Claims.reduce((sum, c) => sum + (c.amount || 0), 0);
     var unclaimed = total - claimed;
 
     el.textContent = (claimed > 0 ? '₹' : '') + claimed.toLocaleString('en-IN');
