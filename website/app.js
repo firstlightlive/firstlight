@@ -2399,6 +2399,8 @@ function _runInit() {
   trackVisitor();
   // Update visitor counter display
   setTimeout(updateVisitorCounter, 1000);
+  // Update days missed counter
+  setTimeout(updateDaysMissed, 500);
 }
 
 // Run immediately if DOM is ready, otherwise wait
@@ -2471,4 +2473,11 @@ async function updateVisitorCounter() {
   el.textContent = '...'; // Show loading state
   var total = await getTotalVisitors();
   el.textContent = total > 0 ? total.toLocaleString('en-IN') : '0';
+}
+
+async function updateDaysMissed() {
+  var el = document.getElementById('daysMissed');
+  if (!el) return;
+  var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
+  el.textContent = slips.length || '0';
 }
