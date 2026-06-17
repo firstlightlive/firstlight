@@ -2530,7 +2530,8 @@ function updatePhaseBreakdown(ch1Count, ch2Count) {
 async function updateClaimedAmount() {
   var el = document.getElementById('claimedAmount');
   var heroEl = document.getElementById('claimedAmountHero');
-  if (!el && !heroEl) return;
+  var proofEl = document.getElementById('proofClaimedCard');
+  if (!el && !heroEl && !proofEl) return;
   try {
     if (!window.supabase) return;
     var { data } = await supabase.from('claims').select('claim_date, status, amount');
@@ -2556,6 +2557,9 @@ async function updateClaimedAmount() {
 
     // Update hero section on dashboard
     if (heroEl) heroEl.textContent = displayText;
+
+    // Update proof page display
+    if (proofEl) proofEl.textContent = displayText;
 
     // Update breakdown visualization
     updateBreakdownVisualization(claimed, unclaimed, total);
