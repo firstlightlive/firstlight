@@ -171,26 +171,37 @@
     <h1>THE IRON<br>COVENANT</h1>
     <div class="cv-hero-rule"></div>
     <div class="cv-hero-sub">4 DISCIPLINES · 20 RULES · ₹<span data-stake-daily>15,000</span> PER DAY AT STAKE</div>
-    <div class="cv-stats-bar">
-      <div class="cv-stat-item">
-        <div class="cv-stat-val" data-day>—</div>
-        <div class="cv-stat-label">DAYS HONORED</div>
+    <!-- ACCOUNTABILITY IMPACT CARD -->
+    <div class="accountability-card" style="margin-top:40px">
+      <div class="accountability-grid">
+        <div class="accountability-metric">
+          <div class="accountability-value missed" id="daysMissed">0</div>
+          <div class="accountability-label">Days Missed</div>
+        </div>
+        <div class="accountability-metric">
+          <div class="accountability-value claimed" id="claimedAmount">₹0</div>
+          <div class="accountability-label">Claimed</div>
+        </div>
+        <div class="accountability-metric">
+          <div class="accountability-value unclaimed" data-unclaimed>—</div>
+          <div class="accountability-label">Unclaimed</div>
+        </div>
+        <div class="accountability-metric">
+          <div class="accountability-value" style="color:#00E5A0; text-shadow: 0 0 20px rgba(0,229,160,0.6);" data-day>—</div>
+          <div class="accountability-label">Days Honored</div>
+        </div>
       </div>
-      <div class="cv-stat-item">
-        <div class="cv-stat-val" style="color:var(--gold)" data-unclaimed>—</div>
-        <div class="cv-stat-label">₹ UNCLAIMED</div>
-      </div>
-      <div class="cv-stat-item">
-        <div class="cv-stat-val" id="claimedAmount" style="color:var(--cyan)">0</div>
-        <div class="cv-stat-label">₹ CLAIMED</div>
-      </div>
-      <div class="cv-stat-item">
-        <div class="cv-stat-val" id="daysMissed" style="color:var(--green)">0</div>
-        <div class="cv-stat-label">VIOLATIONS</div>
-      </div>
-      <div class="cv-stat-item">
-        <div class="cv-stat-val" style="color:rgba(255,255,255,0.25)">∞</div>
-        <div class="cv-stat-label">END DATE</div>
+
+      <!-- BREAKDOWN BAR -->
+      <div class="accountability-breakdown">
+        <div class="breakdown-bar" style="--claimed-width: var(--claimed-pct, 0%); --unclaimed-width: var(--unclaimed-pct, 100%);">
+          <div class="breakdown-claimed"></div>
+          <div class="breakdown-unclaimed"></div>
+        </div>
+        <div class="breakdown-labels" style="--claimed-width: var(--claimed-pct, 0%); --unclaimed-width: var(--unclaimed-pct, 100%);">
+          <div class="breakdown-label-left" id="claimedLabel">CLAIMED 0%</div>
+          <div class="breakdown-label-right" id="unclaimedLabel">UNCLAIMED 100%</div>
+        </div>
       </div>
     </div>
   </div>

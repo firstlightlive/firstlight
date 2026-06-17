@@ -2494,8 +2494,34 @@ async function updateClaimedAmount() {
     var claimed = data
       .filter(c => c.status === 'claimed' || c.status === 'paid_to_charity')
       .reduce((sum, c) => sum + (c.amount || 0), 0);
+    var total = data.reduce((sum, c) => sum + (c.amount || 0), 0);
+    var unclaimed = total - claimed;
+
     el.textContent = (claimed > 0 ? '₹' : '') + claimed.toLocaleString('en-IN');
+
+    // Update breakdown visualization
+    updateBreakdownVisualization(claimed, unclaimed, total);
   } catch (e) {
     console.warn('[Claims] Count error:', e);
   }
+}
+
+function updateBreakdownVisualization(claimed, unclaimed, total) {
+  if (total === 0) return;
+
+  var claimedPct = Math.round((claimed / total) * 100);
+  var unclaimedPct = 100 - claimedPct;
+
+  // Update CSS variables for breakdown bar
+  var card = document.querySelector('.accountability-card');
+  if (card) {
+    card.style.setProperty('--claimed-pct', claimedPct + '%');
+    card.style.setProperty('--unclaimed-pct', unclaimedPct + '%');
+  }
+
+  // Update breakdown labels
+  var claimedLabel = document.getElementById('claimedLabel');
+  var unclaimedLabel = document.getElementById('unclaimedLabel');
+  if (claimedLabel) claimedLabel.textContent = 'CLAIMED ' + claimedPct + '%';
+  if (unclaimedLabel) unclaimedLabel.textContent = 'UNCLAIMED ' + unclaimedPct + '%';
 }

@@ -601,6 +601,176 @@ a,button,.btn,.btn-copy,.btn-outline,.gym-split-btn,.bf-toggle-btn,.ritual-item,
   letter-spacing:3px;color:var(--text-muted);margin-top:8px;
 }
 
+/* ── ACCOUNTABILITY IMPACT CARD ── */
+.accountability-card {
+  background: linear-gradient(135deg, rgba(0,212,255,0.04) 0%, rgba(255,68,68,0.02) 100%);
+  border: 1.5px solid rgba(0,212,255,0.15);
+  border-radius: 16px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(0,212,255,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.accountability-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+}
+
+.accountability-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+  pointer-events: none;
+  opacity: 0;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-20px, -20px) scale(1.1); }
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.accountability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.accountability-metric {
+  text-align: center;
+  padding: 16px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.accountability-metric:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  transform: translateY(-4px);
+}
+
+.accountability-value {
+  font-family: var(--font-mono);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px currentColor;
+  animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.accountability-value.missed {
+  color: #FF4444;
+  text-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+}
+
+.accountability-value.claimed {
+  color: #00D4FF;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+}
+
+.accountability-value.unclaimed {
+  color: #F5A623;
+  text-shadow: 0 0 20px rgba(245, 166, 35, 0.6);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.accountability-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.accountability-breakdown {
+  position: relative;
+  z-index: 2;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.breakdown-bar {
+  display: grid;
+  grid-template-columns: var(--claimed-width) var(--unclaimed-width);
+  gap: 0;
+  height: 8px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 0 20px rgba(0,212,255,0.2) inset;
+}
+
+.breakdown-claimed {
+  background: linear-gradient(90deg, #00D4FF, #00B8FF);
+  box-shadow: 0 0 20px rgba(0,212,255,0.4);
+  animation: expandWidth 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.breakdown-unclaimed {
+  background: linear-gradient(90deg, #F5A623, #E8941C);
+  box-shadow: 0 0 20px rgba(245,166,35,0.4);
+  animation: expandWidth 0.8s cubic-bezier(0.23, 1, 0.320, 1) 0.1s backwards;
+}
+
+@keyframes expandWidth {
+  from {
+    flex-basis: 0%;
+  }
+}
+
+.breakdown-labels {
+  display: grid;
+  grid-template-columns: var(--claimed-width) var(--unclaimed-width);
+  gap: 0;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.breakdown-label-left {
+  color: #00D4FF;
+  text-align: left;
+}
+
+.breakdown-label-right {
+  color: #F5A623;
+  text-align: right;
+}
+
 /* ── STEPS ── */
 .step{display:flex;gap:20px;align-items:flex-start;padding:24px 0}
 .step-num{
