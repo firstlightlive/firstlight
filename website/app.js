@@ -2405,6 +2405,23 @@ function _runInit() {
   setTimeout(updateClaimedAmount, 1500);
 }
 
+// Force fresh data on page load - clear stale cache
+(function() {
+  var lastCacheTime = localStorage.getItem('fl_cache_time');
+  var now = Date.now();
+  var cacheAge = lastCacheTime ? now - parseInt(lastCacheTime) : 999999;
+
+  // Clear cache if older than 5 minutes
+  if (cacheAge > 5 * 60 * 1000) {
+    localStorage.removeItem('fl_slips');
+    localStorage.removeItem('fl_claims');
+    localStorage.removeItem('fl_cache_time');
+    console.log('[CACHE] Cleared stale data, fetching fresh from Supabase');
+  }
+
+  localStorage.setItem('fl_cache_time', now.toString());
+})();
+
 // Run immediately if DOM is ready, otherwise wait
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', _runInit);
