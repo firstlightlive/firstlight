@@ -2299,15 +2299,6 @@
             var proof=await sbFetch('proof_archive','GET',null,'?date=eq.'+todayStr+'&select=date&limit=1');
             var hasProof=proof&&Array.isArray(proof)&&proof.length>0;
 
-            if(!hasStrava&&!hasProof){
-              var banner=document.createElement('div');
-              banner.id='syncBanner';
-              banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px 20px;text-align:center;font-family:var(--font-mono);font-size:11px;letter-spacing:1px;transition:opacity 0.3s';
-              banner.style.background='linear-gradient(135deg,rgba(245,166,35,0.95),rgba(200,130,20,0.95))';
-              banner.style.color='#fff';
-              banner.innerHTML='\u23F3 Today\'s data not synced yet — auto-syncs at 6, 9, 12, 3, 6, 9, 11 PM or force sync from Command Center. <span onclick="this.parentElement.style.display=\'none\'" style="cursor:pointer;margin-left:8px;opacity:0.7">\u2715</span>';
-              if(!document.getElementById('syncBanner'))document.body.prepend(banner);
-            }
           }
         }catch(e){console.warn('[SyncCheck]',e);}
       })();
