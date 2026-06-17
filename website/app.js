@@ -2482,15 +2482,9 @@ async function updateDaysMissed() {
   if (!el) return;
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
 
-  console.log('[DEBUG] All slips:', slips);
-  console.log('[DEBUG] Total slips count:', slips.length);
-
   // Chapter dates
   var streakStart = new Date(FL_DEFAULTS.STREAK_START); // 2026-06-13
   var chapter1End = new Date('2026-06-12');
-
-  console.log('[DEBUG] Streak start:', streakStart);
-  console.log('[DEBUG] Chapter 1 end:', chapter1End);
 
   // Count slips per chapter
   var chapter1Slips = slips.filter(function(slip) {
@@ -2499,12 +2493,8 @@ async function updateDaysMissed() {
   });
   var chapter2Slips = slips.filter(function(slip) {
     var slipDate = new Date(slip.date);
-    console.log('[DEBUG] Checking slip:', slip.date, 'against', streakStart, 'result:', slipDate >= streakStart);
     return slipDate >= streakStart;
   });
-
-  console.log('[DEBUG] Chapter 1 slips:', chapter1Slips.length);
-  console.log('[DEBUG] Chapter 2 slips:', chapter2Slips.length);
 
   // Update main counter (Chapter 2 only)
   el.textContent = chapter2Slips.length || '0';
