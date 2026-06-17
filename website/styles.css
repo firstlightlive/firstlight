@@ -225,6 +225,18 @@ p{color:var(--text-muted);line-height:1.7}
   .container{padding:0 12px}
 }
 
+/* ── ULTRA-SMALL MOBILE (375px and below) — Proof table optimization ── */
+@media(max-width:375px){
+  .proof-table{font-size:0.55rem;line-height:1.2}
+  .proof-table th{padding:4px 2px;text-align:center}
+  .proof-table td{padding:4px 2px}
+  .proof-table tbody tr{border-bottom:1px solid rgba(255,255,255,0.05)}
+  .table-wrap{padding:0 4px;margin:0 -4px}
+  /* Stack critical columns only on extreme mobile */
+  .proof-table th:nth-child(n+5),
+  .proof-table td:nth-child(n+5){font-size:0.45rem}
+}
+
 /* ── SCANLINE TEXTURE (disabled on mobile for performance) ── */
 body::before{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;

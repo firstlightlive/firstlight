@@ -74,7 +74,12 @@
 
   // ── Data ──
   function fetchDay(dateStr, cb) {
-    var url = SUPA + '/rest/v1/strava_activities?start_date_local=gte.' + dateStr + 'T00:00:00&start_date_local=lt.' + dateStr + 'T23:59:59&select=start_date_local,type,sport_type,name,distance,moving_time,average_heartrate&order=start_date_local.asc';
+    // Deadline is 6 AM, so fetch from 6 AM on dateStr to 6 AM on next date
+    var parts = dateStr.split('-');
+    var nextDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    nextDate.setDate(nextDate.getDate() + 1);
+    var nextDateStr = nextDate.getFullYear() + '-' + String(nextDate.getMonth() + 1).padStart(2, '0') + '-' + String(nextDate.getDate()).padStart(2, '0');
+    var url = SUPA + '/rest/v1/strava_activities?start_date_local=gte.' + dateStr + 'T00:30:00&start_date_local=lt.' + nextDateStr + 'T00:30:00&select=start_date_local,type,sport_type,name,distance,moving_time,average_heartrate&order=start_date_local.asc';
     fetch(url, { headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY } })
       .then(function(r) { return r.json(); })
       .then(function(data) { cb(null, Array.isArray(data) ? data : []); })

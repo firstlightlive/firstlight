@@ -64,7 +64,7 @@
 
   function getDayNum() {
     if (typeof getDayNumber === 'function') return getDayNumber();
-    var start = new Date('2026-06-13T00:00:00+05:30');
+    var start = new Date('2026-06-13T00:30:00+05:30'); // Deadline is 6 AM
     var now = new Date();
     var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     var ist = new Date(utc + (5.5 * 3600000));
@@ -575,8 +575,10 @@
       if (d.swim_km) setVal('swimKm', parseFloat(d.swim_km).toFixed(1), ' KM');
     });
 
-    // This week's Strava activities
-    fetchSB('strava_activities', '?start_date_local=gte.' + mondayStr + 'T00:00:00&select=type,distance,moving_time,start_date_local&order=start_date_local.asc').then(function (acts) {
+    // This week's Strava activities (Mon 6 AM to next Mon 6 AM, since deadline is 6 AM)
+    var nextMondayDate = new Date(ist); nextMondayDate.setDate(ist.getDate() + (8 - ist.getDay()));
+    var nextMondayStr = nextMondayDate.getFullYear() + '-' + String(nextMondayDate.getMonth() + 1).padStart(2, '0') + '-' + String(nextMondayDate.getDate()).padStart(2, '0');
+    fetchSB('strava_activities', '?start_date_local=gte.' + mondayStr + 'T00:30:00&start_date_local=lt.' + nextMondayStr + 'T00:30:00&select=type,distance,moving_time,start_date_local&order=start_date_local.asc').then(function (acts) {
       if (!acts || !acts.length) return;
 
       var totalSec = 0, runKm = 0, bikeKm = 0, swimKm = 0, walkKm = 0;
@@ -630,8 +632,11 @@
     });
 
     // Today's Strava — render ALL activities dynamically (include sport_type for Dance/Boxing/etc)
+    // Deadline is 6 AM, so fetch from 6 AM today to 6 AM tomorrow
     console.log('[home] Fetching today activities for: ' + todayStr);
-    fetchSB('strava_activities', '?start_date_local=gte.' + todayStr + 'T00:00:00&start_date_local=lt.' + todayStr + 'T23:59:59&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
+    var tomorrowDate = new Date(ist); tomorrowDate.setDate(ist.getDate() + 1);
+    var tomorrowStr = tomorrowDate.getFullYear() + '-' + String(tomorrowDate.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrowDate.getDate()).padStart(2, '0');
+    fetchSB('strava_activities', '?start_date_local=gte.' + todayStr + 'T00:30:00&start_date_local=lt.' + tomorrowStr + 'T00:30:00&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
       console.log('[home] Today activities result:', acts.length, 'items', acts);
       renderActivityCards(acts || [], 'todayActivities', 'No activities logged yet today', 'Activities appear here as soon as they sync from Strava');
       if (acts && acts.length) {
@@ -641,11 +646,11 @@
       }
     });
 
-    // Yesterday's Strava activities
+    // Yesterday's Strava activities (from 6 AM yesterday to 6 AM today)
     var yesterday = new Date(ist);
     yesterday.setDate(ist.getDate() - 1);
     var yesterdayStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0');
-    fetchSB('strava_activities', '?start_date_local=gte.' + yesterdayStr + 'T00:00:00&start_date_local=lt.' + yesterdayStr + 'T23:59:59&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
+    fetchSB('strava_activities', '?start_date_local=gte.' + yesterdayStr + 'T00:30:00&start_date_local=lt.' + todayStr + 'T00:30:00&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
       renderActivityCards(acts || [], 'yesterdayActivities', 'No activities logged yesterday', 'Rest day or data not yet synced');
     });
 

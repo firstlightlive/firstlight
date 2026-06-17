@@ -1,80 +1,57 @@
-// Visitor Tracking System — Track every pageview
-// CRITICAL: This must be included in EVERY deployment
+// Visitor Tracker — Updates visitor counter display
+// Works with trackVisitor() in app.js (which does the actual tracking)
+// CRITICAL: Must be included in EVERY deployment per user requirement
 
-const VisitorTracker = (() => {
-  const STORAGE_KEY = 'fl_visitor_tracked';
-  const VISITOR_TABLE = 'visitor_logs';
-
-  // Track pageview (once per session)
-  async function trackPageview() {
+(function() {
+  // Update the visitor counter display with live count from site_stats
+  async function updateVisitorCounter() {
     try {
-      // Check if already tracked this session
-      if (sessionStorage.getItem(STORAGE_KEY)) return;
+      var el = document.getElementById('visitorCount');
+      if (!el) return;
 
-      // Get Supabase
-      if (!window.supabase) return;
+      // Use sbFetch (from app.js) to query site_stats
+      if (!window.sbFetch) {
+        console.warn('[Visitor] sbFetch not available yet');
+        return;
+      }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const now = new Date().toISOString();
-      const userAgent = navigator.userAgent;
-      const page = window.location.pathname;
+      // Get total unique visitors across all time
+      var stats = await sbFetch('site_stats', 'GET', null, '?select=total_visits,unique_visitors&order=date.desc&limit=1000');
 
-      // Log visitor
-      await supabase.from(VISITOR_TABLE).insert({
-        visited_at: now,
-        page: page,
-        user_agent: userAgent,
-        session_id: session?.user?.id || 'anon',
-        ip_address: null // Can't get client IP, server will log it
-      });
-
-      // Mark as tracked for this session
-      sessionStorage.setItem(STORAGE_KEY, 'true');
-      console.log('[Visitor] Tracked pageview');
-    } catch (e) {
-      console.warn('[Visitor] Track error:', e);
-    }
-  }
-
-  // Get total visitors (unique sessions)
-  async function getTotalVisitors() {
-    try {
-      if (!window.supabase) return 0;
-
-      // Count unique visitors
-      const { data, error } = await supabase
-        .from(VISITOR_TABLE)
-        .select('session_id', { count: 'exact', head: true });
-
-      if (error) throw error;
-      return data ? data.length : 0;
+      if (stats && Array.isArray(stats)) {
+        var totalVisits = stats.reduce(function(sum, s) { return sum + (s.total_visits || 0); }, 0);
+        el.textContent = totalVisits > 0 ? totalVisits.toLocaleString('en-IN') : '0';
+        console.log('[Visitor] Counter updated:', totalVisits);
+      } else {
+        el.textContent = '0';
+      }
     } catch (e) {
       console.warn('[Visitor] Count error:', e);
-      return 0;
+      var el = document.getElementById('visitorCount');
+      if (el) el.textContent = '0';
     }
   }
 
-  // Update display
-  async function updateDisplay() {
-    const el = document.getElementById('visitorCount');
-    if (!el) return;
-
-    el.textContent = 'loading...';
-    const count = await getTotalVisitors();
-    el.textContent = count > 0 ? count.toLocaleString('en-IN') : '0';
-  }
-
-  // Initialize on load
+  // Initialize when page loads
   function init() {
-    trackPageview().then(updateDisplay);
+    // Wait for app.js to load and set up sbFetch
+    var retries = 0;
+    var waitForApp = setInterval(function() {
+      if (window.sbFetch || retries > 30) {
+        clearInterval(waitForApp);
+        updateVisitorCounter();
+      }
+      retries++;
+    }, 100);
   }
 
-  return { init, getTotalVisitors, updateDisplay };
-})();
+  // Auto-init on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
-// Auto-init on DOM ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => VisitorTracker.init());
-} else {
-  VisitorTracker.init();
-}
+  // Expose for manual calls
+  window.updateVisitorCounter = updateVisitorCounter;
+})();

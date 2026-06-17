@@ -95,6 +95,43 @@ function saveConfig(updates) {
 
 const FL = loadConfig();
 
+// ── INITIALIZE SUPABASE CLIENT ──
+window._supabaseLib = null;
+window._supabaseClient = null;
+
+function initSupabase() {
+  if (!window._supabaseLib && window.supabase && window.supabase.createClient) {
+    window._supabaseLib = window.supabase;
+  }
+
+  if (window._supabaseLib && !window._supabaseClient && FL.SUPABASE_URL && FL.SUPABASE_ANON_KEY) {
+    try {
+      window._supabaseClient = window._supabaseLib.createClient(FL.SUPABASE_URL, FL.SUPABASE_ANON_KEY);
+      console.log('[Supabase] Client initialized successfully');
+      window.supabase = window._supabaseClient;
+      return true;
+    } catch(e) {
+      console.error('[Supabase] Init failed:', e);
+    }
+  }
+  return false;
+}
+
+// Wait for Supabase library to load
+var _supabaseRetries = 0;
+function waitForSupabase() {
+  if (initSupabase()) return;
+  _supabaseRetries++;
+  if (_supabaseRetries < 50) {
+    setTimeout(waitForSupabase, 100);
+  } else {
+    console.error('[Supabase] Failed to initialize after 5 seconds');
+  }
+}
+
+// Start waiting for Supabase
+waitForSupabase();
+
 // ── APPLY CONFIG TO ALL PAGES (dynamic link/text sync) ──
 function applyConfig() {
   // Social links — update all footer + about links
@@ -638,7 +675,7 @@ function saveTodayStats(stats) {
 // ═══════════════════════════════════════════
 // HISTORY LOCK SYSTEM
 // Data locks at midnight. Once the date changes, previous day is permanently locked.
-// No grace window. Log everything before 11:59 PM.
+// No grace window. Log activity before 6:00 AM local time.
 // Exception: Races are always editable (no lock check in saveRace).
 // ═══════════════════════════════════════════
 
@@ -2385,24 +2422,35 @@ function _runInit() {
   SB.online = navigator.onLine;
   updateSyncStatus();
 
-  // Auto-pull today's data from Supabase (background, non-blocking)
+  // Track visitor (non-blocking, public pages only)
+  trackVisitor();
+
+  // Auto-pull today's data from Supabase, then update displays in sequence
   if (SB.ready && SB.online) {
     setTimeout(function() {
       autoPullOnLoad().then(function() {
         flushSyncQueue();
         cleanupOldLocalStorage();
+        // NOW update displays after data is loaded
+        updateVisitorCounter();
+        updateDaysMissed();
+        updateClaimedAmount();
+      }).catch(function(e) {
+        console.error('[Init] autoPullOnLoad failed:', e);
+        // Update anyway with possibly stale data
+        updateVisitorCounter();
+        updateDaysMissed();
+        updateClaimedAmount();
       });
     }, 500);
+  } else {
+    // If offline, update with whatever is in localStorage
+    setTimeout(function() {
+      updateVisitorCounter();
+      updateDaysMissed();
+      updateClaimedAmount();
+    }, 500);
   }
-
-  // Track visitor (non-blocking, public pages only)
-  trackVisitor();
-  // Update visitor counter display
-  setTimeout(updateVisitorCounter, 1000);
-  // Update days missed counter
-  setTimeout(updateDaysMissed, 500);
-  // Update claimed amount display
-  setTimeout(updateClaimedAmount, 1500);
 }
 
 // Force fresh data on page load - clear stale cache
@@ -2499,18 +2547,15 @@ async function updateDaysMissed() {
   if (!el) return;
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
 
-  // Chapter dates
-  var streakStart = new Date(FL_DEFAULTS.STREAK_START); // 2026-06-13
-  var chapter1End = new Date('2026-06-12');
+  // Chapter dates (string-based for ISO-8601 safety)
+  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-06-13'
 
-  // Count slips per chapter
+  // Count slips per chapter (string comparison, no timezone issues)
   var chapter1Slips = slips.filter(function(slip) {
-    var slipDate = new Date(slip.date);
-    return slipDate <= chapter1End;
+    return slip.date && slip.date < streakStart;
   });
   var chapter2Slips = slips.filter(function(slip) {
-    var slipDate = new Date(slip.date);
-    return slipDate >= streakStart;
+    return slip.date && slip.date >= streakStart;
   });
 
   // Update main counter (Chapter 2 only)
@@ -2531,24 +2576,69 @@ async function updateClaimedAmount() {
   var el = document.getElementById('claimedAmount');
   var heroEl = document.getElementById('claimedAmountHero');
   var proofEl = document.getElementById('proofClaimedCard');
-  if (!el && !heroEl && !proofEl) return;
+  var streakEl = document.getElementById('streakClaimedAmount');
+  var streakStatsEl = document.getElementById('streakStatsClaimed');
+  if (!el && !heroEl && !proofEl && !streakEl && !streakStatsEl) return;
   try {
-    if (!window.supabase) return;
-    var { data } = await supabase.from('claims').select('claim_date, status, amount');
-    if (!data) return;
+    // Use sbFetch (custom Supabase client) instead of window.supabase
+    // This is consistent with the rest of the app and always works
+    if (!window.sbFetch) {
+      console.warn('[Claims] sbFetch not available yet');
+      return;
+    }
 
-    // Only count Chapter 2 claims (from STREAK_START onwards)
-    var streakStart = new Date(FL_DEFAULTS.STREAK_START);
+    var data = await sbFetch('claims', 'GET', null, '?select=*');
+
+    // DEEP DEBUG: Log EVERYTHING
+    console.log('[Claims] ===== DEEP DEBUG START =====');
+    console.log('[Claims] Raw data:', data);
+    console.log('[Claims] Data type:', typeof data);
+    console.log('[Claims] Is array?', Array.isArray(data));
+
+    if (!data || !Array.isArray(data)) {
+      console.error('[Claims] FATAL: No data or not array. Data:', data);
+      return;
+    }
+
+    console.log('[Claims] Total records from Supabase:', data.length);
+    if (data.length > 0) {
+      console.log('[Claims] First record FULL details:', JSON.stringify(data[0], null, 2));
+      console.log('[Claims] Record fields:', Object.keys(data[0]));
+    }
+
+    // Only count Chapter 2 claims (from STREAK_START onwards, string-based for safety)
+    var streakStart = FL_DEFAULTS.STREAK_START; // '2026-06-13'
+    console.log('[Claims] Streak start constant:', streakStart);
+
     var chapter2Claims = data.filter(function(c) {
-      var claimDate = c.claim_date ? new Date(c.claim_date) : new Date();
-      return claimDate >= streakStart;
+      var passes = c.claim_date && c.claim_date >= streakStart;
+      console.log('[Claims] Record:', c.claim_date, 'vs', streakStart, '→ passes filter?', passes, '| Full record:', c);
+      return passes;
     });
 
-    var claimed = chapter2Claims
-      .filter(c => c.status === 'claimed' || c.status === 'paid_to_charity')
-      .reduce((sum, c) => sum + (c.amount || 0), 0);
+    console.log('[Claims] After date filter - matched records:', chapter2Claims.length);
+
+    var statusFiltered = chapter2Claims.filter(function(c) {
+      var statusMatch = c.status === 'claimed' || c.status === 'paid_to_charity' || c.status === 'paid';
+      console.log('[Claims] Status check: "' + c.status + '" === "claimed" OR "paid_to_charity" OR "paid"? →', statusMatch);
+      return statusMatch;
+    });
+
+    console.log('[Claims] After status filter - matched records:', statusFiltered.length);
+
+    var claimed = statusFiltered.reduce((sum, c) => {
+      console.log('[Claims] Adding amount:', c.amount, 'to sum:', sum, '→', sum + (c.amount || 0));
+      return sum + (c.amount || 0);
+    }, 0);
+
     var total = chapter2Claims.reduce((sum, c) => sum + (c.amount || 0), 0);
     var unclaimed = total - claimed;
+
+    console.log('[Claims] ===== CALCULATION RESULTS =====');
+    console.log('[Claims] Total claims (Ch2 only):', total);
+    console.log('[Claims] Claimed (paid_to_charity/claimed):', claimed);
+    console.log('[Claims] Unclaimed:', unclaimed);
+    console.log('[Claims] ===== DEEP DEBUG END =====');
 
     var displayText = (claimed > 0 ? '₹' : '') + claimed.toLocaleString('en-IN');
 
@@ -2561,10 +2651,14 @@ async function updateClaimedAmount() {
     // Update proof page display
     if (proofEl) proofEl.textContent = displayText;
 
+    // Update streak page claimed amount
+    if (streakEl) streakEl.textContent = claimed.toLocaleString('en-IN');
+    if (streakStatsEl) streakStatsEl.textContent = claimed.toLocaleString('en-IN');
+
     // Update breakdown visualization
     updateBreakdownVisualization(claimed, unclaimed, total);
   } catch (e) {
-    console.warn('[Claims] Count error:', e);
+    console.error('[Claims] Exception:', e);
   }
 }
 

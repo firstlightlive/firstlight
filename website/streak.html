@@ -1914,7 +1914,10 @@
       </div>
 
       <!-- ── BELOW RINGS ── -->
-      <div class="hero-unclaimed reveal-el">₹<span data-unclaimed-plain>—</span> UNCLAIMED</div>
+      <div class="hero-claimed-breakdown reveal-el" style="display:flex;gap:32px;justify-content:center;margin-bottom:16px;">
+        <div style="text-align:center;color:var(--cyan);">₹<span id="streakClaimedAmount">0</span><br><span style="font-size:0.75rem;opacity:0.8;">CLAIMED</span></div>
+        <div style="text-align:center;color:var(--gold);">₹<span data-unclaimed-plain>—</span><br><span style="font-size:0.75rem;opacity:0.8;">UNCLAIMED</span></div>
+      </div>
       <p class="hero-tagline reveal-el">No end date. No finish line. INFINITE.</p>
 
       <!-- STATUS BEACON — Today's proof status -->
@@ -2164,8 +2167,11 @@
           <div class="streak-num-label">DAYS TRACKED</div>
         </div>
         <div class="streak-num-card">
-          <div class="streak-num-val text-gold" data-unclaimed>—</div>
-          <div class="streak-num-label">₹ AT STAKE</div>
+          <div class="streak-num-val" style="display:flex;gap:16px;align-items:center;justify-content:center;">
+            <div style="text-align:center;color:var(--cyan);">₹<span id="streakStatsClaimed">0</span><br><span style="font-size:0.6rem;opacity:0.8;">CLAIMED</span></div>
+            <div style="text-align:center;color:var(--gold);">₹<span data-unclaimed>—</span><br><span style="font-size:0.6rem;opacity:0.8;">UNCLAIMED</span></div>
+          </div>
+          <div class="streak-num-label">₹ BREAKDOWN</div>
         </div>
         <div class="streak-num-card">
           <div class="streak-num-val" data-day>—</div>
@@ -2292,7 +2298,7 @@
           // Show sync banner after 9 AM IST if no data (syncs at 6, 9, 12, 3, 6, 9, 11, 11:50)
           if(hour>=9){
             // Check if today's Strava activity exists
-            var strava=await sbFetch('strava_activities','GET',null,'?select=id&start_date_local=gte.'+todayStr+'T00:00:00&limit=1');
+            var strava=await sbFetch('strava_activities','GET',null,'?select=id&start_date_local=gte.'+todayStr+'T00:30:00&limit=1');
             var hasStrava=strava&&Array.isArray(strava)&&strava.length>0;
 
             // Check if today's proof archive exists
@@ -2323,7 +2329,7 @@
         var _ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
         var todayStr = _ist.getFullYear() + '-' + String(_ist.getMonth()+1).padStart(2,'0') + '-' + String(_ist.getDate()).padStart(2,'0');
 
-        fetch(FL.SUPABASE_URL + '/rest/v1/strava_activities?start_date_local=gte.' + todayStr + 'T00:00:00&start_date_local=lt.' + todayStr + 'T23:59:59&select=id,type&limit=1', {
+        fetch(FL.SUPABASE_URL + '/rest/v1/strava_activities?start_date_local=gte.' + todayStr + 'T00:30:00&start_date_local=lt.' + (new Date(new Date(todayStr).getTime() + 86400000).toISOString().split('T')[0]) + 'T00:30:00&select=id,type&limit=1', {
           headers: { 'apikey': FL.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + FL.SUPABASE_ANON_KEY }
         })
         .then(function(r) { return r.json(); })
@@ -2378,17 +2384,17 @@
         var currentMin = now.getMinutes();
         var deadline = new Date(now);
 
-        // Deadline is 11:59 PM (23:59) every day
-        // After 11:59 PM (midnight-12:59 AM) = check yesterday's activity
-        // 12:00 AM - 12:59 AM = grace period, still checking previous day
-        // 1:00 AM onwards = new day, countdown to tonight 11:59 PM
+        // Deadline is 6:00 AM (06:00) every day — RULE: 5km RUN before 6:00 AM local
+        // Before 6 AM = countdown to 6 AM today
+        // After 6 AM = countdown to 6 AM tomorrow (or mark BROKEN if no activity)
 
-        if (currentHour === 0) {
-          // Midnight to 12:59 AM — grace period, deadline was 11:59 PM today (just passed)
-          deadline.setHours(23, 59, 0, 0); // already passed, diff will be negative
+        if (currentHour < 6) {
+          // Before 6 AM — countdown to 6 AM today
+          deadline.setHours(6, 0, 0, 0);
         } else {
-          // 1 AM to 11:59 PM — countdown to today 11:59 PM
-          deadline.setHours(23, 59, 0, 0);
+          // After 6 AM — deadline already passed today
+          // Check if activity logged, if not = BROKEN
+          deadline.setHours(6, 0, 0, 0); // for reference, but it's in the past
         }
 
         var diff = deadline - now;
@@ -2419,8 +2425,8 @@
           if (cdStatus) { cdStatus.textContent = 'Day ' + getDayNumber() + ' — Activity verified'; cdStatus.style.color = ''; }
           hideStreakBroken();
         }
-        // Deadline passed (00:00-00:59 grace) + no activity = BROKEN
-        else if (diff === 0 || currentHour === 0) {
+        // After 6 AM + no activity = BROKEN
+        else if (currentHour >= 6) {
           if (_streakActivityCheck.checked && !_streakActivityCheck.hasActivity) {
             if (cdH) cdH.style.color = 'var(--red)';
             if (cdM) cdM.style.color = 'var(--red)';
@@ -2452,7 +2458,7 @@
           if (cdM) cdM.style.color = 'var(--gold)';
           if (cdS) cdS.style.color = 'var(--gold)';
           if (label) { label.textContent = 'DEADLINE APPROACHING'; label.style.color = 'var(--gold)'; }
-          if (cdStatus) { cdStatus.textContent = 'Due at 11:59 PM — Day ' + getDayNumber(); cdStatus.style.color = ''; }
+          if (cdStatus) { cdStatus.textContent = 'Due at 6:00 AM — Day ' + getDayNumber(); cdStatus.style.color = ''; }
           hideStreakBroken();
         }
         // Normal countdown (activity not yet logged, plenty of time)
@@ -2461,7 +2467,7 @@
           if (cdM) cdM.style.color = 'var(--text)';
           if (cdS) cdS.style.color = 'var(--text)';
           if (label) { label.textContent = 'COUNTDOWN TO DEADLINE'; label.style.color = 'var(--cyan)'; }
-          if (cdStatus) { cdStatus.textContent = 'Due at 11:59 PM — Day ' + getDayNumber(); cdStatus.style.color = ''; }
+          if (cdStatus) { cdStatus.textContent = 'Due at 6:00 AM — Day ' + getDayNumber(); cdStatus.style.color = ''; }
           hideStreakBroken();
         }
       }
@@ -2499,7 +2505,7 @@
         var todayProof = (data && data.length > 0) ? data[0] : null;
         var hasRun = todayProof && todayProof.run_km && parseFloat(todayProof.run_km) > 0;
 
-        // No run-specific deadline — any activity before 11:59 PM counts
+        // No run-specific deadline — any activity before 6:00 AM counts
         var runBanner = document.getElementById('runMissedBanner');
         if (runBanner) runBanner.style.display = 'none';
 
@@ -2663,7 +2669,7 @@
             // No activity synced yet — awaiting
             beacon.className = 'proof-beacon proof-beacon--pending';
             if (bLabel) bLabel.textContent = 'AWAITING ACTIVITY — DAY ' + dayNum;
-            if (bDetail) bDetail.textContent = 'Syncs at 6, 9, 12, 3, 6, 9, 11 PM · Deadline 11:59 PM';
+            if (bDetail) bDetail.textContent = 'Syncs at 6, 9, 12, 3, 6, 9, 11 PM · Deadline 6:00 AM';
             if (bLink) bLink.style.display = 'none';
           }
         }
@@ -2728,7 +2734,7 @@
       var distanceSports = ['Run','VirtualRun','Ride','Swim','Walk','Hike','Rowing'];
 
       // Fetch today's activities from strava_activities
-      fetch(SUPA + '/rest/v1/strava_activities?start_date_local=gte.' + todayStr + 'T00:00:00&start_date_local=lt.' + todayStr + 'T23:59:59&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc', {
+      fetch(SUPA + '/rest/v1/strava_activities?start_date_local=gte.' + todayStr + 'T00:30:00&start_date_local=lt.' + (new Date(new Date(todayStr).getTime() + 86400000).toISOString().split('T')[0]) + 'T00:30:00&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc', {
         headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
       })
       .then(function(r) { return r.json(); })
@@ -2784,7 +2790,7 @@
           grid.innerHTML = '<div class="act-empty" style="grid-column:1/-1">' +
             '<div class="act-empty-icon">&#x23F3;</div>' +
             '<div class="act-empty-text">NO ACTIVITIES SYNCED YET</div>' +
-            '<div class="act-empty-sub">Log any activity before 11:59 PM · Syncs at 6, 9, 12, 3, 6, 9, 11 PM</div>' +
+            '<div class="act-empty-sub">Log any activity before 6:00 AM · Syncs at 6, 9, 12, 3, 6, 9, 11 PM</div>' +
             '</div>';
 
           // Chips — all pending

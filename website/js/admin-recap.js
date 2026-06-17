@@ -959,8 +959,10 @@
         range = getMonthRange(refDate);
       }
 
-      var startStr = range.start.getFullYear() + '-' + String(range.start.getMonth() + 1).padStart(2, '0') + '-' + String(range.start.getDate()).padStart(2, '0') + 'T00:00:00';
-      var endStr = range.end.getFullYear() + '-' + String(range.end.getMonth() + 1).padStart(2, '0') + '-' + String(range.end.getDate()).padStart(2, '0') + 'T23:59:59';
+      // Deadline is 6 AM, so fetch from 6 AM on start date to 6 AM on day after end date
+      var startStr = range.start.getFullYear() + '-' + String(range.start.getMonth() + 1).padStart(2, '0') + '-' + String(range.start.getDate()).padStart(2, '0') + 'T00:30:00';
+      var endDate = new Date(range.end); endDate.setDate(endDate.getDate() + 1);
+      var endStr = endDate.getFullYear() + '-' + String(endDate.getMonth() + 1).padStart(2, '0') + '-' + String(endDate.getDate()).padStart(2, '0') + 'T00:30:00';
 
       fetchActivities(startStr, endStr, function(err, activities) {
         generateBtn.disabled = false;

@@ -703,8 +703,8 @@
     // Build day-by-day timeline for the chapter's date range (capped at 730 cells per render)
     var startStr = (chapter && chapter.start) || ((window.FL && FL.STREAK_START) || '2026-06-13');
     var endStr = (chapter && chapter.end) || null;
-    var chStart = new Date(startStr + 'T00:00:00+05:30');
-    var chEnd = endStr ? new Date(endStr + 'T23:59:59+05:30') : null;
+    var chStart = new Date(startStr + 'T00:30:00+05:30');
+    var chEnd = endStr ? new Date(endStr + 'T00:30:00+05:30') : null;
     var today = new Date();
     var dayMap = {};
     rows.forEach(function(r) { if (r.date) dayMap[r.date] = r; });
