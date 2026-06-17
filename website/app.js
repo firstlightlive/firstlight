@@ -2468,6 +2468,7 @@ async function getTotalVisitors() {
 async function updateVisitorCounter() {
   var el = document.getElementById('visitorCount');
   if (!el) return;
+  el.textContent = '...'; // Show loading state
   var total = await getTotalVisitors();
-  if (total > 0) el.textContent = total.toLocaleString('en-IN');
+  el.textContent = total > 0 ? total.toLocaleString('en-IN') : '0';
 }
