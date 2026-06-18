@@ -6,12 +6,53 @@
   <meta name="theme-color" content="#0A0C10">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Install the FirstLight personal accountability journal as a Progressive Web App. Single-user training tracker. Read-only for visitors; the operator's daily-write app is gated by PIN. No data collected from you.">
+  <meta name="robots" content="index,follow">
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icon-512.png">
-  <title>Install First Light · PWA</title>
+  <title>Install First Light · Personal Accountability PWA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <!-- Structured data: declare this as a personal journal / web application,
+       NOT a financial service, gambling app, or marketplace -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "First Light",
+    "alternateName": "FirstLight Personal Accountability Journal",
+    "applicationCategory": "LifestyleApplication",
+    "applicationSubCategory": "Personal Journal",
+    "operatingSystem": "Web (PWA) — iOS Safari, Android Chrome, Desktop Chrome/Edge/Brave",
+    "browserRequirements": "Modern browser with service-worker support",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    },
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "Single individual operator (Anupam Kumar). Visitors view only."
+    },
+    "creator": {
+      "@type": "Person",
+      "name": "Anupam Kumar",
+      "email": "firstlightlive@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Bangalore",
+        "addressCountry": "IN"
+      }
+    },
+    "description": "A personal accountability journal documenting one individual's daily running, sleep, food, and self-discipline practice. Read-only for visitors. Not a financial service, not a wagering platform, not gambling. ₹ amounts referenced are self-imposed personal commitments paid by the operator to themselves.",
+    "url": "https://firstlight.live/install.html",
+    "termsOfService": "https://firstlight.live/terms.html",
+    "privacyPolicy": "https://firstlight.live/privacy.html"
+  }
+  </script>
 
   <style>
     :root {
@@ -29,12 +70,47 @@
     .wrap{max-width:560px;margin:0 auto;padding:0 18px}
     .brand{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--cyan);font-weight:600;text-align:center;margin-bottom:10px}
     h1{font-family:var(--inter);font-size:32px;font-weight:800;letter-spacing:1px;text-align:center;margin-bottom:8px;line-height:1.2}
-    .sub{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--text-muted);text-align:center;margin-bottom:32px;text-transform:uppercase}
+    .sub{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--text-muted);text-align:center;margin-bottom:24px;text-transform:uppercase;line-height:1.6}
+
+    /* Disclaimer banner — declares non-commercial / non-gambling nature */
+    .disclaimer{
+      background:rgba(245,166,35,0.06);
+      border:1px solid rgba(245,166,35,0.25);
+      border-radius:12px;
+      padding:14px 16px;
+      margin-bottom:18px;
+      font-family:var(--mono);font-size:10.5px;color:var(--gold);
+      letter-spacing:0.5px;line-height:1.7;
+    }
+    .disclaimer b{color:var(--text);font-weight:700}
+
+    /* What this app does — value proposition and data disclosure */
+    .does-card{
+      background:var(--bg2);
+      border:1px solid rgba(0,212,255,0.2);
+      border-radius:14px;
+      padding:18px 20px;
+      margin-bottom:20px;
+    }
+    .does-title{
+      font-family:var(--mono);font-size:10px;letter-spacing:2px;
+      color:var(--cyan);font-weight:700;margin-bottom:12px;
+    }
+    .does-list{list-style:none;padding:0;margin:0}
+    .does-list li{
+      font-family:var(--inter);font-size:13.5px;color:var(--text-dim);
+      line-height:1.6;margin-bottom:10px;padding-left:22px;position:relative;
+    }
+    .does-list li::before{
+      content:"›";position:absolute;left:6px;top:0;color:var(--cyan);font-weight:700;
+    }
+    .does-list li:last-child{margin-bottom:0}
+    .does-list b{color:var(--text);font-weight:600}
 
     .detected{
       background:linear-gradient(135deg,rgba(0,212,255,0.10),rgba(0,212,255,0.03));
       border:1px solid rgba(0,212,255,0.3);border-radius:14px;
-      padding:14px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;
+      padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;
     }
     .detected-emoji{font-size:30px}
     .detected-text{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--text-dim);line-height:1.5}
@@ -60,6 +136,7 @@
       font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--cyan);
       font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;
     }
+    .steps-title.uninstall{color:var(--red)}
     .step{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
     .step:last-child{margin-bottom:0}
     .step-num{
@@ -67,6 +144,9 @@
       background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.4);
       color:var(--cyan);font-family:var(--mono);font-size:12px;font-weight:700;
       display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .steps-card.uninstall .step-num{
+      background:rgba(255,82,82,0.12);border-color:rgba(255,82,82,0.4);color:var(--red);
     }
     .step-body{flex:1;font-size:14px;line-height:1.55;color:var(--text-dim)}
     .step-body b{color:var(--text);font-weight:600}
@@ -97,10 +177,11 @@
     }
 
     .footer{
-      margin-top:32px;text-align:center;
+      margin-top:36px;text-align:center;
       font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:1.5px;
+      line-height:2;
     }
-    .footer a{color:var(--cyan);text-decoration:none}
+    .footer a{color:var(--cyan);text-decoration:none;margin:0 6px}
 
     /* Native install hint pulse */
     @keyframes pulse-hint{0%,100%{opacity:0.5}50%{opacity:1}}
@@ -119,7 +200,35 @@
   <div class="wrap">
     <div class="brand">FIRST LIGHT</div>
     <h1>Install the app</h1>
-    <div class="sub">No App Store · Works offline · Free</div>
+    <div class="sub">Personal accountability journal · Works offline · No app store · No payment</div>
+
+    <!-- Plain-language disclaimer for users and classifiers -->
+    <div class="disclaimer">
+      <b>What this is:</b> a single-user training and accountability journal operated by one individual. Read-only for visitors. The Operator's daily-write screens are gated by a private PIN.<br><br>
+      <b>What this is NOT:</b> not gambling, not wagering, not a financial service, not a marketplace. ₹ amounts shown on the public site are self-imposed personal commitments paid by the Operator to themselves — no external party receives or holds money. No payment is collected from you for installing or using this app.
+    </div>
+
+    <!-- What the app does and what data it touches — required by Google's Unwanted Software Policy -->
+    <div class="does-card">
+      <div class="does-title">▸ WHAT THIS APP DOES</div>
+      <ul class="does-list">
+        <li><b>Shows the public site offline.</b> Cached HTML, CSS, and JavaScript for the firstlight.live homepage, streak page, Strava page, and other public pages.</li>
+        <li><b>Operator-only:</b> a daily-punch screen and a full command-center admin app, gated behind a PIN that only the Operator knows.</li>
+        <li><b>Stores locally:</b> a theme preference, an anonymous visit identity, the Operator's cached read data (only if you ARE the Operator). All site-scoped — never used by any other site.</li>
+        <li><b>Does not collect:</b> visitor email, name, IP fingerprint, location, payment, contacts, microphone, camera, or browser history.</li>
+        <li><b>Auto-updates:</b> when a new shell version is published, the service worker refreshes silently. No download prompt, no system files modified.</li>
+        <li><b>Sends emails to the Operator only.</b> Daily and weekly summaries to firstlightlive@gmail.com. Visitors are never emailed.</li>
+        <li><b>Easy to remove</b> — see the "Uninstall" section near the bottom of this page.</li>
+      </ul>
+    </div>
+
+    <!-- Required policy links, before the install action -->
+    <div style="text-align:center;margin-bottom:24px;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--text-muted)">
+      By installing you accept the
+      <a href="terms.html" style="color:var(--cyan);text-decoration:underline">Terms of Service</a>
+      and
+      <a href="privacy.html" style="color:var(--cyan);text-decoration:underline">Privacy Policy</a>.
+    </div>
 
     <!-- Auto-detected platform banner -->
     <div class="detected">
@@ -140,7 +249,7 @@
         <div class="step"><div class="step-num">1</div><div class="step-body">Tap the <b>Share</b> icon <span class="step-icon">⬆️</span> in Safari's bottom bar (or top-right on iPad).</div></div>
         <div class="step"><div class="step-num">2</div><div class="step-body">Scroll down and tap <b>Add to Home Screen</b> <span class="step-icon">⊞</span></div></div>
         <div class="step"><div class="step-num">3</div><div class="step-body">Confirm the name <b>FL Punch</b> and tap <b>Add</b> (top-right).</div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-body">Open from your home screen — unlock with PIN <span class="step-key">2 2 5 9</span> and you're in.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body">Open from your home screen. The Operator's punch / admin screens require a private PIN — visitors see the public site only.</div></div>
       </div>
       <div class="info">
         <b>Why no one-click install?</b> Apple intentionally blocks programmatic install on iOS — only the Safari <b>Share → Add to Home Screen</b> path works. Same for Chrome/Firefox on iOS (they're all Safari underneath).
@@ -154,7 +263,7 @@
         <div class="step"><div class="step-num">1</div><div class="step-body">Tap the <b>⚡ INSTALL THIS APP</b> button above (if active) — Chrome will pop up its install sheet.</div></div>
         <div class="step"><div class="step-num">2</div><div class="step-body">Or: tap Chrome's <b>⋮ menu</b> → <b>Install app</b>.</div></div>
         <div class="step"><div class="step-num">3</div><div class="step-body">Confirm. Icon appears on your home screen + app drawer.</div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-body">Open it — unlock with PIN <span class="step-key">2 2 5 9</span>.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body">Open it. Operator-only screens require a private PIN.</div></div>
       </div>
     </div>
 
@@ -165,11 +274,22 @@
         <div class="step"><div class="step-num">1</div><div class="step-body">Tap <b>⚡ INSTALL THIS APP</b> above — works in <b>Chrome, Edge, Brave, Arc, Vivaldi</b>.</div></div>
         <div class="step"><div class="step-num">2</div><div class="step-body">Or look for the install icon <span class="step-icon">⊕</span> in the address bar.</div></div>
         <div class="step"><div class="step-num">3</div><div class="step-body">App opens in its own window with the cyan header. Pin it to dock/taskbar.</div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-body">Unlock with PIN <span class="step-key">2 2 5 9</span>. Change it from Settings once verified.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body">Operator-only screens require a private PIN that the Operator sets on first launch.</div></div>
       </div>
       <div class="info">
         <b>Safari on Mac?</b> Safari 17+ supports Add to Dock: <b>File → Add to Dock</b>. Older Safari: open via Chrome/Edge for full PWA features.
       </div>
+    </div>
+
+    <!-- Uninstall — required by Google's Unwanted Software Policy -->
+    <div class="steps-card uninstall" style="margin-top:24px;border-color:rgba(255,82,82,0.18)">
+      <div class="steps-title uninstall">↺ HOW TO UNINSTALL</div>
+      <div class="step"><div class="step-num">1</div><div class="step-body"><b>iPhone / iPad:</b> Long-press the icon on your home screen → <b>Remove App</b> → <b>Delete App</b>.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><b>Android:</b> Long-press the icon → <b>Uninstall</b> (or drag the icon to the uninstall area).</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><b>Mac / Windows / Linux (Chrome / Edge / Brave):</b> Open <span class="step-key">chrome://apps</span> → right-click <b>First Light</b> → <b>Remove from Chrome</b>.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><b>Safari macOS 17+:</b> Right-click the dock icon → <b>Remove from Dock</b>.</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><b>Clear all locally-stored data</b> (cache, IndexedDB, localStorage): Browser Settings → Privacy → Site Data → search <span class="step-key">firstlight.live</span> → <b>Clear</b>.</div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body">Removal is complete and permanent. No background process or settings change is left behind.</div></div>
     </div>
 
     <!-- Power-user options: native binaries via PWA Builder -->
@@ -194,20 +314,24 @@
       <div class="steps-title">🚀 ALREADY INSTALLED?</div>
       <a href="/punch.html" class="alt">
         <span class="alt-label"><span class="alt-emoji">⚡</span>
-          <span class="alt-text"><b>PUNCH</b><br>Fast daily entry screen</span>
+          <span class="alt-text"><b>PUNCH</b><br>Fast daily entry screen (Operator only)</span>
         </span>
         <span class="alt-arrow">→</span>
       </a>
       <a href="/admin.html" class="alt">
         <span class="alt-label"><span class="alt-emoji">🛠</span>
-          <span class="alt-text"><b>COMMAND CENTER</b><br>Full admin app</span>
+          <span class="alt-text"><b>COMMAND CENTER</b><br>Full admin app (Operator only)</span>
         </span>
         <span class="alt-arrow">→</span>
       </a>
     </div>
 
     <div class="footer">
-      <a href="/">← firstlight.live</a> · <a href="https://github.com/firstlightlive/firstlight/blob/main/INSTALL.md" target="_blank">Full Install Docs</a>
+      <a href="/">← firstlight.live</a> ·
+      <a href="privacy.html">Privacy</a> ·
+      <a href="terms.html">Terms</a> ·
+      <a href="about.html">About</a><br>
+      <span style="color:var(--text-muted)">© 2026 Anupam Kumar · Personal accountability journal · Bangalore, India</span>
     </div>
   </div>
 
@@ -293,7 +417,6 @@
       // iOS can't programmatically install — guide user to Share menu instead
       installBtn.textContent = 'TAP SHARE ⬆ THEN "ADD TO HOME SCREEN"';
       installBtn.disabled = true;
-      // Animate a hint arrow if the share icon is visible
     } else if (!standalone) {
       installBtn.textContent = '⏳ WAITING FOR BROWSER TO ENABLE INSTALL…';
       installBtn.disabled = true;

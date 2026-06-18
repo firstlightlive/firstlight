@@ -1,64 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy — FirstLight</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body { background: #0A0C10; color: #fff; font-family: 'Inter', sans-serif; }
-        .container { max-width: 800px; margin: 0 auto; padding: 60px 24px; }
-        h1 { font-family: 'IBM Plex Mono'; font-size: 32px; margin-bottom: 32px; color: #00D4FF; }
-        h2 { font-family: 'IBM Plex Mono'; font-size: 18px; margin-top: 32px; margin-bottom: 16px; color: #F5A623; }
-        p { line-height: 1.8; margin-bottom: 16px; color: #ccc; }
-        li { margin-left: 24px; margin-bottom: 8px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Privacy Policy for firstlight.live — a single-user personal accountability journal. Explains what visitor data is collected (very little), what personal data the operator stores (a lot, about themselves), and how to remove it.">
+  <meta name="robots" content="index,follow">
+  <title>Privacy Policy — FirstLight</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: #0A0C10; color: #fff; font-family: 'Inter', sans-serif; }
+    .container { max-width: 800px; margin: 0 auto; padding: 60px 24px; }
+    h1 { font-family: 'IBM Plex Mono'; font-size: 32px; margin-bottom: 8px; color: #00D4FF; }
+    .sub { font-family: 'IBM Plex Mono'; font-size: 11px; letter-spacing: 1.5px; color: #8A95A3; text-transform: uppercase; margin-bottom: 32px; }
+    h2 { font-family: 'IBM Plex Mono'; font-size: 16px; letter-spacing: 1px; margin-top: 36px; margin-bottom: 14px; color: #F5A623; text-transform: uppercase; }
+    h3 { font-family: 'IBM Plex Mono'; font-size: 13px; letter-spacing: 0.5px; margin-top: 22px; margin-bottom: 10px; color: #00E676; }
+    p { line-height: 1.8; margin-bottom: 16px; color: #ccc; font-size: 15px; }
+    li { margin-left: 24px; margin-bottom: 8px; color: #ccc; line-height: 1.7; }
+    a { color: #00D4FF; }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-family: 'IBM Plex Mono'; font-size: 13px; color: #F5A623; }
+    .callout {
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.25);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-family: 'IBM Plex Mono';
+      font-size: 13px;
+      color: #00D4FF;
+      line-height: 1.7;
+    }
+    .callout b { color: #fff; font-weight: 700; }
+    .warning {
+      background: rgba(245,166,35,0.08);
+      border: 1px solid rgba(245,166,35,0.25);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-family: 'IBM Plex Mono';
+      font-size: 13px;
+      color: #F5A623;
+      line-height: 1.7;
+    }
+    .warning b { color: #fff; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    th { font-family: 'IBM Plex Mono'; font-size: 11px; letter-spacing: 1px; color: #00D4FF; text-transform: uppercase; }
+    td { color: #ccc; line-height: 1.6; }
+    .footer-back { margin-top: 60px; font-family: 'IBM Plex Mono'; font-size: 10px; color: #8A95A3; letter-spacing: 1.5px; }
+    .footer-back a { color: #00D4FF; text-decoration: none; margin-right: 16px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Privacy Policy</h1>
-        <p><strong>Last Updated: June 2026</strong></p>
+  <div class="container">
+    <h1>Privacy Policy</h1>
+    <div class="sub">Last Updated: June 2026</div>
 
-        <h2>1. Introduction</h2>
-        <p>FirstLight ("we," "us," or "our") operates the firstlight.live website and app. This Privacy Policy explains how we collect, use, disclose, and safeguard your information.</p>
-
-        <h2>2. Data Collection</h2>
-        <p>FirstLight collects:</p>
-        <ul>
-            <li>Instagram activity data (with your authorization)</li>
-            <li>Strava running/fitness data (with your authorization)</li>
-            <li>Personal fitness metrics you log</li>
-            <li>Account authentication data</li>
-        </ul>
-
-        <h2>3. How We Use Your Data</h2>
-        <p>Your data is used to:</p>
-        <ul>
-            <li>Display your fitness activities and progress</li>
-            <li>Calculate streaks and accountability metrics</li>
-            <li>Generate reports and analytics</li>
-            <li>Maintain account security</li>
-        </ul>
-
-        <h2>4. Data Storage</h2>
-        <p>Your data is stored securely on Supabase (https://supabase.com). We do not sell or share your data with third parties.</p>
-
-        <h2>5. User Data Deletion</h2>
-        <p>You can request deletion of your data at any time. We will delete all stored data within 30 days of your request. To request deletion, email: <strong>firstlightlive@gmail.com</strong></p>
-
-        <h2>6. Third-Party Services</h2>
-        <p>FirstLight integrates with:</p>
-        <ul>
-            <li>Instagram (Meta) — for activity publishing</li>
-            <li>Strava — for fitness data sync</li>
-            <li>Cloudflare — for hosting</li>
-            <li>Supabase — for data storage</li>
-        </ul>
-
-        <h2>7. Contact Us</h2>
-        <p>For privacy concerns, contact: <strong>firstlightlive@gmail.com</strong></p>
-
-        <p style="margin-top: 60px; color: #666; font-size: 12px;">© 2026 FirstLight. All rights reserved.</p>
+    <div class="callout">
+      <b>TL;DR:</b> firstlight.live is a personal accountability journal operated by one individual (Anupam Kumar) for personal use. As a visitor, almost nothing is collected from you — just an anonymous visit count. The personal data on this site is the operator's own data about themselves (training, sleep, food, journals). It is not collected from you and not shared with anyone. If you install the PWA, it runs locally on your device with read-only access to the public site.
     </div>
+
+    <h2>1. Who runs this site</h2>
+    <p>This site is operated by one individual:</p>
+    <ul>
+      <li><b>Operator:</b> Anupam Kumar</li>
+      <li><b>Location:</b> Bangalore, Karnataka, India</li>
+      <li><b>Contact:</b> <a href="mailto:firstlightlive@gmail.com">firstlightlive@gmail.com</a></li>
+      <li><b>Hosted on:</b> Cloudflare (cdn / edge); Supabase (database, EU/US regions)</li>
+    </ul>
+    <p>This is not a company, not a SaaS, not a multi-user platform. There is no other staff, no analytics team, no advertising network, no data-broker partner.</p>
+
+    <h2>2. What is collected from visitors</h2>
+
+    <h3>2.1 Anonymous visit counter</h3>
+    <p>Each page load increments a counter so the operator can see "X visitors since Day 1." No IP, no user agent, no fingerprint, no cookie is associated with this counter. The increment is server-side, anonymous, and aggregated.</p>
+
+    <h3>2.2 Comments (only if you choose to comment)</h3>
+    <p>If you submit a public comment, the following is stored: the text you wrote, the timestamp, and the display name you typed. No email, no IP, no account. Comments are stored in the <code>comments</code> table on Supabase.</p>
+
+    <h3>2.3 Server logs (Cloudflare)</h3>
+    <p>Cloudflare, as the edge provider, may log standard HTTP request data (IP, user agent, path, timestamp) for security and abuse prevention. The operator does not access these logs except for security investigations. Cloudflare's own privacy practices apply: <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a>.</p>
+
+    <h3>2.4 What is NOT collected from visitors</h3>
+    <ul>
+      <li>No advertising cookies, no tracking pixels, no third-party analytics (no Google Analytics, no Meta pixel, no Mixpanel)</li>
+      <li>No email, no name, no phone, no address</li>
+      <li>No payment information (the site does not accept payment from anyone)</li>
+      <li>No location data</li>
+      <li>No browser fingerprinting</li>
+      <li>No cross-site tracking</li>
+    </ul>
+
+    <h2>3. What the operator stores about themselves (the bulk of data on this site)</h2>
+    <p>The Operator (Anupam Kumar) logs extensive personal data into private tables that only the Operator can read. This data is about the Operator only — not about any visitor. It is documented here transparently so visitors understand what kind of project this is.</p>
+
+    <table>
+      <thead><tr><th>Category</th><th>Examples</th><th>Visibility</th></tr></thead>
+      <tbody>
+      <tr><td>Training</td><td>Runs, rides, swims, gym sessions, sleep duration, distance, pace, heart rate, calories</td><td>Public (Strava-style)</td></tr>
+      <tr><td>Daily proof</td><td>Whether the daily 5km run before 6am was completed; daily check-in score</td><td>Public</td></tr>
+      <tr><td>Slips &amp; commitments</td><td>Missed days; self-imposed ₹ commitments incurred and cleared</td><td>Public</td></tr>
+      <tr><td>Body composition</td><td>Body weight log</td><td>Private</td></tr>
+      <tr><td>Food log</td><td>Meals photographed and scanned by Gemini Vision</td><td>Private</td></tr>
+      <tr><td>Journal entries</td><td>Daily reflections, insights, voice memos</td><td>Private</td></tr>
+      <tr><td>Mastery log</td><td>Daily skill practice, deep-work sessions, reading log</td><td>Private</td></tr>
+      <tr><td>Personal discipline log (brahmacharya)</td><td>Daily continence tracker</td><td>Private (sensitive)</td></tr>
+      <tr><td>Finance</td><td>Income, expense, investment ledger; FIRE projection</td><td>Private (sensitive)</td></tr>
+      <tr><td>Goals &amp; tomorrow plan</td><td>Forward-looking commitments</td><td>Private</td></tr>
+      <tr><td>Apple Health metrics</td><td>HRV, resting heart rate, sleep stages</td><td>Private</td></tr>
+      </tbody>
+    </table>
+
+    <p>"Public" data is shown on the public website (index.html, streak.html, strava.html, etc.) as part of the Operator's public-accountability journal. "Private" data is gated behind PIN authentication and Supabase Row-Level Security, accessible only by the Operator.</p>
+
+    <h2>4. Where the data lives</h2>
+
+    <h3>4.1 Server-side</h3>
+    <ul>
+      <li><b>Supabase</b> (Postgres database + Storage). Region: AWS-managed, US/EU. Row-Level Security enforced on private tables.</li>
+      <li><b>Cloudflare</b> (Workers + static assets). Region: global edge.</li>
+      <li><b>Google Cloud Storage</b> (archive of older media). Region: US.</li>
+    </ul>
+
+    <h3>4.2 In your browser (if you visit)</h3>
+    <ul>
+      <li><b>localStorage</b>: a theme preference (<code>fl_theme</code>), an anonymous visitor identity (<code>fl_visitor_id</code>) used only for the visit counter, optional saved comment-author display name.</li>
+      <li><b>No cookies</b> are set by this site.</li>
+    </ul>
+
+    <h3>4.3 In your browser (only if you install the PWA)</h3>
+    <ul>
+      <li><b>Service Worker cache</b> (<code>fl-shell-v5</code>, <code>fl-supa-reads-v3</code>): stores HTML/CSS/JS shell files for offline use.</li>
+      <li><b>IndexedDB</b> (<code>fl-sync</code> + <code>fl-auth</code>): stores write queue for offline punches (Operator only) and a PBKDF2 PIN hash (Operator only).</li>
+      <li><b>sessionStorage</b>: short-lived unlock session token (cleared on tab close).</li>
+    </ul>
+    <p>All locally-stored data can be cleared by uninstalling the PWA and clearing site data (see Section 9 below).</p>
+
+    <h2>5. Third-party services and what each receives</h2>
+
+    <table>
+      <thead><tr><th>Service</th><th>Purpose</th><th>Data shared</th><th>Their policy</th></tr></thead>
+      <tbody>
+      <tr><td>Supabase</td><td>Database, auth, storage</td><td>All app data (Operator's records + visitor comments)</td><td><a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></td></tr>
+      <tr><td>Cloudflare</td><td>Edge hosting, CDN, DNS</td><td>Standard HTTP request data</td><td><a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a></td></tr>
+      <tr><td>Strava</td><td>Activity sync (Operator only)</td><td>OAuth token + activity reads, Operator's account</td><td><a href="https://www.strava.com/legal/privacy" target="_blank" rel="noopener">strava.com/legal/privacy</a></td></tr>
+      <tr><td>Meta / Instagram</td><td>Post publishing (Operator only)</td><td>OAuth token, Operator's account</td><td><a href="https://privacycenter.instagram.com/policy" target="_blank" rel="noopener">privacycenter.instagram.com/policy</a></td></tr>
+      <tr><td>Resend</td><td>Transactional email (Operator only)</td><td>Operator's own email address</td><td><a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">resend.com/privacy</a></td></tr>
+      <tr><td>Google Gemini</td><td>Food photo scanning (Operator only)</td><td>Operator's food photos</td><td><a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">ai.google.dev terms</a></td></tr>
+      <tr><td>Google Cloud Storage</td><td>Archival media (Operator only)</td><td>Operator's media files</td><td><a href="https://cloud.google.com/terms/cloud-privacy-notice" target="_blank" rel="noopener">cloud.google.com privacy</a></td></tr>
+      </tbody>
+    </table>
+
+    <p>None of these services receives visitor data beyond what's normal for the underlying transport (e.g., Cloudflare seeing your HTTP request).</p>
+
+    <h2>6. Notifications, auto-updates, and other PWA behaviour</h2>
+
+    <h3>6.1 Push notifications</h3>
+    <p>The PWA does not currently send push notifications. If this changes in future, a clear opt-in prompt will be shown at install time and notification permission must be explicitly granted by the user via the browser's standard permission dialog. Notifications can be revoked at any time from browser site settings.</p>
+
+    <h3>6.2 Auto-updates</h3>
+    <p>The PWA service worker checks for a new shell version on each visit and updates silently in the background. This is a standard PWA behaviour. No code outside the firstlight.live origin is installed, executed, or modified.</p>
+
+    <h3>6.3 No system modification</h3>
+    <p>Installing the PWA adds an icon to your home screen / app launcher. It does not modify operating-system files, registry entries, browser settings, default search engine, default homepage, or any other system configuration. Uninstalling fully removes the icon and cached data.</p>
+
+    <h3>6.4 No background activity outside the app</h3>
+    <p>The PWA does not run in the background, does not intercept other apps' traffic, does not collect data from other apps, does not modify other apps. It only runs when you explicitly open it.</p>
+
+    <h2>7. Data retention</h2>
+    <p>The Operator's personal data is retained indefinitely as part of a long-term personal-accountability archive. Visitor comments are retained until removed by the Operator or upon request from the commenter.</p>
+
+    <h2>8. Your rights</h2>
+    <p>If you have submitted a comment and wish to:</p>
+    <ul>
+      <li><b>Delete it</b> — email <a href="mailto:firstlightlive@gmail.com">firstlightlive@gmail.com</a> with the comment text and date. It will be removed within 7 days.</li>
+      <li><b>See what is stored</b> — email the same address. The Operator will reply with a copy.</li>
+      <li><b>Request correction</b> — same.</li>
+    </ul>
+    <p>If you are a resident of a jurisdiction that grants additional rights (GDPR, CCPA, DPDP), those rights apply and can be exercised by emailing the same address. The Operator is a single individual and will respond within 30 days.</p>
+
+    <h2>9. How to remove the site from your device</h2>
+
+    <h3>9.1 Uninstall the PWA</h3>
+    <ul>
+      <li><b>iPhone / iPad:</b> Long-press the icon → "Remove App" → "Delete App".</li>
+      <li><b>Android:</b> Long-press the icon → "Uninstall" (or drag to the uninstall area).</li>
+      <li><b>Mac / Windows / Linux (Chrome/Edge/Brave):</b> Open <code>chrome://apps</code> → right-click "First Light" → "Remove from Chrome".</li>
+      <li><b>Safari macOS 17+:</b> Right-click the dock icon → "Remove from Dock".</li>
+    </ul>
+
+    <h3>9.2 Clear all locally-cached data</h3>
+    <ul>
+      <li><b>Chrome / Edge / Brave:</b> Settings → Privacy &amp; security → Site settings → View permissions and data stored across sites → search "firstlight.live" → Clear data.</li>
+      <li><b>Safari (Mac):</b> Settings → Privacy → Manage Website Data → search "firstlight" → Remove.</li>
+      <li><b>Safari (iOS):</b> Settings → Safari → Advanced → Website Data → Edit → swipe "firstlight.live" → Delete.</li>
+      <li><b>Firefox:</b> Settings → Privacy &amp; Security → Cookies and Site Data → Manage Data → search "firstlight" → Remove Selected.</li>
+    </ul>
+    <p>This clears localStorage, IndexedDB, service worker cache, and any other site-scoped storage.</p>
+
+    <h3>9.3 Revoke third-party connections (Operator only)</h3>
+    <p>If you are the Operator and want to disconnect linked accounts:</p>
+    <ul>
+      <li><b>Strava:</b> <a href="https://www.strava.com/settings/apps" target="_blank" rel="noopener">strava.com/settings/apps</a> → revoke "FirstLight"</li>
+      <li><b>Instagram / Meta:</b> <a href="https://accountscenter.facebook.com/apps_and_websites" target="_blank" rel="noopener">accountscenter.facebook.com/apps_and_websites</a> → remove app</li>
+    </ul>
+
+    <h2>10. Security</h2>
+    <p>The Operator follows reasonable security practices:</p>
+    <ul>
+      <li>HTTPS everywhere; HSTS preload</li>
+      <li>Content-Security-Policy, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy headers</li>
+      <li>PIN protected by PBKDF2 (200,000 iterations, SHA-256, random salt) before storage in IndexedDB</li>
+      <li>Supabase Row-Level Security on private tables; sensitive secrets restricted to the database's service role only</li>
+      <li>API tokens stored server-side, never bundled in client JavaScript</li>
+    </ul>
+    <p>No system is perfectly secure. If you believe you have found a vulnerability, please email <a href="mailto:firstlightlive@gmail.com">firstlightlive@gmail.com</a> in good faith before public disclosure.</p>
+
+    <h2>11. Children</h2>
+    <p>This site is not directed at children under 16 and the Operator does not knowingly collect data from children. If a parent or guardian believes a comment was submitted by a child, please email <a href="mailto:firstlightlive@gmail.com">firstlightlive@gmail.com</a> and it will be removed.</p>
+
+    <h2>12. International transfers</h2>
+    <p>Data may be processed in jurisdictions outside India (US / EU) as part of normal cloud-hosted infrastructure. By using the site you consent to such processing.</p>
+
+    <h2>13. Changes to this policy</h2>
+    <p>Material changes will be reflected here with an updated "Last Updated" date.</p>
+
+    <h2>14. Contact</h2>
+    <p>Privacy questions, deletion requests, data-access requests, or security disclosures: <a href="mailto:firstlightlive@gmail.com">firstlightlive@gmail.com</a></p>
+
+    <div class="footer-back">
+      <a href="index.html">← firstlight.live</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="about.html">About</a>
+    </div>
+    <p style="margin-top: 40px; color: #555; font-size: 11px;">© 2026 Anupam Kumar · firstlight.live</p>
+  </div>
 </body>
 </html>

@@ -7,7 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>FIRST LIGHT - The Ironman Journey</title>
-  <meta name="description" content="From Day 1 to Ironman 140.6. Training for the impossible with real stakes. Every run, ride, and swim tracked live.">
+  <meta name="description" content="A personal accountability journal — one individual's daily training for Ironman 140.6, documented in public. Single-user. Read-only for visitors. Not gambling, not a financial service.">
+  <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://firstlight.live/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,9 +17,51 @@
   <link rel="icon" type="image/png" href="icon-512.png">
   <link rel="apple-touch-icon" href="icon-512.png">
   <meta property="og:title" content="FIRST LIGHT - The Ironman Journey">
-  <meta property="og:description" content="From Day 1 to Ironman 140.6. Training for the impossible with real stakes.">
+  <meta property="og:description" content="A personal accountability journal — one individual's daily training for Ironman 140.6, documented in public. Single-user. Read-only for visitors.">
   <meta property="og:image" content="https://firstlight.live/icon-512.png">
   <meta property="og:url" content="https://firstlight.live/">
+  <meta property="og:type" content="website">
+
+  <!-- Structured data: declare this as a personal blog / web application —
+       not a financial service, not gambling, not a marketplace -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["WebSite", "Blog"],
+    "name": "First Light",
+    "alternateName": "FirstLight Personal Accountability Journal",
+    "url": "https://firstlight.live/",
+    "description": "A personal accountability journal documenting one individual's daily training for Ironman 140.6. Read-only for visitors. The ₹ amounts referenced are self-imposed personal commitments paid by the operator to themselves — not gambling, not wagering, not a financial service.",
+    "inLanguage": "en",
+    "author": {
+      "@type": "Person",
+      "name": "Anupam Kumar",
+      "url": "https://firstlight.live/about.html",
+      "jobTitle": "Data Architect",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Bangalore",
+        "addressCountry": "IN"
+      },
+      "sameAs": [
+        "https://www.instagram.com/firstlightlive",
+        "https://www.linkedin.com/in/anupam1001/",
+        "https://strava.app.link/jxGRExHXo2b"
+      ]
+    },
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "Single individual (Anupam Kumar) writes; visitors read."
+    },
+    "isAccessibleForFree": true,
+    "isFamilyFriendly": true,
+    "publisher": {
+      "@type": "Person",
+      "name": "Anupam Kumar"
+    },
+    "license": "https://firstlight.live/terms.html"
+  }
+  </script>
 
   <!-- CDN Libraries (loaded before body scripts) -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -1052,7 +1095,7 @@
       <div class="section-eyebrow reveal-up" style="text-align:center">CLAIMS & IMPACT</div>
       <h2 class="section-heading reveal-up" style="text-align:center;margin-bottom:40px">When You Miss, The Community Responds</h2>
       <p style="text-align:center; max-width:600px; margin:0 auto 48px; color:rgba(255,255,255,0.7); font-size:14px; line-height:1.8;">
-        Every missed day creates a ₹15,000 claimable opportunity. Followers can claim it for their cause or donate to charity. Transparency through accountability.
+        Every missed day triggers a ₹15,000 self-imposed personal-accountability transfer from the Operator to the first verified accountability witness. Witnesses may redirect to their cause or charity. Personal accountability mechanism — not a contest, not gambling, no entry fee, no chance element.
       </p>
 
       <!-- CLAIMS IMPACT METRICS -->
@@ -1100,8 +1143,11 @@
         <a href="https://strava.app.link/jxGRExHXo2b" target="_blank" rel="noopener">STRAVA</a>
         <a href="story.html">MY STORY</a>
         <a href="about.html">ABOUT</a>
+        <a href="privacy.html">PRIVACY</a>
+        <a href="terms.html">TERMS</a>
       </div>
       <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto">Personal accountability journal · Single-user · Not gambling, not a financial service. ₹ amounts shown are self-imposed personal commitments.</div>
       <div class="fl-footer-copy">&copy; 2026 Anupam Kumar</div>
     </div>
   </footer>
