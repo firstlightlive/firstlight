@@ -50,15 +50,19 @@ for f in website/punch.html website/install.html website/app/index.html website/
 done
 node -e "JSON.parse(require('fs').readFileSync('website/manifest.json'))" 2>/dev/null && ok "manifest.json valid" || bad "manifest.json" "invalid"
 
-# SHELL_VERSION cache-pin guard — warns if PWA installs would stay on stale cache
+# SHELL_VERSION cache-pin guard — warns if uncommitted precache changes pile up without bumping
 local_sw_ver=$(/usr/bin/grep -E "^const SHELL_VERSION" website/sw.js | sed -E "s/.*'([^']+)'.*/\1/")
 live_sw_ver=$(curl -sS "${BASE}/sw.js" 2>/dev/null | /usr/bin/grep -E "^const SHELL_VERSION" | sed -E "s/.*'([^']+)'.*/\1/")
+# Count uncommitted modifications to precache-relevant files (anything wrangler would ship)
+uncommitted_precache=$(git status --porcelain 2>/dev/null | /usr/bin/grep -E "^.M (website/sw\.js|website/app\.js|website/.*\.html|website/manifest\.json|website/js/.*\.js|website/styles\.css)" | wc -l | tr -d ' ')
 if [ -z "$local_sw_ver" ]; then
   bad "SHELL_VERSION" "couldn't parse from local sw.js"
 elif [ -z "$live_sw_ver" ]; then
   note "couldn't fetch live SHELL_VERSION (site may be unreachable) — skipping cache-pin check"
+elif [ "$local_sw_ver" = "$live_sw_ver" ] && [ "$uncommitted_precache" -gt 0 ]; then
+  bad "SHELL_VERSION cache pin" "local + live both at ${local_sw_ver} AND ${uncommitted_precache} uncommitted precache file(s). Bump SHELL_VERSION in website/sw.js or installed PWAs will stay on the old cache."
 elif [ "$local_sw_ver" = "$live_sw_ver" ]; then
-  bad "SHELL_VERSION cache pin" "local + live both at ${local_sw_ver} — installed PWAs will stay on the old cache. Bump SHELL_VERSION in website/sw.js before deploying."
+  ok "SHELL_VERSION matches live (${local_sw_ver}) and no uncommitted precache changes"
 else
   ok "SHELL_VERSION bumped (${live_sw_ver} → ${local_sw_ver}) — installed PWAs will pick up changes"
 fi
