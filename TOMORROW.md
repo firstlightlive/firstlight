@@ -1,82 +1,59 @@
 # Tomorrow — resume from here
 
-> Updated 2026-06-16 evening (after RLS lockdown + revert of stake-strip).
+> Updated 2026-06-18 (post Google Unwanted Software Policy compliance + admin_api_key rotation + cron secrets refactor + Option A deploy)
 
 ## Current state in one paragraph
 
-GitHub `prod` + `main` are at `9f260e1` (₹15K language fully restored — yesterday's strip was reverted this morning). Supabase RLS has been hard-locked: 62-table god-mode-for-anon has dropped to 13 public-by-design tables only, with finance/journal/health/brahma/mastery/sleep all returning 401 to anon. **Cloudflare worker is still 4 commits behind** because wrangler is logged out and there's a known blocker we shouldn't deploy through.
+Cloudflare worker **is fully up to date** as of today. Two deploys this session:
+(1) Full Google Unwanted Software Policy compliance — new `/terms` + expanded `/privacy`, JSON-LD declaring this as a personal accountability journal not a financial service, gambling-coded phrases reframed across all indexed pages, ₹15K kept visible per design philosophy, footer disclaimer + noindex on admin/punch/post-*.
+(2) `admin_api_key` rotated (old `b8464678…` → new `934c03a1…`), client files updated (`app.js`, `admin-recap.js`, `admin-dailyproof.js`, `app/index.html`), and cron SQL refactored so the 15 cron jobs no longer hardcode keys — they call `firstlight_cron_call(action_name)` which reads from `public.secrets` at execution time. Supabase RLS option A applied — anon INSERT/UPDATE re-granted on `daily_checkin`, `sleep_log`, `brahma_log`, `mastery_log` so the daily-punch writes work; SELECT still locked. Edge Function verified live with new key (preflight 200) and old key (preflight 403).
 
-## 🛑 The deploy blocker
+## ✅ What just shipped (no follow-up needed)
 
-After yesterday's RLS lockdown, the PWA's `FL.upsert()` writes now hit 401 on `daily_checkin`, `sleep_log`, `brahma_log`, `mastery_log` because anon INSERT/UPDATE was revoked on those tables. Deploying right now would silently break daily-punch — writes get queued in the offline write store and retry forever with 401s.
+- **Google policy**: `/privacy.html`, `/terms.html`, `/install.html` rewrite, footer disclaimers + Privacy/Terms links across 14 public pages, JSON-LD on top pages, `noindex,nofollow` on admin/punch/app-icon/handout/18 post-* templates, all gambling-coded language reframed while keeping ₹15K visible.
+- **Option A**: `GRANT INSERT, UPDATE` on the 4 punch tables to anon. Daily punch writes will succeed. SELECT still 401 on private tables.
+- **Admin key rotation**: New `934c03a1…` key in DB secrets, 5 client files updated, old key rejected with 403.
+- **Cron refactor**: Helper function `public.firstlight_cron_call(action_name)` reads keys from `secrets` at call time. All 15 cron jobs rewritten to use it — zero hardcoded keys in cron command text. Repo SQL files (`supabase/fix_cron_jobs.sql`, `supabase/email_cron_jobs.sql`) regenerated to match. Rotating the key now requires only `UPDATE public.secrets SET value=…`.
 
-**Three viable resolutions, pick one before deploy:**
+## 🟡 Still pending (you, not the harness)
 
-| Option | What | Time | Security |
-|---|---|---|---|
-| **A** | Re-grant anon INSERT/UPDATE on the 4 punch tables only — reads stay locked | 30 sec (one SQL call) | Strong-but-not-max: attacker can WRITE fake rows but can't READ data. For a personal 1-user app, acceptable. |
-| **B** | Build Edge-function write proxy + migrate FL.upsert() → POST through firstlight-sync with admin_api_key | 30–60 min | Maximum |
-| **C** | Hold deploy entirely — leave site on yesterday's "no-₹15K" version | 0 min | Same as A in effect; site temporarily shows the cleaner anti-IG-flag version |
+1. **Rotate the Supabase Mgmt token** (the `sbp_d3d1…7352` one in your transcripts) — flagged in earlier sessions; used several times today (option A SQL, secrets UPDATE, cron rebuild). Revoke + recreate at Supabase Dashboard → Account → Access Tokens.
+2. **Rotate the GitHub PAT** `ghp_7aJU…1yqJ` — also flagged earlier. GitHub → Settings → Developer settings → Personal access tokens.
+3. **DMARC alignment fix** — current DNS shows `aspf=s` (strict). The Google DMARC report you forwarded showed SPF alignment failing because Resend's bounce path is `send.firstlight.live`, not the apex `firstlight.live`. Flip `aspf=s` → `aspf=r` on the `_dmarc.firstlight.live` TXT record via Cloudflare DNS Dashboard (Domain → DNS → Records → find `_dmarc` → edit → save). 30 seconds. Verify with: `dig +short TXT _dmarc.firstlight.live`.
+4. **Search Console + Safe Browsing transparency check** — verify whether firstlight.live was ever actually flagged under the Unwanted Software Policy. If yes, after the new `/terms` + `/privacy` are live (they are), submit a review request at Search Console → Security Issues.
+5. **Postmaster Tools registration** at https://postmaster.google.com — live Gmail reputation feedback.
+6. **Device Fortress Log breach removal** — original ask from Jun 16, not started.
 
-**Recommendation: A now (so daily punch works tonight) + B in next session.**
+## 🟢 Bigger work, deferred (Option B / quality improvements)
 
-The SQL for A:
-```sql
-GRANT INSERT, UPDATE ON public.daily_checkin, public.sleep_log,
-                          public.brahma_log, public.mastery_log TO anon;
-```
-Then deploy.
-
-## Resume sequence (after picking A or B)
-
-```bash
-# 1. Either run option A (above SQL via Management API)
-#    OR finish option B (write Edge function proxy code)
-# 2. Re-auth wrangler — interactive
-!npx wrangler login           # sign in as firstlightlive@gmail.com (account 1a48cc…)
-# 3. Deploy
-cd website && npx wrangler deploy --name firstlight
-# 4. Verify
-bash scripts/pre-deploy-check.sh
-```
-
-## Pending non-deploy work
-
-1. **SPF + DMARC DNS records** — add via Cloudflare DNS dashboard:
-   - `TXT @ → v=spf1 include:_spf.resend.com -all`
-   - `TXT _dmarc → v=DMARC1; p=quarantine; rua=mailto:tradeforgein@gmail.com; aspf=s; adkim=s; pct=100; fo=1`
-2. **Device Fortress Log breach removal** — original ask from yesterday, not started yet.
-3. **Token rotations**: `ghp_7aJU…1yqJ` (GitHub PAT) + `sbp_d3d1…7352` (Supabase Mgmt) — both in transcripts.
-4. **Migrate admin private-table reads through Edge function** — finance / journal / brahma / sleep / mastery panels will be empty after deploy until reads flow through the Edge function. Same path as option B above.
+- **Option B from the prior plan**: route all `FL.upsert()` writes through `firstlight-sync` Edge Function with `admin_api_key`. This would let you fully re-lock anon writes on the 4 punch tables. Option A is the temporary fix; B is the durable one.
+- **Code-review bugs found in the deep read** (untouched today):
+  - `app.js:181-187` `getDayNumber()` builds today via `new Date(year, month, day)` — uses runtime's local TZ, not IST. Off-by-one possible at midnight boundary.
+  - `app.js:682` `LOCK_HOUR = 0` but `CLAUDE.md` says "History lock: 3:00 AM IST grace window". One of them is wrong.
+  - `website/js/admin-claims.js` — 5.4 KB orphan, never loaded by `admin.html`. Delete or wire up.
+  - `website/sw.js:6` `SHELL_VERSION = 'fl-shell-v5'` hardcoded. If you forget to bump on next deploy, installed PWAs stay pinned to today's shell.
 
 ## Audit scripts (committed under `scripts/`)
 
 | Script | Purpose | Run |
 |---|---|---|
 | `test-suite.sh` | 70-check regression suite (PWA + Edge + DB + cron) | `SUPABASE_ACCESS_TOKEN=sbp_… bash scripts/test-suite.sh` |
-| `verify-no-wagering.sh` | 55-check wagering-language scan (informational — user wants ₹15K back so this will report hits) | `bash scripts/verify-no-wagering.sh` |
 | `security-audit.sh` | Full security audit (HTTP headers, secrets, auth, CSP, RLS, email, DNS) | `bash scripts/security-audit.sh` |
-| `pre-deploy-check.sh` | Comprehensive go/no-go before any deploy | `bash scripts/pre-deploy-check.sh` |
-| `strip-stake-amount.js` | Idempotent ₹-stripper (used yesterday, then reverted) — keep around | `node scripts/strip-stake-amount.js` |
+| `pre-deploy-check.sh` | Comprehensive go/no-go before any deploy — **note section 6 still hardcodes the Option A blocker; update or ignore** | `bash scripts/pre-deploy-check.sh` |
 | `backfill-strava-calories.sh` | Strava calorie historical backfill (already complete; safe to re-run) | `SUPABASE_ACCESS_TOKEN=sbp_… bash scripts/backfill-strava-calories.sh` |
+| `strip-stake-amount.js` | (deprecated) reverted Jun 16 — user explicitly wants ₹15K visible | n/a |
 
-## RLS lockdown reference (what's now locked vs open)
+## RLS state (post-Option A)
 
-**LOCKED to anon** (49 tables · 401 permission denied):
-- Finance: `expense_log` · `income_log` · `investment_log` · `finance_{annual_budgets,budgets,fire_config,networth,recurring}`
-- Journal: `journal_{entries,insights,notes}`
-- Voice/work: `voice_entries` · `deep_work_sessions` · `deepwork_log`
-- Audit: `auth_audit_log` · `architecture_log` · `archive_log` · `ig_api_queue`
-- Daily PII: `brahma_{log,daily,weekly,monthly}` · `sleep_log` · `daily_{checkin,logs,rituals}` · `ritual_{completions,definitions}` · `rituals_log`
-- Mastery: `mastery_{log,daily,weekly,monthly_scores,ideas}`
-- Health/body: `health_{daily,metrics,weekly}` · `body_weight` · `weekly_metrics`
-- Other: `tomorrow_plan` · `gym_{sets,workouts}` · `goals` · `goal_comments` · `ekadashi_log` · `stories_completions` · `reading_log` · `weekly_schedule` · `monthly_grids`
-- **CRITICAL**: `secrets` (locked from everyone except service_role)
-- **Catastrophic ops** (TRUNCATE / DELETE / TRIGGER / REFERENCES) revoked from anon on ALL tables
+**LOCKED to anon SELECT (49 tables · 401 on read)** — unchanged from Jun 16 lockdown:
+- Finance, journal, voice/work, audit, daily PII, mastery, health/body, planning, system meta tables. All same as before.
+- **`secrets`** still locked to service_role only.
 
-**STILL public to anon** (13 tables · public-by-design):
-- Read-only display: `proof_archive` · `slips` · `strava_activities` · `instagram_posts` · `races` · `config` · `site_config` · `site_stats`
-- Public engagement: `comments` · `comment_reactions` · `engagement_counters` · `site_visits` · `visitor_identities`
+**Anon INSERT/UPDATE NEWLY re-granted on (Option A)** — but read still locked:
+- `daily_checkin`, `sleep_log`, `brahma_log`, `mastery_log`
+
+**STILL public to anon (13 tables)** — unchanged:
+- `proof_archive`, `slips`, `strava_activities`, `instagram_posts`, `races`, `config`, `site_config`, `site_stats`, `comments`, `comment_reactions`, `engagement_counters`, `site_visits`, `visitor_identities`
 
 ## Cloudflare deploy account
 
@@ -88,11 +65,10 @@ bash scripts/pre-deploy-check.sh
 
 | Surface | Status | Note |
 |---|---|---|
-| pg_cron sync jobs (15 active) | running ✓ | Strava + email + sync continue on schedule |
+| pg_cron sync jobs (15 active) | running ✓ | Now key-leak-free; reads from secrets table at call time |
 | Strava → Supabase pipeline | healthy ✓ | Detail-fetch + MET calorie fallback in place |
-| 318/318 calorie data | populated ✓ | Total 123,370 kcal across AW7 + Strava App |
-| Public site at firstlight.live | live, ₹-stripped version ✓ | Will flip to ₹15K version on next deploy |
-| Supabase RLS | locked ✓ | Anon can't read private data |
-| IG sync (token at 4 days) | running on FB-rate-limited tokens ✓ | Alert fires every sync since FB account is restricted |
+| Public site at firstlight.live | live ✓ | Google-policy compliant + ₹15K visible |
+| Supabase RLS | locked except Option A writes ✓ | Anon can't read private data; can write to the 4 punch tables only |
+| IG sync | running ✓ | |
 
 Resume tomorrow from this doc.

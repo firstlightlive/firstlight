@@ -1,180 +1,70 @@
 -- ═══════════════════════════════════════════════════════
--- FIRST LIGHT — Fix Cron Jobs
--- Run in: Supabase Dashboard → SQL Editor
+-- FIRST LIGHT — Cron Jobs (Sync)
+-- Run in: Supabase Dashboard → SQL Editor (project edgnudrbysybefbqyijq)
 --
--- Step 1: Run the DIAGNOSTIC queries first (at bottom)
--- Step 2: If jobs are failing, run the FIX section
+-- Refactored 2026-06-18: keys no longer hardcoded.
+-- Helper function reads admin_api_key + anon_key from the `secrets`
+-- table at call time, so cron job command text contains no secrets.
+-- Rotate by UPDATEing public.secrets; nothing else needs to change.
+--
+-- Schedules (IST → UTC):
+--   Early sync chain   05:30, 05:45, 05:55, 05:59 IST → 00:00, 00:15, 00:25, 00:29 UTC
+--   Deadline window    06:00, 06:01, 06:15 IST       → 00:30, 00:31, 00:45 UTC
+--   Mid-morning        07:30, 09:00 IST              → 02:00, 03:30 UTC
+--   Late refresh       19:00 IST                     → 13:30 UTC
+--   Pre-archive sync   02:00 IST                     → 20:30 UTC (previous day)
 -- ═══════════════════════════════════════════════════════
 
--- ══════════════════════════════════
--- DIAGNOSTIC: Check existing jobs
--- ══════════════════════════════════
-
--- 1. List all cron jobs
-SELECT jobid, jobname, schedule, command FROM cron.job ORDER BY jobid;
-
--- 2. Check execution history (last 20)
-SELECT jobid, job_name, status, return_message, start_time, end_time
-FROM cron.job_run_details
-ORDER BY start_time DESC
-LIMIT 20;
-
--- ══════════════════════════════════
--- FIX: Delete old jobs and recreate
--- Run this ONLY if diagnostic shows failures
--- ══════════════════════════════════
-
--- First, delete ALL existing sync jobs
-SELECT cron.unschedule(jobname) FROM cron.job WHERE jobname LIKE 'sync-%';
-
--- Verify pg_net is enabled
+-- Ensure pg_net is enabled (for HTTP calls from cron)
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
--- Recreate all 6 jobs with correct syntax
--- 5:55 AM IST = 00:25 UTC
-SELECT cron.schedule(
-  'sync-0555',
-  '25 0 * * *',
-  $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
+-- ─────────────────────────────────────────────────────────────
+-- HELPER: reads keys from secrets at execution time
+-- ─────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.firstlight_cron_call(action_name TEXT)
+RETURNS VOID AS $body$
+DECLARE
+  v_admin_key TEXT;
+  v_anon_key TEXT;
+BEGIN
+  SELECT value INTO v_admin_key FROM public.secrets WHERE key = 'admin_api_key';
+  SELECT value INTO v_anon_key  FROM public.secrets WHERE key = 'anon_key';
+
+  PERFORM net.http_get(
+    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=' || action_name,
     headers := jsonb_build_object(
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0.UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk',
-      'X-Admin-Key', 'b8464678b573c885c449958a9ea760c08b01279d01d3a1f996fc92b7364f10b7'
+      'Authorization', 'Bearer ' || v_anon_key,
+      'X-Admin-Key',   v_admin_key
     )
   );
-  $$
-);
+END;
+$body$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 5:59 AM IST = 00:29 UTC
-SELECT cron.schedule(
-  'sync-0559',
-  '29 0 * * *',
-  $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0.UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk',
-      'X-Admin-Key', 'b8464678b573c885c449958a9ea760c08b01279d01d3a1f996fc92b7364f10b7'
-    )
-  );
-  $$
-);
+-- ─────────────────────────────────────────────────────────────
+-- Clean slate: remove all prior sync jobs (idempotent)
+-- ─────────────────────────────────────────────────────────────
+DO $$
+DECLARE r RECORD;
+BEGIN
+  FOR r IN SELECT jobname FROM cron.job WHERE jobname LIKE 'sync-%' LOOP
+    PERFORM cron.unschedule(r.jobname);
+  END LOOP;
+END $$;
 
--- 6:15 AM IST = 00:45 UTC
-SELECT cron.schedule(
-  'sync-0615',
-  '45 0 * * *',
-  $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0.UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk',
-      'X-Admin-Key', 'b8464678b573c885c449958a9ea760c08b01279d01d3a1f996fc92b7364f10b7'
-    )
-  );
-  $$
-);
+-- ─────────────────────────────────────────────────────────────
+-- Recreate 11 sync jobs (all call action=sync)
+-- ─────────────────────────────────────────────────────────────
+SELECT cron.schedule('sync-0200', '30 20 * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0530', '0  0  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0545', '15 0  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0555', '25 0  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0559', '29 0  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0600', '30 0  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0601', '31 0  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0615', '45 0  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0730', '0  2  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-0900', '30 3  * * *', $$SELECT public.firstlight_cron_call('sync')$$);
+SELECT cron.schedule('sync-1900', '30 13 * * *', $$SELECT public.firstlight_cron_call('sync')$$);
 
--- 9:00 AM IST = 03:30 UTC
-SELECT cron.schedule(
-  'sync-0900',
-  '30 3 * * *',
-  $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0.UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk',
-      'X-Admin-Key', 'b8464678b573c885c449958a9ea760c08b01279d01d3a1f996fc92b7364f10b7'
-    )
-  );
-  $$
-);
-
--- 7:00 PM IST = 13:30 UTC
-SELECT cron.schedule(
-  'sync-1900',
-  '30 13 * * *',
-  $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0.UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk',
-      'X-Admin-Key', 'b8464678b573c885c449958a9ea760c08b01279d01d3a1f996fc92b7364f10b7'
-    )
-  );
-  $$
-);
-
--- 2:00 AM IST = 20:30 UTC
-SELECT cron.schedule(
-  'sync-0200',
-  '30 20 * * *',
-  $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0.UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk',
-      'X-Admin-Key', 'b8464678b573c885c449958a9ea760c08b01279d01d3a1f996fc92b7364f10b7'
-    )
-  );
-  $$
-);
-
--- ══════════════════════════════════
--- ADDED 2026-06-12 (eve of Chapter 2): dense deadline window
--- Strava sync is mission-critical around the 6:00 AM IST deadline.
--- Live morning cadence: 5:30 · 5:45 · 5:55 · 5:59 · 6:00 · 6:01 · 6:15 IST.
--- Applied to the live DB via Supabase Management API on 2026-06-12.
--- ══════════════════════════════════
-
--- 5:30 AM IST = 00:00 UTC
-SELECT cron.schedule('sync-0530', '0 0 * * *', $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer <SUPABASE_ANON_KEY>',
-      'X-Admin-Key', '<ADMIN_API_KEY>'
-    )
-  );
-  $$
-);
-
--- 5:45 AM IST = 00:15 UTC
-SELECT cron.schedule('sync-0545', '15 0 * * *', $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer <SUPABASE_ANON_KEY>',
-      'X-Admin-Key', '<ADMIN_API_KEY>'
-    )
-  );
-  $$
-);
-
--- 6:00 AM IST = 00:30 UTC
-SELECT cron.schedule('sync-0600', '30 0 * * *', $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer <SUPABASE_ANON_KEY>',
-      'X-Admin-Key', '<ADMIN_API_KEY>'
-    )
-  );
-  $$
-);
-
--- 6:01 AM IST = 00:31 UTC (deadline-edge capture)
-SELECT cron.schedule('sync-0601', '31 0 * * *', $$
-  SELECT net.http_get(
-    url := 'https://edgnudrbysybefbqyijq.supabase.co/functions/v1/firstlight-sync?action=sync',
-    headers := jsonb_build_object(
-      'Authorization', 'Bearer <SUPABASE_ANON_KEY>',
-      'X-Admin-Key', '<ADMIN_API_KEY>'
-    )
-  );
-  $$
-);
-
--- Verify new jobs
-SELECT jobid, jobname, schedule FROM cron.job ORDER BY jobid;
+-- ── VERIFY ──
+SELECT jobname, schedule, command FROM cron.job WHERE jobname LIKE 'sync-%' ORDER BY jobname;

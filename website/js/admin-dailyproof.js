@@ -695,7 +695,7 @@
     var captionEl = panel.querySelector('#dproofCaption');
 
     var SYNC_URL = SUPA + '/functions/v1/firstlight-sync';
-    var ADMIN_KEY = ['b8464678b573c885', 'c449958a9ea760c0', '8b01279d01d3a1f9', '96fc92b7364f10b7'].join('');
+    var ADMIN_KEY = ['934c03a18ffe22cb', 'ccef763b4bf480d5', '3f0690177904ba2b', '1d9ebacd52b0eb5d'].join('');
     var IG_ACCOUNT = '17841466893616231';
 
     function renderBoth() {

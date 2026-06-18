@@ -64,11 +64,13 @@ const FL_DEFAULTS = {
   MARATHON_TIME: 'Sub 4:30:00',
 };
 
-// Ensure admin key is always available in localStorage (needed by profile, races, etc.)
-if (!localStorage.getItem('fl_admin_key')) {
-  var _ak = ['b8464678b573c885','c449958a9ea760c0','8b01279d01d3a1f9','96fc92b7364f10b7'];
-  localStorage.setItem('fl_admin_key', _ak.join(''));
-}
+// Ensure admin key is always current — overwrite on every load to support rotation
+(function() {
+  var _ak = ['934c03a18ffe22cb','ccef763b4bf480d5','3f0690177904ba2b','1d9ebacd52b0eb5d'].join('');
+  if (localStorage.getItem('fl_admin_key') !== _ak) {
+    localStorage.setItem('fl_admin_key', _ak);
+  }
+})();
 
 // Merge localStorage overrides with defaults
 function loadConfig() {
