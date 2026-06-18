@@ -354,12 +354,12 @@
     if (s.made) {
       ctx.fillText('✓ DONE ' + fmtClock(s.end) + ' · ' + fmtMargin(s.marginMin) + ' EARLY', W / 2, 858);
     } else {
-      ctx.fillText('✗ MISSED · ₹15,000 PAID · STREAK CONTINUES', W / 2, 858);
+      ctx.fillText('✗ MISSED · ₹15,000 SELF-IMPOSED · STREAK CONTINUES', W / 2, 858);
     }
 
     ctx.font = '500 20px ' + MONO;
     ctx.fillStyle = T.dim;
-    ctx.fillText('₹15,000 ON THE LINE · EVERY DAY · NO END DATE', W / 2, 926);
+    ctx.fillText('₹15,000 DAILY PERSONAL COMMITMENT · NO END DATE', W / 2, 926);
 
     ctx.font = '500 24px ' + MONO;
     ctx.fillStyle = T.dim;

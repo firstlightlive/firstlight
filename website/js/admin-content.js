@@ -113,7 +113,7 @@ function adjustCounter(id, delta) {
 function copyBio() {
   var day = getDayNumber();
   var unclaimed = '₹' + formatINR(getUnclaimed(day));
-  var bio = 'Miss 1 day = ₹15,000 to a follower. Cash.\n' + day + ' days. 0 misses. ' + unclaimed + ' unclaimed.\nRun + Food Code. Before 6AM. Daily.\nBLR | Follow to collect if I fail.';
+  var bio = 'Half Marathon 2:07 · Century 140km\nDaily runner · Bangalore\n' + day + ' days. 0 misses.\n₹15,000 daily self-imposed commitment\nfirstlight.live';
   navigator.clipboard.writeText(bio).then(function() {
     var btn = document.querySelector('[onclick="copyBio()"]');
     btn.classList.add('copied'); btn.textContent = 'COPIED ✓';
