@@ -183,7 +183,12 @@ function getNowIST() {
 function getDayNumber() {
   const start = new Date(FL.STREAK_START + 'T00:00:00+05:30');
   const ist = getNowIST();
-  const today = new Date(ist.getFullYear(), ist.getMonth(), ist.getDate());
+  // Anchor to IST midnight via ISO string so the result is the same in any runtime TZ.
+  // (new Date(year, month, day) builds in the runtime's local TZ — wrong for non-IST hosts.)
+  const y = ist.getFullYear();
+  const m = String(ist.getMonth() + 1).padStart(2, '0');
+  const d = String(ist.getDate()).padStart(2, '0');
+  const today = new Date(y + '-' + m + '-' + d + 'T00:00:00+05:30');
   const diff = Math.floor((today - start) / 86400000);
   return Math.max(0, diff + 1);
 }
@@ -676,16 +681,28 @@ function saveTodayStats(stats) {
 
 // ═══════════════════════════════════════════
 // HISTORY LOCK SYSTEM
-// Data locks at midnight. Once the date changes, previous day is permanently locked.
-// No grace window. Log activity before 6:00 AM local time.
+// Yesterday's data remains editable until 3:00 AM IST (grace window for
+// late-night logging). After 3 AM IST, the previous day is permanently locked.
+// All boundary math anchored to IST so traveling abroad doesn't shift the gate.
 // Exception: Races are always editable (no lock check in saveRace).
 // ═══════════════════════════════════════════
 
-var LOCK_HOUR = 0; // Midnight — data locks when the date changes.
+var LOCK_HOUR = 3; // 3 AM IST — yesterday editable until 3:00 AM IST
 
 function getEffectiveToday() {
-  // Always IST (UTC+5:30) — even if traveling in a different timezone
+  // Calendar IST date — used for streak walks and display labels.
+  // Does NOT apply the grace window; use getLockBoundary() for editability checks.
   var ist = getNowIST();
+  var y = ist.getFullYear();
+  var m = String(ist.getMonth() + 1).padStart(2, '0');
+  var d = String(ist.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + d;
+}
+
+function getLockBoundary() {
+  // Editability gate — before LOCK_HOUR IST, "yesterday" is still inside the grace window.
+  var ist = getNowIST();
+  if (ist.getHours() < LOCK_HOUR) ist.setDate(ist.getDate() - 1);
   var y = ist.getFullYear();
   var m = String(ist.getMonth() + 1).padStart(2, '0');
   var d = String(ist.getDate()).padStart(2, '0');
@@ -694,27 +711,26 @@ function getEffectiveToday() {
 
 function isDateLocked(dateStr) {
   if (!dateStr) return false;
-  var effectiveToday = getEffectiveToday();
-  if (dateStr >= effectiveToday) return false; // Today = editable
-  return true; // Any past date = locked permanently
+  if (dateStr >= getLockBoundary()) return false; // Today (or yesterday within grace) = editable
+  return true; // Past the grace window = locked permanently
 }
 
 function isWeekLocked(weekDateStr) {
-  // A week is locked if ALL 7 days in that week are past the grace window
+  // A week is locked if ALL 7 days fall before the current lock boundary
   if (!weekDateStr) return false;
   var weekEnd = new Date(weekDateStr);
   weekEnd.setDate(weekEnd.getDate() + 6);
-  var today = getEffectiveToday();
-  return (weekEnd.getFullYear()+'-'+String(weekEnd.getMonth()+1).padStart(2,'0')+'-'+String(weekEnd.getDate()).padStart(2,'0')) < today;
+  var boundary = getLockBoundary();
+  return (weekEnd.getFullYear()+'-'+String(weekEnd.getMonth()+1).padStart(2,'0')+'-'+String(weekEnd.getDate()).padStart(2,'0')) < boundary;
 }
 
 function isMonthLocked(monthStr) {
-  // A month is locked if the ENTIRE month is past the grace window
+  // A month is locked if its last day falls before the current lock boundary
   if (!monthStr) return false;
   var parts = monthStr.split('-');
   var lastDay = new Date(parseInt(parts[0]), parseInt(parts[1]), 0);
-  var today = getEffectiveToday();
-  return (lastDay.getFullYear()+'-'+String(lastDay.getMonth()+1).padStart(2,'0')+'-'+String(lastDay.getDate()).padStart(2,'0')) < today;
+  var boundary = getLockBoundary();
+  return (lastDay.getFullYear()+'-'+String(lastDay.getMonth()+1).padStart(2,'0')+'-'+String(lastDay.getDate()).padStart(2,'0')) < boundary;
 }
 
 function showLockWarning() {

@@ -50,6 +50,19 @@ for f in website/punch.html website/install.html website/app/index.html website/
 done
 node -e "JSON.parse(require('fs').readFileSync('website/manifest.json'))" 2>/dev/null && ok "manifest.json valid" || bad "manifest.json" "invalid"
 
+# SHELL_VERSION cache-pin guard — warns if PWA installs would stay on stale cache
+local_sw_ver=$(/usr/bin/grep -E "^const SHELL_VERSION" website/sw.js | sed -E "s/.*'([^']+)'.*/\1/")
+live_sw_ver=$(curl -sS "${BASE}/sw.js" 2>/dev/null | /usr/bin/grep -E "^const SHELL_VERSION" | sed -E "s/.*'([^']+)'.*/\1/")
+if [ -z "$local_sw_ver" ]; then
+  bad "SHELL_VERSION" "couldn't parse from local sw.js"
+elif [ -z "$live_sw_ver" ]; then
+  note "couldn't fetch live SHELL_VERSION (site may be unreachable) — skipping cache-pin check"
+elif [ "$local_sw_ver" = "$live_sw_ver" ]; then
+  bad "SHELL_VERSION cache pin" "local + live both at ${local_sw_ver} — installed PWAs will stay on the old cache. Bump SHELL_VERSION in website/sw.js before deploying."
+else
+  ok "SHELL_VERSION bumped (${live_sw_ver} → ${local_sw_ver}) — installed PWAs will pick up changes"
+fi
+
 # ────────────────────────────────────────────────────────────
 sect "3 · ₹15K STATUS — restored per user's morning decision"
 for f in website/index.html website/app/index.html website/streak.html website/covenant.html; do
