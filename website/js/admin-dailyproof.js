@@ -666,7 +666,7 @@
 
   function generateCaption(s) {
     if (!s.made) {
-      return 'Day ' + s.day + '. Missed. ₹15,000 paid.\nThe streak continues tomorrow.\n\nfirstlight.live';
+      return 'Day ' + s.day + '. Missed.\nSelf-imposed ₹15,000 personal commitment honoured.\nThe streak continues tomorrow.\n\nfirstlight.live';
     }
     return s.day + '\n\n' + s.km.toFixed(1) + ' km. Done ' + fmtClock(s.end).toLowerCase() + '. ' + fmtMargin(s.marginMin).toLowerCase() + ' before deadline.\n\nfirstlight.live';
   }
@@ -718,7 +718,7 @@
       if (modeSelect && modeSelect.value === 'restart') {
         currentStats = { restart: true, day: 0 };
         renderBoth();
-        captionEl.value = '0\n\n110 days. Then one morning, nothing.\nRestarting tomorrow — 5 km before 6 AM. Every day. ₹15,000/day at stake.\n\nfirstlight.live';
+        captionEl.value = '0\n\n110 days. Then one morning, nothing.\nRestarting tomorrow — 5 km before 6 AM. Every day.\n₹15,000 daily self-imposed personal commitment.\n\nfirstlight.live';
         statusEl.textContent = 'Restart announcement rendered — Day 0. No Strava data needed.';
         downloadPostBtn.style.display = '';
         downloadStoryBtn.style.display = '';
