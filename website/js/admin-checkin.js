@@ -511,9 +511,9 @@ async function checkMissedSealPunishments() {
 }
 
 // ── AUTO-PUNISHMENT: Daily check-in missed ──
-// If the daily check-in did not happen for a locked day → 20 km walk auto-fine.
-// Chapter 2 rule (from 2026-06-13): a missing check-in record IS a miss — no record = fined.
-// Pre-Chapter-2 dates are never re-judged (gap days Jun 9-12 + closed Chapter 1 are exempt).
+// If the daily check-in did not happen for a locked day → ₹1,500 to Akshaya Patra auto-fine.
+// Chapter 2 ENDURANCE rule (from 2026-06-20): a missing check-in record IS a miss — no record = fined.
+// Pre-Chapter-2 dates are never re-judged.
 var _morningCheckDone = false;
 async function checkMissedMorningCheckin() {
   if (_morningCheckDone) return;
@@ -522,7 +522,7 @@ async function checkMissedMorningCheckin() {
   if (lastCheck === today) { _morningCheckDone = true; return; }
   _morningCheckDone = true;
 
-  var ENFORCE_FROM = '2026-06-13'; // Chapter 2 Day 1 — never judge gap days or closed Chapter 1
+  var ENFORCE_FROM = '2026-06-20'; // Chapter 2 ENDURANCE Day 1 — never judge prior dates
   var newSlips = [];
 
   for (var i = 1; i <= 7; i++) {
@@ -540,7 +540,7 @@ async function checkMissedMorningCheckin() {
     if (checkin && checkin.app_updated === true) continue;
     // If day was sealed (implies check-in was done) → fine
     if (checkin && checkin.sealed === true) continue;
-    // Chapter 2 rule: NO record at all = the check-in did not happen = fined.
+    // Chapter 2 ENDURANCE rule: NO record at all = the check-in did not happen = fined.
 
     // Deterministic ID
     var slipId = 'slip_morning_' + dateStr;
@@ -571,11 +571,13 @@ async function checkMissedMorningCheckin() {
       description: 'Daily check-in did not happen on ' + dateStr + '.',
       function_met: false,
       upstream_gap: 'The check-in panel was never completed for this day — no seal, no morning tick.',
-      insight: 'The daily check-in is the heartbeat of the system. Missing it triggers an automatic 20 km walk fine.',
-      penalty_type: '20km walk',
-      penalty_km: 20,
-      penalty_walk_km: 20,
-      penalty_cycling_km: 40,
+      insight: 'The daily check-in is the heartbeat of the system. Missing it triggers ₹1,500 to Akshaya Patra.',
+      penalty_type: '₹1,500 charity',
+      penalty_km: 0,
+      penalty_walk_km: 0,
+      penalty_cycling_km: 0,
+      penalty_amount: 1500,
+      penalty_charity: 'Akshaya Patra',
       penalty_status: 'pending',
       proof_url: null,
       created_at: new Date().toISOString(),
@@ -594,7 +596,7 @@ async function checkMissedMorningCheckin() {
   localStorage.setItem('fl_morning_check_date', today);
 
   if (newSlips.length > 0) {
-    alert('⚠ MISSED DAILY CHECK-IN\n\nThe daily check-in did not happen on:\n' + newSlips.join(', ') + '\n\nAuto-fine per day: 20 KM WALK or 40 KM CYCLING\n\nThese slips are PERMANENT. Chapter 2 rule — enforced from June 13, 2026.');
+    alert('⚠ MISSED DAILY CHECK-IN\n\nThe daily check-in did not happen on:\n' + newSlips.join(', ') + '\n\nAuto-fine per day: ₹1,500 to Akshaya Patra (UPI, receipt published)\n\nThese slips are PERMANENT. Chapter 2 ENDURANCE rule — enforced from June 19, 2026.');
   }
 }
 

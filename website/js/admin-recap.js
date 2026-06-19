@@ -296,7 +296,7 @@
   }
 
   function getDayNumber(forDate) {
-    var startDate = new Date('2026-06-13T12:00:00');
+    var startDate = new Date('2026-06-20T12:00:00');
     var d = forDate ? new Date(forDate) : new Date();
     d.setHours(12, 0, 0, 0);
     return Math.floor((d - startDate) / 86400000) + 1;
@@ -1204,11 +1204,114 @@
     var _origSwitch = window.switchPanel;
     window.switchPanel = function(name) {
       _origSwitch(name);
-      if (name === 'recap') initRecapPanel();
+      if (name === 'recap') { initRecapPanel(); initMonthlyEngine(); }
     };
   }
   // Also init on DOMContentLoaded if panel exists
   document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initRecapPanel, 500);
+    setTimeout(function(){ initRecapPanel(); initMonthlyEngine(); }, 500);
   });
+
+  // ─────────────────────────────────────────────────────────────
+  // PHASE 7 — Month-end auto recap (server-side, 7-slide carousel)
+  // ─────────────────────────────────────────────────────────────
+  function callEdgeRecap(params) {
+    var SUPA_URL = (window.FL && window.FL.SUPABASE_URL) || localStorage.getItem('fl_supabase_url') || '';
+    var ANON     = (window.FL && window.FL.SUPABASE_ANON_KEY) || localStorage.getItem('fl_supabase_key') || '';
+    var ADMIN    = localStorage.getItem('fl_admin_api_key') || '';
+    if (!SUPA_URL) return Promise.reject(new Error('Supabase URL missing'));
+    var qs = 'action=monthly-recap';
+    if (params.month) qs += '&month=' + encodeURIComponent(params.month);
+    if (params.dryRun) qs += '&dryRun=1';
+    var headers = { 'Content-Type': 'application/json' };
+    if (ANON)  headers['Authorization'] = 'Bearer ' + ANON;
+    if (ADMIN) headers['X-Admin-Key']   = ADMIN;
+    return fetch(SUPA_URL.replace(/\/$/,'') + '/functions/v1/firstlight-sync?' + qs, { method: 'GET', headers: headers })
+      .then(function(r){ return r.json(); });
+  }
+
+  function _renderMonthlySummary(json) {
+    var box = document.getElementById('monthlyRecapSummary');
+    if (!box) return;
+    var agg = json.aggregate;
+    if (!agg) {
+      box.style.display = 'block';
+      box.innerHTML = '<span style="color:#FF5252">No aggregate returned</span><br><pre style="font-size:10px;color:#5A6B80;white-space:pre-wrap;margin-top:6px">' + JSON.stringify(json, null, 2).slice(0, 600) + '</pre>';
+      return;
+    }
+    box.style.display = 'block';
+    var pct = agg.daysInWindow > 0 ? Math.round(agg.hitDays / agg.daysInWindow * 100) : 0;
+    var sportLine = (agg.sportBreakdown || []).map(function(s){ return s.label + ' ' + s.km.toFixed(1) + 'km'; }).join(' · ');
+    var lines = [
+      '<strong style="color:#F5A623">' + agg.monthLabel + '</strong> · Month ' + agg.monthIndex + ' of Chapter 02',
+      'Days: <strong>' + agg.hitDays + '/' + agg.daysInWindow + '</strong> held (' + pct + '%) · ' + agg.missDays + ' miss · ' + agg.pendingDays + ' pending',
+      'Distance: <strong>' + agg.totalKm.toFixed(1) + ' km</strong> · ' + agg.uniqueSports + ' disciplines · avg ' + agg.avgPerDay.km.toFixed(1) + ' km/day',
+      'Time: <strong>' + Math.floor(agg.totalMin/60) + 'h ' + (agg.totalMin%60) + 'm</strong> · ' + (agg.totalKcal || 0).toLocaleString('en-IN') + ' kcal',
+      'Donated: <strong>Rs ' + (agg.donatedTotal||0).toLocaleString('en-IN') + '</strong> → ' + agg.childrenFedYears + ' child' + (agg.childrenFedYears===1?'':'ren') + ' sponsored',
+      sportLine ? 'Split: ' + sportLine : '',
+      json.publishedPost ? '<strong style="color:#00E676">Published →</strong> <a href="https://www.instagram.com/p/' + json.publishedPost.media_id + '/" target="_blank" style="color:#00D4FF">' + json.publishedPost.media_id + '</a>' : '',
+      json.alreadyDone ? '<strong style="color:#F5A623">Already posted</strong> — idempotency stamp present' : ''
+    ];
+    box.innerHTML = lines.filter(Boolean).join('<br>');
+
+    // Slide preview thumbnails (extracted from dryRun errors[])
+    var prev = document.getElementById('monthlyRecapPreview');
+    if (prev && json.errors && json.errors.length) {
+      var urls = [];
+      json.errors.forEach(function(e){
+        var m = (e || '').match(/https:\/\/[^\s|]+\.png|https:\/\/[^\s|]+\.jpg/g);
+        if (m) m.forEach(function(u){ if (urls.indexOf(u) === -1) urls.push(u); });
+      });
+      if (urls.length) {
+        prev.style.display = 'grid';
+        prev.innerHTML = urls.map(function(u, i){
+          return '<div style="border:1px solid rgba(255,255,255,0.08);border-radius:6px;overflow:hidden"><div style="font:600 9px var(--font-mono);color:var(--text-muted);padding:4px 6px;letter-spacing:1px">SLIDE ' + (i+1) + '</div><img src="' + u + '" style="width:100%;display:block;background:#000" /></div>';
+        }).join('');
+      }
+    }
+  }
+
+  function initMonthlyEngine() {
+    var dryBtn = document.getElementById('monthlyRecapDryRun');
+    var pubBtn = document.getElementById('monthlyRecapPublish');
+    var status = document.getElementById('monthlyRecapStatus');
+    var monthIn = document.getElementById('monthlyRecapMonth');
+    if (!dryBtn || dryBtn.dataset.wired) return;
+    dryBtn.dataset.wired = '1';
+
+    function run(dryRun) {
+      var m = (monthIn && monthIn.value.trim()) || null;
+      if (m && !/^20\d{2}-(0[1-9]|1[0-2])$/.test(m)) {
+        status.innerHTML = '<span style="color:#FF5252">Bad month format — use YYYY-MM</span>';
+        return;
+      }
+      var label = dryRun ? 'Rendering 7 slides (no publish)…' : 'Rendering + publishing 7-slide carousel + Story…';
+      status.innerHTML = '<span style="color:#00D4FF">' + label + '</span>';
+      var sumBox = document.getElementById('monthlyRecapSummary');
+      var prevBox = document.getElementById('monthlyRecapPreview');
+      if (sumBox)  { sumBox.style.display = 'none'; sumBox.innerHTML = ''; }
+      if (prevBox) { prevBox.style.display = 'none'; prevBox.innerHTML = ''; }
+
+      callEdgeRecap({ month: m, dryRun: dryRun })
+        .then(function(json){
+          if (json.errors && json.errors.length && !json.aggregate) {
+            status.innerHTML = '<span style="color:#FF5252">' + (json.errors[0] || 'Failed') + '</span>';
+          } else if (json.alreadyDone) {
+            status.innerHTML = '<span style="color:#F5A623">Already published for this month</span>';
+          } else {
+            status.innerHTML = '<span style="color:#00E676">' + (dryRun ? 'Render OK · ' + json.slidesRendered + ' slides' : 'Published') + '</span>';
+          }
+          _renderMonthlySummary(json);
+        })
+        .catch(function(err){
+          status.innerHTML = '<span style="color:#FF5252">' + err.message + '</span>';
+        });
+    }
+
+    dryBtn.addEventListener('click', function(){ run(true); });
+    pubBtn.addEventListener('click', function(){
+      if (!confirm('Publish 7-slide carousel + Story to @firstlightlive?')) return;
+      run(false);
+    });
+  }
 })();

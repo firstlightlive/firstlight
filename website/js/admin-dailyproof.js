@@ -10,7 +10,7 @@
   var KEY = (window.FL && FL.SUPABASE_ANON_KEY) || localStorage.getItem('fl_supabase_key') || '';
 
   var CHAPTER1_DAYS = 110;
-  var STREAK_START = (window.FL && FL.STREAK_START) || '2026-06-13';
+  var STREAK_START = (window.FL && FL.STREAK_START) || '2026-06-20';
 
   var THEMES = {
     noir:     { name: 'NOIR',     bg: '#000000', text: '#FFFFFF', dim: '#5A6B80', accent: '#FFFFFF', accent2: '#888888', cardBg: 'rgba(255,255,255,0.04)', cardBorder: 'rgba(255,255,255,0.1)',  grain: true,  scanlines: false },
@@ -250,7 +250,7 @@
       ctx.fillText('✗ DEADLINE MISSED', W / 2, sealY + 84);
       ctx.font = '500 26px ' + MONO;
       ctx.fillStyle = T.dim;
-      ctx.fillText('₹15,000 PAID · STREAK CONTINUES', W / 2, sealY + 142);
+      ctx.fillText('₹1,500 → AKSHAYA PATRA · STREAK CONTINUES', W / 2, sealY + 142);
     }
 
     // Stats — 3 columns
@@ -279,7 +279,7 @@
     // Stake line
     ctx.font = '700 34px ' + MONO;
     ctx.fillStyle = T.text;
-    ctx.fillText(s.made ? '₹15,000 STAKED. STILL MINE.' : '₹15,000 GONE. TOMORROW I SHOW UP.', W / 2, 1584);
+    ctx.fillText(s.made ? 'STREAK ALIVE · DAY DONE.' : '₹1,500 → AKSHAYA PATRA. CHILDREN EAT.', W / 2, 1584);
 
     // Lifetime strip
     ctx.font = '500 22px ' + MONO;
@@ -346,7 +346,7 @@
 
     ctx.font = '700 38px ' + MONO;
     ctx.fillStyle = T.text;
-    ctx.fillText('5 KM BEFORE 6:00 AM', W / 2, 796);
+    ctx.fillText('MOVE EVERY DAY', W / 2, 796);
 
     var sc = sealColorFor(s, T);
     ctx.font = '500 26px ' + MONO;
@@ -354,12 +354,12 @@
     if (s.made) {
       ctx.fillText('✓ DONE ' + fmtClock(s.end) + ' · ' + fmtMargin(s.marginMin) + ' EARLY', W / 2, 858);
     } else {
-      ctx.fillText('✗ MISSED · ₹15,000 SELF-IMPOSED · STREAK CONTINUES', W / 2, 858);
+      ctx.fillText('✗ MISSED · ₹1,500 → AKSHAYA PATRA · STREAK CONTINUES', W / 2, 858);
     }
 
     ctx.font = '500 20px ' + MONO;
     ctx.fillStyle = T.dim;
-    ctx.fillText('₹15,000 DAILY PERSONAL COMMITMENT · NO END DATE', W / 2, 926);
+    ctx.fillText('5KM WALK · RUN · 10KM CYCLE · 1KM SWIM · 30MIN HR', W / 2, 926);
 
     ctx.font = '500 24px ' + MONO;
     ctx.fillStyle = T.dim;
@@ -418,8 +418,8 @@
     ctx.beginPath(); ctx.roundRect(cardX, cardY, cardW, cardH, 14); ctx.stroke();
 
     var rows = [
-      ['THE RULE', '5 KM RUN · BEFORE 6 AM'],
-      ['THE STAKE', '₹15,000 / DAY'],
+      ['THE RULE', '5KM ANY MOTION · DAILY'],
+      ['MISS FEE', '₹1,500 → AKSHAYA PATRA'],
       ['END DATE', 'NONE']
     ];
     var ry = cardY + 74;
@@ -451,14 +451,14 @@
 
     ctx.font = '700 48px ' + MONO;
     ctx.fillStyle = sc;
-    ctx.fillText('DAY 1 — TOMORROW', W / 2, sealY + 82);
+    ctx.fillText('DAY 1 — TODAY', W / 2, sealY + 82);
     ctx.font = '500 25px ' + MONO;
     ctx.fillStyle = T.dim;
-    ctx.fillText('13 JUN 2026 · 5 KM · BEFORE 6:00 AM', W / 2, sealY + 140);
+    ctx.fillText('19 JUN 2026 · ANY ONE FROM THE MENU', W / 2, sealY + 140);
 
     ctx.font = '700 38px ' + MONO;
     ctx.fillStyle = T.text;
-    ctx.fillText('WATCH ME REBUILD.', W / 2, 1570);
+    ctx.fillText('WATCH ME ENDURE.', W / 2, 1570);
 
     ctx.font = '500 22px ' + MONO;
     ctx.fillStyle = T.dim;
@@ -521,11 +521,11 @@
 
     ctx.font = '500 27px ' + MONO;
     ctx.fillStyle = T.accent === T.text ? T.accent2 : T.accent;
-    ctx.fillText('5 KM BEFORE 6:00 AM · EVERY DAY', W / 2, 890);
+    ctx.fillText('MOVE EVERY DAY · ONE FROM THE MENU', W / 2, 890);
 
     ctx.font = '500 20px ' + MONO;
     ctx.fillStyle = T.dim;
-    ctx.fillText('₹15,000/DAY AT STAKE · DAY 1 — 13 JUN 2026', W / 2, 948);
+    ctx.fillText('MISS = ₹1,500 → AKSHAYA PATRA · DAY 1 — 19 JUN 2026', W / 2, 948);
 
     ctx.font = '500 24px ' + MONO;
     ctx.fillStyle = T.dim;
@@ -553,7 +553,7 @@
     ctx.font = '700 26px ' + MONO; ctx.fillStyle = T.accent;
     ctx.fillText('◆  F I R S T   L I G H T', W / 2, 122);
     ctx.font = '500 22px ' + MONO; ctx.fillStyle = T.dim;
-    ctx.fillText('CHAPTER 02 — REBUILD', W / 2, 170);
+    ctx.fillText('CHAPTER 02 — ENDURANCE', W / 2, 170);
 
     ctx.font = '700 44px ' + MONO; ctx.fillStyle = T.text;
     ctx.fillText('I RAN 110 DAYS STRAIGHT.', W / 2, 300);
@@ -592,12 +592,12 @@
     ctx.strokeStyle = sc; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.roundRect(90, sealY, W - 180, sealH, 14); ctx.stroke();
     ctx.font = '700 44px ' + MONO; ctx.fillStyle = sc;
-    ctx.fillText(s.made ? '✓ BEFORE 6:00 AM' : '✗ AFTER 6:00 AM — ₹15,000 PAID', W / 2, sealY + 78);
+    ctx.fillText(s.made ? '✓ ACTIVITY LOGGED' : '✗ MISSED — ₹1,500 → AKSHAYA PATRA', W / 2, sealY + 78);
     ctx.font = '500 24px ' + MONO; ctx.fillStyle = T.dim;
-    ctx.fillText(s.made ? fmtMargin(s.marginMin) + ' OF MARGIN · DEADLINE HELD' : 'THE STREAK CONTINUES — NO RESET', W / 2, sealY + 130);
+    ctx.fillText(s.made ? 'DAY CONFIRMED · STREAK ALIVE' : 'THE STREAK CONTINUES — CHILDREN EAT', W / 2, sealY + 130);
 
     ctx.font = '700 38px ' + MONO; ctx.fillStyle = T.text;
-    ctx.fillText('110 BEHIND ME. REBUILDING.', W / 2, 1690);
+    ctx.fillText('110 BEHIND ME. ENDURING.', W / 2, 1690);
 
     var bw = 150, bh = 52, gap = 16, by = 1756;
     ctx.fillStyle = '#0084c8';
@@ -645,13 +645,13 @@
 
     var sc = sealColorFor(s, T);
     ctx.font = '500 27px ' + MONO; ctx.fillStyle = sc;
-    var statLine = (s.km ? s.km.toFixed(1) + ' KM' : '5 KM') + ' · ' + (s.end ? 'DONE ' + fmtClock(s.end) : 'BEFORE 6:00 AM');
+    var statLine = (s.km ? s.km.toFixed(1) + ' KM' : '5 KM') + ' · ' + (s.end ? 'DONE ' + fmtClock(s.end) : 'TODAY');
     ctx.fillText((s.made ? '✓ ' : '') + statLine, W / 2, 890);
 
     ctx.font = '500 20px ' + MONO; ctx.fillStyle = T.dim;
     var MABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     var dd = s.date ? (String(s.date.getDate()).padStart(2, '0') + ' ' + MABBR[s.date.getMonth()] + ' ' + s.date.getFullYear()) : '';
-    ctx.fillText('₹15,000 STAKED · STILL MINE · DAY ' + s.day + (dd ? ' — ' + dd : ''), W / 2, 948);
+    ctx.fillText('CHAPTER 02 · ENDURANCE · DAY ' + s.day + (dd ? ' — ' + dd : ''), W / 2, 948);
 
     ctx.font = '500 24px ' + MONO; ctx.fillStyle = T.dim;
     ctx.fillText('f i r s t l i g h t . l i v e', W / 2, 1014);
@@ -666,9 +666,9 @@
 
   function generateCaption(s) {
     if (!s.made) {
-      return 'Day ' + s.day + '. Missed.\nSelf-imposed ₹15,000 personal commitment honoured.\nThe streak continues tomorrow.\n\nfirstlight.live';
+      return 'Day ' + s.day + '. Missed.\n₹1,500 → Akshaya Patra. Children eat.\nThe streak continues tomorrow.\n\nfirstlight.live';
     }
-    return s.day + '\n\n' + s.km.toFixed(1) + ' km. Done ' + fmtClock(s.end).toLowerCase() + '. ' + fmtMargin(s.marginMin).toLowerCase() + ' before deadline.\n\nfirstlight.live';
+    return s.day + '\n\n' + s.km.toFixed(1) + ' km. Done.\n\nfirstlight.live';
   }
 
   // ══════════════════════════════════════════
@@ -718,7 +718,7 @@
       if (modeSelect && modeSelect.value === 'restart') {
         currentStats = { restart: true, day: 0 };
         renderBoth();
-        captionEl.value = '0\n\n110 days. Then one morning, nothing.\nRestarting tomorrow — 5 km before 6 AM. Every day.\n₹15,000 daily self-imposed personal commitment.\n\nfirstlight.live';
+        captionEl.value = '0\n\n110 days. Then one morning, nothing.\nStarting Chapter 02 — Endurance. One activity from the menu, every day.\nMiss = ₹1,500 → Akshaya Patra.\n\nfirstlight.live';
         statusEl.textContent = 'Restart announcement rendered — Day 0. No Strava data needed.';
         downloadPostBtn.style.display = '';
         downloadStoryBtn.style.display = '';
@@ -743,7 +743,7 @@
             renderBoth();
             captionEl.value = currentStats.comeback ? comebackCaption(currentStats) : generateCaption(currentStats);
             statusEl.textContent = 'Day ' + currentStats.day + ' · ' + currentStats.km.toFixed(1) + ' km · ' +
-              (currentStats.made ? '✓ before 6 AM (' + fmtMargin(currentStats.marginMin) + ' margin)' : '✗ deadline missed — slip variant rendered') +
+              (currentStats.made ? '✓ activity logged' : '✗ no activity — slip variant rendered') +
               (currentStats.foodClean === false ? ' · food code BROKEN' : ' · food ✓');
             downloadPostBtn.style.display = '';
             downloadStoryBtn.style.display = '';

@@ -759,6 +759,11 @@
       <div class="cc-group" data-group="content">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 📸 CONTENT ENGINE</div>
         <div class="cc-group-items">
+          <div class="cc-item" data-panel="brand-strategy"><span class="cc-icon">◆</span> Brand &amp; Strategy</div>
+          <div class="cc-item" data-panel="donation-receipts"><span class="cc-icon">🧾</span> Donation Receipts</div>
+          <div class="cc-item" data-panel="reel-lab"><span class="cc-icon">🎬</span> Reel Lab</div>
+          <div class="cc-item" data-panel="travel-series"><span class="cc-icon">✈️</span> Travel Series</div>
+          <div class="cc-item" data-panel="growth-tracker"><span class="cc-icon">📈</span> Growth Tracker</div>
           <div class="cc-item" data-panel="dailyproof"><span class="cc-icon">☀</span> Daily Proof</div>
           <div class="cc-item" data-panel="recap"><span class="cc-icon">📊</span> Weekly/Monthly Recap</div>
           <div class="cc-item" data-panel="generators"><span class="cc-icon">🎨</span> Generators</div>
@@ -1247,6 +1252,191 @@
       </div>
 
       <!-- ════════════════════════════════════════════════
+           PANEL: BRAND & STRATEGY
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-brand-strategy">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">BRAND &amp; STRATEGY</div>
+          <div class="cc-panel-sub">Positioning, bio, engine publish mode — the high-leverage controls</div>
+        </div>
+
+        <!-- ENGINE PUBLISH MODE -->
+        <div class="panel-section" style="margin-bottom:20px">
+          <div class="panel-section-title">🎯 ENGINE PUBLISH MODE</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">
+            Where the autonomous engine publishes at 23:30 IST. <strong style="color:var(--gold)">Story</strong> is recommended for accounts under 1K followers — daily feed posts get algorithm-suppressed.
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px">
+            <button class="bs-mode-btn" data-mode="carousel" style="padding:14px;background:var(--bg3);border:1px solid rgba(245,166,35,0.3);border-radius:8px;font:700 11px var(--font-mono);color:var(--gold);letter-spacing:1px;cursor:pointer">🎠 CAROUSEL (WIN: 2 slides + GPS route)<br><span style="font-size:9px;color:var(--text-muted);font-weight:400">recommended — engagement-optimized</span></button>
+            <button class="bs-mode-btn" data-mode="story" style="padding:14px;background:var(--bg3);border:1px solid rgba(255,255,255,0.06);border-radius:8px;font:700 11px var(--font-mono);color:var(--text-muted);letter-spacing:1px;cursor:pointer">📱 STORY ONLY<br><span style="font-size:9px;color:var(--text-muted);font-weight:400">algorithm-safe, 24h expiry</span></button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+            <button class="bs-mode-btn" data-mode="feed" style="padding:14px;background:var(--bg3);border:1px solid rgba(255,255,255,0.06);border-radius:8px;font:700 11px var(--font-mono);color:var(--text-muted);letter-spacing:1px;cursor:pointer">📰 FEED ONLY (1 image)<br><span style="font-size:9px;color:var(--text-muted);font-weight:400">single-image feed post</span></button>
+            <button class="bs-mode-btn" data-mode="both" style="padding:14px;background:var(--bg3);border:1px solid rgba(255,255,255,0.06);border-radius:8px;font:700 11px var(--font-mono);color:var(--text-muted);letter-spacing:1px;cursor:pointer">📱📰 BOTH (feed + story)<br><span style="font-size:9px;color:var(--text-muted);font-weight:400">most aggressive</span></button>
+          </div>
+          <div id="bsCurrentMode" style="font:600 11px var(--font-mono);color:var(--green);text-align:center;padding:8px;background:rgba(0,230,118,0.08);border-radius:6px">Current mode: loading…</div>
+        </div>
+
+        <!-- POSITIONING / TAGLINE -->
+        <div class="panel-section" style="margin-bottom:20px">
+          <div class="panel-section-title">◆ POSITIONING</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">
+            What FIRST LIGHT means in one sentence. The brand promise.
+          </div>
+          <div style="background:var(--bg3);padding:16px;border-radius:8px;border-left:3px solid var(--gold);margin-bottom:10px">
+            <div style="font:700 16px Georgia,serif;color:var(--gold);margin-bottom:8px">Data Architect. Endurance athlete.</div>
+            <div style="font:500 13px Georgia,serif;color:var(--text);line-height:1.6">I run cities at 5 AM and build the systems that keep me going.</div>
+          </div>
+          <div style="display:flex;gap:8px"><button class="btn btn-secondary" id="bsCopyPositioning" style="flex:1">COPY POSITIONING</button></div>
+        </div>
+
+        <!-- BIO REWRITE -->
+        <div class="panel-section" style="margin-bottom:20px">
+          <div class="panel-section-title">👤 INSTAGRAM BIO (drop-in)</div>
+          <textarea id="bsBioText" style="width:100%;padding:14px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font:500 13px var(--font-mono);color:var(--text);min-height:120px;resize:vertical" readonly>◆ FIRST LIGHT
+Data Architect · Endurance athlete
+I run cities & build systems that keep me going
+
+Half Marathon 2:07 · Century 104.9 km · Ironman in progress
+firstlight.live</textarea>
+          <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-primary" id="bsCopyBio" style="flex:1">COPY BIO TO CLIPBOARD</button></div>
+        </div>
+
+        <!-- 3 PINNED POSTS -->
+        <div class="panel-section" style="margin-bottom:20px">
+          <div class="panel-section-title">📌 PINNED POSTS (top 3 of your feed)</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">
+            The first 3 posts a new visitor sees. Each tells a different angle of your story.
+          </div>
+          <div id="bsPinnedList" style="display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+
+        <!-- GROWTH TARGETS -->
+        <div class="panel-section">
+          <div class="panel-section-title">🎯 12-MONTH TARGETS</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font:600 11px var(--font-mono)">
+            <div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center"><div style="font-size:18px;color:var(--cyan)">500</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">M3</div></div>
+            <div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center"><div style="font-size:18px;color:var(--cyan)">2K</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">M6</div></div>
+            <div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center"><div style="font-size:18px;color:var(--gold)">10K</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">M12</div></div>
+            <div style="padding:12px;background:var(--bg3);border-radius:8px;text-align:center"><div style="font-size:14px;color:var(--green)">₹50K/mo</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">FIRST INCOME</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
+           PANEL: DONATION RECEIPTS
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-donation-receipts">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">DONATION RECEIPTS</div>
+          <div class="cc-panel-sub">Upload UPI screenshot for any MISS day. System uploads, posts as Story, comments under the MISS post, marks slip as PAID.</div>
+        </div>
+
+        <!-- HOW IT WORKS card -->
+        <div class="panel-section" style="margin-bottom:20px;background:rgba(0,212,255,0.04);border-color:rgba(0,212,255,0.15)">
+          <div class="panel-section-title">📋 FLOW</div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--text);line-height:1.9">
+            <div><span style="color:var(--cyan);font-weight:700">1.</span> You missed a day → engine auto-posted MISS at 23:30 IST → slip is <span style="color:var(--gold)">PENDING</span></div>
+            <div><span style="color:var(--cyan);font-weight:700">2.</span> Next day, you pay ₹1,500 via UPI → screenshot the confirmation</div>
+            <div><span style="color:var(--cyan);font-weight:700">3.</span> Open this panel → pick the pending slip → upload screenshot → SUBMIT</div>
+            <div><span style="color:var(--cyan);font-weight:700">4.</span> System automatically:</div>
+            <div style="padding-left:24px;color:var(--text-muted)">
+              • Stores receipt in public storage<br>
+              • Posts receipt as IG Story (24h reach)<br>
+              • Comments under the original MISS post: "₹1,500 paid → Akshaya Patra · receipt: firstlight.live/accountability"<br>
+              • Flips slip to <span style="color:var(--green)">PAID ✓</span><br>
+              • Updates public ledger at accountability.html
+            </div>
+          </div>
+        </div>
+
+        <!-- PENDING list (slips awaiting receipt) -->
+        <div class="panel-section" style="margin-bottom:20px">
+          <div class="panel-section-title">⚠ PENDING — RECEIPT REQUIRED</div>
+          <div id="receiptsPending" style="display:flex;flex-direction:column;gap:14px"><div style="color:var(--text-muted);font-family:var(--font-mono);font-size:12px;padding:12px">Loading…</div></div>
+        </div>
+
+        <!-- PAID history -->
+        <div class="panel-section">
+          <div class="panel-section-title">✓ PAID — RECEIPT POSTED</div>
+          <div id="receiptsPaid" style="display:flex;flex-direction:column;gap:10px"><div style="color:var(--text-muted);font-family:var(--font-mono);font-size:12px;padding:12px">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
+           PANEL: REEL LAB
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-reel-lab">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">REEL LAB</div>
+          <div class="cc-panel-sub">15-second Reels are the growth engine — 1 per week, hand-crafted, generated from your data</div>
+        </div>
+
+        <div class="panel-section" style="margin-bottom:20px">
+          <div class="panel-section-title">🎬 GENERATE WEEKLY REEL SCRIPT</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+            <select id="reelType" style="padding:12px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font:500 13px var(--font-mono);color:var(--text)">
+              <option value="week-recap">Week Recap (7 days · stats)</option>
+              <option value="system-tour">System Tour (the engine working)</option>
+              <option value="sunrise-run">Sunrise Run Timelapse</option>
+              <option value="city-discovery">City Discovery (run map + landmark)</option>
+              <option value="why-charity">Why ₹1,500 → Akshaya Patra</option>
+            </select>
+            <button class="btn btn-primary" id="reelGenerate">GENERATE SCRIPT</button>
+          </div>
+          <div id="reelOutput" style="font-family:var(--font-mono);font-size:12px;color:var(--text);line-height:1.7;background:var(--bg3);padding:16px;border-radius:8px;min-height:240px;white-space:pre-wrap;border-left:3px solid var(--cyan)">Select a type and click Generate. Output includes: hook, shot list, b-roll, caption, hashtags, music suggestion.</div>
+          <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-secondary" id="reelCopy" style="flex:1">COPY FULL SCRIPT</button></div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
+           PANEL: TRAVEL SERIES
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-travel-series">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">TRAVEL SERIES</div>
+          <div class="cc-panel-sub">"5 AM in {CITY}" — same data, new geography. Builds your travel portfolio.</div>
+        </div>
+
+        <div class="panel-section" style="margin-bottom:20px">
+          <div class="panel-section-title">✈️ CITY POST GENERATOR</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+            <input id="travelCity" placeholder="City name (e.g. Mumbai)" style="padding:12px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font:500 13px var(--font-mono);color:var(--text)">
+            <input id="travelLandmark" placeholder="Landmark / Area (e.g. Marine Drive)" style="padding:12px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font:500 13px var(--font-mono);color:var(--text)">
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn btn-primary" id="travelGenerate" style="flex:1">GENERATE TRAVEL POST</button></div>
+          <div id="travelOutput" style="font-family:var(--font-mono);font-size:12px;color:var(--text);line-height:1.7;background:var(--bg3);padding:16px;border-radius:8px;min-height:200px;white-space:pre-wrap;border-left:3px solid var(--strava)">Caption + Story sequence + hashtags will render here.</div>
+          <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-secondary" id="travelCopy" style="flex:1">COPY</button></div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
+           PANEL: GROWTH TRACKER
+           ════════════════════════════════════════════════ -->
+      <div class="cc-panel" id="p-growth-tracker">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">GROWTH TRACKER</div>
+          <div class="cc-panel-sub">Follower count + engagement rate weekly. The only metric that signals brand health.</div>
+        </div>
+
+        <div class="panel-section" style="margin-bottom:20px">
+          <div class="panel-section-title">📈 LOG THIS WEEK'S NUMBERS</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+            <input type="number" id="gtFollowers" placeholder="Followers" style="padding:12px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font:500 13px var(--font-mono);color:var(--text);text-align:center">
+            <input type="number" id="gtPosts" placeholder="Posts (week)" style="padding:12px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font:500 13px var(--font-mono);color:var(--text);text-align:center">
+            <input type="number" id="gtLikes" placeholder="Total likes" style="padding:12px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font:500 13px var(--font-mono);color:var(--text);text-align:center">
+            <input type="number" id="gtComments" placeholder="Total comments" style="padding:12px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font:500 13px var(--font-mono);color:var(--text);text-align:center">
+          </div>
+          <div style="display:flex;gap:8px"><button class="btn btn-primary" id="gtSave" style="flex:1">SAVE THIS WEEK</button></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-title">📊 HISTORY</div>
+          <div id="gtHistory" style="font:500 12px var(--font-mono);color:var(--text);background:var(--bg3);padding:14px;border-radius:8px;min-height:120px">No data yet. Log this week to start tracking.</div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════
            PANEL: WEEKLY/MONTHLY RECAP GENERATOR
            ════════════════════════════════════════════════ -->
       <div class="cc-panel" id="p-dailyproof">
@@ -1428,6 +1618,36 @@
             <div data-swatch="earth" style="width:48px;height:48px;background:#1A1410;border:2px solid #8D6E63;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#8D6E63;transition:all 0.2s" title="EARTH">ERTH</div>
           </div>
         </div>
+
+        <!-- ─── MONTH-END AUTO RECAP (Phase 7 engine) ─── -->
+        <div style="margin-top:32px;padding:20px;border:1px solid rgba(245,166,35,0.18);border-radius:12px;background:linear-gradient(180deg,rgba(245,166,35,0.04),transparent)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+            <div>
+              <div style="font:700 14px var(--font-mono);color:#F5A623;letter-spacing:3px;margin-bottom:4px">◆ MONTH-END AUTO RECAP</div>
+              <div style="font:500 11px var(--font-mono);color:var(--text-muted);letter-spacing:1px">7-slide carousel · server-rendered · auto-publishes 1st of month at 06:00 IST</div>
+            </div>
+            <div style="font:600 9px var(--font-mono);color:#00E676;letter-spacing:2px;padding:6px 10px;border:1px solid rgba(0,230,118,0.25);border-radius:6px">PHASE 7</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+            <div>
+              <label style="font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;display:block;margin-bottom:6px">MONTH (YYYY-MM)</label>
+              <input id="monthlyRecapMonth" type="text" placeholder="auto: prev month" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(245,166,35,0.18);border-radius:8px;color:var(--text);font:500 12px var(--font-mono)" />
+            </div>
+            <div style="display:flex;align-items:flex-end">
+              <button id="monthlyRecapDryRun" style="width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.25);border-radius:8px;color:var(--cyan);font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer">DRY RUN · RENDER ONLY</button>
+            </div>
+            <div style="display:flex;align-items:flex-end">
+              <button id="monthlyRecapPublish" style="width:100%;padding:10px 12px;background:linear-gradient(135deg,#F5A623,#FC4C02);border:none;border-radius:8px;color:#0A0C10;font:700 11px var(--font-mono);letter-spacing:2px;cursor:pointer">RENDER + PUBLISH NOW</button>
+            </div>
+          </div>
+          <div id="monthlyRecapStatus" style="font:500 11px var(--font-mono);color:var(--text-muted);min-height:16px;margin-bottom:12px"></div>
+          <div id="monthlyRecapSummary" style="display:none;padding:14px;background:rgba(0,0,0,0.35);border-radius:8px;font:500 11px var(--font-mono);color:var(--text);line-height:1.7"></div>
+          <div id="monthlyRecapPreview" style="display:none;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px"></div>
+          <div style="margin-top:14px;font:400 10px var(--font-mono);color:var(--text-muted);line-height:1.6;letter-spacing:1px">
+            <strong style="color:#F5A623">Slides:</strong> 1) Hero · 2) Calendar Heatmap · 3) Total KM · 4) Sport Split · 5) Time &amp; Effort · 6) Charity Impact · 7) Closing CTA
+            <br><strong style="color:#F5A623">Idempotency:</strong> Each month publishes once. Stamped in <code>secrets.monthly_recap_YYYY-MM</code>.
+          </div>
+        </div>
       </div>
 
       <!-- ════════════════════════════════════════════════
@@ -1532,7 +1752,7 @@
         <div class="panel-section">
           <div class="panel-section-title">CAPTION STRUCTURE</div>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;gap:12px;align-items:flex-start"><span class="badge badge-red" style="min-width:22px;justify-content:center">1</span><div><div style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text)">DEAL HOOK</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">"MISS 1 DAY = Rs.15,000 TO FIRST COMMENT"</div></div></div>
+            <div style="display:flex;gap:12px;align-items:flex-start"><span class="badge badge-red" style="min-width:22px;justify-content:center">1</span><div><div style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text)">DEAL HOOK</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">"MISS 1 DAY = Rs.1,500 → AKSHAYA PATRA"</div></div></div>
             <div style="display:flex;gap:12px;align-items:flex-start"><span class="badge badge-gold" style="min-width:22px;justify-content:center">2</span><div><div style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text)">HOOK TYPE <span style="color:var(--text-muted)">(rotating)</span></div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Shocking Stat / Bold Claim / Vulnerable / Counter-Intuitive / Question</div></div></div>
             <div style="display:flex;gap:12px;align-items:flex-start"><span class="badge badge-cyan" style="min-width:22px;justify-content:center">3</span><div><div style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text)">S.O.A.R. MICRO-STORY <span style="color:var(--text-muted)">(80-120 words)</span></div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Situation &rarr; Obstacle &rarr; Action &rarr; Result</div></div></div>
             <div style="display:flex;gap:12px;align-items:flex-start"><span class="badge badge-green" style="min-width:22px;justify-content:center">4</span><div><div style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text)">STATS BLOCK</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Food/Run/Gym status + KM, min, BPM, weather, sleep</div></div></div>
@@ -1620,7 +1840,7 @@
         <div class="panel-section">
           <div class="panel-section-title">STORY HIGHLIGHTS (4 REQUIRED)</div>
           <div class="grid-2" style="gap:12px">
-            <div style="padding:16px;background:var(--bg3);border-radius:8px"><div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px">THE BET</div><div style="font-size:12px;color:var(--text-muted)">Explain the Rs.15,000 mechanic</div></div>
+            <div style="padding:16px;background:var(--bg3);border-radius:8px"><div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px">THE BET</div><div style="font-size:12px;color:var(--text-muted)">Explain the Rs.1,500 → charity mechanic</div></div>
             <div style="padding:16px;background:var(--bg3);border-radius:8px"><div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--red);margin-bottom:4px">THE RULES</div><div style="font-size:12px;color:var(--text-muted)">Iron Covenant food code</div></div>
             <div style="padding:16px;background:var(--bg3);border-radius:8px"><div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">EVIDENCE</div><div style="font-size:12px;color:var(--text-muted)">Best-of collection</div></div>
             <div style="padding:16px;background:var(--bg3);border-radius:8px"><div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:4px">START HERE</div><div style="font-size:12px;color:var(--text-muted)">Origin story for new followers</div></div>
@@ -1996,11 +2216,11 @@
         </div>
 
         <div class="panel-section">
-          <div class="panel-section-title">ESCALATING STAKES SCHEDULE</div>
+          <div class="panel-section-title">STAKE SCHEDULE — FLAT</div>
           <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg3);border-radius:6px"><span style="font-family:var(--font-mono);font-size:12px;color:var(--text)">Day 1–100</span><span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold)">Rs.15,000</span></div>
-            <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg3);border-radius:6px"><span style="font-family:var(--font-mono);font-size:12px;color:var(--text)">Day 101–200</span><span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold)">Rs.20,000</span></div>
-            <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg3);border-radius:6px"><span style="font-family:var(--font-mono);font-size:12px;color:var(--text)">Day 201+</span><span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold)">Rs.25,000</span></div>
+            <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg3);border-radius:6px"><span style="font-family:var(--font-mono);font-size:12px;color:var(--text)">Every miss · forever</span><span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold)">Rs.1,500 → Akshaya Patra</span></div>
+            <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg3);border-radius:6px"><span style="font-family:var(--font-mono);font-size:12px;color:var(--text)">Equivalent unit</span><span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--gold)">1 child × 1 school year</span></div>
+            <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg3);border-radius:6px"><span style="font-family:var(--font-mono);font-size:12px;color:var(--text)">Escalation</span><span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green)">None — flat ENDURANCE rule</span></div>
           </div>
         </div>
       </div>
@@ -2176,7 +2396,7 @@
           <div class="decl-block"><div class="decl-num">FIVE</div><div class="decl-sub">THE FOOD CODE</div><div class="decl-text">No sugar. No junk. No exceptions. Food is fuel, not entertainment. Every meal is an act of respect toward the body that carries me through this mission.</div></div>
           <div class="decl-block"><div class="decl-num">SIX</div><div class="decl-sub">THE DEEP WORK</div><div class="decl-text">Time blocks are sacred. When I sit to work, I work. No phone. No distraction. No half-measures. Depth over breadth. Quality over quantity. Focus is a weapon.</div></div>
           <div class="decl-block"><div class="decl-num">SEVEN</div><div class="decl-sub">THE EVENING PROTOCOL</div><div class="decl-text">By 7 PM, the work ends. No screens, no stimulation. The evening is for oil rituals, reflection, and preparation. Lights out at 8:30 PM. Sleep is earned through discipline, not exhaustion.</div></div>
-          <div class="decl-block"><div class="decl-num">EIGHT</div><div class="decl-sub">THE STAKES</div><div class="decl-text">Rs.15,000 on the line every single day. Not as punishment, but as proof. If I fail, I pay. Cash. To a stranger on the internet. This is not a game. This is my word, monetized.</div></div>
+          <div class="decl-block"><div class="decl-num">EIGHT</div><div class="decl-sub">THE STAKE</div><div class="decl-text">Rs.1,500 to Akshaya Patra every missed day. Not as punishment, but as proof. If I fail, children eat. This is not a game. This is my word, monetized — for good.</div></div>
           <div class="decl-block"><div class="decl-num">NINE</div><div class="decl-sub">THE INFINITE GAME</div><div class="decl-text">There is no end date. There is no finish line. There is no "enough." First Light is not a challenge. It is a way of living. I do not stop. I do not retire. I do not negotiate. I am First Light.</div></div>
         </div>
 
@@ -2202,7 +2422,7 @@
           I gaze at the candle. I pray ho'oponopono.<br>
           I do cyclic sighing. I tape my mouth.<br>
           I sleep on my left side. Lights out by 8:30 PM.<br>
-          Rs.15,000 is on the line. Every. Single. Day.<br>
+          Rs.1,500 to Akshaya Patra per missed day. Flat. Forever.<br>
           I do not negotiate. I do not compromise.<br>
           I am First Light.<br>
           This is the infinite game. And I never stop.
@@ -2539,7 +2759,7 @@
             <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--cyan);margin:20px 0 8px;opacity:0.7">STREAK & STAKES</div>
             <div class="form-row">
               <div class="form-group"><label class="form-label">STREAK START DATE</label><input type="date" class="form-input" id="cfgStreakStart"></div>
-              <div class="form-group"><label class="form-label">BASE STAKE (₹ / DAY)</label><input type="number" class="form-input" id="cfgStake" placeholder="15000"></div>
+              <div class="form-group"><label class="form-label">MISS FEE (₹ / DAY → AKSHAYA PATRA)</label><input type="number" class="form-input" id="cfgStake" placeholder="1500"></div>
             </div>
             <!-- PIN removed — Supabase Auth handles authentication -->
             <div style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:1px;padding:8px 0">🔒 AUTHENTICATED VIA SUPABASE AUTH</div>
@@ -3370,15 +3590,17 @@
   <script src="js/config.js"></script>
   <script src="js/fl-auth.js?v=20260615a"></script>
   <script src="js/fl-offline.js?v=20260615a"></script>
-  <script src="app.js?v=20260613a"></script>
+  <script src="app.js?v=20260619a"></script>
   <!-- JS Modules (extracted from inline for maintainability) -->
   <script src="js/admin-core.js"></script>
-  <script src="js/admin-rituals.js?v=20260613a"></script>
+  <script src="js/admin-rituals.js?v=20260619a"></script>
   <script src="js/admin-daily.js"></script>
   <script src="js/admin-journal.js"></script>
   <script src="js/admin-content.js"></script>
-  <script src="js/admin-recap.js?v=20260613a"></script>
-  <script src="js/admin-dailyproof.js?v=20260613b"></script>
+  <script src="js/admin-recap.js?v=20260620a"></script>
+  <script src="js/admin-dailyproof.js?v=20260619b"></script>
+  <script src="js/admin-strategy.js?v=20260619a"></script>
+  <script src="js/admin-receipts.js?v=20260620c"></script>
   <script src="js/admin-weekly.js"></script>
   <script src="js/admin-analytics.js"></script>
   <script src="js/admin-races.js"></script>
@@ -3435,7 +3657,7 @@
   <script src="js/admin-food.js"></script>
   <script src="js/admin-gym.js"></script>
   <script src="js/admin-voice.js"></script>
-  <script src="js/admin-checkin.js?v=20260613a"></script>
+  <script src="js/admin-checkin.js?v=20260619a"></script>
   <script src="js/admin-slips.js"></script>
   <script src="js/admin-goals.js"></script>
   <script src="js/admin-streaks.js"></script>

@@ -113,7 +113,7 @@ function adjustCounter(id, delta) {
 function copyBio() {
   var day = getDayNumber();
   var unclaimed = '₹' + formatINR(getUnclaimed(day));
-  var bio = 'Half Marathon 2:07 · Century 140km\nDaily runner · Bangalore\n' + day + ' days. 0 misses.\n₹15,000 daily self-imposed commitment\nfirstlight.live';
+  var bio = '◆ FIRST LIGHT\nDaily training. No end date.\nData Architect · Ironman in progress\nHalf Marathon 2:07 · Century Ride 104.9 km\nfirstlight.live';
   navigator.clipboard.writeText(bio).then(function() {
     var btn = document.querySelector('[onclick="copyBio()"]');
     btn.classList.add('copied'); btn.textContent = 'COPIED ✓';

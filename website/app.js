@@ -41,8 +41,8 @@ function initTheme() {
 
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
-  STREAK_START: '2026-06-13',
-  STAKE_PER_DAY: 5000,
+  STREAK_START: '2026-06-20',
+  STAKE_PER_DAY: 1500,
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',
   INSTAGRAM_URL: 'https://www.instagram.com/firstlightlive',
@@ -265,9 +265,9 @@ function formatINRFull(num) {
   return rest + ',' + last3;
 }
 
-// ── STAKE SCHEDULE — flat ₹15,000/day, no escalation, miss = pay & continue ──
+// ── STAKE SCHEDULE — flat ₹1,500/day to Akshaya Patra, no escalation, miss = donate & continue ──
 var STAKE_SCHEDULE = [
-  { fromDay: 1, amount: 15000 }
+  { fromDay: 1, amount: 1500 }
 ];
 
 function getCurrentStake(day) {
@@ -307,7 +307,7 @@ function updateCounters() {
     function applyCounters(day) {
       try {
         var unclaimed = getUnclaimed(day);
-        var dailyStake = (typeof getCurrentStake === 'function') ? getCurrentStake(day) : 15000;
+        var dailyStake = (typeof getCurrentStake === 'function') ? getCurrentStake(day) : 1500;
         var dailyStakeStr = (typeof formatStakeINR === 'function') ? formatStakeINR(dailyStake) : new Intl.NumberFormat('en-IN').format(dailyStake);
 
         document.querySelectorAll('[data-day]').forEach(function(el) { el.textContent = day; });
@@ -2566,7 +2566,7 @@ async function updateDaysMissed() {
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
 
   // Chapter dates (string-based for ISO-8601 safety)
-  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-06-13'
+  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-06-20'
 
   // Count slips per chapter (string comparison, no timezone issues)
   var chapter1Slips = slips.filter(function(slip) {
@@ -2625,7 +2625,7 @@ async function updateClaimedAmount() {
     }
 
     // Only count Chapter 2 claims (from STREAK_START onwards, string-based for safety)
-    var streakStart = FL_DEFAULTS.STREAK_START; // '2026-06-13'
+    var streakStart = FL_DEFAULTS.STREAK_START; // '2026-06-20'
     console.log('[Claims] Streak start constant:', streakStart);
 
     var chapter2Claims = data.filter(function(c) {
@@ -2649,14 +2649,14 @@ async function updateClaimedAmount() {
       return sum + (c.amount || 0);
     }, 0);
 
-    // Total at stake = number of days in Chapter 2 × stake per day (₹15,000)
+    // Total at stake = number of days in Chapter 2 × stake per day (₹1,500)
     // Calculate days from date range, NOT from claims count
     var streakStartDate = new Date(streakStart + 'T00:00:00');
     var todayDate = new Date();
     var daysInChapter2 = Math.floor((todayDate - streakStartDate) / (1000 * 60 * 60 * 24)) + 1;
-    var stakePerDay = 15000;  // Fixed stake for Chapter 2
-    var total = daysInChapter2 * stakePerDay;  // e.g., 6 days × ₹15,000 = ₹90,000
-    var unclaimed = total - claimed;  // ₹90,000 - ₹15,000 = ₹75,000
+    var stakePerDay = 1500;  // Fixed stake for Chapter 2 ENDURANCE
+    var total = daysInChapter2 * stakePerDay;
+    var unclaimed = total - claimed;
     console.log('[Claims] Days calculation: from', streakStart, 'to today =', daysInChapter2, 'days. Total:', total);
 
     console.log('[Claims] ===== CALCULATION RESULTS =====');

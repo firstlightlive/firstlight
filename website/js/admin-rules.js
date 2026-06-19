@@ -8,12 +8,12 @@
 var COVENANT_RULES = [
   {n:1, title:'WAKE AT 4:00 AM', origin:'VEDIC'},
   {n:2, title:'BRAHMA MUHURTA IS SACRED', origin:'VEDIC'},
-  {n:3, title:'RUN EVERY DAY', origin:'IRON COVENANT'},
-  {n:4, title:'GYM AFTER RUN', origin:'IRON COVENANT'},
+  {n:3, title:'MOVE EVERY DAY — MENU OF 5', origin:'ENDURANCE'},
+  {n:4, title:'GYM AFTER ACTIVITY (OPTIONAL)', origin:'ENDURANCE'},
   {n:5, title:'FOOD CODE: NO SUGAR, NO JUNK', origin:'IRON COVENANT'},
   {n:6, title:'NO SCREENS AFTER 7 PM', origin:'BIOHACK'},
   {n:7, title:'LIGHTS OUT BY 8:30 PM', origin:'CIRCADIAN'},
-  {n:8, title:'₹15,000 STAKES EVERY DAY', origin:'FIRST LIGHT'},
+  {n:8, title:'MISS = ₹1,500 TO AKSHAYA PATRA', origin:'ENDURANCE'},
   {n:9, title:'THIS IS THE INFINITE GAME', origin:'FIRST LIGHT'}
 ];
 

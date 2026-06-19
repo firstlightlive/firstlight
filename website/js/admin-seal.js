@@ -5,7 +5,7 @@
 var SEAL_AFFIRMATIONS = [
   '"The morning is won or lost in the first 60 seconds."',
   '"No end date. No finish line. INFINITE."',
-  '"Miss 1 day = Rs.15,000. Zero misses. That is the standard."',
+  '"Miss 1 day = Rs.1,500 → Akshaya Patra. Children eat. Streak continues."',
   '"Discipline is choosing what you want most over what you want now."',
   '"The body achieves what the mind believes."',
   '"Every day you don\'t quit is a day you win."',

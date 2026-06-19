@@ -6,7 +6,7 @@
 // IMPORTANT: bump SHELL_VERSION on every deploy that ships changes to the
 // precached files (HTML/CSS/JS in SHELL_ASSETS). Pre-deploy check warns if
 // you forget. Without a bump, installed PWAs stay pinned to the prior cache.
-const SHELL_VERSION = 'fl-shell-v6';
+const SHELL_VERSION = 'fl-shell-v16';
 const SUPA_CACHE   = 'fl-supa-reads-v3';
 const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 
@@ -19,7 +19,7 @@ const SHELL_ASSETS = [
   '/login.html',
   '/index.html',
   '/styles.css',
-  '/app.js?v=20260613a',
+  '/app.js?v=20260619a',
   '/manifest.json',
   '/icon-512.png',
   '/js/config.js',
@@ -37,7 +37,7 @@ const SHELL_ASSETS = [
   '/js/admin-food.js',
   '/js/admin-checkin.js',
   '/js/admin-journal.js',
-  '/js/admin-rituals.js?v=20260613a',
+  '/js/admin-rituals.js?v=20260619a',
   '/js/admin-tomorrow.js',
   '/js/admin-reading.js?v=1776408664',
   '/js/admin-body-weight.js',
@@ -50,8 +50,8 @@ const SHELL_ASSETS = [
   '/js/admin-ekadashi.js',
   '/js/admin-streaks.js',
   '/js/admin-content.js',
-  '/js/admin-recap.js?v=20260613a',
-  '/js/admin-dailyproof.js?v=20260613b',
+  '/js/admin-recap.js?v=20260619a',
+  '/js/admin-dailyproof.js?v=20260619b',
   '/js/admin-editor.js',
   '/js/admin-analytics.js',
   '/js/admin-settings.js',

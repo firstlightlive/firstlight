@@ -29,13 +29,22 @@ window.FL_BREAK = {
 
 window.FL_CURRENT_CHAPTER = {
   id: 2,
-  name: 'REBUILD',
-  start: '2026-06-13',
-  rule: '5KM RUN BEFORE 6:00 AM LOCAL',
-  stakePerDay: 15000,
-  escalations: 'NO BREAK CLAUSE',
+  name: 'ENDURANCE',
+  start: '2026-06-20',
+  rule: '5KM ANY MOTION DAILY',
+  stakePerDay: 1500,
+  escalations: 'FLAT — NO ESCALATION',
   status: 'ACTIVE',
-  notes: 'New rules from Chapter 02 onwards: flat ₹15,000 stake, 5 km run before 6:00 AM local, 100 km weekly goal, miss = pay & continue (no reset).'
+  charity: { name: 'Akshaya Patra', upi: 'donate@akshayapatra' },
+  menu: [
+    '5 km walk (any pace)',
+    '5 km run',
+    '10 km cycle',
+    '1 km swim',
+    '30 min HR-elevated session (boxing / Zumba / gym / yoga)'
+  ],
+  exemption: 'HOSPITALIZATION ONLY',
+  notes: 'Move every day — one item from the menu. Miss = ₹1,500 to Akshaya Patra (1 child fed for a full academic year), receipt published. No exemptions except hospitalization. Streak measures consecutive days of honesty (activity logged OR payment made).'
 };
 
 window.FL_LIFETIME = {

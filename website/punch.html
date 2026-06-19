@@ -362,7 +362,7 @@
             <option value="mastery">MASTERY MISS</option>
             <option value="other">OTHER</option>
           </select>
-          <input class="p-slip-input" id="p-slip-amount" inputmode="numeric" placeholder="₹15000">
+          <input class="p-slip-input" id="p-slip-amount" inputmode="numeric" placeholder="₹1500">
         </div>
         <input class="p-slip-input" id="p-slip-reason" placeholder="What broke? (one line)">
         <div style="display:flex;gap:8px">
@@ -394,8 +394,8 @@
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     }
 
-    // Chapter 2 starts 2026-06-13 = Day 1
-    const STREAK_START = '2026-06-13';
+    // Chapter 2 ENDURANCE starts 2026-06-20 = Day 1
+    const STREAK_START = '2026-06-20';
     function dayNum(dateStr) {
       const today = new Date(dateStr + 'T00:00:00');
       const start = new Date(STREAK_START + 'T00:00:00');
@@ -546,7 +546,7 @@
       list.forEach((s, i) => {
         const item = document.createElement('div');
         item.className = 'p-slip-item';
-        item.innerHTML = `<span>${s.type.toUpperCase()} · ₹${s.amount || '15000'} · ${(s.reason || '').slice(0,40)}</span><span class="p-slip-rm" data-i="${i}">✕</span>`;
+        item.innerHTML = `<span>${s.type.toUpperCase()} · ₹${s.amount || '1500'} · ${(s.reason || '').slice(0,40)}</span><span class="p-slip-rm" data-i="${i}">✕</span>`;
         wrap.appendChild(item);
       });
       wrap.querySelectorAll('.p-slip-rm').forEach(el => {
@@ -565,7 +565,7 @@
     });
     document.getElementById('p-slip-save').addEventListener('click', () => {
       const type = document.getElementById('p-slip-type').value;
-      const amount = document.getElementById('p-slip-amount').value || '15000';
+      const amount = document.getElementById('p-slip-amount').value || '1500';
       const reason = document.getElementById('p-slip-reason').value.trim();
       if (!reason) { alert('Add a reason'); return; }
       const arr = getSlips();
@@ -646,7 +646,7 @@
           date: TODAY,
           type: slip.type,
           reason: slip.reason,
-          amount: parseInt(slip.amount) || 15000,
+          amount: parseInt(slip.amount) || 1500,
           source: 'punch.html',
         }]);
       });

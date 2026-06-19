@@ -48,7 +48,7 @@
     // Mirror STAKE_SCHEDULE from app.js
     if (typeof getCumulativeUnclaimed === 'function') return getCumulativeUnclaimed(day);
     var schedule = [
-      { fromDay: 1, amount: 15000 }
+      { fromDay: 1, amount: 1500 }
     ];
     var total = 0;
     for (var i = 0; i < schedule.length; i++) {
@@ -64,7 +64,7 @@
 
   function getDayNum() {
     if (typeof getDayNumber === 'function') return getDayNumber();
-    var start = new Date('2026-06-13T00:30:00+05:30'); // Deadline is 6 AM
+    var start = new Date('2026-06-20T00:00:00+05:30'); // Chapter 02 ENDURANCE Day 1
     var now = new Date();
     var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     var ist = new Date(utc + (5.5 * 3600000));
@@ -82,7 +82,7 @@
     if (footDay) footDay.textContent = day;
     var streakDays = document.getElementById('streakDays');
     if (streakDays) animateCounter(streakDays, day);
-    // Total at risk (₹15,000 per day)
+    // Total at risk (₹1,500 per missed day → Akshaya Patra)
     var totalRisk = document.getElementById('totalRisk');
     if (totalRisk) {
       var amt = getCumulativeUnclaimedHome(day);
@@ -626,8 +626,8 @@
       el = document.getElementById('weekGaugeDeficit');
       if (el) {
         if (deficit <= 0) { el.textContent = 'TARGET HIT'; el.style.color = '#00E676'; }
-        else if (deficit > 50) { el.textContent = 'DEFICIT: ' + Math.round(deficit) + ' km — PENALTY ZONE'; el.style.color = '#FF5252'; }
-        else { el.textContent = 'DEFICIT: ' + Math.round(deficit) + ' km — carries forward'; el.style.color = '#F5A623'; }
+        else if (deficit > 50) { el.textContent = 'BELOW TARGET — ' + Math.round(deficit) + ' km to go'; el.style.color = '#F5A623'; }
+        else { el.textContent = Math.round(deficit) + ' km below weekly Ironman training target'; el.style.color = '#F5A623'; }
       }
     });
 

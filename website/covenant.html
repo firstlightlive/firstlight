@@ -170,7 +170,7 @@
     <div class="cv-hero-eyebrow">THE COVENANT · FIRST LIGHT · SINCE FEB 10, 2026</div>
     <h1>THE IRON<br>COVENANT</h1>
     <div class="cv-hero-rule"></div>
-    <div class="cv-hero-sub">4 DISCIPLINES · 20 RULES · ₹<span data-stake-daily>15,000</span> PER DAY AT STAKE</div>
+    <div class="cv-hero-sub">ONE RULE · ONE EXEMPTION · ₹<span data-stake-daily>1,500</span> TO AKSHAYA PATRA PER MISS</div>
     <!-- ACCOUNTABILITY IMPACT CARD -->
     <div class="accountability-card" style="margin-top:40px">
       <div class="accountability-grid">
@@ -223,8 +223,8 @@
 
     <!-- PHASE 2: IRON COVENANT -->
     <div style="background: linear-gradient(135deg, rgba(255,68,68,0.08) 0%, rgba(245,166,35,0.04) 100%); border: 1.5px solid rgba(255,68,68,0.2); border-radius: 16px; padding: 28px; backdrop-filter: blur(10px); transition: all 0.3s ease;">
-      <div style="font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #FF6666; text-transform: uppercase; margin-bottom: 16px;">PHASE 2 — ACTIVE NOW</div>
-      <div style="font-family: var(--font-mono); font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">JUN 13, 2026 — ∞</div>
+      <div style="font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #FF6666; text-transform: uppercase; margin-bottom: 16px;">PHASE 2 — ENDURANCE</div>
+      <div style="font-family: var(--font-mono); font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">JUN 19, 2026 — ∞</div>
       <div style="font-family: var(--font-mono); font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 20px; font-style: italic;">No End Date</div>
       <div style="font-family: var(--font-mono); font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; color: #FF4444; text-shadow: 0 0 20px rgba(255,68,68,0.5); margin-bottom: 8px;" id="phase2Missed">0</div>
       <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.5); text-transform: uppercase;">Days Missed (Current)</div>
@@ -237,43 +237,41 @@
   <h2 style="font-family: var(--font-mono); font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 800; letter-spacing: -1px; margin: 32px 0; text-transform: uppercase; background: linear-gradient(135deg, #FF4444 0%, #F5A623 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">CLAIM IMPACT</h2>
 
   <p style="font-family: var(--font-body); color: rgba(255,255,255,0.7); margin-bottom: 32px; font-size: 14px; line-height: 1.6;">
-    When a day is missed, ₹15,000 becomes claimable. Followers can claim it for personal use or donate to charity. This creates accountability through shared responsibility.
+    When a day is missed, ₹1,500 is donated to <strong>Akshaya Patra</strong> within 24 hours. UPI receipt is published on the accountability ledger. One pre-committed charity. Flat amount. No escalation, no exceptions except hospitalization.
   </p>
 
   <div class="claims-grid">
-    <!-- CLAIM CARD TEMPLATE -->
+    <!-- DONATION EXAMPLE — single demo card -->
     <div class="claim-card">
-      <div class="claim-day">DAY 5 · JUN 17</div>
-      <div class="claim-status open">OPEN TO CLAIM</div>
-      <div class="claim-amount">₹15,000</div>
+      <div class="claim-day">EXAMPLE</div>
+      <div class="claim-status open">DONATION FLOW</div>
+      <div class="claim-amount">₹1,500</div>
       <div class="claim-action">
-        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 12px;">How would you claim this?</div>
-        <button class="claim-button" onclick="alert('Link to claim form')">CLAIM THIS</button>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 12px;">Miss → UPI → Akshaya Patra → screenshot → public ledger</div>
+        <a class="claim-button" href="accountability.html">VIEW LEDGER</a>
       </div>
     </div>
-
-    <!-- ADDITIONAL CLAIM CARDS CAN BE ADDED HERE -->
   </div>
 
-  <!-- CLAIMS IMPACT SUMMARY -->
+  <!-- DONATION SUMMARY -->
   <div class="claims-impact" style="margin-top: 40px;">
-    <div class="impact-title">Claims Dashboard</div>
+    <div class="impact-title">Donation Ledger</div>
     <div class="impact-stats">
       <div class="impact-stat">
-        <div class="impact-stat-value" id="totalClaimable">₹15,000</div>
-        <div class="impact-stat-label">Total Claimable</div>
+        <div class="impact-stat-value" id="totalClaimable">₹1,500</div>
+        <div class="impact-stat-label">Per Miss</div>
       </div>
       <div class="impact-stat">
         <div class="impact-stat-value" id="totalClaimed">₹0</div>
-        <div class="impact-stat-label">Already Claimed</div>
+        <div class="impact-stat-label">Donated To Date</div>
       </div>
       <div class="impact-stat">
-        <div class="impact-stat-value" id="charityDonated">₹0</div>
-        <div class="impact-stat-label">To Charity</div>
+        <div class="impact-stat-value" id="charityDonated">Akshaya Patra</div>
+        <div class="impact-stat-label">Charity</div>
       </div>
       <div class="impact-stat">
-        <div class="impact-stat-value" id="activeClaimCount">1</div>
-        <div class="impact-stat-label">Active Claims</div>
+        <div class="impact-stat-value" id="activeClaimCount">—</div>
+        <div class="impact-stat-label">Total Misses</div>
       </div>
     </div>
   </div>
@@ -331,30 +329,27 @@
       </div>
     </div>
     <div class="cv-rules">
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.1</span><span class="cv-rule-text">Wake before 3:30 AM — Brahma Muhurta, the sacred pre-dawn window (3:00–5:30 AM)</span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.2</span><span class="cv-rule-text"><strong style="color:#fff">5 km morning run — completed before 6:00 AM LOCAL time</strong> (wherever in the world). Strava-verified. Miss = personal consequence.</span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.3</span><span class="cv-rule-text"><strong style="color:#fff">Weekly target: 100 km minimum</strong> across all sports (Mon–Sun). Swim 1 km = 10 km equivalent. Deficit carries forward.</span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.4</span><span class="cv-rule-text"><strong style="color:var(--red)">Deficit &gt; 50 km = CONSEQUENCE:</strong> Personal accountability + deficit × 2 punishment km (immutable slip). Enforced daily.</span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.5</span><span class="cv-rule-text">Garmin + Strava verified — GPS proof on every activity. <a href="strava.html" style="color:var(--cyan)">View live data →</a></span></div>
-      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.6</span><span class="cv-rule-text"><strong style="color:#fff">No break clause — miss does NOT reset the streak.</strong> Consequence is recorded (immutable slip), the day is marked, the streak continues. Resume next morning from where you left off.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.1</span><span class="cv-rule-text"><strong style="color:#fff">Move every day.</strong> Complete <strong>one</strong> from the menu — 5 km walk · 5 km run · 10 km cycle · 1 km swim · 30 min HR-elevated session (boxing / Zumba / gym / yoga).</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.2</span><span class="cv-rule-text">Deadline: <strong style="color:#fff">11:59 PM IST</strong>. Strava-verified for GPS sports. Apple Watch HR session + timestamped photo for boxing / Zumba / gym / yoga.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.3</span><span class="cv-rule-text"><strong style="color:var(--red)">Miss = ₹1,500 to Akshaya Patra</strong> within 24 hours. UPI receipt published on accountability ledger. Flat amount — no escalation.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.4</span><span class="cv-rule-text"><strong style="color:#fff">Only exemption: hospitalization.</strong> Knee hurts → swim. Foot hurt → cycle. Both → upper-body HR session. Only literal medical incapacitation pauses the clock.</span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.5</span><span class="cv-rule-text">Strava + Garmin + Apple Watch verified — GPS or HR proof on every activity. <a href="strava.html" style="color:var(--cyan)">View live data →</a></span></div>
+      <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ 2.6</span><span class="cv-rule-text"><strong style="color:#fff">Streak = consecutive days of honesty.</strong> Activity logged OR payment made → streak continues. Dishonesty (claiming activity that wasn't done, or skipping payment) → streak resets.</span></div>
     </div>
     <div class="cv-clause">
       <div class="cv-clause-label" style="color:#FC4C02">RACE DAY CLAUSE</div>
       <div class="cv-rules" style="padding-left:0">
-        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.1</span><span class="cv-rule-text">Applies to Ultra, Marathon, Half Marathon, or any registered race starting before 6:00 AM</span></div>
-        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.2</span><span class="cv-rule-text">BIB number uploaded to <a href="marathon.html" style="color:var(--cyan)">Races page</a> and posted on <a href="https://www.instagram.com/firstlightlive" style="color:#E1306C" target="_blank">Instagram</a> before race day as public proof</span></div>
-        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.3</span><span class="cv-rule-text">The race counts as the day's run — no separate morning run required</span></div>
-        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.4</span><span class="cv-rule-text">If race starts after 6:00 AM — <strong style="color:#fff">regular 5 km morning run must still happen before the race</strong>. No exceptions.</span></div>
-        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.5</span><span class="cv-rule-text">Running is never excused. The post timing gets flexibility. The run does not.</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.1</span><span class="cv-rule-text">Any registered race (Ultra, Marathon, Half Marathon, Triathlon, etc.) counts as the day's activity.</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.2</span><span class="cv-rule-text">BIB uploaded to <a href="marathon.html" style="color:var(--cyan)">Races page</a> as public proof.</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:#FC4C02">§ R.3</span><span class="cv-rule-text">Race = activity. No separate session needed regardless of distance or start time.</span></div>
       </div>
     </div>
     <div class="cv-clause cv-clause--cyan">
-      <div class="cv-clause-label" style="color:var(--cyan)">FLIGHT TRAVEL CLAUSE — RED-EYE WINDOW</div>
+      <div class="cv-clause-label" style="color:var(--cyan)">TRAVEL CLAUSE</div>
       <div class="cv-rules" style="padding-left:0">
-        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.1</span><span class="cv-rule-text">If flight departs between <strong style="color:#fff">00:30 AM and 06:00 AM</strong> — morning run window is physically impossible</span></div>
-        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.2</span><span class="cv-rule-text">Upon landing — walk <strong style="color:#fff">5 km from the airport</strong>, GPS verified via Strava. No cab until walk is done.</span></div>
-        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.3</span><span class="cv-rule-text">Walk must happen immediately after landing — no hotel first, no delays</span></div>
-        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.4</span><span class="cv-rule-text">Instagram post can be delayed until after the walk is uploaded</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.1</span><span class="cv-rule-text">Travel is not an exemption. 5 km walk is doable in any airport, hotel, or city.</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.2</span><span class="cv-rule-text">Post-landing walk, hotel-corridor walk, terminal walk — all count if Strava-tracked.</span></div>
+        <div class="cv-rule"><span class="cv-rule-num" style="color:var(--cyan)">§ F.3</span><span class="cv-rule-text">If genuinely impossible (24h flight, transit jail) — pay ₹1,500 to Akshaya Patra. Don't game it.</span></div>
       </div>
     </div>
   </section>
@@ -405,11 +400,11 @@
     <div class="cv-decl-title">The First Light Declaration</div>
     <div class="cv-oath">
       <div class="cv-oath-line reveal"><span class="cv-oath-num">ONE</span><span class="cv-oath-text">I wake before the sun. Every day. No negotiation.</span></div>
-      <div class="cv-oath-line reveal"><span class="cv-oath-num">TWO</span><span class="cv-oath-text">I train every day. Run. Ride. Swim. Walk. Gym. No zero days.</span></div>
-      <div class="cv-oath-line reveal"><span class="cv-oath-num">THREE</span><span class="cv-oath-text">I hit 100 km every week. Deficit carries. Exceed 50 km and the penalty is real.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">TWO</span><span class="cv-oath-text">I move every day. One activity from the menu. No zero days.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">THREE</span><span class="cv-oath-text">Walk, run, cycle, swim, or HR session — the body chooses, the streak continues.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">FOUR</span><span class="cv-oath-text">I follow the food code. Six rules. Zero tolerance.</span></div>
-      <div class="cv-oath-line reveal"><span class="cv-oath-num">FIVE</span><span class="cv-oath-text">I document everything. The Command Center tracks it. The <a href="accountability.html" style="color:var(--cyan)">Accountability Ledger</a> is public. Historical records are immutable — even I cannot change them.</span></div>
-      <div class="cv-oath-line reveal"><span class="cv-oath-num">SIX</span><span class="cv-oath-text">I stake ₹<span data-stake-daily>15,000</span> every single day. Miss once and a stranger collects. <span style="color:var(--gold)">₹<span data-unclaimed>—</span></span> unclaimed so far.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">FIVE</span><span class="cv-oath-text">I document everything. The Command Center tracks it. The <a href="accountability.html" style="color:var(--cyan)">Donation Ledger</a> is public. Historical records are immutable — even I cannot change them.</span></div>
+      <div class="cv-oath-line reveal"><span class="cv-oath-num">SIX</span><span class="cv-oath-text">When I miss, I pay ₹<span data-stake-daily>1,500</span> to Akshaya Patra. Children eat. The streak measures honesty, not perfection.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">SEVEN</span><span class="cv-oath-text">I control my devices. They do not control me.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">EIGHT</span><span class="cv-oath-text">I honour the spiritual disciplines. Japa. Nasya. Brahma Muhurta.</span></div>
       <div class="cv-oath-line reveal"><span class="cv-oath-num">NINE</span><span class="cv-oath-text">I am not trying to win. I am refusing to stop.</span></div>
@@ -451,7 +446,7 @@
 <footer class="footer"><div class="container"><div class="footer-top"><div><div class="footer-brand">◆ FIRST LIGHT</div><div class="footer-tagline">No end date. No finish line. INFINITE.</div></div><div class="footer-links"><a href="https://www.instagram.com/firstlightlive" class="footer-link" target="_blank" data-link="instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>INSTAGRAM</a><a href="https://strava.app.link/jxGRExHXo2b" class="footer-link" target="_blank" data-link="strava"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>STRAVA</a><a href="https://x.com/firstlightlive" class="footer-link" target="_blank" data-link="x">X</a><a href="https://www.linkedin.com/in/anupam1001/" class="footer-link" target="_blank" data-link="linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LINKEDIN</a></div></div><div class="footer-bar"><div class="footer-stats">DAY <span data-day></span> · <span data-unclaimed></span> UNCLAIMED · <span style="color:var(--green)">STREAK ALIVE</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div><div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;line-height:1.6">Personal accountability journal · Single-user · Not gambling, not a financial service. <a href="privacy.html" style="color:var(--text-dim);text-decoration:underline">PRIVACY</a> · <a href="terms.html" style="color:var(--text-dim);text-decoration:underline">TERMS</a></div><div class="footer-copy">© 2026 Anupam Kumar · firstlight.live</div></div></div></footer>
 
 <script src="js/config.js"></script>
-<script src="app.js?v=20260613a"></script>
+<script src="app.js?v=20260619a"></script>
 <script>
 (function(){
   // GSAP reveals
