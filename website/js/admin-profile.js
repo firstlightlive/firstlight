@@ -72,8 +72,11 @@ function saveProfile() {
   flashBtn(document.querySelector('#p-profile .btn-primary'), 'SAVED');
 }
 
-// ── UNIVERSAL UPLOAD — direct to Supabase Storage (free, permanent) ──
-async function _uploadPhotoToGCS(file, folder, filenamePrefix, statusEl) {
+// ── UNIVERSAL UPLOAD — Cloudflare R2 via /api/upload worker route ──
+// folder = "profile" | "about" | "races" | "races/bib" | "races/{slug}"
+// Stores under R2 key: photos/{folder}/{prefix}_{ts}.{ext}
+// Public URL: https://firstlight.live/api/proofs/photos/{folder}/{prefix}_{ts}.{ext}
+async function _uploadPhotoToR2(file, folder, filenamePrefix, statusEl, onProgress) {
   if (!file) return null;
   if (!file.type.startsWith('image/')) {
     if (statusEl) { statusEl.textContent = 'Not an image file'; statusEl.style.color = 'var(--red)'; }
@@ -84,42 +87,73 @@ async function _uploadPhotoToGCS(file, folder, filenamePrefix, statusEl) {
     return null;
   }
 
-  if (statusEl) { statusEl.textContent = 'Uploading...'; statusEl.style.color = 'var(--gold)'; }
-
-  try {
-    var ext = file.name.split('.').pop() || 'jpg';
-    var filename = filenamePrefix + '_' + Date.now() + '.' + ext;
-    var path = folder + '/' + filename;
-
-    var sbUrl = FL.SUPABASE_URL;
-    var sbKey = FL.SUPABASE_ANON_KEY;
-    var contentType = file.type || 'image/jpeg';
-
-    var res = await fetch(sbUrl + '/storage/v1/object/media/' + path, {
-      method: 'POST',
-      headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey, 'Content-Type': contentType, 'x-upsert': 'true' },
-      body: file
-    });
-
-    if (!res.ok) {
-      var errText = await res.text().catch(function() { return ''; });
-      throw new Error('HTTP ' + res.status + ': ' + errText.substring(0, 100));
-    }
-
-    var url = sbUrl + '/storage/v1/object/public/media/' + path;
-    if (statusEl) { statusEl.textContent = 'Uploaded'; statusEl.style.color = 'var(--green)'; }
-    return url;
-  } catch(e) {
-    console.error('[Upload]', e);
-    if (statusEl) { statusEl.textContent = 'Failed: ' + e.message; statusEl.style.color = 'var(--red)'; }
+  var adminKey = (typeof FL !== 'undefined' && FL.ADMIN_API_KEY) || localStorage.getItem('fl_admin_api_key') || '';
+  if (!adminKey) {
+    if (statusEl) { statusEl.textContent = 'Missing admin key — login again'; statusEl.style.color = 'var(--red)'; }
     return null;
   }
+
+  if (statusEl) { statusEl.textContent = 'Uploading to Cloudflare R2…'; statusEl.style.color = 'var(--gold)'; }
+
+  // Normalize folder — strip a leading "photos/" if caller passed legacy path
+  var normFolder = (folder || '').replace(/^photos\//, '').replace(/\/+$/, '');
+
+  // Use XHR so we get a real progress event (fetch can't track upload bytes in browser)
+  return new Promise(function(resolve) {
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://firstlight.live/api/upload');
+      xhr.setRequestHeader('x-admin-key', adminKey);
+      xhr.setRequestHeader('x-folder', normFolder);
+      xhr.setRequestHeader('x-filename-prefix', filenamePrefix || 'img');
+      xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
+      if (xhr.upload && onProgress) {
+        xhr.upload.addEventListener('progress', function(e) {
+          if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+        });
+      }
+      xhr.onload = function() {
+        try {
+          var json = JSON.parse(xhr.responseText || '{}');
+          if (xhr.status >= 200 && xhr.status < 300 && json.url) {
+            if (statusEl) { statusEl.textContent = 'Uploaded to R2 (' + Math.round(json.bytes/1024) + ' KB)'; statusEl.style.color = 'var(--green)'; }
+            resolve(json.url);
+          } else {
+            var msg = json.error || ('HTTP ' + xhr.status);
+            if (statusEl) { statusEl.textContent = 'Failed: ' + msg; statusEl.style.color = 'var(--red)'; }
+            console.error('[R2 Upload]', msg);
+            resolve(null);
+          }
+        } catch (e) {
+          if (statusEl) { statusEl.textContent = 'Parse error: ' + e.message; statusEl.style.color = 'var(--red)'; }
+          resolve(null);
+        }
+      };
+      xhr.onerror = function() {
+        if (statusEl) { statusEl.textContent = 'Network error — check connection'; statusEl.style.color = 'var(--red)'; }
+        resolve(null);
+      };
+      xhr.send(file);
+    } catch (e) {
+      console.error('[R2 Upload]', e);
+      if (statusEl) { statusEl.textContent = 'Failed: ' + e.message; statusEl.style.color = 'var(--red)'; }
+      resolve(null);
+    }
+  });
+}
+
+// Back-compat alias — old call sites pass folder like "photos/profile"; the new
+// helper strips that and routes to /api/upload anyway.
+async function _uploadPhotoToGCS(file, folder, filenamePrefix, statusEl) {
+  return _uploadPhotoToR2(file, folder, filenamePrefix, statusEl);
 }
 
 // ── UPLOAD PROFILE PHOTO ──
 async function uploadProfilePhoto(file) {
   var status = document.getElementById('profileUploadStatus');
-  var url = await _uploadPhotoToGCS(file, 'photos/profile', 'profile', status);
+  var url = await _uploadPhotoToR2(file, 'profile', 'profile', status, function(pct) {
+    if (status) status.textContent = 'Uploading to R2 — ' + pct + '%';
+  });
   if (url) {
     document.getElementById('profilePhotoUrl').value = url;
     saveConfig({ PROFILE_PHOTO_URL: url });
@@ -142,7 +176,9 @@ function _saveConfigToSupabase(key, value) {
 // ── UPLOAD ABOUT PAGE PHOTO ──
 async function uploadAboutPhoto(file) {
   var status = document.getElementById('aboutPhotoStatus');
-  var url = await _uploadPhotoToGCS(file, 'photos/about', 'about', status);
+  var url = await _uploadPhotoToR2(file, 'about', 'about', status, function(pct) {
+    if (status) status.textContent = 'Uploading to R2 — ' + pct + '%';
+  });
   if (url) {
     var urlEl = document.getElementById('aboutPhotoUrl');
     if (urlEl) urlEl.value = url;

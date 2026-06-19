@@ -429,7 +429,7 @@
         <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#F5A623;box-shadow:0 0 12px rgba(245,166,35,0.4)"></div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#F5A623;margin-bottom:6px">STEP 2 — PUNISHMENT AUTO-ASSIGNED</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">The system decides the penalty. Not the admin.</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">Missed activity day: <span style="color:#F5A623">₹1,500 to Akshaya Patra within 24 hours</span>, UPI receipt published. Fortress breach (phone-in-house): <span style="color:#FF5252">10km walk per 30 minutes phone stayed inside.</span> The code assigns it. No negotiation. No appeal.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">Missed activity day: <span style="color:#F5A623">₹1,500 to Akshaya Patra within 24 hours</span>, UPI receipt published. Flat amount — no escalation, no compounding, no grace period. The code assigns it. No negotiation. No appeal.</div>
       </div>
 
       <!-- Step 3 -->
@@ -443,17 +443,17 @@
       <!-- Step 4 -->
       <div style="margin-bottom:28px;position:relative">
         <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#00D4FF;box-shadow:0 0 12px rgba(0,212,255,0.4)"></div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#00D4FF;margin-bottom:6px">STEP 4 — STRAVA GPS VERIFICATION</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">The server reads GPS distance directly from Strava. Not from the admin.</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">The admin selects a real Strava Walk or Ride activity. The <span style="color:#00D4FF">database trigger</span> then reads the actual distance from the Strava table — not from the browser. The admin can't type a fake number. Cycling counts at 0.5x (need double). The activity must have happened <span style="color:#00D4FF">after the slip date</span> — no old walks. Each activity can only be used for <span style="color:#00D4FF">one penalty</span>.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#00D4FF;margin-bottom:6px">STEP 4 — QUALIFYING ACTIVITY CHECK</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">At 23:30 IST, the engine queries Strava directly. Not the admin.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">The Edge Function pulls every Strava activity for the IST day and checks the menu thresholds — <span style="color:#00D4FF">5 km walk, 5 km run, 10 km cycle, 1 km swim, or 30 min HR session</span>. Distance and duration are read from Strava's API response, not the browser. If anything qualifies, verdict = WIN. If nothing does, verdict = MISS. The admin can't fake distance or backdate an activity — Strava timestamps are <span style="color:#00D4FF">cryptographically signed at upload</span>.</div>
       </div>
 
       <!-- Step 5 -->
       <div style="margin-bottom:28px;position:relative">
         <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#E040FB;box-shadow:0 0 12px rgba(224,64,251,0.4)"></div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#E040FB;margin-bottom:6px">STEP 5 — ESCALATION ENGINE</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">7 days to complete. Then it gets worse. Every single day.</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">After a 7-day grace period, the penalty escalates by <span style="color:#FF5252;font-weight:700">+3 km per day</span>. Day 8: 23 km. Day 15: 44 km. Caps at <span style="color:#FF5252;font-weight:700">70 km</span> — then a new cascade penalty spawns at 25 km, which also escalates. The chain never ends until every penalty is walked. The escalation is computed <span style="color:#E040FB">by the database server</span> — not the browser. Changing your device clock does nothing.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#E040FB;margin-bottom:6px">STEP 5 — DONATION REQUIRED</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">₹1,500 to Akshaya Patra within 24 hours. UPI receipt uploaded to the ledger.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">Flat <span style="color:#F5A623;font-weight:700">₹1,500</span> per miss — no escalation, no compounding, no grace period. The UPI deep-link is pre-built into the email and the IG miss-post. The operator transfers via the dedicated charity UPI handle and uploads the receipt screenshot. The slip status flips from <span style="color:#FF5252">PENDING</span> to <span style="color:#00E676">CLEARED</span> — and that flip is <span style="color:#E040FB">one-way</span>. The only exemption is hospitalization.</div>
       </div>
 
       <!-- Step 6 -->
@@ -473,8 +473,8 @@
         <span style="color:#FF5252">The system now controls the admin.</span>
       </div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;margin-top:12px;line-height:1.6">
-        He can't delete slips. He can't fake distance. He can't use old walks. He can't change proof after it's set.<br>
-        He can only do one thing — walk the punishment and let the GPS prove it.
+        He can't delete slips. He can't fake distance. He can't backdate an activity. He can't change proof after it's set.<br>
+        He can only do one thing — transfer ₹1,500 to Akshaya Patra and upload the UPI receipt.
       </div>
     </div>
 
@@ -487,11 +487,11 @@
       <div style="display:flex;flex-direction:column;gap:6px;max-width:500px;margin:0 auto">
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,82,82,0.06);border-left:3px solid #FF5252;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FF5252;font-weight:700;min-width:16px">01</span><span style="color:#8a9bb0">DELETE physically blocked by database trigger</span></div>
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(245,166,35,0.06);border-left:3px solid #F5A623;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#F5A623;font-weight:700;min-width:16px">02</span><span style="color:#8a9bb0">Core fields frozen after insert — immutable trigger</span></div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,212,255,0.06);border-left:3px solid #00D4FF;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#00D4FF;font-weight:700;min-width:16px">03</span><span style="color:#8a9bb0">GPS distance read from Strava DB — not browser</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,212,255,0.06);border-left:3px solid #00D4FF;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#00D4FF;font-weight:700;min-width:16px">03</span><span style="color:#8a9bb0">Distance &amp; duration read from Strava API — not browser</span></div>
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,230,118,0.06);border-left:3px solid #00E676;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#00E676;font-weight:700;min-width:16px">04</span><span style="color:#8a9bb0">Strava table write-locked — only Edge Function syncs</span></div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(224,64,251,0.06);border-left:3px solid #E040FB;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#E040FB;font-weight:700;min-width:16px">05</span><span style="color:#8a9bb0">Escalation computed server-side using server clock</span></div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(252,76,2,0.06);border-left:3px solid #FC4C02;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FC4C02;font-weight:700;min-width:16px">06</span><span style="color:#8a9bb0">Activity date must be after slip date — no old walks</span></div>
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border-left:3px solid #E8EDF2;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#E8EDF2;font-weight:700;min-width:16px">07</span><span style="color:#8a9bb0">Unique index — one activity per penalty, no reuse</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(224,64,251,0.06);border-left:3px solid #E040FB;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#E040FB;font-weight:700;min-width:16px">05</span><span style="color:#8a9bb0">Verdict runs server-side at 23:30 IST — no client clock</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(252,76,2,0.06);border-left:3px solid #FC4C02;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FC4C02;font-weight:700;min-width:16px">06</span><span style="color:#8a9bb0">Strava timestamps signed at upload — no backdating</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border-left:3px solid #E8EDF2;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#E8EDF2;font-weight:700;min-width:16px">07</span><span style="color:#8a9bb0">UPI receipt write-once — proof URL cannot be edited</span></div>
         <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,82,82,0.06);border-left:3px solid #FF5252;border-radius:0 6px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:10px"><span style="color:#FF5252;font-weight:700;min-width:16px">08</span><span style="color:#8a9bb0">One-way status — CLEARED can never revert to PENDING</span></div>
       </div>
 
@@ -507,8 +507,8 @@
       <div style="position:absolute;top:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,#00D4FF,#00E676,transparent);opacity:0.5"></div>
 
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;padding:4px 10px;border-radius:4px;background:rgba(245,166,35,0.15);color:#F5A623">IN DEVELOPMENT</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#E8EDF2;letter-spacing:1px">PHASE 2 — AUTO-DONATE</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;padding:4px 10px;border-radius:4px;background:rgba(245,166,35,0.15);color:#F5A623">NEXT EVOLUTION</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#E8EDF2;letter-spacing:1px">AUTO-UPI · ZERO-TOUCH DONATION</span>
       </div>
 
       <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:600;line-height:1.8;margin-bottom:12px">

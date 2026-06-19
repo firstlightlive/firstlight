@@ -593,36 +593,48 @@ async function _renderRaceRouteMap(containerId, race) {
 // GCS PHOTO UPLOAD FOR RACES
 // ══════════════════════════════════════
 
-// Upload directly to Supabase Storage (free, permanent, no GCS)
-async function checkGCSServer() {
-  return true;
+// Upload to Cloudflare R2 via /api/upload worker route.
+// Folder slug: races/{race-slug} so each race has its own folder in R2.
+function _raceSlugForUpload() {
+  var nameEl = document.getElementById('raceName');
+  var dateEl = document.getElementById('raceDate');
+  var name = (nameEl && nameEl.value) || 'race';
+  var date = (dateEl && dateEl.value) || '';
+  var slug = (date.slice(0, 10) + '_' + name).toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
+    .slice(0, 40);
+  return slug || 'race';
 }
 
-async function uploadToGCS(file, folder) {
-  return new Promise(function(resolve, reject) {
-    try {
-      var ext = file.name.split('.').pop() || 'jpg';
-      var name = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + Date.now() + '.' + ext;
-      var path = folder + '/' + name;
-      var sbUrl = FL.SUPABASE_URL;
-      var sbKey = FL.SUPABASE_ANON_KEY;
+async function _uploadOneToR2(file, folderSlug, prefix, onProgress) {
+  var adminKey = (typeof FL !== 'undefined' && FL.ADMIN_API_KEY) || localStorage.getItem('fl_admin_api_key') || '';
+  if (!adminKey) throw new Error('Missing admin key — login again');
+  if (!file.type.startsWith('image/')) throw new Error('Not an image file');
+  if (file.size > 10 * 1024 * 1024) throw new Error('Image too large (max 10 MB)');
 
-      fetch(sbUrl + '/storage/v1/object/media/' + path, {
-        method: 'POST',
-        headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey, 'Content-Type': file.type || 'image/jpeg', 'x-upsert': 'true' },
-        body: file
-      })
-      .then(function(r) {
-        if (!r.ok) throw new Error('Upload HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function() {
-        var url = sbUrl + '/storage/v1/object/public/media/' + path;
-        console.log('[Storage] Uploaded: ' + url);
-        resolve(url);
-      })
-      .catch(function(e) { reject(e.message || 'Upload failed'); });
-    } catch(e) { reject(e.message || 'Processing error'); }
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://firstlight.live/api/upload');
+    xhr.setRequestHeader('x-admin-key', adminKey);
+    xhr.setRequestHeader('x-folder', folderSlug);
+    xhr.setRequestHeader('x-filename-prefix', prefix || 'img');
+    xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
+    if (xhr.upload && onProgress) {
+      xhr.upload.addEventListener('progress', function(e) {
+        if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+      });
+    }
+    xhr.onload = function() {
+      try {
+        var json = JSON.parse(xhr.responseText || '{}');
+        if (xhr.status >= 200 && xhr.status < 300 && json.url) resolve(json.url);
+        else reject(new Error(json.error || ('HTTP ' + xhr.status)));
+      } catch (e) { reject(e); }
+    };
+    xhr.onerror = function() { reject(new Error('Network error')); };
+    xhr.send(file);
   });
 }
 
@@ -631,44 +643,41 @@ async function uploadRacePhotos(files) {
   var container = document.getElementById('photosContainer');
   if (!files || !files.length) return;
 
-  progress.textContent = 'Checking GCS server...';
+  var slug = _raceSlugForUpload();
+  var folder = 'races/' + slug;
+  var nameEl = document.getElementById('raceName');
+  var prefix = ((nameEl && nameEl.value) || 'photo').toLowerCase().replace(/[^a-z0-9_-]/g, '_').slice(0, 24) || 'photo';
+
+  progress.textContent = 'Uploading ' + files.length + ' photo(s) to Cloudflare R2…';
   progress.style.color = 'var(--gold)';
-
-  var serverOk = await checkGCSServer();
-  if (!serverOk) {
-    progress.textContent = '✗ GCS Upload Server is not running! Run: node scripts/gcs-upload-server.js';
-    progress.style.color = 'var(--red)';
-    alert('GCS Upload Server is not running.\n\nOpen Terminal and run:\nnode scripts/gcs-upload-server.js');
-    return;
-  }
-
-  progress.textContent = 'Uploading ' + files.length + ' photo(s) to Google Cloud...';
   var uploaded = 0;
 
   for (var i = 0; i < files.length; i++) {
     try {
-      progress.textContent = 'Uploading ' + (i + 1) + '/' + files.length + ' (' + files[i].name + ')...';
-      var url = await uploadToGCS(files[i], 'photos/races');
+      var fi = i + 1, fn = files[i].name;
+      progress.textContent = 'Uploading ' + fi + '/' + files.length + ' — ' + fn + ' (0%)';
+      var url = await _uploadOneToR2(files[i], folder, prefix + '_' + fi, function(pct) {
+        progress.textContent = 'Uploading ' + fi + '/' + files.length + ' — ' + fn + ' (' + pct + '%)';
+      });
       uploaded++;
 
-      // Add URL to photos container with preview
       var row = document.createElement('div');
       row.className = 'form-row';
       row.style.cssText = 'margin-bottom:6px;align-items:center;padding:6px;background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.12);border-radius:6px';
       row.innerHTML = '<img src="' + url + '" style="width:48px;height:48px;object-fit:cover;border-radius:4px;border:1px solid var(--surface-border)">' +
         '<div class="form-group" style="flex:1;margin:0 8px"><input type="url" class="form-input photo-url" value="' + url + '" readonly style="font-size:9px;color:var(--green)" onclick="this.select()"></div>' +
-        '<span style="font-family:var(--font-mono);font-size:8px;color:var(--green)">GCS ✓</span>' +
+        '<span style="font-family:var(--font-mono);font-size:8px;color:var(--green)">R2 ✓</span>' +
         '<button type="button" class="btn-copy" style="padding:4px 8px;font-size:9px;color:var(--red);margin-left:4px" onclick="this.parentElement.remove()">✗</button>';
       container.appendChild(row);
     } catch(e) {
-      progress.textContent = '✗ Failed (' + files[i].name + '): ' + e;
+      progress.textContent = '✗ Failed (' + files[i].name + '): ' + e.message;
       progress.style.color = 'var(--red)';
-      console.error('[GCS Upload]', e);
+      console.error('[R2 Upload]', e);
     }
   }
 
   if (uploaded > 0) {
-    progress.textContent = uploaded + ' photo(s) uploaded to Google Cloud ✓';
+    progress.textContent = uploaded + ' photo(s) uploaded to Cloudflare R2 ✓';
     progress.style.color = 'var(--green)';
   }
   setTimeout(function() { progress.textContent = ''; progress.style.color = ''; }, 5000);
@@ -677,27 +686,20 @@ async function uploadRacePhotos(files) {
 async function uploadBibPhoto(file) {
   if (!file) return;
   var progress = document.getElementById('uploadProgress');
-
-  var serverOk = await checkGCSServer();
-  if (!serverOk) {
-    progress.textContent = '✗ GCS Upload Server is not running!';
-    progress.style.color = 'var(--red)';
-    alert('GCS Upload Server is not running.\n\nOpen Terminal and run:\nnode scripts/gcs-upload-server.js');
-    return;
-  }
-
-  progress.textContent = 'Uploading bib photo...';
+  progress.textContent = 'Uploading bib photo to R2…';
   progress.style.color = 'var(--gold)';
 
   try {
-    var url = await uploadToGCS(file, 'photos/bibs');
+    var url = await _uploadOneToR2(file, 'races/bib', 'bib', function(pct) {
+      progress.textContent = 'Uploading bib photo — ' + pct + '%';
+    });
     document.getElementById('raceBibPhoto').value = url;
-    progress.textContent = 'Bib photo uploaded to GCS ✓ — ' + url;
+    progress.textContent = 'Bib photo uploaded to R2 ✓ — ' + url;
     progress.style.color = 'var(--green)';
   } catch(e) {
-    progress.textContent = '✗ Bib upload failed: ' + e;
+    progress.textContent = '✗ Bib upload failed: ' + e.message;
     progress.style.color = 'var(--red)';
-    console.error('[GCS Bib Upload]', e);
+    console.error('[R2 Bib Upload]', e);
   }
   setTimeout(function() { progress.textContent = ''; progress.style.color = ''; }, 5000);
 }

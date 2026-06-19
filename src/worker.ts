@@ -20,6 +20,7 @@ export interface Env {
   ASSETS: Fetcher
   PROOFS: R2Bucket
   RENDER_KEY?: string  // optional shared secret for /api/render
+  ADMIN_KEY?: string   // required for /api/upload (admin-only photo uploads)
   MAPBOX_TOKEN?: string // for fetching basemap on WIN_ROUTE slides
 }
 
@@ -76,6 +77,89 @@ export default {
         headers.set('etag', obj.httpEtag)
         headers.set('cache-control', 'public, max-age=31536000, immutable')
         return new Response(obj.body, { headers })
+      }
+
+      // CORS preflight for /api/upload
+      if (path === '/api/upload' && request.method === 'OPTIONS') {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key, X-Folder, X-Filename-Prefix',
+            'Access-Control-Max-Age': '86400'
+          }
+        })
+      }
+
+      // Upload an image to R2 — admin-only.
+      // POST /api/upload
+      // Headers:  X-Admin-Key (required), X-Folder (e.g. "profile", "about", "races", "races/bib"),
+      //           X-Filename-Prefix (optional — defaults to folder name)
+      // Body:     raw image bytes (Content-Type: image/jpeg | image/png | image/webp)
+      // Returns:  { success, url, key, bytes, contentType }
+      if (path === '/api/upload' && request.method === 'POST') {
+        const corsHeaders = { 'Access-Control-Allow-Origin': '*' }
+        if (!env.ADMIN_KEY) {
+          return jsonResponse({ error: 'Server misconfigured: ADMIN_KEY not set' }, 500, corsHeaders)
+        }
+        const provided = request.headers.get('x-admin-key') || ''
+        if (provided !== env.ADMIN_KEY) {
+          return jsonResponse({ error: 'Unauthorized' }, 401, corsHeaders)
+        }
+
+        // Validate content type — only images allowed
+        const contentType = (request.headers.get('content-type') || '').toLowerCase()
+        const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/gif']
+        if (!allowed.some(t => contentType.startsWith(t))) {
+          return jsonResponse({ error: `Unsupported content-type: ${contentType}. Allowed: ${allowed.join(', ')}` }, 415, corsHeaders)
+        }
+
+        // Folder must be whitelisted to prevent abuse / path traversal
+        const folderRaw = (request.headers.get('x-folder') || '').toLowerCase().trim()
+        const folderAllow = /^(profile|about|races|races\/bib|races\/[a-z0-9_-]{1,40})$/
+        if (!folderAllow.test(folderRaw)) {
+          return jsonResponse({ error: `Bad folder. Allowed: profile | about | races | races/bib | races/{slug}` }, 400, corsHeaders)
+        }
+
+        // Prefix slug — used in filename so each race etc. is identifiable
+        const prefixRaw = (request.headers.get('x-filename-prefix') || folderRaw.split('/').pop() || 'img').toLowerCase()
+        const prefix = prefixRaw.replace(/[^a-z0-9_-]/g, '_').slice(0, 40) || 'img'
+
+        // Compute extension from content-type
+        const ext =
+          contentType.startsWith('image/png')   ? 'png'  :
+          contentType.startsWith('image/webp')  ? 'webp' :
+          contentType.startsWith('image/gif')   ? 'gif'  :
+          contentType.startsWith('image/heif') || contentType.startsWith('image/heic') ? 'heic' :
+          'jpg'
+
+        // Read body as bytes; cap at 10 MB
+        const buf = await request.arrayBuffer()
+        if (buf.byteLength === 0) {
+          return jsonResponse({ error: 'Empty body' }, 400, corsHeaders)
+        }
+        if (buf.byteLength > 10 * 1024 * 1024) {
+          return jsonResponse({ error: 'File too large (max 10 MB)' }, 413, corsHeaders)
+        }
+
+        const ts = Number(request.headers.get('x-ts') || Date.now())
+        const filename = `${prefix}_${ts}.${ext}`
+        const r2Key = `photos/${folderRaw}/${filename}`
+
+        await env.PROOFS.put(r2Key, buf, {
+          httpMetadata: { contentType, cacheControl: 'public, max-age=31536000, immutable' },
+          customMetadata: { folder: folderRaw, prefix, uploadedAt: new Date(ts).toISOString() }
+        })
+
+        const publicUrl = `https://firstlight.live/api/proofs/${r2Key}`
+        return jsonResponse({
+          success: true,
+          url: publicUrl,
+          key: r2Key,
+          bytes: buf.byteLength,
+          contentType
+        }, 200, corsHeaders)
       }
     } catch (err) {
       return jsonResponse({ error: (err as Error).message, stack: (err as Error).stack?.slice(0, 1000) }, 500)
@@ -1334,10 +1418,10 @@ function renderMultiSummarySvg(req: RenderRequest): string {
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
-function jsonResponse(body: unknown, status = 200): Response {
+function jsonResponse(body: unknown, status = 200, extraHeaders: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body, null, 2), {
     status,
-    headers: { 'content-type': 'application/json; charset=utf-8', ...corsHeaders() }
+    headers: { 'content-type': 'application/json; charset=utf-8', ...corsHeaders(), ...extraHeaders }
   })
 }
 
@@ -1345,7 +1429,7 @@ function corsHeaders(): Record<string, string> {
   return {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, x-render-key'
+    'access-control-allow-headers': 'content-type, x-render-key, x-admin-key, x-folder, x-filename-prefix, x-ts'
   }
 }
 
