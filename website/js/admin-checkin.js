@@ -596,7 +596,7 @@ async function checkMissedMorningCheckin() {
   localStorage.setItem('fl_morning_check_date', today);
 
   if (newSlips.length > 0) {
-    alert('⚠ MISSED DAILY CHECK-IN\n\nThe daily check-in did not happen on:\n' + newSlips.join(', ') + '\n\nAuto-fine per day: ₹1,500 to Akshaya Patra (UPI, receipt published)\n\nThese slips are PERMANENT. Chapter 2 ENDURANCE rule — enforced from June 19, 2026.');
+    alert('⚠ MISSED DAILY CHECK-IN\n\nThe daily check-in did not happen on:\n' + newSlips.join(', ') + '\n\nAuto-fine per day: ₹1,500 to Akshaya Patra (UPI, receipt published)\n\nThese slips are PERMANENT. Chapter 2 ENDURANCE rule — enforced from June 20, 2026.');
   }
 }
 

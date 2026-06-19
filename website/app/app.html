@@ -278,7 +278,7 @@ function syncSleepNow(){
 // (mirrors initStreakLog in index.html so dots are green without visiting story generator)
 function ensureStreakLog(){
   try{
-    const origin=new Date(2026,5,13);origin.setHours(0,0,0,0);
+    const origin=new Date(2026,5,20);origin.setHours(0,0,0,0);
     const today=new Date();today.setHours(0,0,0,0);
     const log=JSON.parse(localStorage.getItem('fl_log')||'{}');
     let changed=false;

@@ -119,6 +119,18 @@ function todayIST(): string {
   return ist.toISOString().slice(0, 10)
 }
 
+// Returns the current hour in IST (0-23). Used by the too-early-to-judge guard.
+function _currentISTHour(): number {
+  const ist = new Date(Date.now() + (5.5 * 3600000))
+  return ist.getUTCHours()
+}
+
+// VERDICT_CUTOFF_HOUR_IST: the engine refuses to declare MISS before this hour
+// in IST on the same day. Default 22 (= 10 PM). The scheduled cron at 23:30 IST
+// passes; manual/test calls earlier in the day return PENDING instead of MISS.
+// Override per-call with ?force=WIN|MISS or an explicit ?date= older than today.
+const VERDICT_CUTOFF_HOUR_IST = 22
+
 // Get Strava access token via refresh flow — isolated helper, mirrors syncStrava
 async function _stravaAccessToken(): Promise<string | null> {
   const refreshToken = await getSecret('strava_refresh')
@@ -805,6 +817,17 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS' }): Promise<EngineRunR
   // Force flags bypass this (for testing).
   if (verdict.chapterDay < 1 && !opts?.force) {
     result.errors.push(`PRE_CHAPTER — Chapter 02 ENDURANCE starts 2026-06-20 IST. Today (${result.date}) is dormant.`)
+    return result
+  }
+
+  // Too-early-to-judge guard — refuse to declare MISS before VERDICT_CUTOFF_HOUR_IST
+  // when judging "today". Prevents premature manual/test calls from locking in a
+  // false MISS before the user has had the day to log their activity. The
+  // scheduled cron fires at 23:30 IST which passes this guard. Force flags + a
+  // date in the past (e.g. grace re-check of yesterday) bypass.
+  const judgingToday = verdict.date === todayIST()
+  if (judgingToday && verdict.verdict === 'MISS' && _currentISTHour() < VERDICT_CUTOFF_HOUR_IST && !opts?.force) {
+    result.errors.push(`TOO_EARLY — current IST hour ${_currentISTHour()} < cutoff ${VERDICT_CUTOFF_HOUR_IST}. Day not over. No publish.`)
     return result
   }
 

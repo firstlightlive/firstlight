@@ -48,9 +48,23 @@ var ESCALATION = {
   CYCLING_MULTIPLIER: 2  // cycling distance must be 2x walk equivalent
 };
 
+// Chapter 02 ENDURANCE slips (penalty='charity_donation' / category='auto_forfeit')
+// have a flat ₹ amount, no km walk, no escalation. Escalation math is Chapter 01
+// / REBUILD legacy only — applies to slips with km-based penalty types.
+function _isLegacyKmWalkSlip(slip) {
+  if (!slip) return false;
+  if (slip.penalty === 'charity_donation') return false;
+  if (slip.category === 'auto_forfeit') return false;
+  // Treat anything else with a non-zero penalty_km, or explicit km-walk penalty type, as legacy.
+  return slip.penalty === '20km_walk' || slip.penalty === '25km_walk_cascade' ||
+         (slip.penalty_km != null && slip.penalty_km > 0);
+}
+
 // Calculate current required KM for a pending slip (IST-based to match DB trigger)
 function getEscalatedKm(slip) {
   if (slip.penalty_status === 'cleared') return parseFloat(slip.proof_km) || 0;
+  // Chapter 02 charity_donation slips: no km penalty, no escalation
+  if (!_isLegacyKmWalkSlip(slip)) return 0;
 
   var baseKm = slip.category === 'brahmacharya_gate' ? 50 : 20;
   if (slip.cascade_level && slip.cascade_level > 0) baseKm = ESCALATION.CASCADE_BASE_KM;
@@ -68,6 +82,8 @@ function getEscalatedKm(slip) {
 // Check if a slip has hit the 70km cap and needs a cascade penalty
 function needsCascade(slip) {
   if (slip.penalty_status === 'cleared') return false;
+  // Chapter 02 charity_donation slips never cascade (no km penalty)
+  if (!_isLegacyKmWalkSlip(slip)) return false;
   return getEscalatedKm(slip) >= ESCALATION.CAP_KM;
 }
 
@@ -80,6 +96,11 @@ function getEffectiveKm(activityType, distanceKm) {
 // Human-readable escalation status
 function getEscalationStatus(slip) {
   if (slip.penalty_status === 'cleared') return null;
+  // Chapter 02 charity_donation slips have no escalation status
+  if (!_isLegacyKmWalkSlip(slip)) {
+    var rupees = slip.penalty_amount || 1500;
+    return { level: 'flat', text: '₹' + rupees.toLocaleString('en-IN') + ' due within 24h — flat, no escalation', km: 0, color: 'var(--gold,#F5A623)' };
+  }
 
   var baseKm = slip.category === 'brahmacharya_gate' ? 50 : 20;
   if (slip.cascade_level && slip.cascade_level > 0) baseKm = ESCALATION.CASCADE_BASE_KM;

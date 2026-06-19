@@ -1344,9 +1344,9 @@ function genTheme(t,e){
 
 function getDateStr(){const n=streakRenderDate();return `${D[n.getDay()]} · ${n.getDate()} ${M[n.getMonth()]} ${n.getFullYear()}`}
 
-// ===== STREAK ORIGIN — Chapter 02 · Jun 13, 2026 =====
+// ===== STREAK ORIGIN — Chapter 02 ENDURANCE · Jun 20, 2026 =====
 // MUST be declared before the INIT block — getDateStr()/updateStreak() read it at load time (TDZ)
-const STREAK_ORIGIN=new Date(2026,5,13); // Jan=0, so 5=Jun, day=13
+const STREAK_ORIGIN=new Date(2026,5,20); // Jan=0, so 5=Jun, day=20
 
 // ===== INIT =====
 document.getElementById('dateStr').textContent=getDateStr();
@@ -2451,8 +2451,8 @@ function drawHeatmapPanels(c,W,H,stravaImg,stravaStats){
   // Month rows
   const mLblW=26;const cSz=5;const cGp=1;const mStartX=LX+8+mLblW+4;const mStartY=LY+48;
   const rowH=(LH-52)/12;
-  // Streak origin: Chapter 02 · Jun 13, 2026
-  const streakOriginMs=new Date(2026,5,13).getTime();
+  // Streak origin: Chapter 02 ENDURANCE · Jun 20, 2026
+  const streakOriginMs=new Date(2026,5,20).getTime();
   for(let m=0;m<12;m++){
     const ry=mStartY+m*rowH;
     // Month label

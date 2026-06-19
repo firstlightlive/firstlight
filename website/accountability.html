@@ -274,7 +274,7 @@
   <!-- Active Rules — compact, below stats -->
   <div class="rules-card reveal">
     <div class="rules-title">ACTIVE RULES — CHAPTER 02 · ENDURANCE · FROM 20 JUN 2026</div>
-    <div class="rules-row"><div class="rules-key">DAILY</div><div class="rules-val">Complete <strong>one</strong>: 5 km walk · 5 km run · 10 km cycle · 1 km swim · 30 min HR-elevated session (boxing / Zumba / gym / yoga). Strava for GPS sports, Apple Watch HR + timestamped photo for the rest.</div></div>
+    <div class="rules-row"><div class="rules-key">DAILY</div><div class="rules-val">Complete <strong>one</strong>: 5 km walk · 5 km run · 10 km cycle · 1 km swim · 30 min HR-elevated session (boxing / Zumba / gym / yoga). Strava for GPS sports, Garmin HR + timestamped photo for the rest.</div></div>
     <div class="rules-row"><div class="rules-key">MISS</div><div class="rules-val">Nothing logged by 11:59 PM IST = <span class="rules-danger">₹1,500 to Akshaya Patra within 24 h</span>. UPI receipt published below.</div></div>
     <div class="rules-row"><div class="rules-key">EXEMPTION</div><div class="rules-val">Hospitalization only. The menu has 5 options — knee hurts? swim. Foot hurt? cycle. Body literally incapacitated = system pauses. Nothing else qualifies.</div></div>
     <div class="rules-row"><div class="rules-key">STAKE</div><div class="rules-val">₹1,500 flat. Forever. No escalation, no compounding, no tightening.</div></div>
@@ -612,6 +612,11 @@ function filterSlips(type) {
     var currentKm = calcEscalatedKm(s);
     var cyclingKm = currentKm * ESC.CYCLE_MULT;
 
+    // CHAPTER 02 ENDURANCE detection — slips use penalty='charity_donation' + category='auto_forfeit'.
+    // These have a flat ₹ amount, no km walk, no escalation. Chapter 01 / REBUILD legacy
+    // slips use km-based penalties ('20km_walk', '25km_walk_cascade', or no penalty type set).
+    var isCharityDonation = s.penalty === 'charity_donation' || s.category === 'auto_forfeit';
+
     var html = '<div class="slip">';
     html += '<div class="slip-timeline"><div class="slip-dot ' + (isPending ? 'pending' : 'cleared') + '"></div><div class="slip-line"></div></div>';
     html += '<div class="slip-body"><div class="slip-card ' + (isPending ? 'pending' : 'cleared') + '">';
@@ -628,7 +633,12 @@ function filterSlips(type) {
     // Penalty bar
     html += '<div class="slip-penalty-bar ' + (isPending ? 'p' : 'c') + '">';
     html += '<span class="slip-status-pill ' + (isPending ? 'pending' : 'cleared') + '">' + (isPending ? 'PENDING' : 'CLEARED') + '</span>';
-    if (isPending) {
+    if (isCharityDonation) {
+      // Chapter 02 flat-rupee display
+      var rupees = s.penalty_amount || 1500;
+      var charityName = s.penalty_charity || 'Akshaya Patra';
+      html += '<span class="slip-km">PENALTY: <strong>₹' + rupees.toLocaleString('en-IN') + '</strong> → ' + charityName + '</span>';
+    } else if (isPending) {
       html += '<span class="slip-km">PENALTY: <strong>' + currentKm + ' KM</strong> walk/run or ' + cyclingKm + ' km cycling</span>';
     } else {
       html += '<span class="slip-km">' + penaltyInfo.base_km + ' km ' + penaltyInfo.desc + '</span>';
@@ -636,8 +646,9 @@ function filterSlips(type) {
     }
     html += '</div>';
 
-    // Escalation info
-    if (isPending) {
+    // Escalation info — ONLY for legacy km-walk slips. Chapter 02 flat-rupee slips
+    // have no escalation; they're paid in 24h or stay pending forever.
+    if (isPending && !isCharityDonation) {
       var _ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
       var daysElapsed = Math.floor((_ist.getTime() - new Date(s.date + 'T00:00:00+05:30').getTime()) / 86400000);
       var daysLeft = Math.max(0, ESC.GRACE - daysElapsed);
@@ -649,6 +660,9 @@ function filterSlips(type) {
         html += '<div class="slip-esc" style="color:var(--red)">ESCALATING: +' + ESC.DAILY + ' km/day until ' + ESC.CAP + ' km cap</div>';
       }
       if (s.cascade_level) html += '<div class="slip-meta">CASCADE LEVEL ' + s.cascade_level + '</div>';
+    } else if (isPending && isCharityDonation) {
+      // Chapter 02: simple "transfer within 24h" reminder
+      html += '<div class="slip-esc" style="color:var(--gold)">UPI receipt due within 24 hours — flat amount, no escalation</div>';
     }
 
     // Proof
