@@ -1342,6 +1342,9 @@ function renderMultiHeroSvg(req: RenderRequest): string {
   const day = req.chapterDay
   const activities = p.activities || []
   const n = activities.length
+  // Stack day signature theme — NEON (magenta + cyan) wraps the slide.
+  // Per-activity chips/colors keep their bucket identity (BUCKET_COLOR).
+  const t = resolveTheme(req, 'neon')
 
   const totalKm   = (p.totalKm   ?? activities.reduce((s, a) => s + (a.distanceKm || 0), 0)).toFixed(1)
   const totalMin  = Math.round(p.totalMin ?? activities.reduce((s, a) => s + (a.durationMin || 0), 0))
@@ -1378,25 +1381,25 @@ function renderMultiHeroSvg(req: RenderRequest): string {
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
   <defs>
     <radialGradient id="halo" cx="50%" cy="40%" r="70%">
-      <stop offset="0%" stop-color="#00E676" stop-opacity="0.06"/>
-      <stop offset="100%" stop-color="${COLORS.bg}" stop-opacity="0"/>
+      <stop offset="0%" stop-color="${t.halo}"/>
+      <stop offset="100%" stop-color="${t.bg}" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="day-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="${COLORS.text}"/>
-      <stop offset="100%" stop-color="#00E676"/>
+      <stop offset="0%" stop-color="${t.accent2}"/>
+      <stop offset="100%" stop-color="${t.accent}"/>
     </linearGradient>
   </defs>
 
-  <rect width="${W}" height="${H}" fill="${COLORS.bg}"/>
+  <rect width="${W}" height="${H}" fill="${t.bg}"/>
   <rect width="${W}" height="${H}" fill="url(#halo)"/>
 
   <!-- Brand bar -->
   <text x="${W / 2}" y="${cy - off(360)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(28)}" font-weight="700"
-        fill="#00E676" letter-spacing="6">◆ FIRST LIGHT</text>
+        fill="${t.accent}" letter-spacing="6">◆ FIRST LIGHT</text>
   <text x="${W / 2}" y="${cy - off(310)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(20)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE · STACK DAY</text>
+        fill="${t.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE · STACK DAY</text>
 
   <!-- Day number -->
   <text x="${W / 2}" y="${cy + off(60)}" text-anchor="middle"
@@ -1406,25 +1409,25 @@ function renderMultiHeroSvg(req: RenderRequest): string {
   <!-- Activity count -->
   <text x="${W / 2}" y="${cy + off(120)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(36)}" font-weight="700"
-        fill="${COLORS.text}" letter-spacing="4">${n} ACTIVITIES</text>
+        fill="${t.text}" letter-spacing="4">${n} ACTIVITIES</text>
 
   <!-- Sport chips row -->
   ${chips}
 
   <!-- Combined stats row -->
-  <text x="${W * 0.20}" y="${cy + off(290)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(32)}" font-weight="700" fill="${COLORS.text}" letter-spacing="1">${totalKm} KM</text>
-  <text x="${W * 0.20}" y="${cy + off(325)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(14)}" font-weight="500" fill="${COLORS.dim}" letter-spacing="3">DISTANCE</text>
+  <text x="${W * 0.20}" y="${cy + off(290)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(32)}" font-weight="700" fill="${t.text}" letter-spacing="1">${totalKm} KM</text>
+  <text x="${W * 0.20}" y="${cy + off(325)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(14)}" font-weight="500" fill="${t.dim}" letter-spacing="3">DISTANCE</text>
 
-  <text x="${W * 0.50}" y="${cy + off(290)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(32)}" font-weight="700" fill="${COLORS.text}" letter-spacing="1">${timeStr}</text>
-  <text x="${W * 0.50}" y="${cy + off(325)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(14)}" font-weight="500" fill="${COLORS.dim}" letter-spacing="3">TIME</text>
+  <text x="${W * 0.50}" y="${cy + off(290)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(32)}" font-weight="700" fill="${t.text}" letter-spacing="1">${timeStr}</text>
+  <text x="${W * 0.50}" y="${cy + off(325)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(14)}" font-weight="500" fill="${t.dim}" letter-spacing="3">TIME</text>
 
-  <text x="${W * 0.80}" y="${cy + off(290)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(32)}" font-weight="700" fill="${COLORS.text}" letter-spacing="1">${totalKcal}</text>
-  <text x="${W * 0.80}" y="${cy + off(325)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(14)}" font-weight="500" fill="${COLORS.dim}" letter-spacing="3">KCAL</text>
+  <text x="${W * 0.80}" y="${cy + off(290)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(32)}" font-weight="700" fill="${t.text}" letter-spacing="1">${totalKcal}</text>
+  <text x="${W * 0.80}" y="${cy + off(325)}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${fz(14)}" font-weight="500" fill="${t.dim}" letter-spacing="3">KCAL</text>
 
   <!-- URL -->
   <text x="${W / 2}" y="${H - (isStory ? 140 : 80)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(24)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">firstlight.live</text>
+        fill="${t.dim}" letter-spacing="6">firstlight.live</text>
 </svg>`
 }
 
@@ -1435,6 +1438,9 @@ async function renderMultiMapSvg(req: RenderRequest, env: Env): Promise<string> 
   const p = req.payload
   const day = req.chapterDay
   const activities = (p.activities || []).filter(a => a.polyline && a.polyline.length > 0)
+  // Stack day theme — polylines stay in BUCKET_COLOR (sport identity),
+  // page chrome adopts NEON.
+  const t = resolveTheme(req, 'neon')
 
   const MAP_X = 40, MAP_Y = 180
   const MAP_W = W - 80
@@ -1483,8 +1489,8 @@ async function renderMultiMapSvg(req: RenderRequest, env: Env): Promise<string> 
     const dur = `${Math.round(a.durationMin)} min`
     return `
   <circle cx="${legendStartX + 6}" cy="${y - 8}" r="6" fill="${color}"/>
-  <text x="${legendStartX + 30}" y="${y}" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500" fill="${COLORS.text}" letter-spacing="1">${escapeXml(a.name).slice(0,40)}</text>
-  <text x="${W - 80}" y="${y}" text-anchor="end" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="700" fill="${COLORS.text}" letter-spacing="1">${stat} · ${dur}</text>`
+  <text x="${legendStartX + 30}" y="${y}" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500" fill="${t.text}" letter-spacing="1">${escapeXml(a.name).slice(0,40)}</text>
+  <text x="${W - 80}" y="${y}" text-anchor="end" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="700" fill="${t.text}" letter-spacing="1">${stat} · ${dur}</text>`
   }).join('')
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -1496,29 +1502,29 @@ async function renderMultiMapSvg(req: RenderRequest, env: Env): Promise<string> 
     </linearGradient>
   </defs>
 
-  <rect width="${W}" height="${H}" fill="#000000"/>
+  <rect width="${W}" height="${H}" fill="${t.bg}"/>
 
   ${mapDataUrl ? `
   <image x="${MAP_X}" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" href="${mapDataUrl}" preserveAspectRatio="xMidYMid slice"/>
   <rect x="${MAP_X}" y="${MAP_Y}" width="${MAP_W}" height="120" fill="url(#dim-top)"/>
   ` : `
   <rect x="${MAP_X}" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" fill="#0A0A0A"/>
-  <text x="${W / 2}" y="${MAP_Y + MAP_H / 2}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="22" fill="${COLORS.dim}">${activities.length === 0 ? 'No GPS sports today (HR sessions only)' : 'Map unavailable'}</text>
+  <text x="${W / 2}" y="${MAP_Y + MAP_H / 2}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="22" fill="${t.dim}">${activities.length === 0 ? 'No GPS sports today (HR sessions only)' : 'Map unavailable'}</text>
   `}
 
   <!-- Header -->
   <text x="${W / 2}" y="100" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 32 : 26}" font-weight="700"
-        fill="#FC4C02" letter-spacing="6">GPS · ALL ROUTES</text>
+        fill="${t.accent}" letter-spacing="6">GPS · ALL ROUTES</text>
   <text x="${W / 2}" y="${req.orientation === 'story' ? 150 : 138}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500"
-        fill="#9AA5B5" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
+        fill="${t.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
 
   <!-- Stats panel -->
-  <rect x="0" y="${PANEL_Y}" width="${W}" height="${H - PANEL_Y}" fill="#000000"/>
+  <rect x="0" y="${PANEL_Y}" width="${W}" height="${H - PANEL_Y}" fill="${t.bg}"/>
 
   <!-- Legend label -->
-  <text x="80" y="${PANEL_Y + 36}" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 18 : 14}" font-weight="700" fill="${COLORS.dim}" letter-spacing="3">LEGEND</text>
+  <text x="80" y="${PANEL_Y + 36}" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 18 : 14}" font-weight="700" fill="${t.dim}" letter-spacing="3">LEGEND</text>
   ${legendItems}
 
   <!-- Per-activity list -->
@@ -1527,7 +1533,7 @@ async function renderMultiMapSvg(req: RenderRequest, env: Env): Promise<string> 
   <!-- Footer -->
   <text x="${W / 2}" y="${H - 28}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 18 : 14}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
+        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
 </svg>`
 }
 
@@ -1538,6 +1544,7 @@ function renderMultiGridSvg(req: RenderRequest): string {
   const p = req.payload
   const day = req.chapterDay
   const activities = p.activities || []
+  const t = resolveTheme(req, 'neon')
 
   // 2-col grid for up to 6 activities
   const cols = Math.min(2, activities.length)
@@ -1563,28 +1570,28 @@ function renderMultiGridSvg(req: RenderRequest): string {
     <!-- sport label -->
     <text x="${x + 24}" y="${y + 36}" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="700" fill="${color}" letter-spacing="3">${label}</text>
     <!-- big stat -->
-    <text x="${x + cardW/2}" y="${y + 110}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 56 : 44}" font-weight="700" fill="${COLORS.text}" letter-spacing="1">${stat}</text>
+    <text x="${x + cardW/2}" y="${y + 110}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 56 : 44}" font-weight="700" fill="${t.text}" letter-spacing="1">${stat}</text>
     <!-- sub -->
-    <text x="${x + cardW/2}" y="${y + 150}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 20 : 16}" font-weight="500" fill="${COLORS.dim}" letter-spacing="3">${subStat}</text>
+    <text x="${x + cardW/2}" y="${y + 150}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 20 : 16}" font-weight="500" fill="${t.dim}" letter-spacing="3">${subStat}</text>
     <!-- HR + cal at bottom -->
-    <text x="${x + 24}" y="${y + cardH - 24}" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 13}" font-weight="500" fill="${COLORS.dim}" letter-spacing="2">${escapeXml(hrLabel)}</text>
-    <text x="${x + cardW - 24}" y="${y + cardH - 24}" text-anchor="end" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 13}" font-weight="500" fill="${COLORS.dim}" letter-spacing="2">${escapeXml(calLabel)}</text>
+    <text x="${x + 24}" y="${y + cardH - 24}" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 13}" font-weight="500" fill="${t.dim}" letter-spacing="2">${escapeXml(hrLabel)}</text>
+    <text x="${x + cardW - 24}" y="${y + cardH - 24}" text-anchor="end" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 13}" font-weight="500" fill="${t.dim}" letter-spacing="2">${escapeXml(calLabel)}</text>
     <!-- name (truncated) -->
-    <text x="${x + cardW/2}" y="${y + 180}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 13}" font-weight="500" fill="${COLORS.dim}" letter-spacing="1">${escapeXml(a.name).slice(0,32)}</text>
+    <text x="${x + cardW/2}" y="${y + 180}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 13}" font-weight="500" fill="${t.dim}" letter-spacing="1">${escapeXml(a.name).slice(0,32)}</text>
   </g>`
   }).join('')
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
-  <rect width="${W}" height="${H}" fill="#000000"/>
+  <rect width="${W}" height="${H}" fill="${t.bg}"/>
 
   <!-- Header -->
   <text x="${W / 2}" y="100" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 32 : 26}" font-weight="700"
-        fill="#00E676" letter-spacing="6">THE BREAKDOWN</text>
+        fill="${t.accent}" letter-spacing="6">THE BREAKDOWN</text>
   <text x="${W / 2}" y="${req.orientation === 'story' ? 150 : 138}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500"
-        fill="#9AA5B5" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day} · ${activities.length} ACTIVITIES</text>
+        fill="${t.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day} · ${activities.length} ACTIVITIES</text>
 
   <!-- Grid -->
   ${cards}
@@ -1592,7 +1599,7 @@ function renderMultiGridSvg(req: RenderRequest): string {
   <!-- Footer -->
   <text x="${W / 2}" y="${H - 50}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
+        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
 </svg>`
 }
 
@@ -1605,6 +1612,7 @@ function renderMultiSummarySvg(req: RenderRequest): string {
   const day = req.chapterDay
   const activities = p.activities || []
   const n = activities.length
+  const t = resolveTheme(req, 'neon')
 
   const totalKm   = (p.totalKm   ?? activities.reduce((s, a) => s + (a.distanceKm || 0), 0)).toFixed(1)
   const totalMin  = Math.round(p.totalMin ?? activities.reduce((s, a) => s + a.durationMin, 0))
@@ -1646,7 +1654,7 @@ function renderMultiSummarySvg(req: RenderRequest): string {
   <text x="${chartX}" y="${y + barH * 0.65}" font-family="'Roboto Mono', monospace" font-size="${isStory ? 26 : 22}" font-weight="700" fill="${b.color}" letter-spacing="3">${b.label}</text>
   <rect x="${barAreaX}" y="${y}" width="${barAreaW}" height="${barH}" rx="6" fill="rgba(255,255,255,0.04)"/>
   <rect x="${barAreaX}" y="${y}" width="${w}" height="${barH}" rx="6" fill="${b.color}" fill-opacity="0.85"/>
-  <text x="${W - 80}" y="${y + barH * 0.65}" text-anchor="end" font-family="'Roboto Mono', monospace" font-size="${isStory ? 24 : 20}" font-weight="700" fill="${COLORS.text}" letter-spacing="1">${Math.round(b.mins)} MIN</text>`
+  <text x="${W - 80}" y="${y + barH * 0.65}" text-anchor="end" font-family="'Roboto Mono', monospace" font-size="${isStory ? 24 : 20}" font-weight="700" fill="${t.text}" letter-spacing="1">${Math.round(b.mins)} MIN</text>`
   }).join('')
 
   // Day-complete seal: big check inside a glowing circle
@@ -1658,8 +1666,8 @@ function renderMultiSummarySvg(req: RenderRequest): string {
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
   <defs>
     <radialGradient id="halo" cx="50%" cy="20%" r="60%">
-      <stop offset="0%" stop-color="#00E676" stop-opacity="0.10"/>
-      <stop offset="100%" stop-color="${COLORS.bg}" stop-opacity="0"/>
+      <stop offset="0%" stop-color="${t.halo}"/>
+      <stop offset="100%" stop-color="${t.bg}" stop-opacity="0"/>
     </radialGradient>
     <filter id="seal-glow" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="14" result="b"/>
@@ -1667,33 +1675,33 @@ function renderMultiSummarySvg(req: RenderRequest): string {
     </filter>
   </defs>
 
-  <rect width="${W}" height="${H}" fill="${COLORS.bg}"/>
+  <rect width="${W}" height="${H}" fill="${t.bg}"/>
   <rect width="${W}" height="${H}" fill="url(#halo)"/>
 
   <!-- Header -->
   <text x="${W / 2}" y="${isStory ? 130 : 100}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 32 : 26}" font-weight="700"
-        fill="#00E676" letter-spacing="6">STACK DAY · COMPLETE</text>
+        fill="${t.accent}" letter-spacing="6">STACK DAY · COMPLETE</text>
   <text x="${W / 2}" y="${isStory ? 180 : 138}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 22 : 18}" font-weight="500"
-        fill="#9AA5B5" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
+        fill="${t.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
 
   <!-- Seal -->
   <g filter="url(#seal-glow)">
-    <circle cx="${sealCx}" cy="${sealCy}" r="${sealR}" fill="none" stroke="#00E676" stroke-width="6"/>
-    <path d="M${sealCx - sealR * 0.45},${sealCy + sealR * 0.05} L${sealCx - sealR * 0.10},${sealCy + sealR * 0.40} L${sealCx + sealR * 0.55},${sealCy - sealR * 0.40}" fill="none" stroke="#00E676" stroke-width="${isStory ? 14 : 11}" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${sealCx}" cy="${sealCy}" r="${sealR}" fill="none" stroke="${t.accent2}" stroke-width="6"/>
+    <path d="M${sealCx - sealR * 0.45},${sealCy + sealR * 0.05} L${sealCx - sealR * 0.10},${sealCy + sealR * 0.40} L${sealCx + sealR * 0.55},${sealCy - sealR * 0.40}" fill="none" stroke="${t.accent2}" stroke-width="${isStory ? 14 : 11}" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
   <!-- Combined totals -->
   <text x="${W / 2}" y="${sealCy + sealR + 80}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 36 : 30}" font-weight="700"
-        fill="${COLORS.text}" letter-spacing="2">${n} ACTIVITIES  ·  ${totalKm} KM  ·  ${timeStr}</text>
+        fill="${t.text}" letter-spacing="2">${n} ACTIVITIES  ·  ${totalKm} KM  ·  ${timeStr}</text>
   <text x="${W / 2}" y="${sealCy + sealR + 120}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 22 : 18}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="4">${totalKcal} KCAL  ·  ${sportSet.size} DISCIPLINES</text>
+        fill="${t.dim}" letter-spacing="4">${totalKcal} KCAL  ·  ${sportSet.size} DISCIPLINES</text>
 
   <!-- Bar chart label -->
-  <text x="${chartX}" y="${chartStartY - 30}" font-family="'Roboto Mono', monospace" font-size="${isStory ? 18 : 14}" font-weight="700" fill="${COLORS.dim}" letter-spacing="3">TIME PER SPORT</text>
+  <text x="${chartX}" y="${chartStartY - 30}" font-family="'Roboto Mono', monospace" font-size="${isStory ? 18 : 14}" font-weight="700" fill="${t.dim}" letter-spacing="3">TIME PER SPORT</text>
 
   <!-- Bars -->
   ${bars}
@@ -1701,15 +1709,15 @@ function renderMultiSummarySvg(req: RenderRequest): string {
   <!-- Closing line -->
   <text x="${W / 2}" y="${H - (isStory ? 180 : 140)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 28 : 22}" font-weight="700"
-        fill="#00E676" letter-spacing="3">THE BODY ANSWERED.</text>
+        fill="${t.accent}" letter-spacing="3">THE BODY ANSWERED.</text>
   <text x="${W / 2}" y="${H - (isStory ? 130 : 102)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 18 : 15}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="3">Rs 1,500 STAYS · STREAK CONTINUES · DAY ${day + 1} LOADING</text>
+        fill="${t.dim}" letter-spacing="3">Rs 1,500 STAYS · STREAK CONTINUES · DAY ${day + 1} LOADING</text>
 
   <!-- Footer brand -->
   <text x="${W / 2}" y="${H - (isStory ? 60 : 50)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 22 : 18}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
+        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
 </svg>`
 }
 
