@@ -165,6 +165,21 @@ export default {
       return jsonResponse({ error: (err as Error).message, stack: (err as Error).stack?.slice(0, 1000) }, 500)
     }
 
+    // ── PWA SHELL — serve .html in-place (200) instead of 307-redirecting ──
+    //    Cloudflare's default html_handling redirects /punch.html → /punch.
+    //    A *redirected* response can't be replayed from the service-worker
+    //    cache to a navigation request, so the SW's offline precache of these
+    //    shell pages silently fails and a cold offline launch shows a blank
+    //    screen. Mapping the request to the clean URL here returns the asset
+    //    200 in-place, so the SW can cache + replay it offline. Public
+    //    marketing pages keep their canonical clean-URL redirect untouched.
+    const SHELL_HTML = new Set(['/punch.html', '/admin.html', '/install.html', '/login.html', '/index.html'])
+    if (SHELL_HTML.has(path)) {
+      const clean = new URL(request.url)
+      clean.pathname = path === '/index.html' ? '/' : path.slice(0, -5)
+      return env.ASSETS.fetch(new Request(clean, request))
+    }
+
     // ── STATIC ASSETS — pass-through ─────────────────────────────────────
     return env.ASSETS.fetch(request)
   }
