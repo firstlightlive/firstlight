@@ -269,11 +269,30 @@ interface PublishedPost {
   permalink?: string
 }
 
+// Bucket → theme mapping for daily WIN posts (option B from the user audit).
+// Each sport gets its own visual identity; multi-activity days use NEON to
+// stand out. MISS posts intentionally do not theme — they keep the fixed
+// brand palette so the Akshaya Patra messaging reads consistently.
+const BUCKET_THEME: Record<string, string> = {
+  run:       'strava',    // Strava orange
+  walk:      'earth',     // warm brown
+  cycle:     'arctic',    // ice blue
+  swim:      'gradient',  // cyan/purple
+  hrSession: 'infrared'   // hot red
+}
+function _themeFor(verdict: VerdictResult): string | undefined {
+  if (verdict.verdict !== 'WIN' || !verdict.matched) return undefined
+  const all = verdict.allMatched || [verdict.matched]
+  if (all.length >= 2) return 'neon'
+  return BUCKET_THEME[verdict.matched.bucket] || 'strava'
+}
+
 // Render a verdict's image via the Cloudflare Worker, return public R2 URL.
 async function _renderVerdictImage(verdict: VerdictResult, orientation: 'post' | 'story'): Promise<string> {
   const base = await _renderWorkerBase()
   const key = await _renderKey()
 
+  const theme = _themeFor(verdict)
   const payload: Record<string, unknown> = {
     date: verdict.date,
     chapterDay: verdict.chapterDay,
@@ -285,7 +304,8 @@ async function _renderVerdictImage(verdict: VerdictResult, orientation: 'post' |
       activityType: verdict.matched.type,
       activityName: verdict.matched.name,
       distanceKm: verdict.matched.distanceKm,
-      durationMin: verdict.matched.durationMin
+      durationMin: verdict.matched.durationMin,
+      ...(theme ? { theme } : {})
     }
   } else if (verdict.verdict === 'MISS') {
     payload.payload = { charity: AKSHAYA_PATRA, reason: verdict.reason }
@@ -363,7 +383,10 @@ async function _renderMultiSlide(verdict: VerdictResult, variant: 'WIN_MULTI_HER
 
 // Render the GPS-route slide (slide 2 of WIN carousels). Pulls the matched
 // activity's polyline + elevation + calories from the strava_activities table.
-async function _renderRouteSlide(verdict: VerdictResult): Promise<string> {
+// `orientation` controls aspect ratio: 'post' = 1080x1080 (feed carousel),
+// 'story' = 1080x1920 (vertical Story frame). Story uses a taller map block
+// and re-paced bottom stats panel.
+async function _renderRouteSlide(verdict: VerdictResult, orientation: 'post' | 'story' = 'post'): Promise<string> {
   if (!verdict.matched) throw new Error('Cannot render route slide: no matched activity')
   const base = await _renderWorkerBase()
   const key = await _renderKey()
@@ -375,11 +398,12 @@ async function _renderRouteSlide(verdict: VerdictResult): Promise<string> {
     .eq('id', verdict.matched.activityId)
     .maybeSingle()
 
+  const theme = _themeFor(verdict)
   const payload = {
     date: verdict.date,
     chapterDay: verdict.chapterDay,
     variant: 'WIN_ROUTE',
-    orientation: 'post',
+    orientation,
     payload: {
       activityType: verdict.matched.type,
       activityName: verdict.matched.name,
@@ -389,7 +413,8 @@ async function _renderRouteSlide(verdict: VerdictResult): Promise<string> {
       elevationM: data?.total_elevation_gain ? Math.round(data.total_elevation_gain) : undefined,
       caloriesKcal: data?.calories ? Math.round(data.calories) : undefined,
       polyline: data?.summary_polyline || undefined,
-      activityDateIso: data?.start_date_local ? data.start_date_local.slice(0, 10) : verdict.date
+      activityDateIso: data?.start_date_local ? data.start_date_local.slice(0, 10) : verdict.date,
+      ...(theme ? { theme } : {})
     }
   }
 
@@ -514,7 +539,12 @@ function _generateCaption(verdict: VerdictResult): string {
       ? `${m.distanceKm.toFixed(1)} km · ${m.type}`
       : `${Math.round(m.durationMin)} min · ${m.type}`
     const tags = (HASHTAGS_BY_SPORT[m.bucket] || HASHTAGS_BY_SPORT.run).join(' ')
-    return `${opener}\n\nDay ${day}.\n${statLine}.\n\nfirstlight.live\n.\n.\n${tags}`
+    // Strava link — only for GPS sports with a real activity ID
+    const isGps = m.bucket !== 'hrSession'
+    const stravaLine = (isGps && m.activityId > 0)
+      ? `\n\nView on Strava: strava.com/activities/${m.activityId}`
+      : ''
+    return `${opener}\n\nDay ${day}.\n${statLine}.${stravaLine}\n\nfirstlight.live\n.\n.\n${tags}`
   }
 
   if (verdict.verdict === 'MISS') {
@@ -603,6 +633,35 @@ async function _publishIgCarousel(imageUrls: string[], caption: string): Promise
   const pub = await pubResp.json()
   if (pub.error) throw new Error(`Carousel publish: ${pub.error.error_user_msg || pub.error.message}`)
   return { media_id: pub.id }
+}
+
+// Publish 1-2 Story frames for a verdict.
+// GPS sports → 2 frames (hero + route). HR sessions / MISS → 1 frame (hero).
+// Stores the LAST published frame as result.publishedStory (for ledger linking).
+// Tolerates per-frame failures — first-frame failure still tries the second.
+async function _publishVerdictStoryFrames(verdict: VerdictResult, result: EngineRunResult): Promise<void> {
+  // Frame 1: hero
+  const heroUrl = await _renderVerdictImage(verdict, 'story')
+  const heroStory = await _publishIgStory(heroUrl)
+  result.publishedStory = heroStory
+
+  // Frame 2: route slide — only for GPS sports on WIN with a real activityId
+  // Render at STORY orientation (1080x1920) so the second Story frame
+  // doesn't show up as a letterboxed square (the historical bug).
+  if (verdict.verdict === 'WIN' && verdict.matched && verdict.matched.activityId > 0) {
+    const isGps = verdict.matched.bucket !== 'hrSession'
+    if (isGps) {
+      try {
+        const routeUrl = await _renderRouteSlide(verdict, 'story')
+        const routeStory = await _publishIgStory(routeUrl)
+        // Track latest published frame (so the ledger links to the most recent one)
+        result.publishedStory = routeStory
+      } catch (routeErr) {
+        // Non-fatal — hero story is already published. Log for visibility.
+        result.errors.push(`Story route frame failed (non-fatal — hero frame published): ${(routeErr as Error).message}`)
+      }
+    }
+  }
 }
 
 async function _publishIgStory(imageUrl: string): Promise<PublishedPost> {
@@ -922,12 +981,13 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS' }): Promise<EngineRunR
       }
       result.publishedPost = post
 
-      // Carousel mode ALSO publishes a Story (non-fatal if it fails)
+      // Carousel mode ALSO publishes Story frames (non-fatal if any fail)
       // — feed gives permanence + carousel reach, story drives 24h discovery + polls
+      // For GPS sports (walk/run/cycle/swim) we publish a 2-frame Story:
+      // frame 1 = hero (same as carousel slide 1), frame 2 = GPS route slide.
+      // For HR sessions (no GPS) we publish 1 frame (hero only).
       try {
-        const storyUrl = await _renderVerdictImage(verdict, 'story')
-        const story = await _publishIgStory(storyUrl)
-        result.publishedStory = story
+        await _publishVerdictStoryFrames(verdict, result)
       } catch (storyErr) {
         result.errors.push(`Story publish failed (non-fatal — carousel succeeded): ${(storyErr as Error).message}`)
       }
@@ -941,11 +1001,9 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS' }): Promise<EngineRunR
 
     if (wantStory) {
       try {
-        const storyUrl = await _renderVerdictImage(verdict, 'story')
-        const story = await _publishIgStory(storyUrl)
-        result.publishedStory = story
+        await _publishVerdictStoryFrames(verdict, result)
         // Story-only mode: synthesize a post id from the story for ledger linking
-        if (!post) post = { media_id: story.media_id }
+        if (!post && result.publishedStory) post = { media_id: result.publishedStory.media_id }
       } catch (storyErr) {
         // If feed also failed (or wasn't requested) and story fails, this is fatal.
         if (!result.publishedPost) throw storyErr

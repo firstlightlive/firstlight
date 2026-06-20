@@ -187,7 +187,7 @@ interface MultiActivityItem {
 interface RenderRequest {
   date: string                          // YYYY-MM-DD
   chapterDay: number
-  variant: 'WIN' | 'MISS' | 'WIN_ROUTE' | 'WIN_MULTI_HERO' | 'WIN_MULTI_MAP' | 'WIN_MULTI_GRID' | 'WIN_MULTI_SUMMARY' | 'MONTHLY_RECAP'
+  variant: 'WIN' | 'MISS' | 'WIN_ROUTE' | 'WIN_MULTI_HERO' | 'WIN_MULTI_MAP' | 'WIN_MULTI_GRID' | 'WIN_MULTI_SUMMARY' | 'MONTHLY_RECAP' | 'CHAPTER_KICKOFF_HERO' | 'CHAPTER_KICKOFF_PROMISE' | 'CHAPTER_KICKOFF_MENU'
   orientation: 'post' | 'story'
   payload: {
     // WIN-specific (single activity)
@@ -213,6 +213,8 @@ interface RenderRequest {
     // Monthly recap
     monthly?: MonthlyRecapPayload
     monthlySlide?: 1 | 2 | 3 | 4 | 5 | 6 | 7
+    // Theme name — bucket-based palette rotation (see THEMES const)
+    theme?: 'strava' | 'earth' | 'arctic' | 'gradient' | 'infrared' | 'neon'
   }
 }
 
@@ -255,13 +257,16 @@ interface RenderResult {
 async function renderAndStore(req: RenderRequest, env: Env): Promise<RenderResult> {
   await ensureResvg()
 
-  const svg = req.variant === 'WIN'                 ? renderWinSvg(req)
-            : req.variant === 'WIN_ROUTE'           ? await renderWinRouteSvg(req, env)
-            : req.variant === 'WIN_MULTI_HERO'      ? renderMultiHeroSvg(req)
-            : req.variant === 'WIN_MULTI_MAP'       ? await renderMultiMapSvg(req, env)
-            : req.variant === 'WIN_MULTI_GRID'      ? renderMultiGridSvg(req)
-            : req.variant === 'WIN_MULTI_SUMMARY'   ? renderMultiSummarySvg(req)
-            : req.variant === 'MONTHLY_RECAP'       ? renderMonthlyRecapSvg(req)
+  const svg = req.variant === 'WIN'                       ? renderWinSvg(req)
+            : req.variant === 'WIN_ROUTE'                 ? await renderWinRouteSvg(req, env)
+            : req.variant === 'WIN_MULTI_HERO'            ? renderMultiHeroSvg(req)
+            : req.variant === 'WIN_MULTI_MAP'             ? await renderMultiMapSvg(req, env)
+            : req.variant === 'WIN_MULTI_GRID'            ? renderMultiGridSvg(req)
+            : req.variant === 'WIN_MULTI_SUMMARY'         ? renderMultiSummarySvg(req)
+            : req.variant === 'MONTHLY_RECAP'             ? renderMonthlyRecapSvg(req)
+            : req.variant === 'CHAPTER_KICKOFF_HERO'      ? renderKickoffHeroSvg(req)
+            : req.variant === 'CHAPTER_KICKOFF_PROMISE'   ? renderKickoffPromiseSvg(req)
+            : req.variant === 'CHAPTER_KICKOFF_MENU'      ? renderKickoffMenuSvg(req)
             : renderMissSvg(req)
 
   // Rasterize SVG → PNG via resvg-wasm. Fonts are passed as Uint8Array buffers
@@ -316,11 +321,51 @@ const COLORS = {
   strava: '#FC4C02'
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// THEMES — bucket-based palette rotation for daily WIN posts.
+// Engine maps the matched activity bucket to a theme:
+//   run → strava, walk → earth, cycle → arctic, swim → gradient,
+//   hrSession → infrared, multi-activity → neon
+// Each theme carries: bg / text / dim / accent (brand) / accent2 (secondary).
+// Slot semantics preserved across renderers — accent replaces the cyan/green
+// brand color; accent2 replaces the gradient-end color on the big day number.
+// ─────────────────────────────────────────────────────────────────────────────
+type ThemeName = 'strava' | 'earth' | 'arctic' | 'gradient' | 'infrared' | 'neon'
+
+interface Theme {
+  bg:      string
+  text:    string
+  dim:     string
+  accent:  string
+  accent2: string
+  halo:    string  // for radial gradient halo behind hero
+}
+
+const THEMES: Record<ThemeName, Theme> = {
+  strava:   { bg: '#000000', text: '#FFFFFF', dim: '#5A6B80', accent: '#FC4C02', accent2: '#FF6F00', halo: 'rgba(252,76,2,0.06)' },
+  earth:    { bg: '#1A1410', text: '#E8DCC8', dim: '#5C4A3E', accent: '#A1887F', accent2: '#7CB342', halo: 'rgba(161,136,127,0.08)' },
+  arctic:   { bg: '#0A1628', text: '#E8EDF5', dim: '#3B5998', accent: '#93C5FD', accent2: '#60A5FA', halo: 'rgba(147,197,253,0.08)' },
+  gradient: { bg: '#0A0C1A', text: '#FFFFFF', dim: '#6B7DB8', accent: '#00D4FF', accent2: '#A855F7', halo: 'rgba(0,212,255,0.08)' },
+  infrared: { bg: '#0A0000', text: '#FFFFFF', dim: '#6B2020', accent: '#FF1744', accent2: '#FF5252', halo: 'rgba(255,23,68,0.08)' },
+  neon:     { bg: '#0A0A14', text: '#FFFFFF', dim: '#6A2D8C', accent: '#E040FB', accent2: '#00E5FF', halo: 'rgba(224,64,251,0.08)' }
+}
+
+// Resolve theme from payload — fall back to a sensible default for each variant.
+function resolveTheme(req: RenderRequest, defaultName: ThemeName): Theme {
+  const requested = (req.payload.theme || '').toLowerCase() as ThemeName
+  return THEMES[requested] || THEMES[defaultName]
+}
+
 function renderWinSvg(req: RenderRequest): string {
   const W = 1080
   const H = req.orientation === 'story' ? 1920 : 1080
   const day = req.chapterDay
   const p = req.payload
+
+  // Theme — defaults to strava (matches old palette: orange accents). Engine
+  // passes bucket-mapped theme (run=strava / walk=earth / cycle=arctic /
+  // swim=gradient / hrSession=infrared / multi=neon).
+  const t = resolveTheme(req, 'strava')
 
   // Stat row: activity type, distance/duration, pace/HR
   const statLine1 = p.activityName || (p.activityType || 'TRAINING').toUpperCase()
@@ -341,25 +386,25 @@ function renderWinSvg(req: RenderRequest): string {
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
   <defs>
     <radialGradient id="halo" cx="50%" cy="40%" r="70%">
-      <stop offset="0%" stop-color="${COLORS.green}" stop-opacity="0.06"/>
-      <stop offset="100%" stop-color="${COLORS.bg}" stop-opacity="0"/>
+      <stop offset="0%" stop-color="${t.halo}"/>
+      <stop offset="100%" stop-color="${t.bg}" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="day-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="${COLORS.text}"/>
-      <stop offset="100%" stop-color="${COLORS.green}"/>
+      <stop offset="0%" stop-color="${t.text}"/>
+      <stop offset="100%" stop-color="${t.accent2}"/>
     </linearGradient>
   </defs>
 
-  <rect width="${W}" height="${H}" fill="${COLORS.bg}"/>
+  <rect width="${W}" height="${H}" fill="${t.bg}"/>
   <rect width="${W}" height="${H}" fill="url(#halo)"/>
 
   <!-- Brand bar -->
   <text x="${W / 2}" y="${cy - off(360)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(28)}" font-weight="700"
-        fill="${COLORS.green}" letter-spacing="6">◆ FIRST LIGHT</text>
+        fill="${t.accent}" letter-spacing="6">◆ FIRST LIGHT</text>
   <text x="${W / 2}" y="${cy - off(310)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(20)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE</text>
+        fill="${t.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE</text>
 
   <!-- Day number -->
   <text x="${W / 2}" y="${cy + off(80)}" text-anchor="middle"
@@ -368,29 +413,29 @@ function renderWinSvg(req: RenderRequest): string {
 
   <!-- Accent rule -->
   <line x1="${W / 2 - 60}" y1="${cy + off(130)}" x2="${W / 2 + 60}" y2="${cy + off(130)}"
-        stroke="${COLORS.green}" stroke-width="3"/>
+        stroke="${t.accent}" stroke-width="3"/>
 
   <!-- WIN seal -->
-  <text x="${W / 2}" y="${cy + off(200)}" text-anchor="middle"
+  <text x="${W / 2}" y="${cy + off(210)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(42)}" font-weight="700"
-        fill="${COLORS.text}" letter-spacing="4">✓ DAY DONE</text>
+        fill="${t.text}" letter-spacing="4">DAY DONE</text>
 
-  <!-- Stats row 1: activity -->
-  <text x="${W / 2}" y="${cy + off(260)}" text-anchor="middle"
+  <!-- Stats row 1: activity name -->
+  <text x="${W / 2}" y="${cy + off(295)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(28)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="3">${escapeXml(statLine1)}</text>
+        fill="${t.dim}" letter-spacing="3">${escapeXml(statLine1)}</text>
 
   <!-- Stats row 2: numbers -->
   ${distStr || durStr || paceStr || hrStr ? `
-  <text x="${W / 2}" y="${cy + off(310)}" text-anchor="middle"
+  <text x="${W / 2}" y="${cy + off(365)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(32)}" font-weight="700"
-        fill="${COLORS.text}" letter-spacing="2">${[distStr, durStr, paceStr, hrStr].filter(Boolean).join('  ·  ')}</text>
+        fill="${t.text}" letter-spacing="2">${[distStr, durStr, paceStr, hrStr].filter(Boolean).join('  ·  ')}</text>
   ` : ''}
 
   <!-- URL -->
   <text x="${W / 2}" y="${H - (isStory ? 140 : 80)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(24)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">firstlight.live</text>
+        fill="${t.dim}" letter-spacing="6">firstlight.live</text>
 </svg>`
 }
 
@@ -524,6 +569,12 @@ async function renderWinRouteSvg(req: RenderRequest, env: Env): Promise<string> 
   const p = req.payload
   const day = req.chapterDay
 
+  // Theme — defaults to strava (matches old route slide). Engine resolves the
+  // bucket-mapped theme and threads it into the payload.
+  const t = resolveTheme(req, 'strava')
+  // Mapbox polyline color must be a 6-digit hex without "#" — derive once.
+  const polyHex = t.accent.replace('#', '').slice(0, 6)
+
   // Stats
   const distStr = p.distanceKm ? `${p.distanceKm.toFixed(2)} KM` : '—'
   const durStr  = p.durationMin ? `${Math.round(p.durationMin)} MIN` : '—'
@@ -538,24 +589,31 @@ async function renderWinRouteSvg(req: RenderRequest, env: Env): Promise<string> 
   const dateIso = (p.activityDateIso || req.date).slice(0, 10)
   const dateLabel = _prettyDateLabel(dateIso)
 
-  // ── Map area (top 60% of canvas) ──
+  // ── Map area (top half of canvas) ──
+  // Map size carefully sized so the bottom panel fits:
+  //   activity name → date → stats row 1 → stats row 2 → Strava CTA → footer
+  // without overlaps in either post (1080) or story (1920) heights.
   const MAP_X = 40, MAP_Y = 180
   const MAP_W = W - 80
-  const MAP_H = req.orientation === 'story' ? 1100 : 620
+  const MAP_H = req.orientation === 'story' ? 1040 : 510
 
   // Try to fetch a Mapbox basemap with the polyline drawn on it.
   // Fallback to dark+polyline if no token or fetch fails.
+  // STORY orientation: skip Mapbox entirely — resvg-WASM CPU budget can't
+  // rasterize 1080×1920 with an embedded base64 Mapbox PNG at @2x OR @1x.
+  // The polyline-on-dark fallback below is fast, native SVG, and looks clean.
   let mapDataUrl: string | null = null
-  if (p.polyline && env.MAPBOX_TOKEN) {
+  if (req.orientation === 'post' && p.polyline && env.MAPBOX_TOKEN) {
     try {
       // Mapbox path overlay format: path-{stroke}+{rgb}-{opacity}(polyline)
       // We DOUBLE-encode the polyline so Mapbox's path parser sees the right chars.
       const encodedPoly = encodeURIComponent(p.polyline)
-      // dark-v11 has neutral greys; we draw Strava-orange polyline on top.
-      // Width: 6, color fc4c02 (Strava orange), no opacity (full)
-      const path = `path-6+fc4c02(${encodedPoly})`
-      // auto-fit zoom with 60px padding, retina @2x
-      const url = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/${path}/auto/${Math.round(MAP_W)}x${Math.round(MAP_H)}@2x?access_token=${env.MAPBOX_TOKEN}&padding=60&logo=false&attribution=false`
+      // dark-v11 has neutral greys; we draw the theme-accent polyline on top.
+      const path = `path-6+${polyHex}(${encodedPoly})`
+      // auto-fit zoom with 60px padding. @2x for post (sharper square thumb),
+      // @1x for story (1080x1920 canvas + @2x = CPU timeout in resvg-WASM).
+      const retina = req.orientation === 'story' ? '' : '@2x'
+      const url = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/${path}/auto/${Math.round(MAP_W)}x${Math.round(MAP_H)}${retina}?access_token=${env.MAPBOX_TOKEN}&padding=60&logo=false&attribution=false`
       const r = await fetch(url, { cf: { cacheTtl: 86400, cacheEverything: true } } as RequestInit)
       if (r.ok) {
         const buf = await r.arrayBuffer()
@@ -574,16 +632,24 @@ async function renderWinRouteSvg(req: RenderRequest, env: Env): Promise<string> 
   }
 
   // ── Stats panel (bottom 30%) ──
-  const PANEL_Y = req.orientation === 'story' ? 1320 : 820
+  // Vertical rhythm (post mode, panel = 1080 - 700 = 380px tall):
+  //   PANEL_Y       → solid black band starts
+  //   PANEL_Y + 50  → activity name (MORNING RUN)
+  //   PANEL_Y + 80  → date · type
+  //   PANEL_Y + 170 → stats row 1 (+26px label)
+  //   PANEL_Y + 250 → stats row 2 (+26px label)
+  //   H - 60        → VIEW ON STRAVA → (44px gap from row 2 label)
+  //   H - 22        → footer firstlight.live
+  const PANEL_Y = req.orientation === 'story' ? 1240 : 700
   const colX = [W * 0.18, W * 0.50, W * 0.82]
-  const rowY1 = PANEL_Y + 80
-  const rowY2 = PANEL_Y + 200
+  const rowY1 = PANEL_Y + 170
+  const rowY2 = PANEL_Y + 250
+  void elevStr  // elevation removed from layout per user feedback (overlapped CTA)
   const stats = [
     { label: 'DISTANCE', value: distStr },
     { label: 'TIME',     value: durStr  },
     { label: 'AVG PACE', value: paceStr },
     { label: 'AVG HR',   value: hrStr   },
-    { label: 'ELEV',     value: elevStr },
     { label: 'CALORIES', value: calStr  },
   ]
 
@@ -604,8 +670,8 @@ async function renderWinRouteSvg(req: RenderRequest, env: Env): Promise<string> 
     </filter>
   </defs>
 
-  <!-- Base: black -->
-  <rect width="${W}" height="${H}" fill="#000000"/>
+  <!-- Base: themed background -->
+  <rect width="${W}" height="${H}" fill="${t.bg}"/>
 
   <!-- Map area: either Mapbox image, or fallback polyline-on-dark -->
   ${mapDataUrl ? `
@@ -615,47 +681,72 @@ async function renderWinRouteSvg(req: RenderRequest, env: Env): Promise<string> 
   <rect x="${MAP_X}" y="${MAP_Y + MAP_H - 80}" width="${MAP_W}" height="80" fill="url(#dim-bot)"/>
   ` : (fallbackPath ? `
   <rect x="${MAP_X}" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" fill="#0A0A0A"/>
-  <path d="${fallbackPath}" fill="none" stroke="${STRAVA_ORANGE}" stroke-width="12" stroke-opacity="0.35" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
-  <path d="${fallbackPath}" fill="none" stroke="${STRAVA_ORANGE}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  ${req.orientation === 'story' ? `
+  <path d="${fallbackPath}" fill="none" stroke="${t.accent}" stroke-width="14" stroke-opacity="0.20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="${fallbackPath}" fill="none" stroke="${t.accent}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>` : `
+  <path d="${fallbackPath}" fill="none" stroke="${t.accent}" stroke-width="12" stroke-opacity="0.35" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="${fallbackPath}" fill="none" stroke="${t.accent}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`}
   ` : `
-  <text x="${W / 2}" y="${MAP_Y + MAP_H / 2}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="22" fill="#5A6B80">No GPS trace available</text>
+  <text x="${W / 2}" y="${MAP_Y + MAP_H / 2}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="22" fill="${t.dim}">No GPS trace available</text>
   `)}
 
   <!-- Header (top, over dim vignette) -->
   <text x="${W / 2}" y="100" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 32 : 26}" font-weight="700"
-        fill="${STRAVA_ORANGE}" letter-spacing="6">GPS VERIFIED</text>
+        fill="${t.accent}" letter-spacing="6">GPS VERIFIED</text>
   <text x="${W / 2}" y="${req.orientation === 'story' ? 150 : 138}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500"
-        fill="#9AA5B5" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
+        fill="${t.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
 
   <!-- Stats panel — solid black band -->
   <rect x="0" y="${PANEL_Y}" width="${W}" height="${H - PANEL_Y}" fill="#000000"/>
 
   <!-- Activity name + date inside panel -->
-  <text x="${W / 2}" y="${PANEL_Y + 36}" text-anchor="middle"
-        font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 28 : 22}" font-weight="700"
-        fill="#FFFFFF" letter-spacing="2">${escapeXml((p.activityName || 'Activity').toUpperCase())}</text>
-  <text x="${W / 2}" y="${PANEL_Y + 62}" text-anchor="middle"
-        font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 14}" font-weight="500"
-        fill="#5A6B80" letter-spacing="3">${escapeXml(dateLabel)}  ·  ${escapeXml((p.activityType || 'RUN').toUpperCase())}</text>
+  <text x="${W / 2}" y="${PANEL_Y + 50}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 30 : 24}" font-weight="700"
+        fill="${t.text}" letter-spacing="2">${escapeXml((p.activityName || 'Activity').toUpperCase())}</text>
+  <text x="${W / 2}" y="${PANEL_Y + 82}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 13}" font-weight="500"
+        fill="${t.dim}" letter-spacing="3">${escapeXml(dateLabel)}  ·  ${escapeXml((p.activityType || 'RUN').toUpperCase())}</text>
 
-  <!-- Stats grid -->
+  <!-- Stats grid — 3 in row 1 (distance / time / pace), 2 in row 2 outer cols (HR / calories) -->
   ${stats.map((s, i) => {
-    const col = i % 3
-    const row = Math.floor(i / 3)
-    const cx = colX[col]
-    const cy = row === 0 ? rowY1 : rowY2
+    let cx: number, cy: number
+    if (i < 3) {
+      cx = colX[i]
+      cy = rowY1
+    } else {
+      // Row 2 — outer columns only, middle column intentionally left empty
+      cx = i === 3 ? colX[0] : colX[2]
+      cy = rowY2
+    }
     return `
-  <text x="${cx}" y="${cy}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 30 : 26}" font-weight="700" fill="#FFFFFF" letter-spacing="1">${escapeXml(s.value)}</text>
-  <text x="${cx}" y="${cy + 28}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 14 : 12}" font-weight="500" fill="${STRAVA_ORANGE}" letter-spacing="3">${escapeXml(s.label)}</text>
+  <text x="${cx}" y="${cy}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 30 : 26}" font-weight="700" fill="${t.text}" letter-spacing="1">${escapeXml(s.value)}</text>
+  <text x="${cx}" y="${cy + 26}" text-anchor="middle" font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 14 : 11}" font-weight="500" fill="${t.accent}" letter-spacing="3">${escapeXml(s.label)}</text>
     `
   }).join('')}
 
+  <!-- VIEW ON STRAVA CTA — text + SVG polygon arrow (Roboto Mono lacks → glyph) -->
+  ${(() => {
+    const isStory = req.orientation === 'story'
+    const fontSize = isStory ? 22 : 16
+    const textShift = isStory ? -30 : -20      // shift text left to make room for arrow
+    const arrowOffsetX = isStory ? 130 : 95    // arrow base distance from horizontal center
+    const arrowSize = isStory ? 16 : 11        // triangle half-size
+    const baseX = W / 2 + arrowOffsetX
+    const tipX = baseX + arrowSize
+    const ctaY = H - 60
+    return `
+  <text x="${W / 2 + textShift}" y="${ctaY}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fontSize}" font-weight="700"
+        fill="${t.accent}" letter-spacing="6">VIEW ON STRAVA</text>
+  <polygon points="${baseX},${ctaY - arrowSize + 2} ${tipX},${ctaY - 4} ${baseX},${ctaY + 2}" fill="${t.accent}"/>`
+  })()}
+
   <!-- Footer brand -->
-  <text x="${W / 2}" y="${H - 28}" text-anchor="middle"
-        font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 18 : 14}" font-weight="500"
-        fill="#5A6B80" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
+  <text x="${W / 2}" y="${H - 22}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 12}" font-weight="500"
+        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
 </svg>`
 }
 
@@ -1005,6 +1096,213 @@ function _recapSlide7Closing(_req: RenderRequest, m: MonthlyRecapPayload): strin
         fill="${COLORS.gold}" letter-spacing="5">5 AM · NO NEGOTIATIONS</text>
 
   ${_recapFooter()}
+</svg>`
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHAPTER 02 KICK-OFF CAROUSEL — 3 slides
+// HERO · PROMISE · RULES  with India tricolor accent
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SAFFRON = '#FF9933'
+const INDIA_WHITE = '#FFFFFF'
+const INDIA_GREEN = '#138808'
+const AKSHAYA_SAFFRON = '#F26522'
+
+// Tricolor band: 3 stacked thin rounded rectangles, centered horizontally.
+function _tricolorBand(cx: number, cy: number, w = 300, h = 6, gap = 4): string {
+  const bandW = (w - gap * 2) / 3
+  const x0 = cx - w / 2
+  return `
+  <g transform="translate(0, ${cy})">
+    <rect x="${x0}"                            y="0" width="${bandW}" height="${h}" rx="3" fill="${SAFFRON}"/>
+    <rect x="${x0 + bandW + gap}"              y="0" width="${bandW}" height="${h}" rx="3" fill="${INDIA_WHITE}"/>
+    <rect x="${x0 + 2 * (bandW + gap)}"        y="0" width="${bandW}" height="${h}" rx="3" fill="${INDIA_GREEN}"/>
+  </g>`
+}
+
+function _kickoffBg(extra: string = ''): string {
+  return `
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#00D4FF" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="${COLORS.bg}" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo2" cx="50%" cy="80%" r="55%">
+      <stop offset="0%" stop-color="${SAFFRON}" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="${COLORS.bg}" stop-opacity="0"/>
+    </radialGradient>
+    ${extra}
+  </defs>
+  <rect width="1080" height="1080" fill="${COLORS.bg}"/>
+  <rect width="1080" height="1080" fill="url(#halo)"/>
+  <rect width="1080" height="1080" fill="url(#halo2)"/>`
+}
+
+function _kickoffFooter(text = '◆ FIRST LIGHT  ·  firstlight.live'): string {
+  return `
+  <text x="540" y="1030" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="5">${escapeXml(text)}</text>`
+}
+
+// ── SLIDE 1 · HERO ── "DAY 01 BEGINS NOW"
+function renderKickoffHeroSvg(_req: RenderRequest): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  ${_kickoffBg(`<linearGradient id="hero" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${COLORS.text}"/><stop offset="100%" stop-color="${COLORS.cyan}"/></linearGradient>`)}
+
+  <!-- Brand header -->
+  <text x="540" y="135" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="30" font-weight="700"
+        fill="${COLORS.cyan}" letter-spacing="8">◆ FIRST LIGHT</text>
+
+  <!-- Tricolor band -->
+  ${_tricolorBand(540, 175, 320, 8, 6)}
+
+  <!-- DAY 01 hero -->
+  <text x="540" y="540" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="240" font-weight="700"
+        fill="url(#hero)" letter-spacing="6">DAY 01</text>
+
+  <!-- BEGINS NOW -->
+  <text x="540" y="640" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="56" font-weight="700"
+        fill="${COLORS.text}" letter-spacing="10">BEGINS NOW</text>
+
+  <!-- Chapter subtitle -->
+  <text x="540" y="780" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="22" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="6">CHAPTER 02  ·  ENDURANCE</text>
+
+  <!-- Swipe prompt -->
+  <text x="540" y="900" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="6">SWIPE  →</text>
+
+  ${_kickoffFooter('firstlight.live')}
+</svg>`
+}
+
+// ── SLIDE 2 · PROMISE ── "for every day i don't move, 1 indian child eats for 1 full school year"
+function renderKickoffPromiseSvg(_req: RenderRequest): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  ${_kickoffBg()}
+
+  <!-- Brand header -->
+  <text x="540" y="100" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="24" font-weight="700"
+        fill="${COLORS.cyan}" letter-spacing="6">◆ FIRST LIGHT</text>
+
+  <!-- Tricolor band -->
+  ${_tricolorBand(540, 140, 280, 7, 5)}
+
+  <!-- The promise — top stanza -->
+  <text x="540" y="290" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="38" font-weight="500"
+        fill="${COLORS.text}" letter-spacing="3">FOR EVERY DAY</text>
+  <text x="540" y="345" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="38" font-weight="500"
+        fill="${COLORS.text}" letter-spacing="3">I DON'T MOVE,</text>
+
+  <!-- Middle stanza — emphasis -->
+  <text x="540" y="475" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="52" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="4">1 INDIAN CHILD</text>
+  <text x="540" y="540" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="38" font-weight="500"
+        fill="${COLORS.text}" letter-spacing="3">EATS FOR</text>
+  <text x="540" y="610" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="52" font-weight="700"
+        fill="${COLORS.text}" letter-spacing="4">1 FULL SCHOOL YEAR</text>
+
+  <!-- The cost — bottom stanza -->
+  <text x="540" y="800" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="120" font-weight="700"
+        fill="${AKSHAYA_SAFFRON}" letter-spacing="2">Rs 1,500</text>
+  <text x="540" y="870" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="28" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="8">AKSHAYA  PATRA</text>
+
+  ${_kickoffFooter('firstlight.live')}
+</svg>`
+}
+
+// ── SLIDE 3 · RULES ── menu + weekly target + miss penalty
+function renderKickoffMenuSvg(_req: RenderRequest): string {
+  const menu = [
+    '5 KM   WALK',
+    '5 KM   RUN',
+    '10 KM  CYCLE',
+    '1 KM   SWIM',
+    '30 MIN BOXING / YOGA / GYM'
+  ]
+  const menuY = 290
+  const lineH = 52
+  const menuItems = menu.map((item, i) => `
+  <text x="200" y="${menuY + i * lineH}"
+        font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
+        fill="${COLORS.cyan}" letter-spacing="2">•</text>
+  <text x="240" y="${menuY + i * lineH}"
+        font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
+        fill="${COLORS.text}" letter-spacing="3">${item}</text>`).join('')
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  ${_kickoffBg()}
+
+  <!-- Title -->
+  <text x="540" y="115" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="34" font-weight="700"
+        fill="${COLORS.cyan}" letter-spacing="10">THE RULES</text>
+
+  <!-- Tricolor band -->
+  ${_tricolorBand(540, 155, 280, 7, 5)}
+
+  <!-- DAILY section -->
+  <text x="200" y="235"
+        font-family="'Roboto Mono', monospace" font-size="22" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="6">DAILY</text>
+  <line x1="320" y1="226" x2="880" y2="226" stroke="${COLORS.gold}" stroke-opacity="0.25" stroke-width="1"/>
+  ${menuItems}
+  <text x="200" y="${menuY + 5 * lineH + 16}"
+        font-family="'Roboto Mono', monospace" font-size="16" font-weight="500" font-style="italic"
+        fill="${COLORS.dim}" letter-spacing="2">one of these — every day</text>
+
+  <!-- WEEKLY section -->
+  <text x="200" y="690"
+        font-family="'Roboto Mono', monospace" font-size="22" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="6">WEEKLY</text>
+  <line x1="340" y1="681" x2="880" y2="681" stroke="${COLORS.gold}" stroke-opacity="0.25" stroke-width="1"/>
+  <text x="200" y="745"
+        font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
+        fill="${COLORS.cyan}" letter-spacing="2">•</text>
+  <text x="240" y="745"
+        font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
+        fill="${COLORS.text}" letter-spacing="3">100 KM  TOTAL</text>
+
+  <!-- MISS section -->
+  <text x="200" y="830"
+        font-family="'Roboto Mono', monospace" font-size="22" font-weight="700"
+        fill="#FF5252" letter-spacing="6">MISS — daily OR weekly</text>
+  <line x1="690" y1="821" x2="880" y2="821" stroke="#FF5252" stroke-opacity="0.25" stroke-width="1"/>
+  <text x="200" y="890"
+        font-family="'Roboto Mono', monospace" font-size="28" font-weight="700"
+        fill="${AKSHAYA_SAFFRON}" letter-spacing="2">•  Rs 1,500</text>
+  <text x="380" y="890"
+        font-family="'Roboto Mono', monospace" font-size="28" font-weight="700"
+        fill="${COLORS.text}" letter-spacing="3">→ AKSHAYA PATRA</text>
+
+  <!-- Tricolor band bottom -->
+  ${_tricolorBand(540, 960, 220, 6, 4)}
+
+  <!-- Location + date -->
+  <text x="540" y="1000" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="16" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="5">BENGALURU  ·  20.06.2026</text>
+
+  ${_kickoffFooter('firstlight.live')}
 </svg>`
 }
 
