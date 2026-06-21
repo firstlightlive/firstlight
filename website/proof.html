@@ -150,7 +150,7 @@
     </div>
     <div class="summary-card">
       <div class="label">₹ Unclaimed</div>
-      <div class="value gold"><span data-unclaimed>—</span></div>
+      <div class="value gold"><span id="proofUnclaimedCard">—</span></div>
     </div>
     <div class="summary-card">
       <div class="label">₹ Claimed</div>
@@ -457,11 +457,12 @@
         // Distance display
         var distStr = totalKm > 0 ? totalKm.toFixed(1) + ' km' : (r.gym ? 'Gym' : '—');
 
-        // Stake: live chapter accumulates; closed chapters show CLOSED
-        var stake = ch.live ? ((typeof getCumulativeUnclaimed === 'function') ? getCumulativeUnclaimed(dayIn) : dayIn * 1500) : null;
-
-        // Claimed amount: cumulative for this chapter
-        var claimedAmount = ch.live ? 0 : null; // Placeholder for claimed calculation
+        // Stake (HELD model): every logged day in the live chapter is a day you
+        // showed up → ₹1,500 held (unclaimed), ₹0 donated. Misses are gap days with
+        // no proof row; their donation is summed into the Claimed summary card (see
+        // computeStakeFor). Closed chapters used a different stake era → show CLOSED.
+        var stake = ch.live ? 1500 : null;
+        var claimedAmount = ch.live ? 0 : null;
 
         return {
           day: dayIn,
@@ -532,6 +533,37 @@
       if (ccEl) ccEl.textContent = CHAPTERS.length;
     }
 
+    // ── HELD / DONATED stake (live chapter's ₹1,500 model) ──
+    // Held (unclaimed) = days you showed up × ₹1,500. Donated (claimed) = past
+    // days with no proof × ₹1,500. Today is NOT counted until it has been logged.
+    function _todayIST() {
+      if (typeof getEffectiveToday === 'function') { try { return getEffectiveToday(); } catch (e) {} }
+      var d = new Date();
+      var ist = new Date(d.getTime() + (d.getTimezoneOffset() * 60000) + (5.5 * 3600000));
+      return ist.getFullYear() + '-' + String(ist.getMonth() + 1).padStart(2, '0') + '-' + String(ist.getDate()).padStart(2, '0');
+    }
+    function _addDays(ds, n) {
+      var d = new Date(ds + 'T12:00:00Z');   // noon-UTC anchor → date-string math is DST/TZ-safe
+      d.setUTCDate(d.getUTCDate() + n);
+      return d.toISOString().slice(0, 10);
+    }
+    function computeStakeFor(chapter) {
+      if (!chapter || !chapter.live) return null;   // ₹1,500 held model applies to the live chapter only
+      var STAKE = 1500;
+      var todayStr = _todayIST();
+      var proofDates = {};
+      allRows.forEach(function(r) { if (r.chapter === chapter.id) proofDates[r.date] = true; });
+      var held = 0, missed = 0, guard = 0;
+      var lastDay = (chapter.end && chapter.end < todayStr) ? chapter.end : todayStr;
+      var cur = chapter.start;
+      while (cur <= lastDay && guard++ < 100000) {
+        if (proofDates[cur]) held++;
+        else if (cur < todayStr) missed++;   // past day with no proof → miss; today stays pending
+        cur = _addDays(cur, 1);
+      }
+      return { heldDays: held, missDays: missed, held: held * STAKE, donated: missed * STAKE };
+    }
+
     function applyChapter(sel) {
       _selChapter = sel;
       chapterRows = (sel === 'all') ? allRows : allRows.filter(function(r) { return r.chapter === sel; });
@@ -552,6 +584,20 @@
       var tkEl = document.getElementById('proofTotalKm'); if (tkEl) tkEl.textContent = Math.round(totalDist) + ' km';
       var scEl = document.getElementById('proofAvgSleepCard'); if (scEl) scEl.textContent = avgSleep + ' hrs';
       var dcEl = document.getElementById('proofAvgDistCard'); if (dcEl) dcEl.textContent = avgDist + ' km';
+
+      // ₹ Held (unclaimed) / Donated (claimed). Only the live chapter uses the
+      // ₹1,500 model; closed chapters show "—" (different stake era). 'all' shows
+      // the live chapter's totals (the currently active stake).
+      var _liveCh = CHAPTERS[CHAPTERS.length - 1];
+      var _liveStake = computeStakeFor(_liveCh);
+      var _selStake = (sel === 'all' || sel === _liveCh.id) ? _liveStake : null;
+      var ucEl = document.getElementById('proofUnclaimedCard');
+      var clEl = document.getElementById('proofClaimedCard');
+      if (ucEl) ucEl.textContent = _selStake ? '₹' + formatINRFull(_selStake.held) : '—';
+      if (clEl) clEl.textContent = _selStake ? '₹' + formatINRFull(_selStake.donated) : '—';
+      // Footer status line always reflects the live chapter's held total (overrides
+      // app.js's day×₹1,500 [data-unclaimed], which counts today before it's logged)
+      if (_liveStake) document.querySelectorAll('[data-unclaimed]').forEach(function(el) { el.textContent = '₹' + formatINRFull(_liveStake.held); });
 
       renderTable();
 
