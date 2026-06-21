@@ -531,10 +531,15 @@ function _generateCaption(verdict: VerdictResult): string {
 
     // Single activity (original)
     const m = verdict.matched
-    const distStr = m.distanceKm ? m.distanceKm.toFixed(1) : '5'
-    const opener = _pickFromPool(WIN_OPENERS, day)
-      .replace('{DAY}', String(day))
-      .replace('{DIST}', distStr)
+    // Never fabricate a distance. GPS wins use the real km; non-GPS wins (HR
+    // sessions, which legitimately have no distance) fall back to a duration line
+    // instead of the old magic "5 km" default that could mislabel a post.
+    let opener = _pickFromPool(WIN_OPENERS, day).replace('{DAY}', String(day))
+    if (opener.includes('{DIST}')) {
+      opener = m.distanceKm
+        ? opener.replace('{DIST}', m.distanceKm.toFixed(1))
+        : `Day ${day}. ${Math.round(m.durationMin)} minutes, logged.`
+    }
     const statLine = m.distanceKm
       ? `${m.distanceKm.toFixed(1)} km · ${m.type}`
       : `${Math.round(m.durationMin)} min · ${m.type}`
@@ -871,6 +876,17 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS' }): Promise<EngineRunR
   const result: EngineRunResult = { phase: 'verdict', date: todayIST(), emailsSent: [], errors: [] }
   const verdict = await judgeToday({ force: opts?.force })
   result.verdict = verdict
+
+  // ── SAFETY: forced/test verdicts must NEVER publish or write the ledger ──
+  // ?force=WIN injects synthetic data (FORCED_WIN_FOR_TESTING → 5 km / 30 min).
+  // Publishing that is exactly how the Day 1 post went out showing "5 km" instead
+  // of the real 12.53 km run. A forced run now JUDGES ONLY — no Instagram, no DB
+  // write. The real nightly verdict cron (which never passes force) publishes the
+  // live activity. To publish a real post, run the verdict without force.
+  if (opts?.force) {
+    result.errors.push(`FORCED ${opts.force} — test verdict. IG publish + ledger write intentionally skipped so synthetic data can't reach the feed. Run without force to publish the real activity.`)
+    return result
+  }
 
   // Pre-chapter guard — Chapter 02 hasn't started. No publish, no ledger, no email.
   // Force flags bypass this (for testing).
