@@ -391,12 +391,55 @@ async function _renderRouteSlide(verdict: VerdictResult, orientation: 'post' | '
   const base = await _renderWorkerBase()
   const key = await _renderKey()
 
-  // Pull full activity from DB (already synced via syncStrava — has polyline + cal + elev)
-  const { data } = await supaAdmin
+  // Pull full activity from DB (normally synced via syncStrava — has polyline + cal + elev)
+  let { data } = await supaAdmin
     .from('strava_activities')
     .select('summary_polyline,total_elevation_gain,calories,start_date_local,average_heartrate')
     .eq('id', verdict.matched.activityId)
     .maybeSingle()
+
+  // RACE GUARD ─────────────────────────────────────────────────────────────
+  // The verdict pulls activities LIVE from Strava, but this route slide reads
+  // the GPS polyline from the strava_activities DB table — which is populated
+  // by the syncStrava cron. A late-uploaded activity (e.g. a 22:00 walk that
+  // reaches Strava AFTER the 23:15 pre-verdict sync but is still caught by the
+  // 23:30 verdict's live pull) won't be in the DB yet, so the polyline is
+  // missing and the GPS frame silently drops. To make the route independent of
+  // sync timing, fall back to a direct Strava activity-detail fetch — the
+  // authoritative real-time source — whenever the DB row lacks a polyline.
+  if (!data?.summary_polyline) {
+    try {
+      const token = await _stravaAccessToken()
+      if (token) {
+        const det = await fetch(`https://www.strava.com/api/v3/activities/${verdict.matched.activityId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (det.ok) {
+          const dj = await det.json()
+          data = {
+            summary_polyline: dj.map?.summary_polyline || dj.map?.polyline || null,
+            total_elevation_gain: dj.total_elevation_gain ?? data?.total_elevation_gain ?? null,
+            calories: (typeof dj.calories === 'number' ? dj.calories : null) ?? data?.calories ?? null,
+            start_date_local: dj.start_date_local || data?.start_date_local || null,
+            average_heartrate: dj.average_heartrate ?? data?.average_heartrate ?? null
+          }
+        }
+      }
+    } catch (_e) { /* fall through — alert below fires if still empty */ }
+  }
+
+  // LOUD GUARD: if a GPS sport (walk/run/cycle/swim) still has no polyline after
+  // both the DB read and the live fetch, the post WILL publish without a route.
+  // Alert same-day instead of discovering it days later. (HR sessions have no GPS
+  // by design — they get the 1-frame hero, so no alert.)
+  if (!data?.summary_polyline && verdict.matched.bucket !== 'hrSession') {
+    try {
+      await sendAlert(
+        'GPS route MISSING on a GPS-sport WIN',
+        `Activity ${verdict.matched.activityId} (${verdict.matched.type} "${verdict.matched.name}", ${verdict.date}) qualified as a GPS WIN, but no summary_polyline was found in the DB or via a live Strava detail fetch. The post will publish WITHOUT a route frame. Likely causes: the activity was recorded with no GPS (manual entry), or the detail fetch was rate-limited (HTTP 429).`
+      )
+    } catch (_e) { /* non-fatal */ }
+  }
 
   const theme = _themeFor(verdict)
   const payload = {
@@ -1665,9 +1708,16 @@ async function syncStrava(log: string[]) {
       pr_count: a.pr_count || 0,
       summary_polyline: a.map ? a.map.summary_polyline : null
     }
-    try { await supaUpsert('strava_activities', row, 'id'); synced++ } catch (_e) { /* skip */ }
+    try { await supaUpsert('strava_activities', row, 'id'); synced++ }
+    catch (e) { log.push(`Strava: upsert FAILED for activity ${a.id}: ${(e as Error).message}`) }
   }
   log.push(`Strava: ${synced}/${activities.length} synced (detail: ${detailHits} hits, ${detailMisses} misses)`)
+  // Surface partial-write failures into SYNC_HEALTH (the handler scans `log` for
+  // 'failed'/'FAILED'), so a silently-broken sync becomes visible instead of
+  // looking 'healthy' while rows quietly fail to land.
+  if (synced < activities.length) {
+    log.push(`Strava: ⚠ ${activities.length - synced} of ${activities.length} activities did NOT persist`)
+  }
 }
 
 // ═══════════════════════════════════════════
