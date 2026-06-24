@@ -872,9 +872,18 @@ async function runNudge(): Promise<EngineRunResult> {
 // If publish fails after step 3, DB has verdict but no ig_post_id. Next cron run
 // is idempotent-skipped; operator gets publish-failure email and can manually clear
 // the proof_archive row to retry. Worst case: ledger shows verdict without IG link.
-async function runVerdict(opts?: { force?: 'WIN' | 'MISS' }): Promise<EngineRunResult> {
-  const result: EngineRunResult = { phase: 'verdict', date: todayIST(), emailsSent: [], errors: [] }
-  const verdict = await judgeToday({ force: opts?.force })
+async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republish?: boolean }): Promise<EngineRunResult> {
+  const result: EngineRunResult = { phase: 'verdict', date: opts?.date || todayIST(), emailsSent: [], errors: [] }
+
+  // Republish path: re-sync Strava FIRST so the matched activity (and its GPS
+  // summary_polyline) is present in strava_activities before the route slide
+  // renders. _renderRouteSlide reads the polyline from the DB by activity id; a
+  // re-pushed past-date post would otherwise drop the GPS frame all over again.
+  if (opts?.republish) {
+    try { await syncStrava([]) } catch (e) { result.errors.push(`Republish pre-sync warning: ${(e as Error).message}`) }
+  }
+
+  const verdict = await judgeToday({ force: opts?.force, date: opts?.date })
   result.verdict = verdict
 
   // ── SAFETY: forced/test verdicts must NEVER publish or write the ledger ──
@@ -915,8 +924,11 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS' }): Promise<EngineRunR
     return result
   }
 
-  // Idempotency — block double-runs from the start
-  if (await _verdictAlreadyPosted(result.date)) {
+  // Idempotency — block double-runs from the start.
+  // Republish intentionally bypasses this lock (the proof_archive row already
+  // exists for a past date being re-pushed); _recordVerdict upserts on date so
+  // no duplicate ledger row is created — only ig_post_id is refreshed.
+  if (!opts?.republish && await _verdictAlreadyPosted(result.date)) {
     result.alreadyDone = true
     return result
   }
@@ -2936,6 +2948,40 @@ Deno.serve(async (req) => {
       } else {
         result = await runVerdict({ force })
       }
+      return new Response(JSON.stringify(result, null, 2), { headers })
+    }
+
+    // ── REPUBLISH a specific past date (e.g. a post that dropped its GPS frame) ──
+    // GET ?action=republish&date=YYYY-MM-DD[&dry=1]
+    //   dry=1  → re-sync + re-judge that date and report whether the matched
+    //            activity has a GPS polyline. Publishes NOTHING. Run this first.
+    //   (live) → re-sync + re-judge + re-render (incl. GPS route) + publish,
+    //            bypassing the per-date idempotency lock. Creates a NEW IG post
+    //            (delete the old GPS-less one by hand first).
+    if (action === 'republish') {
+      const date = url.searchParams.get('date')
+      if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return new Response(JSON.stringify({ error: 'republish requires ?date=YYYY-MM-DD' }), { status: 400, headers })
+      }
+      const dry = url.searchParams.get('dry') === '1' || url.searchParams.get('dryRun') === '1'
+      if (dry) {
+        try { await syncStrava([]) } catch (_e) { /* tolerate — judge still reports */ }
+        const v = await judgeToday({ date })
+        let polyline: string | null = null
+        if (v.matched) {
+          const { data } = await supaAdmin
+            .from('strava_activities')
+            .select('summary_polyline')
+            .eq('id', v.matched.activityId)
+            .maybeSingle()
+          polyline = data?.summary_polyline || null
+        }
+        return new Response(JSON.stringify({
+          dryRun: true, date, verdict: v.verdict, matched: v.matched,
+          hasGps: !!polyline, polylineLen: polyline ? polyline.length : 0
+        }, null, 2), { headers })
+      }
+      const result = await runVerdict({ date, republish: true })
       return new Response(JSON.stringify(result, null, 2), { headers })
     }
 
