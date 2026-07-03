@@ -204,9 +204,17 @@ function _appleWorkoutToLite(w: Record<string, unknown>, date: string): StravaAc
   const pretty = raw.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
   const mapped = APPLE_TYPE_MAP.find(m => m.re.test(raw))?.type || 'Workout'
   const distM = Math.round(Number(w.distance_km || 0) * 1000)
-  // A GPS sport with NO recorded distance can't be judged on a distance floor —
-  // judge it on the 30-min session floor instead (type 'Workout' → hrSession).
-  const effType = (mapped !== 'Workout' && distM === 0) ? 'Workout' : mapped
+  // Floor-aware typing: keep the typed sport ONLY if its distance floor passes;
+  // otherwise judge by the 30-min session floor (type 'Workout' → hrSession).
+  // This covers distance-unknown workouts AND prevents a verdict downgrade when
+  // a later export fills in a sub-floor distance (e.g. a 59-min 3km walk stays
+  // a session WIN — matching how it was judged and published).
+  const FLOOR: Record<string, number> = {
+    Run: ENDURANCE_RULE.run.minMeters, Walk: ENDURANCE_RULE.walk.minMeters,
+    Hike: ENDURANCE_RULE.walk.minMeters, Ride: ENDURANCE_RULE.cycle.minMeters,
+    Swim: ENDURANCE_RULE.swim.minMeters
+  }
+  const effType = (mapped !== 'Workout' && distM >= (FLOOR[mapped] ?? 0)) ? mapped : 'Workout'
   return {
     id: 0,                                   // no Strava id — suppresses links & route slides
     type: effType,
