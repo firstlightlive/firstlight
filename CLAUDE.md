@@ -31,7 +31,7 @@
 - admin-core.js — switchPanel routing, date nav, createDateNav
 - admin-init.js — dashboard widgets, mission status, buildDashboardStats()
 - styles.css — all styling, 3 themes (dark/light/outdoor)
-- Nav tabs (locked): STREAK | RULES | EVIDENCE | ACCOUNTABILITY | INSTAGRAM | STRAVA | RACES | PROGRAMS | ABOUT
+- Nav tabs (locked): STREAK | RULES | EVIDENCE | ACCOUNTABILITY | INSTAGRAM | RACES | PROGRAMS | ABOUT (STRAVA removed from public nav 2026-07-03 — strava.html is admin-gated via fl-auth; only admins access it)
 
 ### Testing Checklist
 - Run node -c on all JS files before deploying
