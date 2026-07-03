@@ -413,16 +413,17 @@ async function _fullActivity(activityId: number) {
 async function _buildMultiActivityPayload(verdict: VerdictResult): Promise<Record<string, unknown>> {
   const all = verdict.allMatched || (verdict.matched ? [verdict.matched] : [])
   const items = await Promise.all(all.map(async m => {
-    const det = await _fullActivity(m.activityId)
+    const det = m.activityId > 0 ? await _fullActivity(m.activityId) : null
+    const apple = m.activityId === 0 ? await _appleRouteData(verdict.date, m.durationMin) : null
     return {
       bucket: m.bucket,
       type: m.type,
       name: m.name,
       distanceKm: m.distanceKm,
       durationMin: m.durationMin,
-      polyline: det?.summary_polyline || undefined,
+      polyline: det?.summary_polyline || apple?.polyline || undefined,
       averageHr: det?.average_heartrate ? Math.round(det.average_heartrate) : undefined,
-      caloriesKcal: det?.calories ? Math.round(det.calories) : undefined,
+      caloriesKcal: (det?.calories ? Math.round(det.calories) : undefined) ?? apple?.caloriesKcal,
     }
   }))
   const totalKm = items.reduce((s, a) => s + (a.distanceKm || 0), 0)
@@ -459,6 +460,60 @@ async function _renderMultiSlide(verdict: VerdictResult, variant: 'WIN_MULTI_HER
 // `orientation` controls aspect ratio: 'post' = 1080x1080 (feed carousel),
 // 'story' = 1080x1920 (vertical Story frame). Story uses a taller map block
 // and re-paced bottom stats panel.
+// ── Apple GPS routes ────────────────────────────────────────────────────────
+// HAE route points are stored (downsampled) in health_daily.workouts_detail;
+// encode them into the same Google polyline format the render worker already
+// consumes for Strava routes.
+
+function _downsampleRoute(pts: Array<[number, number]>, max = 400): Array<[number, number]> {
+  if (pts.length <= max) return pts
+  const step = (pts.length - 1) / (max - 1)
+  return Array.from({ length: max }, (_, i) => pts[Math.round(i * step)])
+}
+
+// Google encoded-polyline algorithm (precision 1e5) — matches Strava's
+// summary_polyline format. Verified against Google's reference vector.
+function _encodePolyline(points: Array<[number, number]>): string {
+  let out = ''
+  let prevLat = 0, prevLng = 0
+  const encodeValue = (v: number): string => {
+    let n = v < 0 ? ~(v << 1) : (v << 1)
+    let s = ''
+    while (n >= 0x20) {
+      s += String.fromCharCode((0x20 | (n & 0x1f)) + 63)
+      n >>= 5
+    }
+    return s + String.fromCharCode(n + 63)
+  }
+  for (const [lat, lng] of points) {
+    const iLat = Math.round(lat * 1e5)
+    const iLng = Math.round(lng * 1e5)
+    out += encodeValue(iLat - prevLat) + encodeValue(iLng - prevLng)
+    prevLat = iLat
+    prevLng = iLng
+  }
+  return out
+}
+
+// Look up the Apple route (+calories) for a verdict's matched workout by date.
+// Matches on duration when the day has several workouts; falls back to the
+// first workout that carries a route.
+async function _appleRouteData(date: string, durationMin: number): Promise<{ polyline: string; caloriesKcal?: number } | null> {
+  const { data } = await supaAdmin.from('health_daily')
+    .select('workouts_detail').eq('date', date).maybeSingle()
+  const arr = data?.workouts_detail
+  if (!Array.isArray(arr)) return null
+  const withRoute = (x: Record<string, unknown>) => Array.isArray(x.route) && (x.route as unknown[]).length > 1
+  const w = (arr as Array<Record<string, unknown>>).find(x =>
+      withRoute(x) && Math.round(Number(x.duration_min || 0)) === Math.round(durationMin))
+    || (arr as Array<Record<string, unknown>>).find(withRoute)
+  if (!w) return null
+  return {
+    polyline: _encodePolyline(w.route as Array<[number, number]>),
+    caloriesKcal: w.calories ? Math.round(Number(w.calories)) : undefined
+  }
+}
+
 async function _renderRouteSlide(verdict: VerdictResult, orientation: 'post' | 'story' = 'post'): Promise<string> {
   if (!verdict.matched) throw new Error('Cannot render route slide: no matched activity')
   const base = await _renderWorkerBase()
@@ -501,11 +556,26 @@ async function _renderRouteSlide(verdict: VerdictResult, orientation: 'post' | '
     } catch (_e) { /* fall through — alert below fires if still empty */ }
   }
 
+  // APPLE ROUTE: for Apple-sourced wins (activityId 0), the GPS trail lives in
+  // health_daily.workouts_detail — encode it into the same polyline format.
+  if (!data?.summary_polyline && verdict.matched.activityId === 0) {
+    const apple = await _appleRouteData(verdict.date, verdict.matched.durationMin)
+    if (apple) {
+      data = {
+        summary_polyline: apple.polyline,
+        total_elevation_gain: data?.total_elevation_gain ?? null,
+        calories: apple.caloriesKcal ?? data?.calories ?? null,
+        start_date_local: data?.start_date_local ?? null,
+        average_heartrate: data?.average_heartrate ?? null
+      }
+    }
+  }
+
   // LOUD GUARD: if a GPS sport (walk/run/cycle/swim) still has no polyline after
   // both the DB read and the live fetch, the post WILL publish without a route.
   // Alert same-day instead of discovering it days later. (HR sessions have no GPS
   // by design — they get the 1-frame hero, so no alert.)
-  // (activityId === 0 = Apple Health source — no polyline exists by design, no alert)
+  // (activityId === 0 = Apple Health source — route optional, no alert)
   if (!data?.summary_polyline && verdict.matched.bucket !== 'hrSession' && verdict.matched.activityId > 0) {
     try {
       await sendAlert(
@@ -767,10 +837,12 @@ async function _publishVerdictStoryFrames(verdict: VerdictResult, result: Engine
   const heroStory = await _publishIgStory(heroUrl)
   result.publishedStory = heroStory
 
-  // Frame 2: route slide — only for GPS sports on WIN with a real activityId
-  // Render at STORY orientation (1080x1920) so the second Story frame
-  // doesn't show up as a letterboxed square (the historical bug).
-  if (verdict.verdict === 'WIN' && verdict.matched && verdict.matched.activityId > 0) {
+  // Frame 2: route slide — GPS sports on WIN with a route source (Strava id,
+  // or an Apple route in workouts_detail). Render at STORY orientation
+  // (1080x1920) so the second Story frame doesn't letterbox (historical bug).
+  if (verdict.verdict === 'WIN' && verdict.matched &&
+      (verdict.matched.activityId > 0 ||
+       (await _appleRouteData(verdict.date, verdict.matched.durationMin)) !== null)) {
     const isGps = verdict.matched.bucket !== 'hrSession'
     if (isGps) {
       try {
@@ -1106,10 +1178,14 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republ
           }
         } else {
           // Single activity — original 2-slide carousel (hero + route).
-          // Apple-sourced wins (activityId 0) have no polyline — hero only.
+          // Strava wins carry a polyline; Apple wins may carry one via
+          // workouts_detail routes (HAE "Include Route Data").
           const slide1 = await _renderVerdictImage(verdict, 'post')
           let slide2: string | null = null
-          if (verdict.matched && verdict.matched.activityId > 0) {
+          const routeWorthTrying = verdict.matched &&
+            (verdict.matched.activityId > 0 ||
+             (await _appleRouteData(verdict.date, verdict.matched.durationMin)) !== null)
+          if (routeWorthTrying) {
             try {
               slide2 = await _renderRouteSlide(verdict)
             } catch (routeErr) {
@@ -2290,6 +2366,15 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
     const wArr = day._workouts as Array<Record<string, unknown>>
     const ae = w.activeEnergyBurned as Record<string, unknown> | null
     const dist = w.distance as Record<string, unknown> | null
+    // HAE "Include Route Data": workout.route = [{lat, lon, ...}, ...] —
+    // downsampled + stored so the route slide can render an Apple GPS map.
+    const routeRaw = Array.isArray(w.route) ? (w.route as Array<Record<string, unknown>>) : []
+    const routePts: Array<[number, number]> = []
+    for (const p of routeRaw) {
+      const lat = Number(p.lat ?? p.latitude)
+      const lng = Number(p.lon ?? p.lng ?? p.longitude)
+      if (Number.isFinite(lat) && Number.isFinite(lng)) routePts.push([+lat.toFixed(5), +lng.toFixed(5)])
+    }
     wArr.push({
       type: String(w.name || 'unknown').toLowerCase().replace(/\s+/g, '_'),
       duration_min: w.duration ? Math.round(Number(w.duration) / 60) : 0,
@@ -2298,6 +2383,7 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
       // captured for the Apple-primary judge's typed distance floors
       distance_km: dist ? +Number(dist.qty || 0).toFixed(2) : 0,
       start: toTime(String(w.start || '')),
+      ...(routePts.length > 1 ? { route: _downsampleRoute(routePts, 400) } : {})
     })
   }
 
