@@ -182,8 +182,68 @@ async function _pullStravaForDate(dateStr: string, accessToken: string): Promise
   return null
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// APPLE HEALTH — PRIMARY activity source (2026-07-03, post-Strava-ban pivot).
+// Workouts arrive via Health Auto Export → action=health-ingest → health_daily.
+// They are mapped into StravaActivityLite so the SAME ENDURANCE_RULE evaluator
+// judges both sources identically. Strava (banned 2026-06-30) is demoted to
+// best-effort garnish: if its API ever answers again, its candidates win
+// (they carry GPS polylines for route slides); otherwise it is ignored.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const APPLE_TYPE_MAP: Array<{ re: RegExp; type: string }> = [
+  { re: /run/i,             type: 'Run' },
+  { re: /hik/i,             type: 'Hike' },
+  { re: /walk/i,            type: 'Walk' },
+  { re: /cycl|bik/i,        type: 'Ride' },
+  { re: /swim/i,            type: 'Swim' },
+]
+
+function _appleWorkoutToLite(w: Record<string, unknown>, date: string): StravaActivityLite {
+  const raw = String(w.type || 'workout')
+  const pretty = raw.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  const mapped = APPLE_TYPE_MAP.find(m => m.re.test(raw))?.type || 'Workout'
+  const distM = Math.round(Number(w.distance_km || 0) * 1000)
+  // A GPS sport with NO recorded distance can't be judged on a distance floor —
+  // judge it on the 30-min session floor instead (type 'Workout' → hrSession).
+  const effType = (mapped !== 'Workout' && distM === 0) ? 'Workout' : mapped
+  return {
+    id: 0,                                   // no Strava id — suppresses links & route slides
+    type: effType,
+    sport_type: effType,
+    name: `${pretty} · Apple Watch`,
+    distance: distM,
+    moving_time: Math.round(Number(w.duration_min || 0) * 60),
+    start_date_local: `${date}T${String(w.start || '12:00')}:00`
+  }
+}
+
+// Read the day's Apple workouts from health_daily.
+// Returns null when NO row exists (pipeline silent — infra, not a miss),
+// [] when the row exists but holds no workouts (a real rest/miss day).
+async function _pullAppleForDate(dateStr: string): Promise<StravaActivityLite[] | null> {
+  const { data, error } = await supaAdmin.from('health_daily')
+    .select('workout_count,workout_types,workout_total_min,workouts_detail')
+    .eq('date', dateStr).maybeSingle()
+  if (error || !data) return null
+
+  const detail = data.workouts_detail
+  if (Array.isArray(detail) && detail.length > 0) {
+    return detail.map((w) => _appleWorkoutToLite(w as Record<string, unknown>, dateStr))
+  }
+  // Legacy rows (ingested before workouts_detail existed): synthesize one
+  // candidate per recorded type, duration split evenly — distance unknown.
+  const types: string[] = Array.isArray(data.workout_types) ? data.workout_types : []
+  const n = Number(data.workout_count || 0)
+  if (n === 0 || types.length === 0) return []
+  const perMin = Math.round(Number(data.workout_total_min || 0) / Math.max(n, 1))
+  return types.slice(0, n).map((t) =>
+    _appleWorkoutToLite({ type: t, duration_min: perMin, distance_km: 0 }, dateStr))
+}
+
 // Top-level: judge a given IST date (defaults to today). Returns VerdictResult.
-// Used by ?action=judge route and (later) by 23:30 / 00:15 pg_cron jobs.
+// Apple Health is PRIMARY; Strava is best-effort. PENDING only when NEITHER
+// source produced any data (system never declares MISS on infra failure).
 async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Promise<VerdictResult> {
   const date = opts?.date || todayIST()
   const day = chapterDay(new Date(`${date}T12:00:00+05:30`))
@@ -199,14 +259,27 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Pro
     return { verdict: 'MISS', date, chapterDay: day, candidates: [], reason: 'FORCED_MISS_FOR_TESTING' }
   }
 
-  const token = await _stravaAccessToken()
-  if (!token) {
-    return { verdict: 'PENDING', date, chapterDay: day, candidates: [], pendingReason: 'Strava token refresh failed — auth issue, manual check required' }
-  }
+  // 1. Apple Health — PRIMARY
+  const apple = await _pullAppleForDate(date)
 
-  const activities = await _pullStravaForDate(date, token)
-  if (activities === null) {
-    return { verdict: 'PENDING', date, chapterDay: day, candidates: [], pendingReason: 'Strava API unreachable after 3 retries — NOT declaring MISS on infra failure' }
+  // 2. Strava — best-effort garnish (never blocks, never causes PENDING on its own)
+  let strava: StravaActivityLite[] | null = null
+  try {
+    const token = await _stravaAccessToken()
+    if (token) strava = await _pullStravaForDate(date, token)
+  } catch (_e) { /* banned/unreachable — Apple carries the day */ }
+
+  // Prefer Strava's candidates when it actually returned activities (richer
+  // captions + GPS routes); otherwise judge on Apple. No mixing — avoids
+  // double-counting the same workout seen by both sources.
+  const activities: StravaActivityLite[] = (strava && strava.length > 0) ? strava : (apple ?? [])
+
+  // Infra guard: NEITHER source has any data channel for this date
+  if (apple === null && (strava === null || strava.length === 0)) {
+    return {
+      verdict: 'PENDING', date, chapterDay: day, candidates: [],
+      pendingReason: 'No data from Apple Health (no health_daily row — check Health Auto Export) and Strava unavailable — NOT declaring MISS on infra failure'
+    }
   }
 
   const allMatches = evaluateAllActivities(activities)
@@ -234,7 +307,7 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Pro
   }
 
   const reason = activities.length === 0
-    ? 'No Strava activities recorded for today (IST window)'
+    ? 'No workouts recorded today (Apple Health row present but empty; Strava unavailable)'
     : `Found ${activities.length} activities, none met the menu thresholds (walk/run ≥5km, cycle ≥10km, swim ≥1km, HR-session ≥30min)`
 
   return { verdict: 'MISS', date, chapterDay: day, candidates: activities, reason }
@@ -432,7 +505,8 @@ async function _renderRouteSlide(verdict: VerdictResult, orientation: 'post' | '
   // both the DB read and the live fetch, the post WILL publish without a route.
   // Alert same-day instead of discovering it days later. (HR sessions have no GPS
   // by design — they get the 1-frame hero, so no alert.)
-  if (!data?.summary_polyline && verdict.matched.bucket !== 'hrSession') {
+  // (activityId === 0 = Apple Health source — no polyline exists by design, no alert)
+  if (!data?.summary_polyline && verdict.matched.bucket !== 'hrSession' && verdict.matched.activityId > 0) {
     try {
       await sendAlert(
         'GPS route MISSING on a GPS-sport WIN',
@@ -1031,13 +1105,16 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republ
             throw new Error('No slides rendered for multi-activity day')
           }
         } else {
-          // Single activity — original 2-slide carousel (hero + route)
+          // Single activity — original 2-slide carousel (hero + route).
+          // Apple-sourced wins (activityId 0) have no polyline — hero only.
           const slide1 = await _renderVerdictImage(verdict, 'post')
           let slide2: string | null = null
-          try {
-            slide2 = await _renderRouteSlide(verdict)
-          } catch (routeErr) {
-            result.errors.push(`Route slide failed (falling back to single image): ${(routeErr as Error).message}`)
+          if (verdict.matched && verdict.matched.activityId > 0) {
+            try {
+              slide2 = await _renderRouteSlide(verdict)
+            } catch (routeErr) {
+              result.errors.push(`Route slide failed (falling back to single image): ${(routeErr as Error).message}`)
+            }
           }
           if (slide2) {
             post = await _publishIgCarousel([slide1, slide2], caption)
@@ -2212,10 +2289,15 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
     if (!day._workouts) day._workouts = []
     const wArr = day._workouts as Array<Record<string, unknown>>
     const ae = w.activeEnergyBurned as Record<string, unknown> | null
+    const dist = w.distance as Record<string, unknown> | null
     wArr.push({
       type: String(w.name || 'unknown').toLowerCase().replace(/\s+/g, '_'),
       duration_min: w.duration ? Math.round(Number(w.duration) / 60) : 0,
       calories: ae ? Math.round(Number(ae.qty || 0)) : 0,
+      // HAE sends distance as {qty, units:'km'} when the workout has one —
+      // captured for the Apple-primary judge's typed distance floors
+      distance_km: dist ? +Number(dist.qty || 0).toFixed(2) : 0,
+      start: toTime(String(w.start || '')),
     })
   }
 
@@ -2277,12 +2359,13 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
         row.workout_types = wArr.map(w => w.type)
         row.workout_total_min = wArr.reduce((s: number, w) => s + Number(w.duration_min || 0), 0)
         row.workout_total_cal = wArr.reduce((s: number, w) => s + Number(w.calories || 0), 0)
+        row.workouts_detail = wArr   // per-workout {type, duration_min, calories, distance_km, start} — read by the Apple-primary judge
       }
 
       // ── FAULT-TOLERANT MERGE: fetch existing row, never let a re-export degrade stored data ──
       const { data: existingRow } = await supaAdmin
         .from('health_daily')
-        .select('sleep_hours,vo2_max,workout_count,workout_types,workout_total_min,workout_total_cal,raw_payload')
+        .select('sleep_hours,vo2_max,workout_count,workout_types,workout_total_min,workout_total_cal,workouts_detail,raw_payload')
         .eq('date', date)
         .maybeSingle()
 
@@ -2304,6 +2387,7 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
         row.workout_types   = existingRow.workout_types
         row.workout_total_min = existingRow.workout_total_min
         row.workout_total_cal = existingRow.workout_total_cal
+        row.workouts_detail = existingRow.workouts_detail
       }
 
       // 4. Sleep: max-wins — check BOTH health_daily and sleep_log, take the highest stored value
