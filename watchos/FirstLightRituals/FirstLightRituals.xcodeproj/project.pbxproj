@@ -1,0 +1,618 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B4C86614EE0B4EEC4AF7B3C /* RitualStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1A643F0D60EFBD18060CFF /* RitualStore.swift */; };
+		0B63333EB2FA54DB1EF98524 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309A5A3FCE9279D5AF4B505C /* NotificationView.swift */; };
+		0BDA19F81E45B1D85334FB1D /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853B26748325A5CCEA04E873 /* NotificationScheduler.swift */; };
+		17E593E36D498920AC814B36 /* ProgressWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D04903EFADCCE0831284F7 /* ProgressWidget.swift */; };
+		1B26A31B6BEA9B383B805BF3 /* FLDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B62E0324B56E8862DE8230 /* FLDate.swift */; };
+		1E7620AEA5E6692479BF28C3 /* NowBlockWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1BB8F323063B9D2A9F7D932 /* NowBlockWidget.swift */; };
+		228E4FE723A35478E06CB476 /* TickCurrentRitualIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73799B0609E5B052B3BDC33 /* TickCurrentRitualIntent.swift */; };
+		263CCAEBB6209DB2739A8AE8 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A66F2E918929CF8BBA5FD /* AppRouter.swift */; };
+		275C65CC2E2DCD4A0E53CAF4 /* RitualRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F5D9C8B9DEFB23E7C72C793 /* RitualRowView.swift */; };
+		2C494F0EDC7B90E6B463B710 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9978A7E1DEB681297E03C700 /* AppGroup.swift */; };
+		2E11A5B04A94910CB3D552B6 /* DayStateIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = C21A7D615C33B3F500A62D16 /* DayStateIO.swift */; };
+		33A632A315C2374A4375D357 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0594041B96EDC91895915AE5 /* APIClient.swift */; };
+		35CAE6A379B4E3AF366296FB /* WeekendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B0512E8642D7FF3BE56BFA /* WeekendView.swift */; };
+		3624AA152622759A8A371AFD /* AppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3547DBF750B4F815A3BB80A0 /* AppShortcuts.swift */; };
+		5516AB597F0F7C1BFF32ADBE /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9978A7E1DEB681297E03C700 /* AppGroup.swift */; };
+		6408DFB9EE2D5BE9DD551948 /* NotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75904E02029EA261AD4F0CE1 /* NotificationDelegate.swift */; };
+		6BA8D56C3E08AD925B1A4722 /* FirstLightRitualsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190180506FAC7E58DC3E5D06 /* FirstLightRitualsApp.swift */; };
+		71F977C0C9FBCBA39B85804F /* Rituals.json in Resources */ = {isa = PBXBuildFile; fileRef = 83E69DEEA6F8C3EAF808C149 /* Rituals.json */; };
+		76D89C03482916283F0A5C30 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E521EF25A8E70E53AD377A /* KeychainStore.swift */; };
+		7E010613AA37B256F18561F3 /* RitualModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F9C0411298309853E77A03 /* RitualModels.swift */; };
+		80C0EB58A7E46D5E9AC348D5 /* DayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70612E1315566DDFACB64927 /* DayView.swift */; };
+		87DFC44E2DB0BC66F0A4627A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26DC660A192461C392398968 /* RootView.swift */; };
+		8A4C30869EDF94EA399F55D0 /* SnapshotTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD049532C954902341BE29D7 /* SnapshotTimeline.swift */; };
+		A22C669808E6FFA3C9953072 /* RitualsComplications.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 369141A61E95D4B95662DEE7 /* RitualsComplications.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A6500ABD9254AF3BACA15B27 /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A20AB28199DCC08F0E1BCB4 /* SyncEngine.swift */; };
+		B22162B74CCF4E8E86A3D88D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B095A61E04B5AB25EA99DF0E /* SettingsView.swift */; };
+		BBF82241D2B05824C03D5D84 /* OfflineQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98DC3D593413115A4A7B2E09 /* OfflineQueue.swift */; };
+		CB051D01FC3A170A0603F3E0 /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D084E3D2C96DC3D26E2FF85B /* WidgetSnapshot.swift */; };
+		D065B97D8BCB9CF9AF078F2A /* RitualsWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E56A4EFE14A80BF5E8F1A481 /* RitualsWidgetBundle.swift */; };
+		D85CD1886D5B9AC0D4E14BE9 /* ChecklistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 620B0D8BC9DE7916B6E47BEE /* ChecklistView.swift */; };
+		DEF1C1B877ED1427F1230CC9 /* FLTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2219CF715A17240515646CD4 /* FLTheme.swift */; };
+		E555985C734F10C1656D22FE /* NowHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D6C76FEBE6BCC2C170895A /* NowHeroView.swift */; };
+		F2781050BBFFDEB8ED45610B /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D084E3D2C96DC3D26E2FF85B /* WidgetSnapshot.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		30CACA11B85DC9CC925A5066 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4CE3D206C218107F639B4247 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 24FF1B02686641860D9C7DBF;
+			remoteInfo = RitualsComplications;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D628FB051DA56643A8DC7A9B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A22C669808E6FFA3C9953072 /* RitualsComplications.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0594041B96EDC91895915AE5 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		179A66F2E918929CF8BBA5FD /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
+		190180506FAC7E58DC3E5D06 /* FirstLightRitualsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLightRitualsApp.swift; sourceTree = "<group>"; };
+		2219CF715A17240515646CD4 /* FLTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLTheme.swift; sourceTree = "<group>"; };
+		26DC660A192461C392398968 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		29B0512E8642D7FF3BE56BFA /* WeekendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekendView.swift; sourceTree = "<group>"; };
+		309A5A3FCE9279D5AF4B505C /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		3547DBF750B4F815A3BB80A0 /* AppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcuts.swift; sourceTree = "<group>"; };
+		369141A61E95D4B95662DEE7 /* RitualsComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = RitualsComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B1A643F0D60EFBD18060CFF /* RitualStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualStore.swift; sourceTree = "<group>"; };
+		3F5D9C8B9DEFB23E7C72C793 /* RitualRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualRowView.swift; sourceTree = "<group>"; };
+		52D04903EFADCCE0831284F7 /* ProgressWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressWidget.swift; sourceTree = "<group>"; };
+		54E521EF25A8E70E53AD377A /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		56A0F79A1BC6072CC7858C6B /* RitualsComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RitualsComplications.entitlements; sourceTree = "<group>"; };
+		5A20AB28199DCC08F0E1BCB4 /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
+		620B0D8BC9DE7916B6E47BEE /* ChecklistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistView.swift; sourceTree = "<group>"; };
+		70612E1315566DDFACB64927 /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
+		75904E02029EA261AD4F0CE1 /* NotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDelegate.swift; sourceTree = "<group>"; };
+		76D6C76FEBE6BCC2C170895A /* NowHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowHeroView.swift; sourceTree = "<group>"; };
+		83E69DEEA6F8C3EAF808C149 /* Rituals.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Rituals.json; sourceTree = "<group>"; };
+		841A80F444F4578A34F44B91 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		853B26748325A5CCEA04E873 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
+		91FE15FB22875738EFBA4FB0 /* FirstLightRituals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FirstLightRituals.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		98DC3D593413115A4A7B2E09 /* OfflineQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineQueue.swift; sourceTree = "<group>"; };
+		9978A7E1DEB681297E03C700 /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
+		AD049532C954902341BE29D7 /* SnapshotTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTimeline.swift; sourceTree = "<group>"; };
+		B095A61E04B5AB25EA99DF0E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B760E431A58BBBECA13E021E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C21A7D615C33B3F500A62D16 /* DayStateIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStateIO.swift; sourceTree = "<group>"; };
+		D084E3D2C96DC3D26E2FF85B /* WidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshot.swift; sourceTree = "<group>"; };
+		D7F9C0411298309853E77A03 /* RitualModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualModels.swift; sourceTree = "<group>"; };
+		E1BB8F323063B9D2A9F7D932 /* NowBlockWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowBlockWidget.swift; sourceTree = "<group>"; };
+		E56A4EFE14A80BF5E8F1A481 /* RitualsWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualsWidgetBundle.swift; sourceTree = "<group>"; };
+		E9B62E0324B56E8862DE8230 /* FLDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLDate.swift; sourceTree = "<group>"; };
+		F35B63D6C7DB9DA0C7087183 /* FirstLightRituals.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FirstLightRituals.entitlements; sourceTree = "<group>"; };
+		F73799B0609E5B052B3BDC33 /* TickCurrentRitualIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickCurrentRitualIntent.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0CD0D9FB236ACD10E369219B /* FirstLightRituals */ = {
+			isa = PBXGroup;
+			children = (
+				F35B63D6C7DB9DA0C7087183 /* FirstLightRituals.entitlements */,
+				841A80F444F4578A34F44B91 /* Info.plist */,
+				55B0BB026EF42C60303AF482 /* App */,
+				8EBB6F31907AE5DC14D76E89 /* Intents */,
+				A182B108929804BA29B49F73 /* Models */,
+				A3A6CF8C6EAAAF6F01D028D1 /* Notifications */,
+				F510C65A1C5D82B5B588DF21 /* Resources */,
+				239B1261C86321802F426059 /* Store */,
+				4213F07D06EC54431334A258 /* Sync */,
+				A97BBD5DB76A9E5D21D0F359 /* Theme */,
+				D50539B84667B272ED1D832E /* Views */,
+			);
+			path = FirstLightRituals;
+			sourceTree = "<group>";
+		};
+		239B1261C86321802F426059 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				C21A7D615C33B3F500A62D16 /* DayStateIO.swift */,
+				3B1A643F0D60EFBD18060CFF /* RitualStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		4213F07D06EC54431334A258 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				0594041B96EDC91895915AE5 /* APIClient.swift */,
+				54E521EF25A8E70E53AD377A /* KeychainStore.swift */,
+				98DC3D593413115A4A7B2E09 /* OfflineQueue.swift */,
+				5A20AB28199DCC08F0E1BCB4 /* SyncEngine.swift */,
+			);
+			path = Sync;
+			sourceTree = "<group>";
+		};
+		55B0BB026EF42C60303AF482 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				179A66F2E918929CF8BBA5FD /* AppRouter.swift */,
+				190180506FAC7E58DC3E5D06 /* FirstLightRitualsApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		60264694E4369B4E1E0A7196 = {
+			isa = PBXGroup;
+			children = (
+				0CD0D9FB236ACD10E369219B /* FirstLightRituals */,
+				ECA3443C8898F872B3586BE1 /* RitualsComplications */,
+				7424A8EA32AC3FC5EB021EEE /* Shared */,
+				9F31B006E35F12B9E015D85D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7424A8EA32AC3FC5EB021EEE /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				9978A7E1DEB681297E03C700 /* AppGroup.swift */,
+				D084E3D2C96DC3D26E2FF85B /* WidgetSnapshot.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		8EBB6F31907AE5DC14D76E89 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				3547DBF750B4F815A3BB80A0 /* AppShortcuts.swift */,
+				F73799B0609E5B052B3BDC33 /* TickCurrentRitualIntent.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		9F31B006E35F12B9E015D85D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				91FE15FB22875738EFBA4FB0 /* FirstLightRituals.app */,
+				369141A61E95D4B95662DEE7 /* RitualsComplications.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A182B108929804BA29B49F73 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E9B62E0324B56E8862DE8230 /* FLDate.swift */,
+				D7F9C0411298309853E77A03 /* RitualModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A3A6CF8C6EAAAF6F01D028D1 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				75904E02029EA261AD4F0CE1 /* NotificationDelegate.swift */,
+				853B26748325A5CCEA04E873 /* NotificationScheduler.swift */,
+				309A5A3FCE9279D5AF4B505C /* NotificationView.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		A97BBD5DB76A9E5D21D0F359 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				2219CF715A17240515646CD4 /* FLTheme.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		D50539B84667B272ED1D832E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				620B0D8BC9DE7916B6E47BEE /* ChecklistView.swift */,
+				70612E1315566DDFACB64927 /* DayView.swift */,
+				76D6C76FEBE6BCC2C170895A /* NowHeroView.swift */,
+				3F5D9C8B9DEFB23E7C72C793 /* RitualRowView.swift */,
+				26DC660A192461C392398968 /* RootView.swift */,
+				B095A61E04B5AB25EA99DF0E /* SettingsView.swift */,
+				29B0512E8642D7FF3BE56BFA /* WeekendView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		ECA3443C8898F872B3586BE1 /* RitualsComplications */ = {
+			isa = PBXGroup;
+			children = (
+				B760E431A58BBBECA13E021E /* Info.plist */,
+				E1BB8F323063B9D2A9F7D932 /* NowBlockWidget.swift */,
+				52D04903EFADCCE0831284F7 /* ProgressWidget.swift */,
+				56A0F79A1BC6072CC7858C6B /* RitualsComplications.entitlements */,
+				E56A4EFE14A80BF5E8F1A481 /* RitualsWidgetBundle.swift */,
+				AD049532C954902341BE29D7 /* SnapshotTimeline.swift */,
+			);
+			path = RitualsComplications;
+			sourceTree = "<group>";
+		};
+		F510C65A1C5D82B5B588DF21 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				83E69DEEA6F8C3EAF808C149 /* Rituals.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		24FF1B02686641860D9C7DBF /* RitualsComplications */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6922881D7CCA16EE0B84E43B /* Build configuration list for PBXNativeTarget "RitualsComplications" */;
+			buildPhases = (
+				3B4DC449767BAA7B30C9BFE2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RitualsComplications;
+			packageProductDependencies = (
+			);
+			productName = RitualsComplications;
+			productReference = 369141A61E95D4B95662DEE7 /* RitualsComplications.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		F61CBCB1A4477F8501B3441E /* FirstLightRituals */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E6C698973AAD2D9C9B2BCC63 /* Build configuration list for PBXNativeTarget "FirstLightRituals" */;
+			buildPhases = (
+				8AEF33EAF2B7238FC3190FED /* Sources */,
+				056332D443420CFE6B1DC68D /* Resources */,
+				D628FB051DA56643A8DC7A9B /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2D547593D35BCB3724E43E46 /* PBXTargetDependency */,
+			);
+			name = FirstLightRituals;
+			packageProductDependencies = (
+			);
+			productName = FirstLightRituals;
+			productReference = 91FE15FB22875738EFBA4FB0 /* FirstLightRituals.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4CE3D206C218107F639B4247 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 7566C81E74DE8A571580CE36 /* Build configuration list for PBXProject "FirstLightRituals" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 60264694E4369B4E1E0A7196;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9F31B006E35F12B9E015D85D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F61CBCB1A4477F8501B3441E /* FirstLightRituals */,
+				24FF1B02686641860D9C7DBF /* RitualsComplications */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		056332D443420CFE6B1DC68D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71F977C0C9FBCBA39B85804F /* Rituals.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3B4DC449767BAA7B30C9BFE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C494F0EDC7B90E6B463B710 /* AppGroup.swift in Sources */,
+				1E7620AEA5E6692479BF28C3 /* NowBlockWidget.swift in Sources */,
+				17E593E36D498920AC814B36 /* ProgressWidget.swift in Sources */,
+				D065B97D8BCB9CF9AF078F2A /* RitualsWidgetBundle.swift in Sources */,
+				8A4C30869EDF94EA399F55D0 /* SnapshotTimeline.swift in Sources */,
+				F2781050BBFFDEB8ED45610B /* WidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8AEF33EAF2B7238FC3190FED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33A632A315C2374A4375D357 /* APIClient.swift in Sources */,
+				5516AB597F0F7C1BFF32ADBE /* AppGroup.swift in Sources */,
+				263CCAEBB6209DB2739A8AE8 /* AppRouter.swift in Sources */,
+				3624AA152622759A8A371AFD /* AppShortcuts.swift in Sources */,
+				D85CD1886D5B9AC0D4E14BE9 /* ChecklistView.swift in Sources */,
+				2E11A5B04A94910CB3D552B6 /* DayStateIO.swift in Sources */,
+				80C0EB58A7E46D5E9AC348D5 /* DayView.swift in Sources */,
+				1B26A31B6BEA9B383B805BF3 /* FLDate.swift in Sources */,
+				DEF1C1B877ED1427F1230CC9 /* FLTheme.swift in Sources */,
+				6BA8D56C3E08AD925B1A4722 /* FirstLightRitualsApp.swift in Sources */,
+				76D89C03482916283F0A5C30 /* KeychainStore.swift in Sources */,
+				6408DFB9EE2D5BE9DD551948 /* NotificationDelegate.swift in Sources */,
+				0BDA19F81E45B1D85334FB1D /* NotificationScheduler.swift in Sources */,
+				0B63333EB2FA54DB1EF98524 /* NotificationView.swift in Sources */,
+				E555985C734F10C1656D22FE /* NowHeroView.swift in Sources */,
+				BBF82241D2B05824C03D5D84 /* OfflineQueue.swift in Sources */,
+				7E010613AA37B256F18561F3 /* RitualModels.swift in Sources */,
+				275C65CC2E2DCD4A0E53CAF4 /* RitualRowView.swift in Sources */,
+				0B4C86614EE0B4EEC4AF7B3C /* RitualStore.swift in Sources */,
+				87DFC44E2DB0BC66F0A4627A /* RootView.swift in Sources */,
+				B22162B74CCF4E8E86A3D88D /* SettingsView.swift in Sources */,
+				A6500ABD9254AF3BACA15B27 /* SyncEngine.swift in Sources */,
+				228E4FE723A35478E06CB476 /* TickCurrentRitualIntent.swift in Sources */,
+				35CAE6A379B4E3AF366296FB /* WeekendView.swift in Sources */,
+				CB051D01FC3A170A0603F3E0 /* WidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2D547593D35BCB3724E43E46 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 24FF1B02686641860D9C7DBF /* RitualsComplications */;
+			targetProxy = 30CACA11B85DC9CC925A5066 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		259DD39A25E0BEBC39939D29 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FirstLightRituals/FirstLightRituals.entitlements;
+				INFOPLIST_FILE = FirstLightRituals/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = live.firstlight.rituals;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		8300C1EB9DFEBD8EB4A5C3C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RitualsComplications/RitualsComplications.entitlements;
+				INFOPLIST_FILE = RitualsComplications/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = live.firstlight.rituals.complications;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		85BDA36410E98ED2F15C5BCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		B5BF3477118CDB9C8A48C200 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FirstLightRituals/FirstLightRituals.entitlements;
+				INFOPLIST_FILE = FirstLightRituals/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = live.firstlight.rituals;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		C82242EF56706F21D4463E34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RitualsComplications/RitualsComplications.entitlements;
+				INFOPLIST_FILE = RitualsComplications/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = live.firstlight.rituals.complications;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		FB467862B0EFDEDF7A45186A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6922881D7CCA16EE0B84E43B /* Build configuration list for PBXNativeTarget "RitualsComplications" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8300C1EB9DFEBD8EB4A5C3C5 /* Debug */,
+				C82242EF56706F21D4463E34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7566C81E74DE8A571580CE36 /* Build configuration list for PBXProject "FirstLightRituals" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB467862B0EFDEDF7A45186A /* Debug */,
+				85BDA36410E98ED2F15C5BCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E6C698973AAD2D9C9B2BCC63 /* Build configuration list for PBXNativeTarget "FirstLightRituals" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				259DD39A25E0BEBC39939D29 /* Debug */,
+				B5BF3477118CDB9C8A48C200 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4CE3D206C218107F639B4247 /* Project object */;
+}

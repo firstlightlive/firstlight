@@ -29,3 +29,8 @@ node_modules/
 !.dev.vars.example
 .env*
 !.env.example
+
+# Xcode / watchOS
+watchos/**/xcuserdata/
+watchos/**/*.xcuserstate
+watchos/**/DerivedData/

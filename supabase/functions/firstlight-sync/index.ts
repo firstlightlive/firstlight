@@ -2847,6 +2847,246 @@ async function adminWrite(body: Record<string, unknown>) {
 }
 
 // ═══════════════════════════════════════════
+// RITUAL SYNC — watchOS app endpoint (action=ritual-sync)
+// Narrow, watch-key-gated read/write for rituals_log + daily_rituals +
+// daily_checkin pct + weekend_log. See supabase/watch_ritual_sync.sql for the
+// secret + weekend_log DDL. Server owns the date guard: rituals_log/weekend_log
+// have NO history-lock trigger in prod (only updated_at triggers).
+// ═══════════════════════════════════════════
+
+const RITUAL_PERIODS = ['morning', 'midday', 'evening'] as const
+type RitualPeriod = typeof RITUAL_PERIODS[number]
+
+// Legacy rows are double-encoded (jsonb STRING containing array JSON) because
+// the web client sent JSON.stringify(ids) as the column value. Normalize both
+// shapes to a clean string[].
+function _normalizeIds(raw: unknown): string[] {
+  let v = raw
+  for (let i = 0; i < 2 && typeof v === 'string'; i++) {
+    try { v = JSON.parse(v) } catch (_e) { return [] }
+  }
+  if (!Array.isArray(v)) return []
+  return v.filter((x): x is string => typeof x === 'string')
+}
+
+// IST clock + effective-day math — mirrors enforce_history_lock()
+// (website/supabase_schema.sql:555-601): before 3:00 AM IST, yesterday is
+// still the editable day.
+function _istParts(): { dateStr: string; hour: number; iso: string } {
+  const ist = new Date(Date.now() + 5.5 * 3600 * 1000)
+  return {
+    dateStr: ist.toISOString().slice(0, 10),
+    hour: ist.getUTCHours(),
+    iso: ist.toISOString().slice(0, 19)
+  }
+}
+function _ritualDayWindow(): { calendarToday: string; effectiveToday: string; graceActive: boolean; nowIst: string } {
+  const { dateStr, hour, iso } = _istParts()
+  const graceActive = hour < 3
+  let effectiveToday = dateStr
+  if (graceActive) {
+    const d = new Date(dateStr + 'T00:00:00Z')
+    d.setUTCDate(d.getUTCDate() - 1)
+    effectiveToday = d.toISOString().slice(0, 10)
+  }
+  return { calendarToday: dateStr, effectiveToday, graceActive, nowIst: iso }
+}
+
+const RITUAL_ID_RE = /^[a-z0-9_]{1,64}$/
+const WEEKEND_ID_RE = /^(sat|sun)_[a-z_]+$/
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+
+async function ritualSyncGet(date: string) {
+  if (!DATE_RE.test(date)) return { status: 400, body: { error: 'BAD_DATE', detail: 'date must be YYYY-MM-DD' } }
+
+  const [rl, wk, dc] = await Promise.all([
+    supaAdmin.from('rituals_log').select('period,completed_ids,updated_at').eq('date', date),
+    supaAdmin.from('weekend_log').select('completed_ids,updated_at').eq('date', date).maybeSingle(),
+    supaAdmin.from('daily_checkin').select('morning_pct,midday_pct,evening_pct,sealed,sealed_at').eq('date', date).maybeSingle()
+  ])
+  if (rl.error) return { status: 500, body: { error: 'READ_FAILED', detail: rl.error.message } }
+
+  const periods: Record<string, { completed_ids: string[]; updated_at: string | null }> = {}
+  for (const p of RITUAL_PERIODS) periods[p] = { completed_ids: [], updated_at: null }
+  for (const row of rl.data || []) {
+    if ((RITUAL_PERIODS as readonly string[]).includes(row.period)) {
+      periods[row.period] = { completed_ids: _normalizeIds(row.completed_ids), updated_at: row.updated_at || null }
+    }
+  }
+  // weekend_log read is best-effort: table may not exist until watch_ritual_sync.sql runs
+  const weekend = (wk && !wk.error && wk.data)
+    ? { completed_ids: _normalizeIds(wk.data.completed_ids), updated_at: wk.data.updated_at || null }
+    : { completed_ids: [], updated_at: null }
+
+  const win = _ritualDayWindow()
+  return {
+    status: 200,
+    body: {
+      success: true, date, periods,
+      weekend_tasks: weekend,
+      checkin: (dc && !dc.error && dc.data) ? dc.data : { morning_pct: null, midday_pct: null, evening_pct: null, sealed: false, sealed_at: null },
+      server: {
+        now_ist: win.nowIst, effective_today: win.effectiveToday, grace_active: win.graceActive,
+        writable: date >= win.effectiveToday && date <= win.calendarToday
+      }
+    }
+  }
+}
+
+async function ritualSyncPost(body: Record<string, unknown>) {
+  const date = String(body.date || '')
+  const period = String(body.period || '')
+  const completed = Array.isArray(body.completed_ids) ? body.completed_ids : []
+  const removed = Array.isArray(body.removed_ids) ? body.removed_ids : []
+  const totalActive = Number(body.total_active)
+
+  // ── Validation ──
+  if (!DATE_RE.test(date)) return { status: 400, body: { error: 'BAD_DATE', detail: 'date must be YYYY-MM-DD' } }
+  const isWeekend = period === 'weekend'
+  if (!isWeekend && !(RITUAL_PERIODS as readonly string[]).includes(period)) {
+    return { status: 400, body: { error: 'BAD_PERIOD', detail: 'period must be morning|midday|evening|weekend' } }
+  }
+  if (completed.length > 200 || removed.length > 200) {
+    return { status: 400, body: { error: 'TOO_MANY_IDS', detail: 'max 200 ids per array' } }
+  }
+  const idRe = isWeekend ? WEEKEND_ID_RE : RITUAL_ID_RE
+  for (const id of [...completed, ...removed]) {
+    if (typeof id !== 'string' || !idRe.test(id)) {
+      return { status: 400, body: { error: 'BAD_ID', detail: `invalid id: ${String(id).slice(0, 80)}` } }
+    }
+  }
+  if (!isWeekend && (!Number.isInteger(totalActive) || totalActive < 1 || totalActive > 100)) {
+    return { status: 400, body: { error: 'BAD_TOTAL_ACTIVE', detail: 'total_active must be an integer 1-100' } }
+  }
+
+  // ── Date guard (server-owned; rituals_log/weekend_log have no trigger) ──
+  const win = _ritualDayWindow()
+  if (date > win.calendarToday) {
+    return { status: 400, body: { error: 'FUTURE_DATE', detail: `date ${date} is after IST today ${win.calendarToday}`, server: { effective_today: win.effectiveToday, grace_active: win.graceActive } } }
+  }
+  if (date < win.effectiveToday) {
+    return { status: 409, body: { error: 'HISTORY_LOCKED', detail: `date ${date} is beyond the 3:00 AM IST grace window`, effective_today: win.effectiveToday, grace_until: '03:00 IST', server: { grace_active: win.graceActive } } }
+  }
+
+  const warnings: string[] = []
+
+  // ── Weekend path: merge → weekend_log only ──
+  if (isWeekend) {
+    const { data: existing, error: rErr } = await supaAdmin.from('weekend_log').select('completed_ids').eq('date', date).maybeSingle()
+    if (rErr) {
+      await _watchSyncHealthBump(`weekend_log read: ${rErr.message}`)
+      return { status: 500, body: { error: 'WRITE_FAILED', detail: rErr.message } }
+    }
+    const server = _normalizeIds(existing?.completed_ids)
+    const removedSet = new Set(removed as string[])
+    const merged = [...new Set([...server.filter(id => !removedSet.has(id)), ...(completed as string[])])]
+    const { error: wErr } = await supaAdmin.from('weekend_log')
+      .upsert({ date, completed_ids: merged, updated_at: new Date().toISOString() }, { onConflict: 'date' })
+    if (wErr) {
+      await _watchSyncHealthBump(`weekend_log write: ${wErr.message}`)
+      const locked = /HISTORY LOCKED/i.test(wErr.message)
+      return locked
+        ? { status: 409, body: { error: 'HISTORY_LOCKED', detail: wErr.message } }
+        : { status: 500, body: { error: 'WRITE_FAILED', detail: wErr.message } }
+    }
+    return {
+      status: 200,
+      body: {
+        success: true, date, period, merged_ids: merged, merged_count: merged.length,
+        completion_pct: null, sealed: false, wrote: { weekend_log: true }, warnings,
+        updated_at: new Date().toISOString(),
+        server: { effective_today: win.effectiveToday, grace_active: win.graceActive }
+      }
+    }
+  }
+
+  // ── Period path: rituals_log (authoritative) → daily_rituals + daily_checkin (mirrors) ──
+  const { data: existing, error: rErr } = await supaAdmin.from('rituals_log')
+    .select('completed_ids').eq('date', date).eq('period', period).maybeSingle()
+  if (rErr) {
+    await _watchSyncHealthBump(`rituals_log read: ${rErr.message}`)
+    return { status: 500, body: { error: 'WRITE_FAILED', detail: rErr.message } }
+  }
+  const server = _normalizeIds(existing?.completed_ids)
+  const removedSet = new Set(removed as string[])
+  // union merge: adds never lost; removals explicit. Writing a real jsonb
+  // array also heals this row's legacy double-encoding.
+  const merged = [...new Set([...server.filter(id => !removedSet.has(id)), ...(completed as string[])])]
+
+  const { error: wErr } = await supaAdmin.from('rituals_log')
+    .upsert({ date, period, completed_ids: merged, updated_at: new Date().toISOString() }, { onConflict: 'date,period' })
+  if (wErr) {
+    await _watchSyncHealthBump(`rituals_log write: ${wErr.message}`)
+    return { status: 500, body: { error: 'WRITE_FAILED', detail: wErr.message } }
+  }
+
+  const pct = Math.min(100, Math.round((merged.length / totalActive) * 100))
+
+  // Mirror 1: legacy daily_rituals (best-effort; has history-lock trigger — map to warning)
+  const wrote = { rituals_log: true, daily_rituals: false, daily_checkin: false }
+  try {
+    await supaUpsert('daily_rituals', {
+      date, period, done_indices: merged, total_items: totalActive, completion_pct: pct
+    }, 'date,period')
+    wrote.daily_rituals = true
+  } catch (e) {
+    warnings.push(`daily_rituals mirror failed: ${(e as Error).message}`)
+  }
+
+  // Mirror 2: daily_checkin — COLUMN-SCOPED pct update only. Never whole-row
+  // upsert (that pattern is what broke web sync); never touches sealed/journal.
+  let sealed = false
+  try {
+    const pctCol = `${period}_pct`
+    const { data: dcRow, error: dcErr } = await supaAdmin.from('daily_checkin')
+      .select('id,sealed').eq('date', date).maybeSingle()
+    if (dcErr) throw new Error(dcErr.message)
+    if (dcRow) {
+      sealed = !!dcRow.sealed
+      const { error } = await supaAdmin.from('daily_checkin').update({ [pctCol]: pct }).eq('date', date)
+      if (error) throw new Error(error.message)
+    } else {
+      const { error } = await supaAdmin.from('daily_checkin').insert({ date, [pctCol]: pct })
+      if (error) {
+        if (error.code === '23505') { // insert race — row appeared; update instead
+          const { error: e2 } = await supaAdmin.from('daily_checkin').update({ [pctCol]: pct }).eq('date', date)
+          if (e2) throw new Error(e2.message)
+        } else throw new Error(error.message)
+      }
+    }
+    wrote.daily_checkin = true
+  } catch (e) {
+    warnings.push(`daily_checkin pct update failed: ${(e as Error).message}`)
+  }
+
+  return {
+    status: 200,
+    body: {
+      success: true, date, period, merged_ids: merged, merged_count: merged.length,
+      completion_pct: pct, sealed, wrote, warnings,
+      updated_at: new Date().toISOString(),
+      server: { effective_today: win.effectiveToday, grace_active: win.graceActive }
+    }
+  }
+}
+
+// Failure telemetry: config-row counter + max one alert email per IST day at ≥3 errors.
+async function _watchSyncHealthBump(detail: string) {
+  try {
+    const today = _istParts().dateStr
+    const raw = await getSecret('WATCH_SYNC_HEALTH')
+    let h: { date: string; errors: number; alerted: boolean } = { date: today, errors: 0, alerted: false }
+    if (raw) { try { const p = JSON.parse(raw); if (p.date === today) h = p } catch (_e) { /* reset */ } }
+    h.errors++
+    if (h.errors >= 3 && !h.alerted) {
+      h.alerted = true
+      await sendAlert('Watch ritual-sync failing', `${h.errors} errors today. Latest: ${detail.slice(0, 300)}`)
+    }
+    await setSecret('WATCH_SYNC_HEALTH', JSON.stringify(h))
+  } catch (_e) { /* telemetry must never break sync */ }
+}
+
+// ═══════════════════════════════════════════
 // MAIN HANDLER
 // ═══════════════════════════════════════════
 Deno.serve(async (req) => {
@@ -2856,7 +3096,7 @@ Deno.serve(async (req) => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key, X-Webhook-Secret, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key, X-Webhook-Secret, X-Watch-Key, Authorization',
       }
     })
   }
@@ -2902,6 +3142,31 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify(result), { headers })
     } catch (e) {
       return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers })
+    }
+  }
+
+  // Ritual sync — watchOS app endpoint, uses its own narrow secret.
+  // Header only (no URL-param fallback — keeps the key out of edge logs).
+  // A valid admin key is accepted as a debug superset.
+  if (action === 'ritual-sync') {
+    const watchKey = await getSecret('watch_api_key')
+    const providedWatch = req.headers.get('x-watch-key') || ''
+    const watchAuthed = (watchKey && providedWatch === watchKey) || isAuthed
+    if (!watchAuthed) {
+      return new Response(JSON.stringify({ error: 'Unauthorized — missing or invalid API key' }), { status: 403, headers })
+    }
+    try {
+      if (req.method === 'GET') {
+        const date = url.searchParams.get('date') || _ritualDayWindow().effectiveToday
+        const result = await ritualSyncGet(date)
+        return new Response(JSON.stringify(result.body), { status: result.status, headers })
+      }
+      const body = await req.json()
+      const result = await ritualSyncPost(body)
+      return new Response(JSON.stringify(result.body), { status: result.status, headers })
+    } catch (e) {
+      await _watchSyncHealthBump(`unhandled: ${(e as Error).message}`)
+      return new Response(JSON.stringify({ error: 'WRITE_FAILED', detail: (e as Error).message }), { status: 500, headers })
     }
   }
 
