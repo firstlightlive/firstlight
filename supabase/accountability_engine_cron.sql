@@ -4,9 +4,10 @@
 -- Run in: Supabase Dashboard → SQL Editor (project edgnudrbysybefbqyijq)
 --
 -- Schedules (IST → UTC):
---   21:00 IST  → 15:30 UTC daily   — engine-nudge   (alert if not qualified)
---   23:30 IST  → 18:00 UTC daily   — engine-verdict (final judgement + publish)
---   00:15 IST  → 18:45 UTC daily   — engine-grace   (recheck yesterday's MISS)
+--   21:00 IST  → 15:30 UTC daily   — engine-nudge            (alert if not qualified)
+--   23:30 IST  → 18:00 UTC daily   — engine-verdict          (final judgement + publish)
+--   23:55 IST  → 18:25 UTC daily   — engine-verdict-fallback (publish ONLY if 23:30 posted nothing — idempotent skip if already posted)
+--   00:15 IST  → 18:45 UTC daily   — engine-grace            (recheck yesterday's MISS)
 --
 -- Assumes public.firstlight_cron_call(text) already exists (defined in
 -- supabase/email_cron_jobs.sql). Reads admin_key + anon_key from secrets.
@@ -58,6 +59,16 @@ SELECT cron.schedule(
 SELECT cron.schedule(
   'engine-verdict',
   '0 18 * * *',                                   -- 18:00 UTC = 23:30 IST
+  $$SELECT public.firstlight_cron_call('engine-verdict')$$
+);
+
+-- 23:55 IST fallback verdict — safety net. engine-verdict is idempotent
+-- (_verdictAlreadyPosted), so this ONLY publishes if the 23:30 run posted nothing
+-- (e.g. it errored, or Strava hadn't synced and it bailed). If 23:30 already posted,
+-- this is a no-op skip. "If no posting is done, then post" — final time, do not change.
+SELECT cron.schedule(
+  'engine-verdict-fallback',
+  '25 18 * * *',                                  -- 18:25 UTC = 23:55 IST
   $$SELECT public.firstlight_cron_call('engine-verdict')$$
 );
 
