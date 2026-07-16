@@ -631,6 +631,14 @@
         <div class="theme-toggle" style="margin:8px 0 0;gap:4px"><button data-theme-btn="dark" onclick="setTheme('dark')" title="Dark" style="width:24px;height:24px;font-size:11px">🌙</button><button data-theme-btn="light" onclick="setTheme('light')" title="Light" style="width:24px;height:24px;font-size:11px">☀️</button><button data-theme-btn="outdoor" onclick="setTheme('outdoor')" title="Outdoor" style="width:24px;height:24px;font-size:11px">🔆</button></div>
       </div>
 
+      <!-- REVIEW -->
+      <div class="cc-group open" data-group="review">
+        <div class="cc-group-header"><span class="cc-arrow">▶</span> 📊 REVIEW</div>
+        <div class="cc-group-items">
+          <div class="cc-item" data-panel="review"><span class="cc-icon">◎</span> Daily Review</div>
+        </div>
+      </div>
+
       <!-- COMMAND CENTER -->
       <div class="cc-group open" data-group="command">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 🎯 COMMAND CENTER</div>
@@ -1532,6 +1540,15 @@ firstlight.live</textarea>
             <div data-swatch="earth" style="width:48px;height:48px;background:#1A1410;border:2px solid #8D6E63;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font:600 7px var(--font-mono);color:#8D6E63;transition:all 0.2s" title="EARTH">ERTH</div>
           </div>
         </div>
+      </div>
+
+      <!-- ═══ REVIEW — private "how am I doing" dashboard (js/admin-review.js) ═══ -->
+      <div class="cc-panel" id="p-review">
+        <div style="padding:24px 0 8px">
+          <div class="cc-panel-title">DAILY REVIEW</div>
+          <div class="cc-panel-sub">Your private progress at a glance — activity · sleep · body · streak</div>
+        </div>
+        <div id="reviewRoot"></div>
       </div>
 
       <!-- ═══ APPS — ACTIVITY STUDIO (rendered by js/admin-activity-studio.js) ═══ -->
@@ -3654,6 +3671,7 @@ firstlight.live</textarea>
   <script src="js/admin-content.js"></script>
   <script src="js/admin-recap.js?v=20260620a"></script>
   <script src="js/admin-activity-studio.js?v=20260712a"></script>
+  <script src="js/admin-review.js?v=20260716a"></script>
   <script src="js/admin-dailyproof.js?v=20260619b"></script>
   <script src="js/admin-strategy.js?v=20260619a"></script>
   <script src="js/admin-receipts.js?v=20260620c"></script>
