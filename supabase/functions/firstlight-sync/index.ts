@@ -2830,7 +2830,7 @@ function _todayLocalISO(): string {
 }
 async function _todayRunStats(): Promise<{ km: number; min: number; pace: string; start: string; name: string } | null> {
   const today = _todayLocalISO()
-  const { data } = await supaAnon.from('strava_activities').select('name,type,start_date_local,distance,moving_time')
+  const { data } = await supaAdmin.from('strava_activities').select('name,type,start_date_local,distance,moving_time')
     .eq('type', 'Run').gte('start_date_local', today + 'T00:00:00').lt('start_date_local', today + 'T23:59:59')
     .order('start_date_local', { ascending: false }).limit(1)
   if (!data || !data.length) return null
@@ -2949,7 +2949,7 @@ async function emailWeeklyRecap() {
   const sevenDaysAgo = new Date(today.getTime() - 7 * 86400000).toISOString().slice(0, 10)
 
   // Pull ALL Strava activities for the week (multi-sport, not just runs)
-  const { data: actsData } = await supaAnon.from('strava_activities').select('distance,moving_time,start_date_local,type')
+  const { data: actsData } = await supaAdmin.from('strava_activities').select('distance,moving_time,start_date_local,type')
     .gte('start_date_local', sevenDaysAgo + 'T00:00:00')
   const acts = actsData || []
   const totalKm = Math.round(acts.reduce((s: number, r: { distance?: number }) => s + ((r.distance || 0) / 1000), 0) * 10) / 10
