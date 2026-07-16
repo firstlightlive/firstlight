@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<title>FIRST LIGHT — Day 12 · Missed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Playfair+Display:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1080px;height:1080px;overflow:hidden;background:#0A0C10}
+  body{
+    font-family:'IBM Plex Mono',monospace;
+    color:rgba(255,255,255,0.85);
+    padding:78px 80px;
+    display:flex;flex-direction:column;
+    position:relative;
+  }
+  /* film grain */
+  body::before{
+    content:'';position:absolute;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity:0.045;pointer-events:none;z-index:1;
+  }
+  /* warm glow from below — Akshaya Patra gold, not celebratory white */
+  body::after{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at bottom,rgba(245,166,35,0.10),transparent 62%);
+    pointer-events:none;z-index:1;
+  }
+  .wrap{position:relative;z-index:2;display:flex;flex-direction:column;height:100%}
+
+  .header{text-align:center;margin-bottom:6px}
+  .brand{font-size:22px;letter-spacing:10px;color:#F5A623;font-weight:700}
+  .day-line{font-size:15px;letter-spacing:6px;color:rgba(255,255,255,0.5);margin-top:16px}
+
+  .miss-tag{
+    text-align:center;margin:44px 0 8px;
+  }
+  .miss-word{
+    font-family:'Playfair Display',serif;font-weight:900;
+    font-size:118px;line-height:0.95;letter-spacing:-3px;
+    color:#FF5252;
+    text-shadow:0 0 60px rgba(255,82,82,0.18);
+  }
+  .miss-sub{
+    font-size:16px;letter-spacing:7px;color:rgba(255,255,255,0.45);
+    margin-top:26px;text-transform:uppercase;
+  }
+
+  .statement{
+    text-align:center;margin:40px 8px 0;
+    font-size:27px;line-height:1.5;font-weight:400;
+    color:rgba(255,255,255,0.82);
+  }
+  .statement b{color:#fff;font-weight:700}
+
+  /* the donation block — the point of the post */
+  .give{
+    margin:44px 0 0;padding:38px 34px;text-align:center;
+    background:linear-gradient(180deg,rgba(245,166,35,0.12),rgba(245,166,35,0.04));
+    border:2px solid #F5A623;border-radius:14px;
+    box-shadow:0 0 70px rgba(245,166,35,0.12),inset 0 0 34px rgba(245,166,35,0.05);
+  }
+  .give-amount{
+    font-family:'Playfair Display',serif;font-weight:900;
+    font-size:96px;line-height:1;letter-spacing:-2px;
+    background:linear-gradient(180deg,#F8D28A 10%,#F5A623);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .give-to{
+    font-size:19px;letter-spacing:4px;color:rgba(245,166,35,0.9);
+    font-weight:700;margin-top:18px;
+  }
+  .give-unit{
+    font-size:15px;letter-spacing:3px;color:rgba(255,255,255,0.55);
+    margin-top:14px;line-height:1.7;
+  }
+
+  /* streak-holds strip */
+  .hold{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    margin:36px 0 0;padding:22px 0;
+    border-top:1px solid rgba(255,255,255,0.08);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .hold-dot{width:10px;height:10px;border-radius:50%;background:#00E676;box-shadow:0 0 16px rgba(0,230,118,0.6)}
+  .hold-text{font-size:18px;letter-spacing:4px;color:rgba(255,255,255,0.8);font-weight:500}
+  .hold-text b{color:#00E676;font-weight:700}
+
+  .footer{text-align:center;margin-top:auto;padding-top:30px}
+  .footer-receipt{
+    font-size:13px;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-bottom:16px;
+  }
+  .footer-domain{font-size:17px;letter-spacing:6px;color:rgba(255,255,255,0.55)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="brand">◆ FIRST LIGHT</div>
+    <div class="day-line">DAY 12 · CHAPTER 02 · ENDURANCE</div>
+  </div>
+
+  <div class="miss-tag">
+    <div class="miss-word">MISSED.</div>
+    <div class="miss-sub">No run. No ride. No swim. No excuse.</div>
+  </div>
+
+  <div class="statement">
+    The body said no today.<br>
+    So <b>1 child says yes to lunch</b> — every school day for a year.
+  </div>
+
+  <div class="give">
+    <div class="give-amount">₹1,500</div>
+    <div class="give-to">→ AKSHAYA PATRA FOUNDATION</div>
+    <div class="give-unit">1 CHILD · 1 FULL SCHOOL YEAR · 200 MID-DAY MEALS<br>PAID IN FULL · 02 JUL 2026</div>
+  </div>
+
+  <div class="hold">
+    <span class="hold-dot"></span>
+    <span class="hold-text">THE STREAK <b>HOLDS</b>. THE DEBT IS PAID. BACK TOMORROW.</span>
+  </div>
+
+  <div class="footer">
+    <div class="footer-receipt">80G RECEIPT · BLR-225-154562 · VERIFIED</div>
+    <div class="footer-domain">firstlight.live</div>
+  </div>
+</div>
+</body>
+</html>
