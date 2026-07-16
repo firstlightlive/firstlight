@@ -249,6 +249,30 @@ async function _pullAppleForDate(dateStr: string): Promise<StravaActivityLite[] 
     _appleWorkoutToLite({ type: t, duration_min: perMin, distance_km: 0 }, dateStr))
 }
 
+// Manual uploads from the Activity Studio app (admin.html → APPS). They live
+// ONLY in strava_activities (device_name='FirstLight Studio'), written via
+// action=admin-write — invisible to both the Apple pipeline and the Strava
+// API, so the judge unions them in explicitly. Mapped with id:0 like Apple
+// candidates: no strava.com caption link, no route slide.
+const STUDIO_DEVICE = 'FirstLight Studio'
+async function _pullManualForDate(dateStr: string): Promise<StravaActivityLite[]> {
+  const { data, error } = await supaAdmin.from('strava_activities')
+    .select('type,sport_type,name,distance,moving_time,start_date_local')
+    .eq('device_name', STUDIO_DEVICE)
+    .gte('start_date_local', `${dateStr}T00:00:00`)
+    .lte('start_date_local', `${dateStr}T23:59:59`)
+  if (error || !data) return []
+  return data.map((a): StravaActivityLite => ({
+    id: 0,
+    type: a.type || '',
+    sport_type: a.sport_type || a.type || '',
+    name: a.name || 'Manual entry',
+    distance: Number(a.distance || 0),
+    moving_time: Number(a.moving_time || 0),
+    start_date_local: a.start_date_local || ''
+  }))
+}
+
 // Top-level: judge a given IST date (defaults to today). Returns VerdictResult.
 // Apple Health is PRIMARY; Strava is best-effort. PENDING only when NEITHER
 // source produced any data (system never declares MISS on infra failure).
@@ -277,13 +301,21 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Pro
     if (token) strava = await _pullStravaForDate(date, token)
   } catch (_e) { /* banned/unreachable — Apple carries the day */ }
 
+  // 3. Activity Studio manual uploads — always unioned in (they exist in no
+  //    other channel). A manual entry can never be double-counted by Apple or
+  //    Strava since neither ever sees it.
+  const manual = await _pullManualForDate(date)
+
   // Prefer Strava's candidates when it actually returned activities (richer
   // captions + GPS routes); otherwise judge on Apple. No mixing — avoids
   // double-counting the same workout seen by both sources.
-  const activities: StravaActivityLite[] = (strava && strava.length > 0) ? strava : (apple ?? [])
+  const activities: StravaActivityLite[] = [
+    ...((strava && strava.length > 0) ? strava : (apple ?? [])),
+    ...manual
+  ]
 
-  // Infra guard: NEITHER source has any data channel for this date
-  if (apple === null && (strava === null || strava.length === 0)) {
+  // Infra guard: NO source has any data channel for this date
+  if (apple === null && (strava === null || strava.length === 0) && manual.length === 0) {
     return {
       verdict: 'PENDING', date, chapterDay: day, candidates: [],
       pendingReason: 'No data from Apple Health (no health_daily row — check Health Auto Export) and Strava unavailable — NOT declaring MISS on infra failure'
