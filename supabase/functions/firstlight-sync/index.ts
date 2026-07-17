@@ -18,11 +18,39 @@ const IG_ACCOUNT_ID = '17841466893616231'
 const CHAPTER_1_START = new Date('2026-02-10T00:00:00+05:30')
 const CHAPTER_1_END = new Date('2026-06-09T00:00:00+05:30') // exclusive — Day 110 = Jun 8
 const CHAPTER_2_START = new Date('2026-06-20T00:00:00+05:30')
+// Chapter 3 FIRST LIGHT: 2026-07-18 onward (Day 1..). New rule: RUN >=5km STARTED
+// before 06:00 local. Miss = ₹1500 → Akshaya Patra. Chapter 2 closes as a monument.
+const CHAPTER_3_START = new Date('2026-07-18T00:00:00+05:30')
+const CHAPTER_3_RUN_MIN_METERS = 5000
+const CHAPTER_3_CUTOFF_HOUR = 6           // run must START before 06:00 local
+function chapterOf(date: Date | string): number {
+  const d = (date instanceof Date) ? date : new Date(date)
+  if (d.getTime() >= CHAPTER_3_START.getTime()) return 3
+  if (d.getTime() >= CHAPTER_2_START.getTime()) return 2
+  if (d.getTime() >= CHAPTER_1_START.getTime() && d.getTime() < CHAPTER_1_END.getTime()) return 1
+  return 0
+}
 function chapterDay(date: Date | string): number {
   const d = (date instanceof Date) ? date : new Date(date)
+  if (d.getTime() >= CHAPTER_3_START.getTime()) return Math.floor((d.getTime() - CHAPTER_3_START.getTime()) / 86400000) + 1
   if (d.getTime() >= CHAPTER_2_START.getTime()) return Math.floor((d.getTime() - CHAPTER_2_START.getTime()) / 86400000) + 1
   if (d.getTime() >= CHAPTER_1_START.getTime() && d.getTime() < CHAPTER_1_END.getTime()) return Math.floor((d.getTime() - CHAPTER_1_START.getTime()) / 86400000) + 1
   return 0
+}
+
+// Chapter 3 evaluator — RUN >=5km whose START time is before 06:00 local.
+// Returns the qualifying run (as a MatchedActivity-shaped object) or null.
+function evaluateChapter3(activities: StravaActivityLite[]): { bucket: keyof typeof ENDURANCE_RULE; activity: StravaActivityLite } | null {
+  const RUN_TYPES = ['Run', 'TrailRun', 'VirtualRun']
+  for (const a of activities) {
+    if (RUN_TYPES.indexOf(a.type) === -1) continue
+    if (a.distance < CHAPTER_3_RUN_MIN_METERS) continue
+    // start_date_local: "YYYY-MM-DDTHH:MM:SS..." — read the local hour
+    const m = /T(\d{2}):/.exec(a.start_date_local || '')
+    const hour = m ? parseInt(m[1], 10) : 99
+    if (hour < CHAPTER_3_CUTOFF_HOUR) return { bucket: 'run', activity: a }
+  }
+  return null
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -322,28 +350,39 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Pro
     }
   }
 
+  const toMatched = (m: { bucket: keyof typeof ENDURANCE_RULE; activity: StravaActivityLite }): MatchedActivity => {
+    const isGps = m.bucket !== 'hrSession'
+    return {
+      bucket: m.bucket,
+      activityId: m.activity.id,
+      type: m.activity.type,
+      name: m.activity.name,
+      distanceKm: isGps ? +(m.activity.distance / 1000).toFixed(2) : undefined,
+      durationMin: +(m.activity.moving_time / 60).toFixed(1)
+    }
+  }
+
+  // Chapter 3 FIRST LIGHT — RUN >=5km STARTED before 06:00 local (single-rule).
+  if (chapterOf(`${date}T12:00:00+05:30`) === 3) {
+    const match = evaluateChapter3(activities)
+    if (match) {
+      const m = toMatched(match)
+      return { verdict: 'WIN', date, chapterDay: day, candidates: activities, matched: m, allMatched: [m] }
+    }
+    const runs = activities.filter(a => ['Run', 'TrailRun', 'VirtualRun'].indexOf(a.type) !== -1)
+    const reason3 = runs.length === 0
+      ? 'No run recorded today (Chapter 3: 5km run before 6 AM).'
+      : runs.some(a => a.distance >= CHAPTER_3_RUN_MIN_METERS)
+        ? 'Ran 5km+ but not before 6:00 AM — First Light window missed.'
+        : `Ran ${(Math.max(...runs.map(a => a.distance)) / 1000).toFixed(1)}km — short of the 5km before 6 AM.`
+    return { verdict: 'MISS', date, chapterDay: day, candidates: activities, reason: reason3 }
+  }
+
+  // Chapter 2 ENDURANCE — any menu activity, any time.
   const allMatches = evaluateAllActivities(activities)
   if (allMatches.length > 0) {
-    const toMatched = (m: { bucket: keyof typeof ENDURANCE_RULE; activity: StravaActivityLite }): MatchedActivity => {
-      const isGps = m.bucket !== 'hrSession'
-      return {
-        bucket: m.bucket,
-        activityId: m.activity.id,
-        type: m.activity.type,
-        name: m.activity.name,
-        distanceKm: isGps ? +(m.activity.distance / 1000).toFixed(2) : undefined,
-        durationMin: +(m.activity.moving_time / 60).toFixed(1)
-      }
-    }
     const allMatched = allMatches.map(toMatched)
-    return {
-      verdict: 'WIN',
-      date,
-      chapterDay: day,
-      candidates: activities,
-      matched: allMatched[0],
-      allMatched
-    }
+    return { verdict: 'WIN', date, chapterDay: day, candidates: activities, matched: allMatched[0], allMatched }
   }
 
   const reason = activities.length === 0
