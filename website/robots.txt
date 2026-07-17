@@ -1,3 +1,8 @@
-# FirstLight is a private personal dashboard. Do not index anything.
+# FirstLight is a private personal dashboard.
+# Every content page carries <meta name="robots" content="noindex,nofollow,noarchive">.
+# We intentionally leave the site CRAWLABLE so search engines actually SEE the
+# noindex and DROP any previously-indexed pages. A blanket "Disallow: /" would
+# hide the noindex from crawlers and let stale results linger (per Google's
+# block-indexing docs). No sitemap is published.
 User-agent: *
-Disallow: /
+Allow: /
