@@ -40,3 +40,6 @@ watchos/**/DerivedData/
 /BLR-225-154562.pdf
 WhatsApp Image*
 firstlight-ipad-app*.zip
+
+# Payment screenshots (PII) — keep local, never commit to the PUBLIC repo
+website/day12/assets/
