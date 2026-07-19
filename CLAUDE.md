@@ -41,7 +41,7 @@
 - Deploy: firebase deploy --only hosting --project firstlightlive-5012b
 
 ### Deployment
-- Hosting: Cloudflare Workers (`cd website && npx wrangler deploy --name firstlight`) — auth as firstlightlive@gmail.com
+- Hosting: Cloudflare Workers. Deploy from the REPO ROOT: `npx wrangler deploy` (reads ./wrangler.jsonc → bundles src/worker.ts Worker + serves website/ assets) — auth as firstlightlive@gmail.com. ⚠️ NEVER deploy from `cd website` — that config is assets-only (no `main`) and, because it shares the `firstlight` worker name, it OVERWRITES the real Worker and strips all `/api/*` routes (/api/render, /api/health, /api/upload, /api/proofs), causing IG-publish "Render worker returned 404". The assets-only website/wrangler.jsonc was deleted 2026-07-19 to remove this footgun.
 - Custom domain: firstlight.live
 - Backend sync: Supabase Edge Function `firstlight-sync` at supabase/functions/firstlight-sync/index.ts. Deploy: `SUPABASE_ACCESS_TOKEN=sbp_... supabase functions deploy firstlight-sync --project-ref edgnudrbysybefbqyijq`
 - Scheduler: pg_cron jobs inside Supabase (see supabase/fix_cron_jobs.sql) — NOT Google Cloud Scheduler
