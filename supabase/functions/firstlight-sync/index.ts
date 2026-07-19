@@ -2464,7 +2464,7 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
       else if (name === 'apple_exercise_time') { if (qty != null) day.exercise_minutes = Math.round(qty) }
       else if (name === 'apple_stand_hour' || name === 'apple_stand_time') { if (qty != null) day.stand_hours = Math.round(qty) }
       else if (name === 'step_count') { if (qty != null) day.steps = Math.round(qty) }
-      else if (name === 'distance_walking_running') { if (qty != null) day.distance_km = qty }
+      else if (name === 'distance_walking_running') { if (qty != null) day.distance_km = /mi/i.test(unit) ? +(qty * 1.60934).toFixed(3) : qty }
       else if (name === 'flights_climbed') { if (qty != null) day.flights_climbed = Math.round(qty) }
       else if (name === 'walking_speed') { if (qty != null) day.walking_speed = qty }
       else if (name === 'walking_step_length') { if (qty != null) day.walking_step_length = qty }
@@ -2502,9 +2502,10 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
       type: String(w.name || 'unknown').toLowerCase().replace(/\s+/g, '_'),
       duration_min: w.duration ? Math.round(Number(w.duration) / 60) : 0,
       calories: ae ? Math.round(Number(ae.qty || 0)) : 0,
-      // HAE sends distance as {qty, units:'km'} when the workout has one —
-      // captured for the Apple-primary judge's typed distance floors
-      distance_km: dist ? +Number(dist.qty || 0).toFixed(2) : 0,
+      // HAE sends distance as {qty, units} — units follow the app's export
+      // preference (km OR mi). Convert mi→km so the judge's typed distance
+      // floors (5km run/walk, 10km cycle, 1km swim) are unit-correct regardless.
+      distance_km: dist ? +(Number(dist.qty || 0) * (/mi/i.test(String(dist.units || '')) ? 1.60934 : 1)).toFixed(2) : 0,
       start: toTime(String(w.start || '')),
       ...(routePts.length > 1 ? { route: _downsampleRoute(routePts, 400) } : {})
     })
