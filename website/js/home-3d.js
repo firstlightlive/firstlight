@@ -552,6 +552,52 @@
     }).catch(function (e) { console.error('[fetchSB] ' + table + ' error:', e); return []; });
   }
 
+  // Apple Health workouts for a date, mapped into the strava_activities card shape.
+  // health_daily is GRANT-locked away from anon, so read with the logged-in session
+  // token (authenticated role). The page is login-gated, so a session exists.
+  function fetchAppleWorkouts(dateStr) {
+    var session;
+    try { session = JSON.parse(localStorage.getItem('fl_supabase_session') || 'null'); } catch (e) { session = null; }
+    if (!session || !session.access_token) return Promise.resolve([]);
+    return fetch(SUPA + '/rest/v1/health_daily?date=eq.' + dateStr + '&select=workouts_detail', {
+      headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + session.access_token }
+    }).then(function (r) {
+      if (!r.ok) { console.warn('[home] apple health_daily HTTP ' + r.status); return []; }
+      return r.json();
+    }).then(function (rows) {
+      if (!Array.isArray(rows) || !rows.length || !Array.isArray(rows[0].workouts_detail)) return [];
+      var TYPE = { walk: 'Walk', hik: 'Hike', run: 'Run', cycl: 'Ride', bik: 'Ride', swim: 'Swim' };
+      return rows[0].workouts_detail.map(function (w) {
+        var raw = String(w.type || 'workout').toLowerCase();
+        var mapped = 'Workout';
+        for (var k in TYPE) { if (raw.indexOf(k) !== -1) { mapped = TYPE[k]; break; } }
+        var pretty = raw.replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+        return {
+          name: pretty + ' · Apple Watch',
+          type: mapped, sport_type: mapped,
+          distance: (Number(w.distance_km) || 0) * 1000,
+          moving_time: (Number(w.duration_min) || 0) * 60,
+          average_heartrate: null,
+          calories: Number(w.calories) || null,
+          start_date_local: dateStr + 'T' + (w.start || '12:00') + ':00',
+          _apple: true
+        };
+      });
+    }).catch(function (e) { console.warn('[home] apple workouts error:', e); return []; });
+  }
+
+  // Merge Strava + Apple lists; drop Apple items whose start HH:MM matches a Strava
+  // activity (same session synced to both) — Strava has richer detail (HR/pace/cal).
+  function mergeActivities(strava, apple) {
+    var stravaTimes = (strava || []).map(function (a) { return String(a.start_date_local || '').slice(11, 16); });
+    var extra = (apple || []).filter(function (a) {
+      return stravaTimes.indexOf(String(a.start_date_local || '').slice(11, 16)) === -1;
+    });
+    return (strava || []).concat(extra).sort(function (a, b) {
+      return String(a.start_date_local || '').localeCompare(String(b.start_date_local || ''));
+    });
+  }
+
   function loadLiveData() {
     var ist = (typeof getNowIST === 'function') ? getNowIST() : new Date();
     var todayStr = ist.getFullYear() + '-' + String(ist.getMonth() + 1).padStart(2, '0') + '-' + String(ist.getDate()).padStart(2, '0');
@@ -636,22 +682,27 @@
     console.log('[home] Fetching today activities for: ' + todayStr);
     var tomorrowDate = new Date(ist); tomorrowDate.setDate(ist.getDate() + 1);
     var tomorrowStr = tomorrowDate.getFullYear() + '-' + String(tomorrowDate.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrowDate.getDate()).padStart(2, '0');
-    fetchSB('strava_activities', '?start_date_local=gte.' + todayStr + 'T00:30:00&start_date_local=lt.' + tomorrowStr + 'T00:30:00&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
-      console.log('[home] Today activities result:', acts.length, 'items', acts);
-      renderActivityCards(acts || [], 'todayActivities', 'No activities logged yet today', 'Activities appear here as soon as they sync from Strava');
-      if (acts && acts.length) {
-        acts.forEach(function (a) {
-          if (a.average_heartrate) setVal('restHR', Math.round(a.average_heartrate), ' BPM');
-        });
-      }
+    Promise.all([
+      fetchSB('strava_activities', '?start_date_local=gte.' + todayStr + 'T00:30:00&start_date_local=lt.' + tomorrowStr + 'T00:30:00&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc'),
+      fetchAppleWorkouts(todayStr)
+    ]).then(function (res) {
+      var acts = mergeActivities(res[0], res[1]);
+      console.log('[home] Today activities (strava+apple):', acts.length, 'items', acts);
+      renderActivityCards(acts, 'todayActivities', 'No activities logged yet today', 'Activities appear here as soon as they sync');
+      acts.forEach(function (a) {
+        if (a.average_heartrate) setVal('restHR', Math.round(a.average_heartrate), ' BPM');
+      });
     });
 
     // Yesterday's Strava activities (from 6 AM yesterday to 6 AM today)
     var yesterday = new Date(ist);
     yesterday.setDate(ist.getDate() - 1);
     var yesterdayStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0');
-    fetchSB('strava_activities', '?start_date_local=gte.' + yesterdayStr + 'T00:30:00&start_date_local=lt.' + todayStr + 'T00:30:00&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc').then(function (acts) {
-      renderActivityCards(acts || [], 'yesterdayActivities', 'No activities logged yesterday', 'Rest day or data not yet synced');
+    Promise.all([
+      fetchSB('strava_activities', '?start_date_local=gte.' + yesterdayStr + 'T00:30:00&start_date_local=lt.' + todayStr + 'T00:30:00&select=name,type,sport_type,distance,moving_time,average_heartrate,calories,start_date_local&order=start_date_local.asc'),
+      fetchAppleWorkouts(yesterdayStr)
+    ]).then(function (res) {
+      renderActivityCards(mergeActivities(res[0], res[1]), 'yesterdayActivities', 'No activities logged yesterday', 'Rest day or data not yet synced');
     });
 
     // Lifetime stats — include sport_type for Dance/Boxing/Pilates/Yoga breakdown
