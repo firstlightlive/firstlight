@@ -37,6 +37,19 @@ function chapterDay(date: Date | string): number {
   if (d.getTime() >= CHAPTER_1_START.getTime() && d.getTime() < CHAPTER_1_END.getTime()) return Math.floor((d.getTime() - CHAPTER_1_START.getTime()) / 86400000) + 1
   return 0
 }
+// Chapter identity for rendered post footers. SINGLE SOURCE OF TRUTH: derived
+// from chapterOf() (which owns the boundary dates) and passed to the render
+// Worker in every payload. The Worker never hardcodes a chapter number, so a
+// footer can't silently go stale at a rollover the way "CHAPTER 02" did when
+// Chapter 03 launched. Add a new chapter's label here — one place — on rollover.
+const CHAPTER_BRAND: Record<number, string> = {
+  1: 'CHAPTER 01 · FOUNDATION',
+  2: 'CHAPTER 02 · ENDURANCE',
+  3: 'CHAPTER 03 · FIRST LIGHT',
+}
+function chapterBrand(date: Date | string): string {
+  return CHAPTER_BRAND[chapterOf(date)] || 'FIRST LIGHT'
+}
 
 // Chapter 3 evaluator — any RUN >=5km qualifies (WIN, streak alive). A run
 // STARTED before 06:00 local additionally earns the "first light" badge
@@ -456,6 +469,7 @@ async function _renderVerdictImage(verdict: VerdictResult, orientation: 'post' |
   const payload: Record<string, unknown> = {
     date: verdict.date,
     chapterDay: verdict.chapterDay,
+    chapter: chapterBrand(verdict.date),
     variant: verdict.verdict,
     orientation
   }
@@ -527,6 +541,7 @@ async function _renderMultiSlide(verdict: VerdictResult, variant: 'WIN_MULTI_HER
   const body = {
     date: verdict.date,
     chapterDay: verdict.chapterDay,
+    chapter: chapterBrand(verdict.date),
     variant,
     orientation,
     payload
@@ -676,6 +691,7 @@ async function _renderRouteSlide(verdict: VerdictResult, orientation: 'post' | '
   const payload = {
     date: verdict.date,
     chapterDay: verdict.chapterDay,
+    chapter: chapterBrand(verdict.date),
     variant: 'WIN_ROUTE',
     orientation,
     payload: {
@@ -1624,6 +1640,7 @@ async function _renderMonthlySlide(agg: MonthlyRecapAggregate, slideNum: number)
   const body = {
     date: `${agg.year}-${String(agg.monthNum).padStart(2,'0')}-01`,
     chapterDay: 0,
+    chapter: chapterBrand(`${agg.year}-${String(agg.monthNum).padStart(2,'0')}-01`),
     variant: 'MONTHLY_RECAP',
     orientation: 'post',
     payload: {

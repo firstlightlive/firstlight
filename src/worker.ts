@@ -202,6 +202,7 @@ interface MultiActivityItem {
 interface RenderRequest {
   date: string                          // YYYY-MM-DD
   chapterDay: number
+  chapter?: string                      // footer brand e.g. "CHAPTER 03 · FIRST LIGHT" — supplied by the edge fn (single source of truth for chapter identity)
   variant: 'WIN' | 'MISS' | 'WIN_ROUTE' | 'WIN_MULTI_HERO' | 'WIN_MULTI_MAP' | 'WIN_MULTI_GRID' | 'WIN_MULTI_SUMMARY' | 'MONTHLY_RECAP' | 'CHAPTER_KICKOFF_HERO' | 'CHAPTER_KICKOFF_PROMISE' | 'CHAPTER_KICKOFF_MENU'
   orientation: 'post' | 'story'
   payload: {
@@ -371,6 +372,14 @@ function resolveTheme(req: RenderRequest, defaultName: ThemeName): Theme {
   return THEMES[requested] || THEMES[defaultName]
 }
 
+// Chapter brand line for image footers. The edge function owns the chapter
+// boundary dates and passes the label in every render request, so it is the
+// single source of truth. The fallback is the program brand — never a hardcoded
+// chapter number — so a footer can never silently go stale at a chapter rollover.
+function chapterBrand(req: RenderRequest): string {
+  return req.chapter || 'FIRST LIGHT'
+}
+
 function renderWinSvg(req: RenderRequest): string {
   const W = 1080
   const H = req.orientation === 'story' ? 1920 : 1080
@@ -419,7 +428,7 @@ function renderWinSvg(req: RenderRequest): string {
         fill="${t.accent}" letter-spacing="6">◆ FIRST LIGHT</text>
   <text x="${W / 2}" y="${cy - off(310)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(20)}" font-weight="500"
-        fill="${t.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE</text>
+        fill="${t.dim}" letter-spacing="6">${chapterBrand(req)}</text>
 
   <!-- Day number -->
   <text x="${W / 2}" y="${cy + off(80)}" text-anchor="middle"
@@ -489,7 +498,7 @@ function renderMissSvg(req: RenderRequest): string {
         fill="${COLORS.gold}" letter-spacing="6">◆ FIRST LIGHT</text>
   <text x="${W / 2}" y="${cy - off(310)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(20)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE</text>
+        fill="${COLORS.dim}" letter-spacing="6">${chapterBrand(req)}</text>
 
   <!-- Day number -->
   <text x="${W / 2}" y="${cy + off(80)}" text-anchor="middle"
@@ -711,7 +720,7 @@ async function renderWinRouteSvg(req: RenderRequest, env: Env): Promise<string> 
         fill="${t.accent}" letter-spacing="6">GPS VERIFIED</text>
   <text x="${W / 2}" y="${req.orientation === 'story' ? 150 : 138}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500"
-        fill="${t.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
+        fill="${t.dim}" letter-spacing="4">${chapterBrand(req)} · DAY ${day}</text>
 
   <!-- Stats panel — solid black band -->
   <rect x="0" y="${PANEL_Y}" width="${W}" height="${H - PANEL_Y}" fill="#000000"/>
@@ -822,7 +831,7 @@ function _recapHeader(monthLabel: string, slideLabel: string): string {
         fill="${COLORS.cyan}" letter-spacing="6">${escapeXml(monthLabel)}</text>
   <text x="${W_REC / 2}" y="138" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · ${escapeXml(slideLabel)}</text>`
+        fill="${COLORS.dim}" letter-spacing="4">${chapterBrand(req)} · ${escapeXml(slideLabel)}</text>`
 }
 
 function _recapFooter(): string {
@@ -833,7 +842,7 @@ function _recapFooter(): string {
 }
 
 // SLIDE 1 — Cover/Hero
-function _recapSlide1Cover(_req: RenderRequest, m: MonthlyRecapPayload): string {
+function _recapSlide1Cover(req: RenderRequest, m: MonthlyRecapPayload): string {
   const heroPct = m.daysInWindow > 0 ? Math.round((m.hitDays / m.daysInWindow) * 100) : 0
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W_REC} ${H_REC}" width="${W_REC}" height="${H_REC}">
@@ -844,7 +853,7 @@ function _recapSlide1Cover(_req: RenderRequest, m: MonthlyRecapPayload): string 
         fill="${COLORS.cyan}" letter-spacing="8">◆ FIRST LIGHT</text>
   <text x="${W_REC / 2}" y="210" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="20" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE</text>
+        fill="${COLORS.dim}" letter-spacing="6">${chapterBrand(req)}</text>
 
   <text x="${W_REC / 2}" y="340" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="42" font-weight="700"
@@ -1083,7 +1092,7 @@ function _recapSlide6CharityImpact(_req: RenderRequest, m: MonthlyRecapPayload):
 }
 
 // SLIDE 7 — Closing CTA
-function _recapSlide7Closing(_req: RenderRequest, m: MonthlyRecapPayload): string {
+function _recapSlide7Closing(req: RenderRequest, m: MonthlyRecapPayload): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W_REC} ${H_REC}" width="${W_REC}" height="${H_REC}">
   ${_recapBg(`<linearGradient id="next" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${COLORS.text}"/><stop offset="100%" stop-color="${COLORS.cyan}"/></linearGradient>`)}
@@ -1093,7 +1102,7 @@ function _recapSlide7Closing(_req: RenderRequest, m: MonthlyRecapPayload): strin
         fill="${COLORS.cyan}" letter-spacing="8">◆ FIRST LIGHT</text>
   <text x="${W_REC / 2}" y="250" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="20" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE</text>
+        fill="${COLORS.dim}" letter-spacing="6">${chapterBrand(req)}</text>
 
   <text x="${W_REC / 2}" y="450" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="42" font-weight="700"
@@ -1115,7 +1124,7 @@ function _recapSlide7Closing(_req: RenderRequest, m: MonthlyRecapPayload): strin
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CHAPTER 02 KICK-OFF CAROUSEL — 3 slides
+// CHAPTER KICK-OFF CAROUSEL — 3 slides (chapter label supplied per-request)
 // HERO · PROMISE · RULES  with India tricolor accent
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1162,7 +1171,7 @@ function _kickoffFooter(text = '◆ FIRST LIGHT  ·  firstlight.live'): string {
 }
 
 // ── SLIDE 1 · HERO ── "DAY 01 BEGINS NOW"
-function renderKickoffHeroSvg(_req: RenderRequest): string {
+function renderKickoffHeroSvg(req: RenderRequest): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
   ${_kickoffBg(`<linearGradient id="hero" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${COLORS.text}"/><stop offset="100%" stop-color="${COLORS.cyan}"/></linearGradient>`)}
@@ -1188,7 +1197,7 @@ function renderKickoffHeroSvg(_req: RenderRequest): string {
   <!-- Chapter subtitle -->
   <text x="540" y="780" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="22" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">CHAPTER 02  ·  ENDURANCE</text>
+        fill="${COLORS.dim}" letter-spacing="6">${chapterBrand(req)}</text>
 
   <!-- Swipe prompt -->
   <text x="540" y="900" text-anchor="middle"
@@ -1414,7 +1423,7 @@ function renderMultiHeroSvg(req: RenderRequest): string {
         fill="${t.accent}" letter-spacing="6">◆ FIRST LIGHT</text>
   <text x="${W / 2}" y="${cy - off(310)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(20)}" font-weight="500"
-        fill="${t.dim}" letter-spacing="6">CHAPTER 02 · ENDURANCE · STACK DAY</text>
+        fill="${t.dim}" letter-spacing="6">${chapterBrand(req)} · STACK DAY</text>
 
   <!-- Day number -->
   <text x="${W / 2}" y="${cy + off(60)}" text-anchor="middle"
@@ -1533,7 +1542,7 @@ async function renderMultiMapSvg(req: RenderRequest, env: Env): Promise<string> 
         fill="${t.accent}" letter-spacing="6">GPS · ALL ROUTES</text>
   <text x="${W / 2}" y="${req.orientation === 'story' ? 150 : 138}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500"
-        fill="${t.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
+        fill="${t.dim}" letter-spacing="4">${chapterBrand(req)} · DAY ${day}</text>
 
   <!-- Stats panel -->
   <rect x="0" y="${PANEL_Y}" width="${W}" height="${H - PANEL_Y}" fill="${t.bg}"/>
@@ -1606,7 +1615,7 @@ function renderMultiGridSvg(req: RenderRequest): string {
         fill="${t.accent}" letter-spacing="6">THE BREAKDOWN</text>
   <text x="${W / 2}" y="${req.orientation === 'story' ? 150 : 138}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500"
-        fill="${t.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day} · ${activities.length} ACTIVITIES</text>
+        fill="${t.dim}" letter-spacing="4">${chapterBrand(req)} · DAY ${day} · ${activities.length} ACTIVITIES</text>
 
   <!-- Grid -->
   ${cards}
@@ -1699,7 +1708,7 @@ function renderMultiSummarySvg(req: RenderRequest): string {
         fill="${t.accent}" letter-spacing="6">STACK DAY · COMPLETE</text>
   <text x="${W / 2}" y="${isStory ? 180 : 138}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 22 : 18}" font-weight="500"
-        fill="${t.dim}" letter-spacing="4">CHAPTER 02 · ENDURANCE · DAY ${day}</text>
+        fill="${t.dim}" letter-spacing="4">${chapterBrand(req)} · DAY ${day}</text>
 
   <!-- Seal -->
   <g filter="url(#seal-glow)">

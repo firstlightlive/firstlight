@@ -1,0 +1,11 @@
+# Supabase project config.
+# Minimal by design — only pins per-function settings that MUST survive deploys.
+project_id = "edgnudrbysybefbqyijq"
+
+# firstlight-sync is called by pg_cron, the HAE health webhook, and admin_key
+# URL params — none of which send a Supabase JWT. It MUST deploy with JWT
+# verification OFF, or every cron verdict / webhook / admin call returns
+# "UNAUTHORIZED_NO_AUTH_HEADER". Pinning it here means `supabase functions
+# deploy firstlight-sync` no longer depends on remembering `--no-verify-jwt`.
+[functions.firstlight-sync]
+verify_jwt = false
