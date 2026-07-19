@@ -2625,7 +2625,15 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
         if (dn > 0) proofRow.day_number = dn
         await supaUpsert('proof_archive', proofRow, 'date')
 
-        await supaUpsert('daily_logs', { date, sleep_hrs: finalSleepHours, wake_time: row.wake_time || null }, 'date')
+        try {
+          await supaUpsert('daily_logs', { date, sleep_hrs: finalSleepHours, wake_time: row.wake_time || null }, 'date')
+        } catch (dlErr) {
+          // daily_logs is the sealed accountability ledger — history-locked past days
+          // correctly refuse edits. A backfill must NOT rewrite a sealed verdict, but it
+          // MUST still land the raw health_metrics/health_daily below. Swallow the lock,
+          // re-throw anything else.
+          if (!/HISTORY LOCKED/i.test((dlErr as Error).message)) throw dlErr
+        }
       }
 
       // Individual metrics
