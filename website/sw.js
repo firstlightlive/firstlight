@@ -6,7 +6,7 @@
 // IMPORTANT: bump SHELL_VERSION on every deploy that ships changes to the
 // precached files (HTML/CSS/JS in SHELL_ASSETS). Pre-deploy check warns if
 // you forget. Without a bump, installed PWAs stay pinned to the prior cache.
-const SHELL_VERSION = 'fl-shell-v18';
+const SHELL_VERSION = 'fl-shell-v19';
 const SUPA_CACHE   = 'fl-supa-reads-v3';
 const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 
@@ -16,7 +16,7 @@ const SHELL_ASSETS = [
   '/admin.html',
   '/punch.html',
   '/install.html',
-  '/login.html',
+  '/login',
   '/index.html',
   '/styles.css',
   '/app.js?v=20260619a',
@@ -121,20 +121,31 @@ self.addEventListener('fetch', (event) => {
 // ── SHELL — cache-first, network-revalidate ───────────
 async function handleShell(req) {
   try {
-    const cached = await caches.match(req);
+    let cached = await caches.match(req);
+    // A REDIRECTED response (e.g. /login.html → /login) is rejected by the browser
+    // when served for a navigation ("moved permanently" / "cannot be reached").
+    // Rebuild it clean, and never cache one.
+    if (cached && cached.redirected) cached = await stripRedirect(cached);
     const fetchPromise = fetch(req)
-      .then((resp) => {
-        if (resp && resp.ok && resp.type === 'basic') {
+      .then(async (resp) => {
+        if (resp && resp.ok && resp.type === 'basic' && !resp.redirected) {
           const clone = resp.clone();
           caches.open(SHELL_VERSION).then((c) => c.put(req, clone)).catch(() => {});
         }
-        return resp;
+        return (resp && resp.redirected) ? stripRedirect(resp) : resp;
       })
       .catch(() => cached); // network down → fall back to cache
     return cached || fetchPromise;
   } catch (e) {
     return fetch(req);
   }
+}
+
+// Rebuild a redirected response as a plain 200 so the browser accepts it for a
+// navigation request (redirected responses fail page loads under a service worker).
+async function stripRedirect(resp) {
+  const body = await resp.blob();
+  return new Response(body, { status: 200, statusText: 'OK', headers: new Headers(resp.headers) });
 }
 
 // ── SUPABASE — pass-through online, queue/cache offline ──
