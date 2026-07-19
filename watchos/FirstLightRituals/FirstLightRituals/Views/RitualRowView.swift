@@ -29,6 +29,9 @@ struct RitualRowView: View {
                     .strikethrough(done, color: .white.opacity(0.4))
                 HStack(spacing: 4) {
                     Text(item.cat).flMono(8).foregroundStyle(.white.opacity(0.3)).kerning(1)
+                    if item.tier == 1 {
+                        Text("◆ KEY").flMono(8, weight: .bold).foregroundStyle(FLTheme.gold).kerning(1)
+                    }
                     if inactive {
                         Text("off").flMono(8).foregroundStyle(.white.opacity(0.35))
                     } else if item.id == "m_earthing" {

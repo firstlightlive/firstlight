@@ -18,9 +18,9 @@ const IG_ACCOUNT_ID = '17841466893616231'
 const CHAPTER_1_START = new Date('2026-02-10T00:00:00+05:30')
 const CHAPTER_1_END = new Date('2026-06-09T00:00:00+05:30') // exclusive — Day 110 = Jun 8
 const CHAPTER_2_START = new Date('2026-06-20T00:00:00+05:30')
-// Chapter 3 FIRST LIGHT: 2026-07-18 onward (Day 1..). New rule: RUN >=5km STARTED
+// Chapter 3 FIRST LIGHT: 2026-07-19 onward (Day 1..). New rule: RUN >=5km STARTED
 // before 06:00 local. Miss = ₹1500 → Akshaya Patra. Chapter 2 closes as a monument.
-const CHAPTER_3_START = new Date('2026-07-18T00:00:00+05:30')
+const CHAPTER_3_START = new Date('2026-07-19T00:00:00+05:30')
 const CHAPTER_3_RUN_MIN_METERS = 5000
 const CHAPTER_3_CUTOFF_HOUR = 6           // run must START before 06:00 local
 function chapterOf(date: Date | string): number {
@@ -38,19 +38,23 @@ function chapterDay(date: Date | string): number {
   return 0
 }
 
-// Chapter 3 evaluator — RUN >=5km whose START time is before 06:00 local.
-// Returns the qualifying run (as a MatchedActivity-shaped object) or null.
-function evaluateChapter3(activities: StravaActivityLite[]): { bucket: keyof typeof ENDURANCE_RULE; activity: StravaActivityLite } | null {
+// Chapter 3 evaluator — any RUN >=5km qualifies (WIN, streak alive). A run
+// STARTED before 06:00 local additionally earns the "first light" badge
+// (firstLight=true); the time is NOT required to keep the streak. Prefers a
+// first-light run when one exists, else falls back to any 5km run of the day.
+function evaluateChapter3(activities: StravaActivityLite[]): { bucket: keyof typeof ENDURANCE_RULE; activity: StravaActivityLite; firstLight: boolean } | null {
   const RUN_TYPES = ['Run', 'TrailRun', 'VirtualRun']
+  let fallback: { bucket: keyof typeof ENDURANCE_RULE; activity: StravaActivityLite; firstLight: boolean } | null = null
   for (const a of activities) {
     if (RUN_TYPES.indexOf(a.type) === -1) continue
     if (a.distance < CHAPTER_3_RUN_MIN_METERS) continue
     // start_date_local: "YYYY-MM-DDTHH:MM:SS..." — read the local hour
     const m = /T(\d{2}):/.exec(a.start_date_local || '')
     const hour = m ? parseInt(m[1], 10) : 99
-    if (hour < CHAPTER_3_CUTOFF_HOUR) return { bucket: 'run', activity: a }
+    if (hour < CHAPTER_3_CUTOFF_HOUR) return { bucket: 'run', activity: a, firstLight: true }
+    if (!fallback) fallback = { bucket: 'run', activity: a, firstLight: false }
   }
-  return null
+  return fallback
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -105,6 +109,7 @@ interface VerdictResult {
   candidates: StravaActivityLite[]
   reason?: string                       // MISS only
   pendingReason?: string                // PENDING only
+  firstLight?: boolean                  // Chapter 3 WIN: run started before 06:00 local (badge)
 }
 
 // Single-match rule evaluator (back-compat) — returns FIRST qualifying activity
@@ -362,19 +367,22 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Pro
     }
   }
 
-  // Chapter 3 FIRST LIGHT — RUN >=5km STARTED before 06:00 local (single-rule).
+  // Chapter 3 FIRST LIGHT — the ENDURANCE menu keeps the streak (5km walk/run, 10km
+  // cycle, 1km swim, or 30min session), any time before midnight. A qualifying
+  // activity STARTED before 06:00 local earns the "first light" badge (not required).
   if (chapterOf(`${date}T12:00:00+05:30`) === 3) {
-    const match = evaluateChapter3(activities)
-    if (match) {
-      const m = toMatched(match)
-      return { verdict: 'WIN', date, chapterDay: day, candidates: activities, matched: m, allMatched: [m] }
+    const allMatches = evaluateAllActivities(activities)
+    if (allMatches.length > 0) {
+      const allMatched = allMatches.map(toMatched)
+      const firstLight = allMatches.some(mm => {
+        const hm = /T(\d{2}):/.exec(mm.activity.start_date_local || '')
+        return hm ? parseInt(hm[1], 10) < CHAPTER_3_CUTOFF_HOUR : false
+      })
+      return { verdict: 'WIN', date, chapterDay: day, candidates: activities, matched: allMatched[0], allMatched, firstLight }
     }
-    const runs = activities.filter(a => ['Run', 'TrailRun', 'VirtualRun'].indexOf(a.type) !== -1)
-    const reason3 = runs.length === 0
-      ? 'No run recorded today (Chapter 3: 5km run before 6 AM).'
-      : runs.some(a => a.distance >= CHAPTER_3_RUN_MIN_METERS)
-        ? 'Ran 5km+ but not before 6:00 AM — First Light window missed.'
-        : `Ran ${(Math.max(...runs.map(a => a.distance)) / 1000).toFixed(1)}km — short of the 5km before 6 AM.`
+    const reason3 = activities.length === 0
+      ? 'No qualifying activity today (Chapter 3 menu: 5km walk/run, 10km cycle, 1km swim, or 30min session).'
+      : `Found ${activities.length} activities, none met the menu floor (walk/run >=5km, cycle >=10km, swim >=1km, session >=30min).`
     return { verdict: 'MISS', date, chapterDay: day, candidates: activities, reason: reason3 }
   }
 
@@ -806,9 +814,10 @@ function _generateCaption(verdict: VerdictResult): string {
         ? opener.replace('{DIST}', m.distanceKm.toFixed(1))
         : `Day ${day}. ${Math.round(m.durationMin)} minutes, logged.`
     }
-    const statLine = m.distanceKm
+    const badge = verdict.firstLight ? ' · before first light' : ''
+    const statLine = (m.distanceKm
       ? `${m.distanceKm.toFixed(1)} km · ${m.type}`
-      : `${Math.round(m.durationMin)} min · ${m.type}`
+      : `${Math.round(m.durationMin)} min · ${m.type}`) + badge
     const tags = (HASHTAGS_BY_SPORT[m.bucket] || HASHTAGS_BY_SPORT.run).join(' ')
     // Strava link — only for GPS sports with a real activity ID
     const isGps = m.bucket !== 'hrSession'
@@ -1053,11 +1062,28 @@ async function _emailVerdictMiss(verdict: VerdictResult, post: PublishedPost) {
     `Day ${day} MISS. Donate ₹${STAKE_AMOUNT} via UPI: ${upi}. Then comment receipt on: ${link}`)
 }
 
+// Sent when a MISS is HELD pending operator confirmation (miss-confirm gate).
+// Nothing has been posted publicly yet — the operator confirms (post) or disputes (do nothing).
+async function _emailMissConfirmRequest(verdict: VerdictResult) {
+  const day = verdict.chapterDay
+  const ledger = 'https://firstlight.live/accountability.html'
+  const html = _emailShell(`Day ${day} — MISS held for your confirmation`, `
+    <p style="font-size:18px;color:#fff">The engine judged Day ${day} a MISS — but nothing has been posted publicly.</p>
+    <p style="color:#888">${verdict.reason || ''}</p>
+    <p style="margin:24px 0;color:#D4A843;font-weight:700">It's on the ledger and held private. Open your admin app to decide:</p>
+    <p style="color:#888">• <strong style="color:#fff">Confirm</strong> → the miss posts publicly and the ₹${STAKE_AMOUNT.toLocaleString('en-IN')} donation flow starts.<br>
+       • <strong style="color:#fff">Dispute</strong> (the run happened, the feed missed it) → do nothing. No public post goes out.</p>
+    <p style="color:#888;margin-top:24px">Ledger: <a href="${ledger}" style="color:#00D4FF">${ledger}</a></p>
+  `)
+  await _sendEmail(`[FIRSTLIGHT ⏸] Day ${day} — MISS held, awaiting your confirmation`, html,
+    `Day ${day} judged MISS — held private, nothing posted. Open admin to Confirm (post + donate) or Dispute (do nothing).`)
+}
+
 async function _emailNudge(verdict: VerdictResult) {
   const day = verdict.chapterDay
   const html = _emailShell(`Day ${day} — 2.5h left`, `
     <p style="font-size:18px;color:#fff">No qualifying activity yet.</p>
-    <p style="color:#888">Window closes at 23:30 IST. Menu: 5km walk · 5km run · 10km cycle · 1km swim · 30min HR session.</p>
+    <p style="color:#888">Window closes at 23:59 IST. Chapter 03: a 5 km run keeps the streak — before 6 AM earns the first-light mark.</p>
   `)
   await _sendEmail(`[FIRSTLIGHT] Day ${day} — 2.5h left, no qualifying activity yet`, html, `Day ${day} — 2.5h left, no qualifying activity yet.`)
 }
@@ -1085,6 +1111,7 @@ interface EngineRunResult {
   alreadyDone?: boolean
   publishedPost?: PublishedPost
   publishedStory?: PublishedPost
+  missAwaitingConfirm?: boolean
   emailsSent: string[]
   errors: string[]
 }
@@ -1140,7 +1167,7 @@ async function runNudge(): Promise<EngineRunResult> {
 // If publish fails after step 3, DB has verdict but no ig_post_id. Next cron run
 // is idempotent-skipped; operator gets publish-failure email and can manually clear
 // the proof_archive row to retry. Worst case: ledger shows verdict without IG link.
-async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republish?: boolean }): Promise<EngineRunResult> {
+async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republish?: boolean; confirmMiss?: boolean }): Promise<EngineRunResult> {
   const result: EngineRunResult = { phase: 'verdict', date: opts?.date || todayIST(), emailsSent: [], errors: [] }
 
   // Republish path: re-sync Strava FIRST so the matched activity (and its GPS
@@ -1208,6 +1235,23 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republ
   } catch (err) {
     result.errors.push(`DB write failed (skipping publish to avoid stuck state): ${(err as Error).message}`)
     try { await _emailPublishFailure(verdict, err as Error); result.emailsSent.push('db-failure') } catch (_e) { /* tolerate */ }
+    return result
+  }
+
+  // ── MISS-CONFIRM GATE ──
+  // The slip is on the ledger now (written above) and the ₹ is owed regardless.
+  // But a MISS is NOT auto-posted to public Instagram until the operator confirms
+  // it — this stops a flaky data feed (Strava ban / Apple Health gaps) from
+  // auto-shaming a day the run actually happened. WINs are never gated.
+  //   Confirm a real miss:  ?action=confirm-miss&date=YYYY-MM-DD  (posts it)
+  //   Dispute a false miss: do nothing — no public post ever goes out.
+  if (verdict.verdict === 'MISS' && !opts?.confirmMiss) {
+    result.missAwaitingConfirm = true
+    result.errors.push(`MISS_AWAITING_CONFIRM — slip recorded; public post HELD pending confirmation. Confirm: ?action=confirm-miss&date=${result.date}`)
+    try {
+      await _emailMissConfirmRequest(verdict)
+      result.emailsSent.push('miss-confirm-request')
+    } catch (_e) { /* tolerate */ }
     return result
   }
 
@@ -3378,8 +3422,39 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Health ingest — uses its own secret
-  if (action === 'health-ingest') {
+  // ── Strava OAuth code exchange (called by /strava-connect.html after authorize) ──
+  // GET ?action=strava-connect&code=XXX — swaps the one-time authorize code for
+  // access+refresh tokens using the stored client_id/secret, stores them, returns
+  // the athlete. No admin key (the code itself is the one-time secret); anon JWT
+  // (platform gate) is enough. Overwrites the old banned app's tokens.
+  if (action === 'strava-connect') {
+    const code = url.searchParams.get('code')
+    if (!code) return new Response(JSON.stringify({ success: false, error: 'missing ?code=' }), { status: 400, headers })
+    const clientId = await getSecret('strava_client_id')
+    const clientSecret = await getSecret('strava_client_secret')
+    try {
+      const resp = await fetch('https://www.strava.com/oauth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `client_id=${clientId}&client_secret=${clientSecret}&code=${encodeURIComponent(code)}&grant_type=authorization_code`
+      })
+      const data = await resp.json()
+      if (data.access_token) {
+        await setSecret('strava_access', data.access_token)
+        await setSecret('strava_refresh', data.refresh_token)
+        return new Response(JSON.stringify({ success: true, athlete: data.athlete?.firstname || 'you', athleteId: data.athlete?.id }), { headers })
+      }
+      return new Response(JSON.stringify({ success: false, error: data.message || 'exchange failed', detail: data }), { status: 400, headers })
+    } catch (e) {
+      return new Response(JSON.stringify({ success: false, error: (e as Error).message }), { status: 500, headers })
+    }
+  }
+
+  // Health ingest — uses its own secret. Routes on EITHER ?action=health-ingest
+  // OR the mere presence of the x-webhook-secret header, so clients (e.g. Health
+  // Auto Export) that drop/mangle the URL query string still reach this handler
+  // by sending the secret header alone against the bare function URL.
+  if (action === 'health-ingest' || req.headers.get('x-webhook-secret')) {
     const webhookSecret = await getSecret('health_webhook_secret')
     const provided = req.headers.get('x-webhook-secret') || ''
     if (webhookSecret && provided !== webhookSecret) {
@@ -3546,6 +3621,20 @@ Deno.serve(async (req) => {
         }, null, 2), { headers })
       }
       const result = await runVerdict({ date, republish: true })
+      return new Response(JSON.stringify(result, null, 2), { headers })
+    }
+
+    // ── CONFIRM a held MISS → publish it publicly (operator gate for #2) ──
+    // The nightly verdict records a MISS to the ledger but HOLDS the public IG
+    // post pending confirmation (guards against false misses). This publishes it.
+    // republish:true re-syncs + re-judges + bypasses the idempotency lock, so if
+    // the day is now a WIN (late sync) a WIN posts instead — a false miss self-heals.
+    if (action === 'confirm-miss') {
+      const date = url.searchParams.get('date')
+      if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return new Response(JSON.stringify({ error: 'confirm-miss requires ?date=YYYY-MM-DD' }), { status: 400, headers })
+      }
+      const result = await runVerdict({ date, confirmMiss: true, republish: true })
       return new Response(JSON.stringify(result, null, 2), { headers })
     }
 

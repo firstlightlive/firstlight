@@ -22,6 +22,7 @@ struct RitualDef: Codable, Identifiable, Hashable {
     let desc: String
     let cat: String
     let active: Bool
+    let tier: Int?          // 1 = keystone (antifragile core); nil/2 = bonus
 }
 
 struct RitualBlock: Codable, Identifiable, Hashable {

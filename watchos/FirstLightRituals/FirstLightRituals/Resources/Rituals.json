@@ -1,5 +1,5 @@
 {
-  "version": "2026-06-12-v5",
+  "version": "2026-07-19-v6",
   "generated_at_note": "run scripts/generate-watch-rituals.js to regenerate — do not hand-edit",
   "generated_from": [
     "website/js/admin-rituals.js",
@@ -8,7 +8,7 @@
   "total_active": {
     "morning": 27,
     "midday": 15,
-    "evening": 30
+    "evening": 29
   },
   "periods": {
     "morning": {
@@ -23,9 +23,10 @@
               "time12": "3:30",
               "time24": "03:30",
               "title": "Alarm — Wake immediately",
-              "desc": "Zero negotiation. The alarm is a command, not a suggestion. Feet on cold floor activates cortisol awakening response. No snooze. Ever. 3:30 AM is decided at 9:30 PM the night before.",
+              "desc": "Zero negotiation. The alarm is a command, not a suggestion. Feet on cold floor activates cortisol awakening response. No snooze. Ever. 3:30 AM is decided at 8:45 PM the night before.",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "m_tongue_scraper",
@@ -34,7 +35,8 @@
               "title": "Tongue scraper (copper)",
               "desc": "Removes Ama (toxins). 30 seconds. Before any water or food enters the mouth. Ayurvedic morning detox.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_oil_pull",
@@ -43,7 +45,8 @@
               "title": "Oil pull (coconut oil)",
               "desc": "Start swishing immediately before any water. Standing in bathroom. Mouth completely dry. Pulls bacteria, whitens teeth, strengthens gums. 3-4 min.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_cold_dive",
@@ -52,7 +55,8 @@
               "title": "Cold water dive reflex",
               "desc": "While still swishing oil. Vagus nerve activated. Full wakefulness. Resets nervous system. BIOHACK.",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "m_spit_oil",
@@ -61,7 +65,8 @@
               "title": "Spit oil pull + rinse",
               "desc": "Spit into trash, not sink. Rinse mouth with warm water. Oil pulling complete — bacteria removed, gums strengthened.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_brush",
@@ -70,7 +75,8 @@
               "title": "Brush teeth",
               "desc": "After oil pull, not before. Brush thoroughly. Clean slate before fenugreek water enters the system.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_fenugreek",
@@ -79,7 +85,8 @@
               "title": "Fenugreek water (soaked overnight)",
               "desc": "Soak 1 tsp methi overnight in copper vessel. Copper ionises water, kills bacteria, thyroid support. Total 250ml.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_chyawanprash",
@@ -88,7 +95,8 @@
               "title": "Chyawanprash (1 tsp)",
               "desc": "2-3 min after fenugreek. Empty stomach. Amla Vit C absorbed by 4:27 AM when collagen arrives — direct co-factor for synthesis. Immunity. Ojas.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -104,7 +112,8 @@
               "title": "Marma point self-massage",
               "desc": "Vagbhata. Ajna 30s, Hridaya 30s, Nabhi 30s clockwise. 2 min. Full body energy activated. Pressure points.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_pranayama",
@@ -113,7 +122,8 @@
               "title": "Pranayama (Nadi Shodhana)",
               "desc": "Nadi Shodhana or Kapalabhati. Open air rooftop. Phone away. 5 min compressed. SACRED.",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_japa",
@@ -122,7 +132,8 @@
               "title": "Japa (108 beads)",
               "desc": "Mala or silent. Phone away. Full presence. Do not suppress. Pure witnessing. Japa = concentration. This = equanimity.",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_thai_meditation",
@@ -131,7 +142,8 @@
               "title": "Thai forest meditation",
               "desc": "Sit still after Japa. Close eyes. A sound arises — note: sound. A thought — thinking. A sensation — sensation. Do not follow. Do not suppress. 3 min open awareness.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_earthing",
@@ -140,7 +152,8 @@
               "title": "Earthing — bare feet on ground (SUNDAY ONLY)",
               "desc": "SUNDAY ONLY — not possible on weekdays. Eyes open to sky. 3 things spoken aloud. Step onto grass or earth. Bare skin contact. Morning gratitude is an opening, not a review.",
               "cat": "BIOHACK",
-              "active": false
+              "active": false,
+              "tier": 2
             },
             {
               "id": "m_brahmacharya",
@@ -149,7 +162,8 @@
               "title": "Brahmacharya mala (intention set)",
               "desc": "",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_collagen",
@@ -158,7 +172,8 @@
               "title": "Collagen peptides + lemon water",
               "desc": "Rooftop, empty stomach. Amino acids peak ~5:20 AM = mid-run. Vitamin C is the direct co-factor for collagen synthesis. 30 min clear gap before food.",
               "cat": "FUEL",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -174,7 +189,8 @@
               "title": "L-Carnitine + Creatine",
               "desc": "Drop tablet, dissolve 60 sec, add Creatine 5g, stir. Rinse glass. L-Carnitine 2000mg activates in 5-8 min. Run at 4:35 AM. FUEL.",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "m_ikigai",
@@ -183,7 +199,8 @@
               "title": "Ikigai spoken aloud",
               "desc": "I am not trying to win. I am refusing to stop. Said with conviction. Every single morning.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_sattu",
@@ -192,7 +209,8 @@
               "title": "Sattu drink",
               "desc": "100g Sattu + 350ml water + half lemon + pinch of salt. Takes under a minute. Drink steadily while driving.",
               "cat": "FUEL",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_box_breathing",
@@ -201,7 +219,8 @@
               "title": "Box breathing (4-4-4-4)",
               "desc": "Alert neutrality. Engine on, car stationary. 5 rounds. Then go. Navy SEAL protocol.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -217,7 +236,8 @@
               "title": "Post-workout meal FIRST (protein + carbs)",
               "desc": "EAT BEFORE HOT SHOWER. 20-40g protein + fast carbs within 20-30 min of gym end = anabolic window. Eggs / whey / paneer + banana or rice. mTOR pathway is open NOW. Hot shower after eating = vasodilation delivers nutrients to muscles. Science: PMC11780495 (2024).",
               "cat": "FUEL",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_hot_shower",
@@ -226,7 +246,8 @@
               "title": "Hot shower (38-42°C, 10 min)",
               "desc": "AFTER cool-down + meal. 38-42°C for 10 min. Vasodilation: blood vessels expand, nutrients delivered to worked muscles. Growth hormone mild pulse. Cortisol drops. Does NOT suppress mTOR (unlike cold after gym). Science: Scandinavian J Medicine 2024.",
               "cat": "SKIN",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_moisturiser",
@@ -235,7 +256,8 @@
               "title": "Moisturiser + sunscreen",
               "desc": "",
               "cat": "SKIN",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_free_writing",
@@ -244,7 +266,8 @@
               "title": "Free writing (commute/office)",
               "desc": "",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -260,7 +283,8 @@
               "title": "Ginger lime shot",
               "desc": "",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_oats_paneer",
@@ -269,7 +293,8 @@
               "title": "Oats + paneer breakfast",
               "desc": "Post-gym meal at 7:05 already covers nutrition. This is removed from daily tracking.",
               "cat": "FUEL",
-              "active": false
+              "active": false,
+              "tier": 2
             },
             {
               "id": "m_shata_pada",
@@ -278,7 +303,8 @@
               "title": "Shata Pada (100 steps after meal)",
               "desc": "",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_sunlight",
@@ -287,7 +313,8 @@
               "title": "Sunlight exposure (5 min)",
               "desc": "",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "m_vitamins",
@@ -296,7 +323,8 @@
               "title": "Vitamins (D3+K2, Omega-3)",
               "desc": "",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "m_cdp_choline",
@@ -305,7 +333,8 @@
               "title": "CDP-Choline",
               "desc": "Not required daily — disabled from routine tracking. Re-enable manually on days of use.",
               "cat": "BIOHACK",
-              "active": false
+              "active": false,
+              "tier": 2
             },
             {
               "id": "m_review_blocks",
@@ -314,7 +343,8 @@
               "title": "Review time blocks for the day",
               "desc": "",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         }
@@ -334,7 +364,8 @@
               "title": "Posture reset + desk ergonomics",
               "desc": "Spine straight, shoulders back, monitor at eye level. 30 sec body scan. Prevent tech neck and lower back compression.",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_eye_rest",
@@ -343,7 +374,8 @@
               "title": "20-20-20 eye rule",
               "desc": "Every 20 minutes look at something 20 feet away for 20 seconds. Do a full 2-minute eye rest — palming, blinking, distance gaze.",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_hydration",
@@ -352,7 +384,8 @@
               "title": "Hydration check (750ml by noon)",
               "desc": "Track water intake. Minimum 3L per day target. Copper vessel preferred. Room temperature or warm.",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_stretch",
@@ -361,7 +394,8 @@
               "title": "Standing stretch (5 min)",
               "desc": "Neck rolls, shoulder shrugs, hip flexor stretch, hamstring stretch. Counter the damage of sitting. Every joint.",
               "cat": "MOVE",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_breathwork",
@@ -370,7 +404,8 @@
               "title": "Box breathing (2 min)",
               "desc": "4-4-4-4 pattern. Resets cortisol after morning deep work blocks. Parasympathetic activation before lunch.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -386,7 +421,8 @@
               "title": "Lunch — dal, roti, sabzi, salad",
               "desc": "No white rice. No fried items. Food code applies. Eat mindfully — no phone, no laptop. Chew 32 times. Last solid meal before 6 PM sprout mix.",
               "cat": "FUEL",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "mid_shata_pada",
@@ -395,7 +431,8 @@
               "title": "Shata Pada (100 steps after lunch)",
               "desc": "Walk 100 steps after every meal. Vagbhata prescription. Aids digestion, prevents insulin spikes. Non-negotiable.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_triphala_water",
@@ -404,7 +441,8 @@
               "title": "Warm water (copper vessel)",
               "desc": "Sip warm water 15-20 min after lunch. Never cold water with meals — kills Agni. Ayurvedic digestive fire protection.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -420,7 +458,8 @@
               "title": "Green tea + L-Theanine",
               "desc": "Afternoon nootropic stack. L-Theanine 200mg + green tea. Calm focus without jitters. No coffee after 12 PM (sleep hygiene).",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_nuts",
@@ -429,7 +468,8 @@
               "title": "Handful of soaked almonds/walnuts",
               "desc": "Brain fuel. Soaked overnight for better absorption. 8-10 almonds + 3 walnuts. Omega-3 for afternoon cognitive performance.",
               "cat": "FUEL",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_sunlight",
@@ -438,7 +478,8 @@
               "title": "Afternoon sunlight (5 min)",
               "desc": "Huberman protocol — late afternoon sun viewing helps set circadian clock for proper melatonin onset. No sunglasses. Direct exposure.",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_gratitude_micro",
@@ -447,7 +488,8 @@
               "title": "Micro-gratitude (1 thing)",
               "desc": "Pause. One specific thing from today. Say it internally. Resets hedonic adaptation. Afternoon anchor point.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -463,7 +505,8 @@
               "title": "End-of-work task review",
               "desc": "Review deep work blocks completed. Flag unfinished items for tomorrow. Capture loose threads before shutdown.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_inbox_zero",
@@ -472,7 +515,8 @@
               "title": "Inbox zero pass",
               "desc": "Process remaining messages. Reply, delegate, or defer. Clean digital workspace before evening covenant begins.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "mid_shutdown",
@@ -481,7 +525,8 @@
               "title": "Shutdown ritual — \"Shutdown complete\"",
               "desc": "Cal Newport shutdown ritual. Review calendar for tomorrow. Say \"Shutdown complete\" out loud. Work brain OFF. Evening brain ON.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         }
@@ -501,7 +546,8 @@
               "title": "Laptop close — HARD STOP",
               "desc": "Work ends at 7 PM. Non-negotiable. Treated like the morning run — no exceptions, no \"just 5 more minutes\". 8:30 PM sleep is decided here.",
               "cat": "SLEEP",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "e_internet_off",
@@ -510,7 +556,8 @@
               "title": "Internet OFF",
               "desc": "",
               "cat": "SLEEP",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_sprout_mix",
@@ -519,7 +566,8 @@
               "title": "Sprout mix (moong/chana)",
               "desc": "Last food of the day. 1.5h before sleep. Light meal = stomach clear by 8:30 PM. Empty stomach sleep = full recovery mode. Growth hormone maximised. Evening Covenant begins.",
               "cat": "FUEL",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_shata_pada",
@@ -528,7 +576,8 @@
               "title": "Shata Pada (100 steps)",
               "desc": "",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -544,7 +593,8 @@
               "title": "Tomorrow planning (time blocks)",
               "desc": "Write tomorrow's plan NOW so 3:30 AM wake has zero decision-making. Pre-decide everything.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_copper_vessel",
@@ -553,7 +603,8 @@
               "title": "Fill copper vessel + soak methi",
               "desc": "",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_gym_bag",
@@ -562,7 +613,8 @@
               "title": "Gym bag packed",
               "desc": "",
               "cat": "MOVE",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_clothes",
@@ -571,7 +623,8 @@
               "title": "Clothes laid out (run + gym kit)",
               "desc": "",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_supplements_out",
@@ -580,7 +633,8 @@
               "title": "Supplements laid out",
               "desc": "",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_keys",
@@ -589,7 +643,8 @@
               "title": "Keys + essentials ready",
               "desc": "",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_hot_water",
@@ -598,7 +653,8 @@
               "title": "Hot water ready (thermos)",
               "desc": "",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_loban",
@@ -607,7 +663,8 @@
               "title": "Loban (frankincense) lit",
               "desc": "",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -621,9 +678,10 @@
               "time12": "7:25",
               "time24": "19:25",
               "title": "Cold water dive reflex",
-              "desc": "Evening dose. Resets nervous system after the day. Vagus nerve activation. Face submerge 30s.",
+              "desc": "MOVED TO MORNING (post-run) - evening cold raises arousal and fights the magnesium + glycine sleep stack. Kept in the list, off daily tracking.",
               "cat": "BIOHACK",
-              "active": true
+              "active": false,
+              "tier": 2
             },
             {
               "id": "e_coconut_oil",
@@ -632,7 +690,8 @@
               "title": "Coconut oil (face + body)",
               "desc": "",
               "cat": "SKIN",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_nasya",
@@ -641,7 +700,8 @@
               "title": "Nasya oil (2 drops per nostril)",
               "desc": "Lubricates brain pathway. Improves sleep quality. Every night. 30 days = visible difference.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_mula_bandha",
@@ -650,7 +710,8 @@
               "title": "Mula Bandha practice",
               "desc": "Root lock. Engage 10s, release, 10 reps. Ayurvedic energy conservation. Upward movement of Ojas.",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_abhyanga",
@@ -659,7 +720,8 @@
               "title": "Abhyanga (self oil massage)",
               "desc": "",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_shilajit",
@@ -668,7 +730,8 @@
               "title": "Shilajit (purified resin)",
               "desc": "Evening dose — 40 min after sprout mix. OR take in morning (pre-run fasted = also valid). Overnight recovery, testosterone, mitochondrial repair. Warm water, alone.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_olive_oil_navel",
@@ -677,7 +740,8 @@
               "title": "Olive oil on navel",
               "desc": "",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -693,7 +757,8 @@
               "title": "Magnesium + Triphala + Glycine",
               "desc": "Magnesium glycinate 400mg + Triphala + Glycine 3g. All in warm water. Glycine lowers core body temperature = sleep onset trigger. Completes collagen cycle.",
               "cat": "BIOHACK",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "e_warm_milk",
@@ -702,7 +767,8 @@
               "title": "Warm milk + Ashwagandha",
               "desc": "400-500ml + turmeric + black pepper + Ashwagandha 600mg + Jatamansi + 2 tbsp cottage cheese. Sip slowly. Casein protein overnight = muscle repair.",
               "cat": "AYUR",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
@@ -718,13 +784,14 @@
               "title": "Night prep confirmed ✓",
               "desc": "",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             }
           ]
         },
         {
           "id": "eblk5",
-          "name": "REFLECTION + SLEEP (8:05-8:30)",
+          "name": "REFLECTION + SLEEP (8:05-8:45)",
           "start24": "20:05",
           "items": [
             {
@@ -734,7 +801,8 @@
               "title": "Roman Examen (review of conscience)",
               "desc": "3 min written. What aligned. What did not. What changes tomorrow. Final line: Tomorrow I will improve [one specific micro-thing] by 1%. Kaizen. 1% daily = 37x better in one year.",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_3_wins",
@@ -743,7 +811,8 @@
               "title": "3 Wins of the day",
               "desc": "3 wins written + \"This happened because...\" Internal locus of control. Harvard: strongest longevity predictor.",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_reverse_replay",
@@ -752,7 +821,8 @@
               "title": "Reverse day replay (end to start)",
               "desc": "",
               "cat": "MIND",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_gratitude",
@@ -761,7 +831,8 @@
               "title": "Gratitude (3 things)",
               "desc": "",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_trataka",
@@ -770,7 +841,8 @@
               "title": "Trataka (candle gazing)",
               "desc": "Fixed gaze on flame. 5 min. Sharpens concentration, improves eyesight, calms mind. SACRED.",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_hooponopono",
@@ -779,7 +851,8 @@
               "title": "Ho’oponopono prayer",
               "desc": "4 phrases directed at anyone with mild irritation: I love you. I’m sorry. Please forgive me. Thank you. Held resentment = chronic cortisol = accelerated aging. 3 min Hawaiian forgiveness.",
               "cat": "SACRED",
-              "active": true
+              "active": true,
+              "tier": 2
             },
             {
               "id": "e_cyclic_sighing",
@@ -788,16 +861,18 @@
               "title": "Cyclic sighing (5 min)",
               "desc": "",
               "cat": "SLEEP",
-              "active": true
+              "active": true,
+              "tier": 1
             },
             {
               "id": "e_lights_out",
-              "time12": "9:30",
-              "time24": "21:30",
+              "time12": "8:45",
+              "time24": "20:45",
               "title": "LIGHTS OUT",
-              "desc": "3:30 AM is decided here. 9:30 PM → 3:30 AM = 6h sleep (personal optimal, not 7.5h standard). The morning is won or lost in the first 60 seconds of this moment.",
+              "desc": "3:30 AM is decided here. 8:45 PM → 3:30 AM = ~6h45m sleep (evidence-corrected up from 6h). The morning is won or lost in the first 60 seconds of this moment.",
               "cat": "SLEEP",
-              "active": true
+              "active": true,
+              "tier": 1
             }
           ]
         }

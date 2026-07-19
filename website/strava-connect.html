@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Connect Strava — First Light</title>
+<style>
+  html,body{margin:0;height:100%;background:#0A0C10;color:#E8EDF2;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+  .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:40px 24px;box-sizing:border-box}
+  .mark{font-size:12px;letter-spacing:4px;color:#FC4C02;margin-bottom:28px}
+  .spin{width:44px;height:44px;border:3px solid rgba(252,76,2,0.2);border-top-color:#FC4C02;
+    border-radius:50%;animation:s 0.9s linear infinite;margin:0 auto 24px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  #msg{font-size:18px;line-height:1.6;max-width:520px}
+  .ok{color:#00E676}.err{color:#FF5252}
+  .detail{font-size:11px;color:#5a6b80;margin-top:16px;max-width:520px;word-break:break-word;line-height:1.6}
+  a{color:#00D4FF}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mark">◆ FIRST LIGHT · STRAVA</div>
+  <div class="spin" id="spin"></div>
+  <div id="msg">Connecting your Strava…</div>
+  <div class="detail" id="detail"></div>
+</div>
+<script>
+  var SUPA = "https://edgnudrbysybefbqyijq.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0.UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk";
+  function done(cls, text, detail){
+    document.getElementById('spin').style.display='none';
+    var m=document.getElementById('msg'); m.className=cls; m.innerHTML=text;
+    if(detail) document.getElementById('detail').textContent=detail;
+  }
+  var p = new URLSearchParams(location.search);
+  var code = p.get('code'), err = p.get('error');
+  if(err){ done('err','❌ Strava said: '+err+'<br><small>Re-check the app’s callback domain is <b>firstlight.live</b>.</small>'); }
+  else if(!code){ done('err','No authorization code in the URL.<br><small>Open the authorize link again.</small>'); }
+  else {
+    fetch(SUPA + "/functions/v1/firstlight-sync?action=strava-connect&code=" + encodeURIComponent(code),
+      { method:"POST", headers:{ "Authorization":"Bearer "+ANON, "Content-Type":"application/json" } })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d && d.success){ done('ok','✅ Connected as <b>'+(d.athlete||'you')+'</b>!<br><small>You can close this tab. Head back to the chat.</small>'); }
+        else { done('err','❌ '+((d&&d.error)||'Connection failed'), d&&d.detail? JSON.stringify(d.detail).slice(0,400):''); }
+      })
+      .catch(function(e){ done('err','❌ '+e.message); });
+  }
+</script>
+</body>
+</html>

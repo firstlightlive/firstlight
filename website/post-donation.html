@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Donation Post — First Light</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#07090d;color:#E8EDF2;font-family:'Inter',sans-serif;padding:26px 14px 70px}
+  h1{font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:3px;color:#F5A623;text-align:center;margin:0 0 20px}
+  .grid{display:flex;flex-wrap:wrap;gap:22px;justify-content:center;align-items:flex-start}
+  .col{text-align:center}
+  canvas{border-radius:14px;box-shadow:0 14px 50px rgba(0,0,0,.55);background:#0A0C10}
+  #feed{width:360px}#story{width:230px}
+  .cap{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#7c8ba0;margin-top:9px}
+  .caption{max-width:620px;margin:30px auto 0;background:#0f131b;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px 22px}
+  .caption h3{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:#F5A623;margin:0 0 10px}
+  .caption pre{white-space:pre-wrap;font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;color:#cfd8e3;margin:0}
+</style>
+</head>
+<body>
+  <h1>◆ FIRST LIGHT · DONATION POST (preview)</h1>
+  <div class="grid">
+    <div class="col"><canvas id="feed" width="1080" height="1080"></canvas><div class="cap">FEED · 1080×1080</div></div>
+    <div class="col"><canvas id="story" width="1080" height="1920"></canvas><div class="cap">STORY · 1080×1920</div></div>
+  </div>
+  <div class="caption"><h3>CAPTION</h3><pre id="cap"></pre></div>
+
+<script>
+const CAPTION = "₹3,000 → Akshaya Patra.\n\nTwo children. One full academic year of mid-day meals.\n\nThe system holds. The ledger stays honest.\n\nfirstlight.live";
+document.getElementById('cap').textContent = CAPTION;
+const GOLD='#F5A623', GREEN='#00E676', DIM='rgba(255,255,255,0.5)';
+function grain(ctx,w,h){ctx.save();for(let i=0;i<w*h/650;i++){ctx.fillStyle='rgba(255,255,255,'+(Math.random()*0.016)+')';ctx.fillRect(Math.random()*w,Math.random()*h,1.3,1.3);}ctx.restore();}
+function spread(s){return s.split('').join(' ');}
+
+function render(ctx,w,h){
+  ctx.fillStyle='#0A0C10';ctx.fillRect(0,0,w,h);
+  // gold halo
+  const g=ctx.createRadialGradient(w/2,h*0.40,60,w/2,h*0.40,w*0.72);
+  g.addColorStop(0,'rgba(245,166,35,0.10)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  ctx.textAlign='center';
+  const cy=h*0.40;
+  // top tag
+  ctx.fillStyle=GOLD;ctx.font='700 26px "IBM Plex Mono"';ctx.fillText(spread('◆ FIRST LIGHT · THE LEDGER'), w/2, h*0.135);
+  // hero amount
+  ctx.fillStyle='#fff';ctx.font='700 '+(w*0.24)+'px "IBM Plex Mono"';ctx.fillText('₹3,000', w/2, cy);
+  ctx.fillStyle=GREEN;ctx.font='700 34px "IBM Plex Mono"';ctx.fillText(spread('→ AKSHAYA PATRA'), w/2, cy+70);
+  // divider
+  ctx.strokeStyle='rgba(245,166,35,0.4)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w/2-70,cy+130);ctx.lineTo(w/2+70,cy+130);ctx.stroke();
+  // impact
+  ctx.fillStyle='#fff';ctx.font='700 40px "IBM Plex Mono"';ctx.fillText('2 CHILDREN FED', w/2, cy+230);
+  ctx.fillStyle=DIM;ctx.font='500 26px "IBM Plex Mono"';ctx.fillText('one full academic year · ~400 meals', w/2, cy+282);
+  // honest line
+  ctx.fillStyle='rgba(255,255,255,0.65)';ctx.font='500 26px "IBM Plex Mono"';
+  ctx.fillText('The system holds.', w/2, h*0.80);
+  ctx.fillText('The ledger stays honest.', w/2, h*0.80+40);
+  // footer
+  ctx.fillStyle='rgba(255,255,255,0.35)';ctx.font='500 24px "IBM Plex Mono"';ctx.fillText('firstlight.live', w/2, h*0.93);
+  grain(ctx,w,h);
+}
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(()=>{
+  render(document.getElementById('feed').getContext('2d'),1080,1080);
+  render(document.getElementById('story').getContext('2d'),1080,1920);
+},60));
+</script>
+</body>
+</html>

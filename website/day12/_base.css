@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Playfair+Display:wght@800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0C10; --gold:#F5A623; --gold-lt:#F8D28A;
+  --red:#FF5252; --green:#00E676; --ink:rgba(255,255,255,0.85);
+  --mono:'IBM Plex Mono',monospace; --serif:'Playfair Display',serif;
+}
+html,body{background:var(--bg);overflow:hidden}
+body{font-family:var(--mono);color:var(--ink);position:relative;display:flex;flex-direction:column}
+/* film grain */
+body::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.045;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.wrap{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:space-between;height:100%;width:100%}
+.brand{font-size:22px;letter-spacing:10px;color:var(--gold);font-weight:700;text-align:center}
+.day-line{font-size:15px;letter-spacing:6px;color:rgba(255,255,255,0.5);margin-top:16px;text-align:center}
+.serif-hero{font-family:var(--serif);font-weight:900;line-height:0.92;letter-spacing:-3px}
+.pageno{position:absolute;bottom:44px;right:56px;z-index:3;font-size:15px;letter-spacing:4px;color:rgba(255,255,255,0.35)}
+.swipe{position:absolute;bottom:44px;left:56px;z-index:3;font-size:14px;letter-spacing:4px;color:var(--gold);opacity:0.8}
+.domain{font-size:17px;letter-spacing:6px;color:rgba(255,255,255,0.5);text-align:center}

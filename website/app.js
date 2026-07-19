@@ -41,7 +41,7 @@ function initTheme() {
 
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
-  STREAK_START: '2026-06-20',
+  STREAK_START: '2026-07-19',
   STAKE_PER_DAY: 1500,
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',
@@ -2566,21 +2566,21 @@ async function updateDaysMissed() {
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
 
   // Chapter dates (string-based for ISO-8601 safety)
-  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-06-20'
+  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-07-19' — current chapter (03 FIRST LIGHT)
 
   // Count slips per chapter (string comparison, no timezone issues)
-  var chapter1Slips = slips.filter(function(slip) {
+  var priorSlips = slips.filter(function(slip) {
     return slip.date && slip.date < streakStart;
   });
-  var chapter2Slips = slips.filter(function(slip) {
+  var currentSlips = slips.filter(function(slip) {
     return slip.date && slip.date >= streakStart;
   });
 
-  // Update main counter (Chapter 2 only)
-  el.textContent = chapter2Slips.length || '0';
+  // Update main counter (current chapter only)
+  el.textContent = currentSlips.length || '0';
 
-  // Update phase breakdown if elements exist
-  updatePhaseBreakdown(chapter1Slips.length, chapter2Slips.length);
+  // Update phase breakdown if elements exist (prior chapters vs current)
+  updatePhaseBreakdown(priorSlips.length, currentSlips.length);
 }
 
 function updatePhaseBreakdown(ch1Count, ch2Count) {
@@ -2624,8 +2624,8 @@ async function updateClaimedAmount() {
       console.log('[Claims] Record fields:', Object.keys(data[0]));
     }
 
-    // Only count Chapter 2 claims (from STREAK_START onwards, string-based for safety)
-    var streakStart = FL_DEFAULTS.STREAK_START; // '2026-06-20'
+    // Only count current-chapter claims (from STREAK_START onwards, string-based for safety)
+    var streakStart = FL_DEFAULTS.STREAK_START; // '2026-07-19'
     console.log('[Claims] Streak start constant:', streakStart);
 
     var chapter2Claims = data.filter(function(c) {

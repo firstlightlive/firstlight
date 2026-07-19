@@ -252,8 +252,9 @@
 <body>
 
 <!-- NAV -->
-<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">HOME</a><a href="streak.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link active">HOW IT WORKS</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
-<div class="nav-mobile"><a href="index.html" class="nav-link">HOME</a><a href="streak.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">EVIDENCE</a><a href="accountability.html" class="nav-link">ACCOUNTABILITY</a><a href="instagram.html" class="nav-link">INSTAGRAM</a><a href="marathon.html" class="nav-link">RACES</a><a href="ironman.html" class="nav-link">IRONMAN</a><a href="programs.html" class="nav-link">PROGRAMS</a><a href="about.html" class="nav-link">ABOUT</a><a href="story.html" class="nav-link">MY STORY</a><a href="system.html" class="nav-link active">HOW IT WORKS</a></div>
+<nav class="nav"><div class="nav-inner"><a href="index.html" class="nav-brand"><span class="diamond">◆</span> FIRST LIGHT <span class="nav-day"><span class="pulse-dot"></span> <span data-nav-day>—</span></span></a><div class="nav-links"><a href="index.html" class="nav-link">HOME</a><a href="streak.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">PROOF</a><a href="strava.html" class="nav-link">STRAVA</a><a href="ironman.html" class="nav-link">TRAINING</a><a href="about.html" class="nav-link active">ABOUT</a></div><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+<div class="nav-mobile"><a href="index.html" class="nav-link">HOME</a><a href="streak.html" class="nav-link">STREAK</a><a href="covenant.html" class="nav-link">RULES</a><a href="proof.html" class="nav-link">PROOF</a><a href="strava.html" class="nav-link">STRAVA</a><a href="ironman.html" class="nav-link">TRAINING</a><a href="about.html" class="nav-link active">ABOUT</a></div>
+  <div class="fl-subnav" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:11px 16px;background:rgba(10,12,16,0.72);border-bottom:1px solid rgba(255,255,255,0.06);font-family:'IBM Plex Mono',monospace;position:relative;z-index:40;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);"><a href="about.html" style="padding:7px 16px;border-radius:6px;border:1px solid transparent;font-size:11px;font-weight:700;letter-spacing:1.5px;text-decoration:none;color:rgba(255,255,255,0.55);background:transparent;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">ABOUT</a><a href="story.html" style="padding:7px 16px;border-radius:6px;border:1px solid transparent;font-size:11px;font-weight:700;letter-spacing:1.5px;text-decoration:none;color:rgba(255,255,255,0.55);background:transparent;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">MY STORY</a><a href="system.html" style="padding:7px 16px;border-radius:6px;border:1px solid rgba(245,166,35,0.4);font-size:11px;font-weight:700;letter-spacing:1.5px;text-decoration:none;color:#F5A623;background:rgba(245,166,35,0.12);-webkit-tap-highlight-color:transparent;touch-action:manipulation;">HOW IT WORKS</a></div>
 <script>
 (function(){var t=document.querySelector('.nav-toggle'),m=document.querySelector('.nav-mobile');if(!t||!m)return;t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var o=m.classList.contains('open');if(o){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';}else{t.classList.add('open');m.classList.add('open');document.body.style.cssText='overflow:hidden;position:fixed;width:100%;top:-'+window.scrollY+'px';}});m.querySelectorAll('.nav-link').forEach(function(a){a.addEventListener('click',function(){t.classList.remove('open');m.classList.remove('open');document.body.style.cssText='';});});})();
 </script>
@@ -447,7 +448,7 @@
         <div style="position:absolute;left:-35px;top:4px;width:14px;height:14px;border-radius:50%;background:#00D4FF;box-shadow:0 0 12px rgba(0,212,255,0.4)"></div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#00D4FF;margin-bottom:6px">STEP 4 — QUALIFYING ACTIVITY CHECK</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E8EDF2;font-weight:700;margin-bottom:6px">At 23:30 IST, the engine queries Strava directly. Not the admin.</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">The Edge Function pulls every Strava activity for the IST day and checks the menu thresholds — <span style="color:#00D4FF">5 km walk, 5 km run, 10 km cycle, 1 km swim, or 30 min HR session</span>. Distance and duration are read from Strava's API response, not the browser. If anything qualifies, verdict = WIN. If nothing does, verdict = MISS. The admin can't fake distance or backdate an activity — Strava timestamps are <span style="color:#00D4FF">cryptographically signed at upload</span>.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a9bb0;line-height:1.7">The Edge Function pulls every activity for the IST day and checks the menu — <span style="color:#00D4FF">5 km walk/run, 10 km cycle, 1 km swim, or 30 min session (before 6:00 AM earns the first-light mark)</span>. Distance and start time are read from the Strava / Apple Health API response, not the browser. If any menu activity qualifies, verdict = WIN. If nothing does, verdict = MISS. The admin can't fake distance or backdate an activity — Strava timestamps are <span style="color:#00D4FF">cryptographically signed at upload</span>.</div>
       </div>
 
       <!-- Step 5 -->
@@ -604,7 +605,7 @@
     <div class="feat-card">
       <div class="feat-icon">⚖️</div>
       <div class="feat-title">ONE EXEMPTION — HOSPITALIZATION</div>
-      <div class="feat-desc">Knee hurts? Swim. Foot hurt? Cycle. Both? Upper-body HR session. The menu has 5 options — only literal medical incapacitation pauses the clock. "Tired" is not an exemption. <a href="accountability.html" style="color:#00D4FF">View the ledger →</a></div>
+      <div class="feat-desc">One real activity from the menu, before 6:00 AM. Only literal medical incapacitation pauses the clock. "Tired" is not an exemption. <a href="accountability.html" style="color:#00D4FF">View the ledger →</a></div>
     </div>
     <div class="feat-card">
       <div class="feat-icon">📡</div>
@@ -618,17 +619,17 @@
     </div>
   </div>
 
-  <!-- CHAPTER 02 ENDURANCE SUMMARY -->
+  <!-- CHAPTER 03 FIRST LIGHT SUMMARY -->
   <div style="margin-top:48px;max-width:640px;margin-left:auto;margin-right:auto;padding:28px 28px 20px;background:rgba(0,0,0,0.5);border:1px solid rgba(0,230,118,0.15);border-radius:12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 0 40px rgba(0,230,118,0.03),inset 0 0 60px rgba(0,0,0,0.3)">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:3px;color:#00E676;margin-bottom:20px;text-align:center">CHAPTER 02 — ENDURANCE</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:3px;color:#00E676;margin-bottom:20px;text-align:center">CHAPTER 03 — FIRST LIGHT</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div style="padding:14px 16px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.12);border-radius:8px">
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">MISS FEE</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00E676">₹1,500<span style="font-size:10px;color:#5a6a7a;font-weight:400">/miss</span></div>
       </div>
       <div style="padding:14px 16px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.12);border-radius:8px">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">DAILY MENU</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00E676">5 OPTIONS<span style="font-size:10px;color:#5a6a7a;font-weight:400"> · any one</span></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">THE RULE</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#00E676">THE MENU<span style="font-size:10px;color:#5a6a7a;font-weight:400"> · one/day</span></div>
       </div>
       <div style="padding:14px 16px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.12);border-radius:8px">
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;letter-spacing:1px;margin-bottom:6px">CHARITY</div>
@@ -639,7 +640,7 @@
         <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#FF5252">HOSPITAL ONLY</div>
       </div>
     </div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;margin-top:16px;text-align:center;line-height:1.7;font-style:italic">Flat ₹1,500 — no escalation. One activity per day. Streak measures consecutive days of honesty: activity logged OR payment made.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5a6a7a;margin-top:16px;text-align:center;line-height:1.7;font-style:italic">Flat ₹1,500 — no escalation. One menu activity every day (aim for before 6 AM — the first-light mark). Streak measures consecutive days of honesty: activity logged OR payment made.</div>
   </div>
 </section>
 

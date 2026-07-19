@@ -16,6 +16,18 @@ window.FL_CHAPTERS = [
     escalations: 'FULL',
     status: 'COMPLETE',
     closingNote: 'The first 110 days. No end date set. The body adapted. The system stood.'
+  },
+  {
+    id: 2,
+    name: 'ENDURANCE',
+    start: '2026-06-20',
+    end: '2026-07-18',
+    days: 29,
+    rule: '5KM ANY MOTION DAILY',
+    stakePerDay: 1500,
+    escalations: 'FLAT — NO ESCALATION',
+    status: 'COMPLETE',
+    closingNote: 'Any motion, every day — walk, run, cycle, swim, or a sweat session. The chapter that kept the streak alive through injury and dead sensors, then handed off to the morning run.'
   }
 ];
 
@@ -28,23 +40,22 @@ window.FL_BREAK = {
 };
 
 window.FL_CURRENT_CHAPTER = {
-  id: 2,
-  name: 'ENDURANCE',
-  start: '2026-06-20',
-  rule: '5KM ANY MOTION DAILY',
+  id: 3,
+  name: 'FIRST LIGHT',
+  start: '2026-07-19',
+  rule: 'ONE FROM THE MENU · AIM BEFORE 6AM',
   stakePerDay: 1500,
   escalations: 'FLAT — NO ESCALATION',
   status: 'ACTIVE',
   charity: { name: 'Akshaya Patra', upi: 'donate@akshayapatra' },
   menu: [
-    '5 km walk (any pace)',
-    '5 km run',
+    '5 km walk or run',
     '10 km cycle',
     '1 km swim',
-    '30 min HR-elevated session (boxing / Zumba / gym / yoga)'
+    '30 min HR-elevated session (gym / boxing / yoga / HIIT)'
   ],
   exemption: 'HOSPITALIZATION ONLY',
-  notes: 'Move every day — one item from the menu. Miss = ₹1,500 to Akshaya Patra (1 child fed for a full academic year), receipt published. No exemptions except hospitalization. Streak measures consecutive days of honesty (activity logged OR payment made).'
+  notes: 'One activity from the menu, every day — 5 km walk/run, 10 km cycle, 1 km swim, or a 30-min session. Start it before first light (6:00 AM local) to earn the day its "first light" mark; but any menu activity before midnight keeps the streak alive. Miss entirely = ₹1,500 to Akshaya Patra (1 child fed for a full academic year), receipt published. Only exemption: hospitalization.'
 };
 
 window.FL_LIFETIME = {

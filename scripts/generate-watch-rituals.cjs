@@ -104,7 +104,8 @@ for (const period of ['morning', 'midday', 'evening']) {
       title: it.title,
       desc: it.desc || '',
       cat: it.cat || '',
-      active: it.active !== false
+      active: it.active !== false,
+      tier: it.tier === 1 ? 1 : 2
     };
     b.items.push(entry);
     if (b.start24 === null || entry.time24 < b.start24) b.start24 = entry.time24;
@@ -132,7 +133,7 @@ assert(totalActive.morning === 27, `morning active must be 27, got ${totalActive
 assert(periods.midday.blocks.reduce((s, b) => s + b.items.length, 0) === 15, 'midday must have 15 items');
 assert(totalActive.midday === 15, `midday active must be 15, got ${totalActive.midday}`);
 assert(periods.evening.blocks.reduce((s, b) => s + b.items.length, 0) === 30, 'evening must have 30 items');
-assert(totalActive.evening === 30, `evening active must be 30, got ${totalActive.evening}`);
+assert(totalActive.evening === 29, `evening active must be 29, got ${totalActive.evening}`);
 assert(seed.weekend.saturday.length === 7, 'saturday must have 7 tasks');
 assert(seed.weekend.sunday.length === 10, 'sunday must have 10 tasks');
 assert(seed.weekend.saturday.every(t => /^sat_[a-z_]+$/.test(t.id)), 'sat ids');
@@ -143,10 +144,10 @@ assert(find('morning', 'm_alarm').time24 === '03:30', 'm_alarm 03:30');
 assert(find('midday', 'mid_lunch').time24 === '13:30', 'mid_lunch 13:30');
 assert(find('midday', 'mid_posture_check').time24 === '12:00', 'mid_posture_check 12:00');
 assert(find('evening', 'e_laptop_close').time24 === '19:00', 'e_laptop_close 19:00');
-assert(find('evening', 'e_lights_out').time24 === '21:30', 'e_lights_out 21:30');
+assert(find('evening', 'e_lights_out').time24 === '20:45', 'e_lights_out 20:45');
 const inactive = ['morning', 'midday', 'evening']
   .flatMap(p => periods[p].blocks.flatMap(b => b.items)).filter(i => !i.active).map(i => i.id).sort();
-assert(JSON.stringify(inactive) === JSON.stringify(['m_cdp_choline', 'm_earthing', 'm_oats_paneer']),
+assert(JSON.stringify(inactive) === JSON.stringify(['e_cold_dive', 'm_cdp_choline', 'm_earthing', 'm_oats_paneer']),
   `inactive set drifted: ${inactive.join(',')}`);
 
 // ── Write ───────────────────────────────────────────────────────────────────

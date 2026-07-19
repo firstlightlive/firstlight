@@ -34,3 +34,9 @@ node_modules/
 watchos/**/xcuserdata/
 watchos/**/*.xcuserstate
 watchos/**/DerivedData/
+
+# Stray local files — kept on disk, never committed to the PUBLIC repo
+/firstlight-ipad-app.zip
+/BLR-225-154562.pdf
+WhatsApp Image*
+firstlight-ipad-app*.zip

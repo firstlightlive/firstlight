@@ -18,7 +18,7 @@
   var SYNC_URL = SUPA + '/functions/v1/firstlight-sync';
   var ADMIN_KEY = ['934c03a18ffe22cb', 'ccef763b4bf480d5', '3f0690177904ba2b', '1d9ebacd52b0eb5d'].join('');
   var IG_ACCOUNT = '17841466893616231';
-  var CH3_START = '2026-07-18';
+  var CH3_START = '2026-07-19';
   var CUTOFF_HOUR = 6, MIN_KM = 5;
   var MONO = '"IBM Plex Mono", monospace';
   var GOLD = '#F5A623', GREEN = '#00E676', RED = '#FF5252', CYAN = '#00D4FF';

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Post Design Preview — First Light</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#07090d;--pan:#0f131b;--line:rgba(255,255,255,.07);--dim:#7c8ba0}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:#E8EDF2;font-family:'Inter',sans-serif;padding:28px 16px 80px}
+  h1{font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:3px;color:#F5A623;text-align:center;margin:0 0 4px}
+  .sub{text-align:center;color:var(--dim);font-size:12px;margin-bottom:22px}
+  .controls{max-width:400px;margin:0 auto 26px;text-align:center}
+  .up{display:inline-block;padding:11px 18px;border:1px solid rgba(245,166,35,.5);border-radius:8px;color:#F5A623;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;cursor:pointer}
+  input[type=file]{display:none}
+  .grid{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:900px;margin:0 auto}
+  .slide{width:340px}
+  .slide canvas{width:100%;border-radius:14px;display:block;box-shadow:0 14px 50px rgba(0,0,0,.55);background:#0A0C10}
+  .cap{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);text-align:center;margin-top:9px}
+  .note{max-width:620px;margin:34px auto 0;color:var(--dim);font-size:13px;line-height:1.7;text-align:center}
+</style>
+</head>
+<body>
+  <h1>◆ FIRST LIGHT · POST DESIGN</h1>
+  <div class="sub">Photo-forward minimal — dynamic carousel (cover → one slide per activity → summary)</div>
+  <div class="controls">
+    <label class="up">⇧ DROP IN YOUR PHOTO TO SEE THE COVER<input type="file" id="ph" accept="image/*"></label>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="note">This is a live mock on sample data. Your real posts pull the actual route + stats, and your uploaded photo fills the cover. Tell me what to tweak — spacing, colours, which 3 stats, the day-tag treatment — and I'll refine, then wire it into the daily post.</div>
+
+<script>
+const W=1080, ACC={run:'#FC4C02',cycle:'#00E676',swim:'#00B0FF',gold:'#F5A623'};
+let photo=null;
+
+function mk(cap){
+  const wrap=document.createElement('div');wrap.className='slide';
+  const c=document.createElement('canvas');c.width=W;c.height=W;
+  const cp=document.createElement('div');cp.className='cap';cp.textContent=cap;
+  wrap.appendChild(c);wrap.appendChild(cp);document.getElementById('grid').appendChild(wrap);
+  return c.getContext('2d');
+}
+function grain(ctx){ // subtle film grain
+  const n=2600; ctx.save();
+  for(let i=0;i<n;i++){ctx.fillStyle='rgba(255,255,255,'+(Math.random()*0.018)+')';
+    ctx.fillRect(Math.random()*W,Math.random()*W,1.4,1.4);} ctx.restore();
+}
+function imgCover(ctx,img){ // object-fit: cover
+  const r=Math.max(W/img.width,W/img.height), iw=img.width*r, ih=img.height*r;
+  ctx.drawImage(img,(W-iw)/2,(W-ih)/2,iw,ih);
+}
+// synthetic but realistic GPS loop, normalized to a box
+function route(seed){
+  const pts=[]; let a=seed;
+  for(let t=0;t<=1;t+=0.012){
+    const ang=t*Math.PI*2*1.15+seed;
+    const rad=0.34+0.13*Math.sin(ang*3+seed)+0.05*Math.cos(ang*7);
+    pts.push([0.5+rad*Math.cos(ang)*(0.9+0.15*Math.sin(t*9+seed)),
+              0.5+rad*Math.sin(ang)*(0.82+0.12*Math.cos(t*11))]);
+  } return pts;
+}
+function drawRoute(ctx,pts,acc,bx,by,bw,bh){
+  ctx.save();
+  // glow pass
+  ctx.strokeStyle=acc; ctx.lineWidth=13; ctx.lineJoin='round'; ctx.lineCap='round';
+  ctx.shadowColor=acc; ctx.shadowBlur=34; ctx.globalAlpha=.9;
+  ctx.beginPath();
+  pts.forEach((p,i)=>{const x=bx+p[0]*bw,y=by+p[1]*bh; i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.stroke();
+  // crisp pass
+  ctx.shadowBlur=0; ctx.globalAlpha=1; ctx.lineWidth=6; ctx.strokeStyle='#fff'; ctx.globalAlpha=.85; ctx.stroke();
+  ctx.globalAlpha=1;
+  // start/end dots
+  const s=pts[0],e=pts[pts.length-1];
+  ctx.fillStyle='#00E676';ctx.beginPath();ctx.arc(bx+s[0]*bw,by+s[1]*bh,11,0,7);ctx.fill();
+  ctx.fillStyle=acc;ctx.beginPath();ctx.arc(bx+e[0]*bw,by+e[1]*bh,11,0,7);ctx.fill();
+  ctx.restore();
+}
+function tag(ctx,x,y,text,col){ctx.font='700 30px "IBM Plex Mono"';ctx.fillStyle=col;
+  ctx.textAlign='left';ctx.fillText(spread(text),x,y);}
+function spread(s){return s.split('').join(' ');}
+
+function drawCover(ctx){
+  ctx.fillStyle='#0A0C10';ctx.fillRect(0,0,W,W);
+  if(photo){imgCover(ctx,photo);}
+  else{const g=ctx.createLinearGradient(0,0,W,W);g.addColorStop(0,'#12161f');g.addColorStop(1,'#080a0e');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,W);
+    ctx.fillStyle='rgba(255,255,255,.13)';ctx.textAlign='center';ctx.font='500 36px "IBM Plex Mono"';
+    ctx.fillText('◇  YOUR PHOTO OF THE DAY',W/2,W/2-6);
+    ctx.font='400 20px "IBM Plex Mono"';ctx.fillStyle='rgba(255,255,255,.09)';
+    ctx.fillText('full-bleed · the moment, not the metrics',W/2,W/2+34);}
+  // bottom scrim
+  const s=ctx.createLinearGradient(0,560,0,W);s.addColorStop(0,'rgba(7,9,13,0)');s.addColorStop(1,'rgba(7,9,13,.94)');
+  ctx.fillStyle=s;ctx.fillRect(0,520,W,W-520);
+  // tag block
+  ctx.textAlign='left';
+  ctx.fillStyle=ACC.gold;ctx.font='700 27px "IBM Plex Mono"';ctx.fillText(spread('◆ FIRST LIGHT'),72,904);
+  ctx.fillStyle='#fff';ctx.font='700 108px "IBM Plex Mono"';ctx.fillText('DAY 1',66,1002);
+  ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='500 25px "IBM Plex Mono"';
+  ctx.fillText('SUN · 19 JUL 2026',1012,1002);
+  // thin accent rule
+  ctx.strokeStyle=ACC.gold;ctx.globalAlpha=.7;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(72,930);ctx.lineTo(150,930);ctx.stroke();ctx.globalAlpha=1;
+  grain(ctx);
+}
+function drawActivity(ctx,o){
+  ctx.fillStyle='#0A0C10';ctx.fillRect(0,0,W,W);
+  // faint halo
+  const h=ctx.createRadialGradient(W/2,470,80,W/2,470,620);
+  h.addColorStop(0,o.acc+'22');h.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=h;ctx.fillRect(0,0,W,W);
+  tag(ctx,72,120,o.sport,o.acc);
+  ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='500 24px "IBM Plex Mono"';
+  ctx.fillText(o.name,1008,120);
+  drawRoute(ctx,o.route,o.acc,150,190,780,560);
+  // divider
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(72,830);ctx.lineTo(1008,830);ctx.stroke();
+  // 3 stats
+  const st=[['DISTANCE',o.dist],['TIME',o.time],['PACE',o.pace]];
+  st.forEach((s,i)=>{const cx=180+i*360;
+    ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.42)';ctx.font='600 20px "IBM Plex Mono"';
+    ctx.fillText(spread(s[0]),cx,896);
+    ctx.fillStyle='#fff';ctx.font='700 54px "IBM Plex Mono"';ctx.fillText(s[1],cx,956);});
+  ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='500 20px "IBM Plex Mono"';
+  ctx.fillText('firstlight.live',W/2,1030);
+  grain(ctx);
+}
+// non-GPS activities (gym, boxing, pool swim, HR sessions): effort ring, no map
+function drawEffort(ctx,o){
+  ctx.fillStyle='#0A0C10';ctx.fillRect(0,0,W,W);
+  const h=ctx.createRadialGradient(W/2,468,80,W/2,468,620);
+  h.addColorStop(0,o.acc+'22');h.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=h;ctx.fillRect(0,0,W,W);
+  tag(ctx,72,120,o.sport,o.acc);
+  ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='500 24px "IBM Plex Mono"';ctx.fillText(o.name,1008,120);
+  const cx=W/2,cy=468,r=228;
+  ctx.lineWidth=16;ctx.strokeStyle='rgba(255,255,255,.06)';ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+  ctx.strokeStyle=o.acc;ctx.lineCap='round';ctx.shadowColor=o.acc;ctx.shadowBlur=30;
+  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*0.84);ctx.stroke();ctx.shadowBlur=0;
+  ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='700 150px "IBM Plex Mono"';ctx.fillText(o.durn,cx,cy+22);
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='600 28px "IBM Plex Mono"';ctx.fillText(spread('MINUTES'),cx,cy+86);
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(72,830);ctx.lineTo(1008,830);ctx.stroke();
+  const st=[['AVG HR',o.hr],['CALORIES',o.cal],['INTENSITY',o.intensity]];
+  st.forEach((s,i)=>{const x=180+i*360;
+    ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.42)';ctx.font='600 20px "IBM Plex Mono"';ctx.fillText(spread(s[0]),x,896);
+    ctx.fillStyle='#fff';ctx.font='700 52px "IBM Plex Mono"';ctx.fillText(s[1],x,956);});
+  ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='500 20px "IBM Plex Mono"';ctx.fillText('firstlight.live',W/2,1030);
+  grain(ctx);
+}
+function drawSummary(ctx){
+  ctx.fillStyle='#0A0C10';ctx.fillRect(0,0,W,W);
+  const h=ctx.createRadialGradient(W/2,430,60,W/2,430,640);
+  h.addColorStop(0,'rgba(245,166,35,.13)');h.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=h;ctx.fillRect(0,0,W,W);
+  ctx.textAlign='center';
+  ctx.fillStyle=ACC.gold;ctx.font='700 26px "IBM Plex Mono"';ctx.fillText(spread('THE DAY, STACKED'),W/2,300);
+  ctx.fillStyle='#fff';ctx.font='700 220px "IBM Plex Mono"';ctx.fillText('27.6',W/2,510);
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='600 30px "IBM Plex Mono"';ctx.fillText(spread('TOTAL KILOMETRES'),W/2,560);
+  // pills
+  const pills=[['5','ACTIVITIES'],['2h 51m','MOVING'],['4','SPORTS']];
+  pills.forEach((p,i)=>{const cx=200+i*340;
+    ctx.fillStyle='#fff';ctx.font='700 40px "IBM Plex Mono"';ctx.fillText(p[0],cx,740);
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='600 18px "IBM Plex Mono"';ctx.fillText(spread(p[1]),cx,780);});
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='500 22px "IBM Plex Mono"';ctx.fillText('DAY 1 · FIRST LIGHT · firstlight.live',W/2,1000);
+  grain(ctx);
+}
+
+// A full "stack day": photo cover → GPS activities → non-GPS activities → summary.
+// Each activity type gets a colour; GPS ones show a route, non-GPS show an effort ring.
+const SLIDES=[
+  {cap:'SLIDE 1 · COVER (your photo)', draw:c=>drawCover(c)},
+  {cap:'SLIDE 2 · RUN · GPS route',    draw:c=>drawActivity(c,{sport:'RUN',name:'Morning Run',acc:ACC.run,route:route(1.2),dist:'5.2 km',time:'26:10',pace:'5:01'})},
+  {cap:'SLIDE 3 · WALK · GPS route',   draw:c=>drawActivity(c,{sport:'WALK',name:'Evening Walk',acc:ACC.gold,route:route(3.3),dist:'4.1 km',time:'42:00',pace:'10:14'})},
+  {cap:'SLIDE 4 · CYCLE · GPS route',  draw:c=>drawActivity(c,{sport:'CYCLE',name:'Loop Ride',acc:ACC.cycle,route:route(4.7),dist:'18.3 km',time:'46:30',pace:'23.6'})},
+  {cap:'SLIDE 5 · GYM · effort (no GPS)',    draw:c=>drawEffort(c,{sport:'GYM',name:'Strength',acc:ACC.gold,durn:'45',hr:'128',cal:'410',intensity:'HARD'})},
+  {cap:'SLIDE 6 · BOXING · effort (no GPS)', draw:c=>drawEffort(c,{sport:'BOXING',name:'Bag Work',acc:'#FF5252',durn:'30',hr:'156',cal:'380',intensity:'PEAK'})},
+  {cap:'SLIDE 7 · SWIM · effort (pool)',     draw:c=>drawEffort(c,{sport:'SWIM',name:'Pool',acc:ACC.swim,durn:'25',hr:'132',cal:'300',intensity:'STEADY'})},
+  {cap:'LAST · SUMMARY (auto on stack days)', draw:c=>drawSummary(c)},
+];
+let ctxs=[];
+function renderAll(){ ctxs.forEach((c,i)=>SLIDES[i].draw(c)); }
+window.addEventListener('DOMContentLoaded',()=>{
+  ctxs=SLIDES.map(s=>mk(s.cap));
+  document.getElementById('ph').addEventListener('change',e=>{
+    const f=e.target.files[0];if(!f)return;const img=new Image();
+    img.onload=()=>{photo=img;renderAll();};img.src=URL.createObjectURL(f);
+  });
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(renderAll,60));
+});
+</script>
+</body>
+</html>
