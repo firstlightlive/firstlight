@@ -1,3 +1,6 @@
 .wrangler
 wrangler.jsonc
 .assetsignore
+# Local IG story design folder — contains raw payment screenshots (UPI + receipt)
+# with personal PII. Static assets bypass the login gate, so never ship these.
+day12/
