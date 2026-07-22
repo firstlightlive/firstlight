@@ -417,9 +417,11 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Pro
 // ACCOUNTABILITY ENGINE — Phase 2-7
 // Orchestrates: render → R2 → IG publish → ledger write → email.
 // Idempotent per (date, variant). Three entry points called by pg_cron:
-//   - nudge   (21:00 IST)  — alert operator if not yet qualified
-//   - verdict (23:30 IST)  — final judgement + publish
-//   - grace   (00:15 IST)  — re-check yesterday's MISS in case of late sync
+//   - nudge   (21:00 IST)        — alert operator if not yet qualified
+//   - verdict (23:30 IST)        — final judgement + publish
+//   - grace   (00:15–02:50 IST)  — re-check yesterday's MISS on late sync;
+//                                  flips MISS→WIN + clears the phantom slip
+//                                  (see supabase/extend_grace_cron.sql)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const AKSHAYA_PATRA = 'Akshaya Patra'
@@ -1806,21 +1808,50 @@ async function runGrace(): Promise<EngineRunResult> {
   result.verdict = reJudged
   if (reJudged.verdict !== 'WIN') return result
 
-  // Flipped! Retract the forfeit and post a correction story
+  // Flipped! A late sync (Apple Health / manual / Strava) turned yesterday's
+  // MISS into a WIN. Retract the phantom forfeit — but NEVER silently.
   result.errors.push('VERDICT_REVISED_MISS_TO_WIN')
 
-  // Mark slip as retracted (don't delete — log immutable)
-  try {
-    await supaAdmin
-      .from('slips')
-      .update({ penalty_status: 'cleared', penalty_amount: 0, insight: `Retracted by 00:15 grace re-check — late Strava sync flipped verdict to WIN.` })
-      .eq('client_id', `engine_miss_${yesterday}`)
-  } catch (_e) { /* tolerate */ }
-
-  // Update proof_archive
+  // 1. Flip proof_archive to WIN FIRST. The slip-immutability trigger's
+  //    verdict-revision clearance (PATH 4, supabase/fix_grace_slip_retraction.sql)
+  //    reads proof_archive.verdict, so it must already say WIN before we clear.
   try {
     await supaUpsert('proof_archive', { date: yesterday, verdict: 'WIN' }, 'date')
-  } catch (_e) { /* tolerate */ }
+  } catch (e) {
+    await sendAlert('[FIRSTLIGHT] grace: proof_archive WIN update failed',
+      `Day ${reJudged.chapterDay} (${yesterday}) revised MISS→WIN but proof_archive update failed: ${(e as Error).message}. Slip retraction is now blocked — resolve manually.`)
+  }
+
+  // 2. Retract the slip: zero the penalty + mark cleared. Do NOT touch `insight`
+  //    (the immutability trigger freezes it). PATH 4 permits this receiptless
+  //    clear ONLY because penalty_amount=0 AND proof_archive says WIN. If the
+  //    clear is blocked or matches no row, ALERT — do not swallow it: a silent
+  //    failure here is exactly what left slip id=32 stuck 'pending' on
+  //    2026-07-21 and forced a manual SQL void.
+  try {
+    const { data: cleared, error: clrErr } = await supaAdmin
+      .from('slips')
+      .update({ penalty_status: 'cleared', penalty_amount: 0 })
+      .eq('client_id', `engine_miss_${yesterday}`)
+      .eq('penalty_status', 'pending')
+      .select('id')
+    if (clrErr) throw clrErr
+    if (!cleared || cleared.length === 0) {
+      // No row updated: either already cleared (fine) or a stuck one remains.
+      const { data: stuck } = await supaAdmin
+        .from('slips')
+        .select('id, penalty_status')
+        .eq('client_id', `engine_miss_${yesterday}`)
+        .maybeSingle()
+      if (stuck && stuck.penalty_status === 'pending') {
+        await sendAlert('[FIRSTLIGHT] grace: false-miss slip STUCK pending',
+          `Day ${reJudged.chapterDay} (${yesterday}) revised MISS→WIN but slip id=${stuck.id} is still 'pending' — the immutability trigger blocked the clear. Apply supabase/fix_grace_slip_retraction.sql (PATH 4), then re-run engine-grace or void manually.`)
+      }
+    }
+  } catch (e) {
+    await sendAlert('[FIRSTLIGHT] grace: false-miss slip retraction FAILED',
+      `Day ${reJudged.chapterDay} (${yesterday}) revised MISS→WIN but clearing engine_miss_${yesterday} threw: ${(e as Error).message}. It will nag as a phantom ₹${STAKE_AMOUNT}. Apply supabase/fix_grace_slip_retraction.sql or void manually.`)
+  }
 
   // Email
   try {
