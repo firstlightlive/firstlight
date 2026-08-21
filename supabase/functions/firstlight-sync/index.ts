@@ -10,6 +10,14 @@ const SUPA_URL = Deno.env.get('SUPABASE_URL') || ''
 const SUPA_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 const SUPA_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') || ''
 const IG_ACCOUNT_ID = '17841466893616231'
+// Sentinel days_left for a token Facebook reports as expires_at=0 (never expires —
+// i.e. a Business Manager System User token). Big enough to sail past every
+// "is it expiring soon?" threshold without special-casing each comparison.
+const NEVER_EXPIRES_DAYS = 36500
+// Must match the redirect URI whitelisted in the Facebook app's Login settings.
+const IG_REDIRECT_URI = 'https://firstlight.live/ig-connect.html'
+// The Facebook Page that owns @firstlightlive. Its PAGE token is the permanent one.
+const FB_PAGE_ID = '1135082336346089'
 
 // ── Chapter-aware day numbering ──
 // Chapter 1 FOUNDATION: 2026-02-10 → 2026-06-08 (Day 1..110, CLOSED).
@@ -23,8 +31,41 @@ const CHAPTER_2_START = new Date('2026-06-20T00:00:00+05:30')
 const CHAPTER_3_START = new Date('2026-07-19T00:00:00+05:30')
 const CHAPTER_3_RUN_MIN_METERS = 5000
 const CHAPTER_3_CUTOFF_HOUR = 6           // run must START before 06:00 local
+// Chapter 4 DISCIPLINE: 2026-07-27 onward (Day 1..). Rule: ANY workout anchors the
+// day (same menu as Chapter 2 — judge's default path; no before-6AM badge). NO money
+// this chapter — misses/violations are paid in DISTANCE (the Punishment Cycle, self-
+// logged in discipline.html). The 5 rituals (wake<4AM, meditation, workout, journal,
+// sleep 6h) + prohibitions live in the tracker. NO Instagram (ig_publish_enabled='false').
+const CHAPTER_4_START = new Date('2026-07-27T00:00:00+05:30')
+
+// ── THE PUBLIC DAY COUNTER — CONTINUOUS, NEVER RESETS ──────────────────────
+// DAY_EPOCH is the single anchor for every day number the outside world sees:
+// IG captions, rendered slides, proof_archive.day_number, instagram_posts.
+// day_number and all five emails. Day 1 = 2026-07-19, forever.
+//
+// A CHAPTER CHANGES THE RULE AND THE FOOTER BRANDING. IT DOES NOT RESTART THE
+// NUMBER. When CHAPTER_4_START (2026-07-27) was added, chapterDay() reset to 1
+// and the feed silently walked backwards 8 days — Aug 18 printed Day 23 instead
+// of Day 31, and captions, proof_archive and instagram_posts all disagreed with
+// each other because the IG-sync rewriter (see _syncIgPosts) recomputes
+// day_number on every pass and clobbered the dayOverride republishes.
+//
+// ⚠️ ADDING CHAPTER 5/6/7…: add the start date to chapterOf() and a label to
+// CHAPTER_BRAND. DO NOT add a branch to chapterDay(). There is deliberately
+// exactly one live-era formula below and it must stay that way.
+const DAY_EPOCH = CHAPTER_3_START   // 2026-07-19 = Day 1
+
+// Pull the day number a published caption actually prints ("...\n\nDay 31.\n...").
+// Used by the IG sync so a late post's stored day_number mirrors what the public
+// sees, rather than being recomputed from the post's timestamp.
+function _captionDay(caption?: string | null): number | null {
+  const m = /(?:^|\n)Day (\d+)\b/.exec(caption || '')
+  const n = m ? parseInt(m[1], 10) : NaN
+  return Number.isFinite(n) && n > 0 ? n : null
+}
 function chapterOf(date: Date | string): number {
   const d = (date instanceof Date) ? date : new Date(date)
+  if (d.getTime() >= CHAPTER_4_START.getTime()) return 4
   if (d.getTime() >= CHAPTER_3_START.getTime()) return 3
   if (d.getTime() >= CHAPTER_2_START.getTime()) return 2
   if (d.getTime() >= CHAPTER_1_START.getTime() && d.getTime() < CHAPTER_1_END.getTime()) return 1
@@ -32,7 +73,10 @@ function chapterOf(date: Date | string): number {
 }
 function chapterDay(date: Date | string): number {
   const d = (date instanceof Date) ? date : new Date(date)
-  if (d.getTime() >= CHAPTER_3_START.getTime()) return Math.floor((d.getTime() - CHAPTER_3_START.getTime()) / 86400000) + 1
+  // LIVE ERA — one formula, no chapter boundaries. Never add a branch above this.
+  if (d.getTime() >= DAY_EPOCH.getTime()) return Math.floor((d.getTime() - DAY_EPOCH.getTime()) / 86400000) + 1
+  // CLOSED chapters keep their frozen historical per-chapter numbering so the
+  // archived rows and the monument cards in chapters.js still line up.
   if (d.getTime() >= CHAPTER_2_START.getTime()) return Math.floor((d.getTime() - CHAPTER_2_START.getTime()) / 86400000) + 1
   if (d.getTime() >= CHAPTER_1_START.getTime() && d.getTime() < CHAPTER_1_END.getTime()) return Math.floor((d.getTime() - CHAPTER_1_START.getTime()) / 86400000) + 1
   return 0
@@ -46,6 +90,7 @@ const CHAPTER_BRAND: Record<number, string> = {
   1: 'CHAPTER 01 · FOUNDATION',
   2: 'CHAPTER 02 · ENDURANCE',
   3: 'CHAPTER 03 · FIRST LIGHT',
+  4: 'CHAPTER 04 · DISCIPLINE',
 }
 function chapterBrand(date: Date | string): string {
   return CHAPTER_BRAND[chapterOf(date)] || 'FIRST LIGHT'
@@ -322,9 +367,17 @@ async function _pullManualForDate(dateStr: string): Promise<StravaActivityLite[]
 // Top-level: judge a given IST date (defaults to today). Returns VerdictResult.
 // Apple Health is PRIMARY; Strava is best-effort. PENDING only when NEITHER
 // source produced any data (system never declares MISS on infra failure).
-async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Promise<VerdictResult> {
+async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS'; dayOverride?: number }): Promise<VerdictResult> {
   const date = opts?.date || todayIST()
-  const day = chapterDay(new Date(`${date}T12:00:00+05:30`))
+  // dayOverride exists for back-fill republishes across a chapter boundary. The
+  // public feed carries ONE continuous day counter; when a new chapter resets
+  // chapterDay() to 1, re-posting an older day would print a number lower than
+  // the post before it. Every consumer below reads verdict.chapterDay, so setting
+  // it here fixes the caption, the rendered slide, proof_archive.day_number and
+  // the emails in one place. Never set by the nightly cron — republish only.
+  const day = (typeof opts?.dayOverride === 'number' && opts.dayOverride > 0)
+    ? opts.dayOverride
+    : chapterDay(new Date(`${date}T12:00:00+05:30`))
 
   // Force flags for testing (?force=WIN / ?force=MISS)
   if (opts?.force === 'WIN') {
@@ -340,12 +393,21 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS' }): Pro
   // 1. Apple Health — PRIMARY
   const apple = await _pullAppleForDate(date)
 
-  // 2. Strava — best-effort garnish (never blocks, never causes PENDING on its own)
+  // 2. Strava — DISABLED by default (APPLE-ONLY mode, 2026-07-24). The Strava API
+  //    app (client 226450) is tied to the WRONG athlete — a secondary account
+  //    (1669656814), not the followers account (206338460) — and the API path was
+  //    abandoned after repeated OAuth callback-domain failures. If left on, the
+  //    judge would "prefer Strava's candidates" and post the wrong account's data
+  //    (or miss a real Apple workout). FirstLight now runs on Apple Health as the
+  //    SOLE source. Re-enable ONLY if a correct-account token is ever restored, by
+  //    setting the secret strava_source_enabled='true'.
   let strava: StravaActivityLite[] | null = null
-  try {
-    const token = await _stravaAccessToken()
-    if (token) strava = await _pullStravaForDate(date, token)
-  } catch (_e) { /* banned/unreachable — Apple carries the day */ }
+  if ((await getSecret('strava_source_enabled')) === 'true') {
+    try {
+      const token = await _stravaAccessToken()
+      if (token) strava = await _pullStravaForDate(date, token)
+    } catch (_e) { /* banned/unreachable — Apple carries the day */ }
+  }
 
   // 3. Activity Studio manual uploads — always unioned in (they exist in no
   //    other channel). A manual entry can never be double-counted by Apple or
@@ -818,7 +880,7 @@ function _generateCaption(verdict: VerdictResult): string {
         tags = (HASHTAGS_BY_SPORT[buckets[0]] || HASHTAGS_BY_SPORT.run).slice(0, 3)
           .concat((HASHTAGS_BY_SPORT[buckets[1]] || HASHTAGS_BY_SPORT.run).slice(0, 2))
       }
-      return `${opener}\n\nDay ${day}.\n${bullets}\n\nThe body stacked.\n\nfirstlight.live\n.\n.\n${tags.join(' ')}`
+      return `${opener}\n\nDay ${day}.\n${bullets}\n\nThe body stacked.\n\n${tags.join(' ')}`
     }
 
     // Single activity (original)
@@ -837,22 +899,23 @@ function _generateCaption(verdict: VerdictResult): string {
       ? `${m.distanceKm.toFixed(1)} km · ${m.type}`
       : `${Math.round(m.durationMin)} min · ${m.type}`) + badge
     const tags = (HASHTAGS_BY_SPORT[m.bucket] || HASHTAGS_BY_SPORT.run).join(' ')
-    // Strava link — only for GPS sports with a real activity ID
-    const isGps = m.bucket !== 'hrSession'
-    const stravaLine = (isGps && m.activityId > 0)
-      ? `\n\nView on Strava: strava.com/activities/${m.activityId}`
-      : ''
-    return `${opener}\n\nDay ${day}.\n${statLine}.${stravaLine}\n\nfirstlight.live\n.\n.\n${tags}`
+    // ANTI-SPAM (2026-07-24): captions carry NO external links. firstlight.live
+    // now resolves to a login wall (private site) and the strava.com activity
+    // link ties IG↔Strava — both read as promo / scam-bait to platform
+    // classifiers. That footprint is what got IG restricted and drew Strava's
+    // club-spam flag. Identity + proof stats only; no link, no ".\n." hashtag
+    // curtain. See CLAUDE.md "Anti-Spam Rules".
+    return `${opener}\n\nDay ${day}.\n${statLine}.\n\n${tags}`
   }
 
   if (verdict.verdict === 'MISS') {
     // ₹1,500 is Akshaya Patra's exact sponsorship price: 1 child for 1 academic year (~200 school days).
     const opener = _pickFromPool(MISS_OPENERS, day).replace('{DAY}', String(day))
     const tags = MISS_HASHTAGS.join(' ')
-    return `${opener}\n\nDay ${day}.\n${AKSHAYA_PATRA} · 1 child · 1 school year · 200 mid-day meals.\nReceipt in comments. Back tomorrow.\n\nfirstlight.live\n.\n.\n${tags}`
+    return `${opener}\n\nDay ${day}.\n${AKSHAYA_PATRA} · 1 child · 1 school year · 200 mid-day meals.\nReceipt in comments. Back tomorrow.\n\n${tags}`
   }
 
-  return `Day ${day}\n\nfirstlight.live`
+  return `Day ${day}`
 }
 
 // Publish a single-image IG feed post via Graph API. Returns media_id.
@@ -1185,7 +1248,7 @@ async function runNudge(): Promise<EngineRunResult> {
 // If publish fails after step 3, DB has verdict but no ig_post_id. Next cron run
 // is idempotent-skipped; operator gets publish-failure email and can manually clear
 // the proof_archive row to retry. Worst case: ledger shows verdict without IG link.
-async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republish?: boolean; confirmMiss?: boolean }): Promise<EngineRunResult> {
+async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republish?: boolean; confirmMiss?: boolean; dayOverride?: number }): Promise<EngineRunResult> {
   const result: EngineRunResult = { phase: 'verdict', date: opts?.date || todayIST(), emailsSent: [], errors: [] }
 
   // Republish path: re-sync Strava FIRST so the matched activity (and its GPS
@@ -1196,7 +1259,7 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republ
     try { await syncStrava([]) } catch (e) { result.errors.push(`Republish pre-sync warning: ${(e as Error).message}`) }
   }
 
-  const verdict = await judgeToday({ force: opts?.force, date: opts?.date })
+  const verdict = await judgeToday({ force: opts?.force, date: opts?.date, dayOverride: opts?.dayOverride })
   result.verdict = verdict
 
   // ── SAFETY: forced/test verdicts must NEVER publish or write the ledger ──
@@ -1270,6 +1333,16 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republ
       await _emailMissConfirmRequest(verdict)
       result.emailsSent.push('miss-confirm-request')
     } catch (_e) { /* tolerate */ }
+    return result
+  }
+
+  // ── INSTAGRAM OFF (Chapter 04 DISCIPLINE — clean mode) ──
+  // Accountability is already fully recorded above (verdict row + slip + ₹ stake
+  // + emails). From here the system does NOT post to Instagram: set the secret
+  // ig_publish_enabled='false'. The judge, ledger, penalty and email all keep
+  // running — only the public post is skipped. Re-enable by setting 'true'/removing.
+  if ((await getSecret('ig_publish_enabled')) === 'false') {
+    result.errors.push('IG_PUBLISH_DISABLED — verdict + ledger + stake recorded; no Instagram post (clean mode).')
     return result
   }
 
@@ -1674,8 +1747,7 @@ function _generateMonthlyCaption(agg: MonthlyRecapAggregate): string {
     lines.push('Zero misses. Streak held all month.')
   }
   lines.push('')
-  lines.push(`Full month at firstlight.live`)
-  lines.push('')
+  // ANTI-SPAM (2026-07-24): no firstlight.live CTA — private site = login wall.
   lines.push('#firstlight #ironmanintraining #chapter02 #accountability #endurance')
   return lines.join('\n')
 }
@@ -1880,6 +1952,22 @@ async function sendAlert(subject: string, body: string) {
       body: JSON.stringify({ from: ALERT_FROM, to: [ALERT_TO], subject: '[FIRSTLIGHT] ' + subject, text: body })
     })
   } catch (_e) { /* silent — alerting must never break sync */ }
+}
+
+// Rate-limited alert. `sync` runs 6× a day, so a persistent fault (e.g. a dead IG
+// token) would otherwise mail 6 identical copies daily until it's fixed — which
+// trains you to ignore the alert. Fires at most once per `ttlHours` per key.
+async function alertOnce(key: string, ttlHours: number, subject: string, body: string) {
+  const cfgKey = 'ALERT_LAST_' + key
+  try {
+    const { data } = await supaAdmin.from('config').select('value').eq('key', cfgKey).single()
+    const last = data?.value ? Date.parse(data.value) : 0
+    if (last && (Date.now() - last) < ttlHours * 3600_000) return   // still inside the quiet window
+  } catch (_e) { /* no row yet → fall through and alert */ }
+  await sendAlert(subject, body)
+  try {
+    await supaUpsert('config', { key: cfgKey, value: new Date().toISOString() }, 'key')
+  } catch (_e) { /* ignore */ }
 }
 
 // Supabase client with service_role (for secrets table)
@@ -2136,38 +2224,184 @@ async function backfillStravaCalories(log: string[], limit: number) {
 }
 
 // ═══════════════════════════════════════════
+// PERMANENT TOKEN CONVERSION — the cure for the 60-day cycle
+// ═══════════════════════════════════════════
+// A Facebook USER token always dies (60 days max, and no server call can extend it —
+// fb_exchange_token returns the same expiry when the input is already long-lived).
+// A PAGE token derived from a LONG-LIVED user token does NOT expire: Graph reports
+// expires_at = 0 for it, and it keeps working indefinitely. Instagram's content
+// publishing endpoints accept it for the linked IG business account.
+//
+// So the whole outage class is fixed by never storing a user token in the first place.
+// This converts one into the permanent page token. It is deliberately conservative:
+// every failure path returns null and the caller keeps whatever it already had.
+async function derivePermanentPageToken(
+  userToken: string,
+  appId: string,
+  appSecret: string,
+  log: string[]
+): Promise<{ token: string; pageName: string; expiresAt: number } | null> {
+  try {
+    // The page token inherits its lifetime from the user token it came from, so a
+    // SHORT-lived parent yields a short-lived page token. Upgrade the parent first.
+    let parent = userToken
+    const parentDbg = await fetch(
+      `https://graph.facebook.com/v21.0/debug_token?input_token=${parent}&access_token=${appId}|${appSecret}`
+    ).then(r => r.json())
+    const parentExpiry = parentDbg?.data?.expires_at || 0
+    const parentDays = parentExpiry === 0 ? NEVER_EXPIRES_DAYS : Math.floor((parentExpiry - Date.now() / 1000) / 86400)
+    if (parentDays < 50) {
+      const long = await fetch(
+        `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token` +
+        `&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${parent}`
+      ).then(r => r.json())
+      if (long.access_token) parent = long.access_token
+    }
+
+    // Ask for the pages this user administers, along with each page's own token.
+    const accounts = await fetch(
+      `https://graph.facebook.com/v21.0/me/accounts?fields=id,name,access_token,instagram_business_account{id}` +
+      `&access_token=${encodeURIComponent(parent)}`
+    ).then(r => r.json())
+    if (accounts.error) { log.push(`Instagram: page-token lookup failed — ${accounts.error.message}`); return null }
+
+    const pages: any[] = accounts.data || []
+    // Prefer the page actually linked to our IG account; fall back to the known page id.
+    const page = pages.find(p => p.instagram_business_account?.id === IG_ACCOUNT_ID)
+      || pages.find(p => String(p.id) === FB_PAGE_ID)
+    if (!page?.access_token) {
+      log.push(`Instagram: no page token available (${pages.length} page(s) visible) — needs pages_show_list + the IG account linked to the page`)
+      return null
+    }
+
+    // Confirm it really is permanent before trusting it.
+    const dbg = await fetch(
+      `https://graph.facebook.com/v21.0/debug_token?input_token=${page.access_token}&access_token=${appId}|${appSecret}`
+    ).then(r => r.json())
+    if (!dbg?.data?.is_valid) { log.push('Instagram: derived page token failed validation'); return null }
+    const expiresAt = dbg.data.expires_at || 0
+    if (expiresAt !== 0) {
+      log.push(`Instagram: page token still carries an expiry (${expiresAt}) — parent user token was not long-lived; not adopting`)
+      return null
+    }
+    if (!(dbg.data.scopes || []).includes('instagram_content_publish')) {
+      log.push('Instagram: page token lacks instagram_content_publish — not adopting')
+      return null
+    }
+
+    // Final proof: it must actually reach the IG account we publish to.
+    const acct = await fetch(
+      `https://graph.facebook.com/v21.0/${IG_ACCOUNT_ID}?fields=id,username&access_token=${encodeURIComponent(page.access_token)}`
+    ).then(r => r.json())
+    if (acct.error) { log.push(`Instagram: page token cannot reach IG account — ${acct.error.message}`); return null }
+
+    return { token: page.access_token, pageName: page.name || FB_PAGE_ID, expiresAt }
+  } catch (e) {
+    log.push(`Instagram: page-token conversion threw — ${(e as Error).message}`)
+    return null
+  }
+}
+
+// ═══════════════════════════════════════════
 // INSTAGRAM SYNC
 // ═══════════════════════════════════════════
 async function syncInstagram(log: string[]) {
   log.push('Instagram: starting...')
 
-  let igToken = await getSecret('ig_access')
-  if (!igToken) { log.push('Instagram: no token'); return }
+  // Typed `string` (not `string | null`) so that reassigning it after a refresh
+  // doesn't reset narrowing and re-introduce null into every downstream call.
+  const storedToken = await getSecret('ig_access')
+  if (!storedToken) { log.push('Instagram: no token'); return }
+  let igToken: string = storedToken
 
-  // Check token expiry
+  // ── Check token expiry ───────────────────────────────────────────────────
+  // debug_token returns expires_at === 0 for tokens that NEVER expire (Business
+  // Manager System User tokens). That is the healthiest possible state, so it must
+  // not be read as "expired" — the old `expiresAt > 0 ? … : -1` did exactly that.
   const debug = await fetch(
     `https://graph.facebook.com/v21.0/debug_token?input_token=${igToken}&access_token=${igToken}`
   ).then(r => r.json())
-  const isValid = debug?.data?.is_valid
+  const isValid = debug?.data?.is_valid === true
   const expiresAt = debug?.data?.expires_at || 0
-  const daysLeft = expiresAt > 0 ? Math.floor((expiresAt - Date.now() / 1000) / 86400) : -1
-  log.push(`Instagram: token valid=${isValid}, expires in ${daysLeft} days`)
+  // `let` — the self-heal below can flip this to true mid-run by swapping in the
+  // permanent page token, which must then suppress the refresh + expiry-alert blocks.
+  let neverExpires = isValid && expiresAt === 0
+  const daysLeft = neverExpires
+    ? NEVER_EXPIRES_DAYS
+    : (expiresAt > 0 ? Math.floor((expiresAt - Date.now() / 1000) / 86400) : -1)
+  const tokenKind = debug?.data?.type || 'UNKNOWN'
+  log.push(`Instagram: token valid=${isValid}, kind=${tokenKind}, ${neverExpires ? 'never expires ✅' : `expires in ${daysLeft} days`}`)
 
   // Save token health
   try {
     await supaUpsert('config', {
       key: 'IG_TOKEN_HEALTH',
-      value: JSON.stringify({ valid: isValid, days_left: daysLeft, checked_at: new Date().toISOString(), expires_at: expiresAt })
+      value: JSON.stringify({ valid: isValid, days_left: daysLeft, never_expires: neverExpires, token_kind: tokenKind, checked_at: new Date().toISOString(), expires_at: expiresAt })
     }, 'key')
   } catch (_e) { /* ignore */ }
 
-  if (!isValid || daysLeft < 0) {
+  // Hard failure — the token is dead, so every publish/sync below will 190 out.
+  // This previously only wrote a log line nobody reads: the token silently expired
+  // on 2026-08-17 and nothing was emailed. Now it alerts (once a day, not 6×).
+  if (!isValid) {
+    const reason = debug?.data?.error?.message || 'token is not valid'
     log.push('⚠ Instagram: TOKEN EXPIRED')
+    await alertOnce('ig_token_dead', 20,
+      'IG TOKEN DEAD — publishing is down',
+      `The Instagram token is no longer valid, so IG sync and daily proof publish are DOWN right now.\n\n` +
+      `Facebook says: ${reason}\n\n` +
+      `A Facebook user token cannot be revived from the server — it needs one browser login. Two options:\n\n` +
+      `  1. FASTEST (60 days): open https://firstlight.live/ig-connect.html and click through the Facebook login.\n` +
+      `  2. PERMANENT (never expires): create a Business Manager System User token and store it as \`ig_access\`.\n` +
+      `     https://business.facebook.com/settings/system-users\n\n` +
+      `Option 2 ends this class of outage for good — system-user tokens have no 60-day clock.`
+    )
+    return
   }
 
-  // Refresh if < 45 days
+  // ── SELF-HEAL: promote any expiring user token to a permanent page token ──
+  // Runs on every sync. The moment a valid user token exists — whether it was just
+  // pasted in, or has been sitting here for weeks — it is swapped for the page token
+  // that never expires. After this succeeds once, `neverExpires` is true forever and
+  // this block, the refresh below, and every expiry alert go permanently quiet.
+  if (!neverExpires && daysLeft >= 0) {
+    const igAppId = await getSecret('ig_app_id')
+    const igAppSecret = await getSecret('ig_app_secret')
+    if (igAppId && igAppSecret) {
+      const permanent = await derivePermanentPageToken(igToken, igAppId, igAppSecret, log)
+      if (permanent) {
+        igToken = permanent.token
+        neverExpires = true   // suppresses the refresh + expiry-warning blocks below
+        await setSecret('ig_access', igToken)
+        await supaUpsert('config', {
+          key: 'IG_TOKEN_HEALTH',
+          value: JSON.stringify({ valid: true, days_left: NEVER_EXPIRES_DAYS, never_expires: true, token_kind: 'page', checked_at: new Date().toISOString(), expires_at: 0 })
+        }, 'key')
+        log.push(`Instagram: ✅ SELF-HEALED — swapped ${daysLeft}d user token for the permanent page token (${permanent.pageName})`)
+        await alertOnce('ig_token_permanent', 24 * 365,
+          'IG token is now PERMANENT — no more 60-day expiries',
+          `The Instagram token was a user token with ${daysLeft} days left. It has been automatically replaced with the ` +
+          `Facebook Page access token for "${permanent.pageName}", which Facebook reports as never-expiring.\n\n` +
+          `You should not have to log in for Instagram again. The nightly sync re-verifies this on every run and will ` +
+          `alert you if it ever stops being true.`
+        )
+        // fall through — the rest of this sync runs on the permanent token
+      } else {
+        log.push('Instagram: could not derive a permanent page token — staying on the user token')
+      }
+    }
+  }
+
+  // ── Refresh when under 45 days ───────────────────────────────────────────
+  // IMPORTANT: fb_exchange_token does NOT reset the 60-day clock on a token that is
+  // ALREADY long-lived — Facebook hands back a token with the same expiry it already
+  // had. So this call keeps the token fresh only when it descends from a short-lived
+  // token; otherwise it is a no-op that used to log "✅ token refreshed" and hide the
+  // fact that the clock was still running down to zero. We now measure the actual
+  // gain and escalate when there is none.
   let daysLeftAfter = daysLeft
-  if (isValid && daysLeft < 45 && daysLeft >= 0) {
+  let extended = false
+  if (!neverExpires && daysLeft < 45 && daysLeft >= 0) {
     const igAppId = await getSecret('ig_app_id')
     const igAppSecret = await getSecret('ig_app_secret')
     if (igAppId && igAppSecret) {
@@ -2176,31 +2410,52 @@ async function syncInstagram(log: string[]) {
           `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${igAppId}&client_secret=${igAppSecret}&fb_exchange_token=${igToken}`
         ).then(r => r.json())
         if (newToken.access_token) {
-          igToken = newToken.access_token
-          await setSecret('ig_access', igToken)
-          log.push('Instagram: ✅ token refreshed')
-          // Re-check days_left on the new token
           const recheck = await fetch(
-            `https://graph.facebook.com/v21.0/debug_token?input_token=${igToken}&access_token=${igToken}`
+            `https://graph.facebook.com/v21.0/debug_token?input_token=${newToken.access_token}&access_token=${newToken.access_token}`
           ).then(r => r.json())
-          if (recheck?.data?.expires_at) {
-            daysLeftAfter = Math.floor((recheck.data.expires_at - Date.now() / 1000) / 86400)
+          const newExpiresAt = recheck?.data?.expires_at || 0
+          const newValid = recheck?.data?.is_valid === true
+          const newDays = newExpiresAt === 0 && newValid
+            ? NEVER_EXPIRES_DAYS
+            : Math.floor((newExpiresAt - Date.now() / 1000) / 86400)
+
+          // Only adopt the new token if it is at least as good as what we hold.
+          // Guards against replacing a 40-day token with the 2-hour stub Facebook
+          // returns in the final hours of a long-lived token's life.
+          if (newValid && newDays >= daysLeft) {
+            igToken = newToken.access_token
+            await setSecret('ig_access', igToken)
+            daysLeftAfter = newDays
+            extended = newDays > daysLeft
+            log.push(`Instagram: token exchanged — ${daysLeft}d → ${newDays === NEVER_EXPIRES_DAYS ? 'never expires' : newDays + 'd'}`)
+          } else {
+            log.push(`Instagram: ⚠ exchange returned a WORSE token (${newDays}d vs ${daysLeft}d) — kept the existing one`)
           }
         }
       } catch (e) {
         log.push(`Instagram: ⚠ refresh failed: ${(e as Error).message}`)
-        await sendAlert('IG token refresh FAILED', `Instagram long-lived token has ${daysLeft} days remaining and refresh threw: ${(e as Error).message}. If days_left reaches 0, IG sync + daily proof publish dies. Regenerate manually at https://developers.facebook.com/tools/explorer/ and update ig_access in the secrets table.`)
+        await alertOnce('ig_refresh_threw', 20, 'IG token refresh FAILED',
+          `Instagram long-lived token has ${daysLeft} days remaining and refresh threw: ${(e as Error).message}. If days_left reaches 0, IG sync + daily proof publish dies. Re-auth at https://firstlight.live/ig-connect.html`)
       }
     }
   }
-  // Early-warning alert when token isn't being extended properly (FB restriction symptom)
-  // — fires when post-refresh life is still under 7 days. Standard long-lived tokens get 60d back.
-  if (isValid && daysLeftAfter < 7 && daysLeftAfter >= 0) {
-    await sendAlert(
-      `IG token under-extending (${daysLeftAfter}d left)`,
-      `Facebook only granted ${daysLeftAfter}d on the latest IG token refresh — expected 60d. This is usually a symptom of account restriction (App Review pending, content flagged, or rate-limited). Daily proof publish will die in ${daysLeftAfter}d unless cleared. Action: check https://business.facebook.com/business_locked / IG account status, resolve any flags, then trigger ?action=refresh-token again. (Was: ${daysLeft}d before refresh, ${daysLeftAfter}d after.)`
+
+  // ── Early warning: the clock is running down and we cannot stop it ────────
+  // Fires at 30 days out, not 7 — because when the exchange is a no-op there is
+  // nothing the server can do, and the fix needs Anupam at a browser. 30 days of
+  // notice beats 7, and it is the same one-click fix either way.
+  if (!neverExpires && daysLeftAfter <= 30 && daysLeftAfter >= 0 && !extended) {
+    await alertOnce('ig_token_expiring', 72,
+      `IG token expires in ${daysLeftAfter}d — needs one browser login`,
+      `The Instagram token has ${daysLeftAfter} days left and the automatic refresh could NOT extend it.\n\n` +
+      `This is expected, not a fault: Facebook does not let a server re-extend a token that is already long-lived — ` +
+      `fb_exchange_token returns the same expiry it already had. Only a fresh browser login mints a new 60-day token.\n\n` +
+      `  1. FASTEST (60 days): open https://firstlight.live/ig-connect.html and click through the Facebook login.\n` +
+      `  2. PERMANENT (never expires): Business Manager → System Users → generate a token with instagram_content_publish,\n` +
+      `     then store it as \`ig_access\`. https://business.facebook.com/settings/system-users\n\n` +
+      `Do option 2 once and this email never comes back.`
     )
-    log.push(`Instagram: ⚠ token still only ${daysLeftAfter}d after refresh — FB likely restricting`)
+    log.push(`Instagram: ⚠ ${daysLeftAfter}d left, exchange cannot extend — browser re-auth required`)
   }
 
   // Pull latest 10 posts
@@ -2224,7 +2479,12 @@ async function syncInstagram(log: string[]) {
   for (const p of posts.data) {
     const postDate = new Date(p.timestamp)
     const dateStr = postDate.toISOString().split('T')[0]
-    const dayNum = chapterDay(postDate)
+    // The caption is the PUBLISHED truth — trust it over the timestamp. A post
+    // that goes out late (grace republish at 10:14 IST) carries YESTERDAY's day
+    // number, but chapterDay(p.timestamp) would compute today's and overwrite it.
+    // That mismatch is exactly how the site's DAY badge drifted off the captions.
+    // Fall back to the timestamp only for posts with no "Day N" in the caption.
+    const dayNum = _captionDay(p.caption) ?? chapterDay(postDate)
 
     // Skip gap-day posts (Jun 9-12, between chapters) so we don't pollute existing rows
     if (dayNum < 1) { skipped++; continue }
@@ -2957,10 +3217,11 @@ async function uploadReceipt(body: Record<string, unknown>) {
 // Resend HTML emails with FIRST LIGHT brand. All compute day number
 // from STREAK_START and pull today's stats from strava_activities.
 // ═══════════════════════════════════════════
-const STREAK_START_ISO = '2026-06-20' // Chapter 02 ENDURANCE Day 1
+// Emails share the ONE public counter (DAY_EPOCH via chapterDay) — they used to
+// run off their own STREAK_START_ISO='2026-06-20' anchor, so a morning email said
+// "Day 61" while that night's post said "Day 31". Same number everywhere now.
 function _daysSinceStart(): number {
-  const ms = Date.now() - new Date(STREAK_START_ISO + 'T00:00:00+05:30').getTime()
-  return Math.max(1, Math.floor(ms / 86400000) + 1)
+  return Math.max(1, chapterDay(new Date(`${todayIST()}T12:00:00+05:30`)))
 }
 function _todayLocalISO(): string {
   // IST date string YYYY-MM-DD
@@ -3081,6 +3342,72 @@ ${stats ? `<table cellpadding="12" cellspacing="0" style="width:100%;border-coll
     'END-OF-DAY')
   await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')} · 90 min to verdict`, html, `Day ${dn} · 90 min till verdict — firstlight.live`)
   return { sent: 'eod', day: dn }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RESET / Clarity Protocol — pre-noon reminder (fires BEFORE the noon
+// auto-relapse sweep, reset_noon_sweep()). Emails ONLY if a day is
+// genuinely at risk: unconfirmed clean AND no relapse logged. Stage
+// (early / final) is derived from the IST hour so one action serves both
+// cron slots (09:00 early nudge, 11:30 last call). Goes to the operator.
+// ══════════════════════════════════════════════════════════════════
+function _istDateStr(offsetDays = 0): string {
+  return new Date(Date.now() + offsetDays * 86400000).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
+}
+function _istHour(): number {
+  return parseInt(new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata', hour12: false }).slice(0, 2), 10)
+}
+async function emailResetReminder() {
+  const { data: stRows } = await supaAdmin.from('reset_state').select('start_date').eq('id', 'me').limit(1)
+  const start = ((stRows && stRows[0] && stRows[0].start_date) as string) || _istDateStr(0)
+  const today = _istDateStr(0)
+  const yesterday = _istDateStr(-1)
+  if (yesterday < start) return { sent: false, reason: 'before protocol start', today }
+
+  const { data: dayRows } = await supaAdmin.from('reset_days').select('d,clean').gte('d', start).lte('d', yesterday)
+  const { data: relRows } = await supaAdmin.from('reset_relapses').select('occurred_on').gte('occurred_on', start).lte('occurred_on', yesterday)
+  const cleanSet = new Set<string>(((dayRows || []) as Array<{ d: string; clean: boolean }>).filter(r => r.clean).map(r => r.d))
+  const relSet = new Set<string>(((relRows || []) as Array<{ occurred_on: string }>).map(r => r.occurred_on))
+
+  const atRisk: string[] = []
+  let d = start, guard = 0
+  while (d <= yesterday && guard < 800) {
+    if (!cleanSet.has(d) && !relSet.has(d)) atRisk.push(d)
+    d = new Date(new Date(d + 'T00:00:00Z').getTime() + 86400000).toISOString().slice(0, 10)
+    guard++
+  }
+  if (atRisk.length === 0) return { sent: false, reason: 'nothing at risk — all days confirmed or logged', today }
+
+  const final = _istHour() >= 11
+  const imminent = atRisk[atRisk.length - 1]   // closest to today — its deadline is noon today
+  const older = atRisk.length - 1
+  const when = final ? 'in ~30 minutes (12:00 noon IST)' : 'at 12:00 noon IST today'
+  const subject = final
+    ? `[RESET] ⚠ Noon deadline — confirm ${imminent} clean now`
+    : `[RESET] Confirm ${imminent} clean before noon`
+  const olderLine = older > 0
+    ? `<p style="color:#FF8A8A;font-size:13px;margin:0 0 12px">Plus ${older} earlier day${older > 1 ? 's' : ''} still unconfirmed — already overdue.</p>` : ''
+
+  const html = `<!DOCTYPE html><html><body style="margin:0;background:#0A0C10;font-family:-apple-system,Segoe UI,Roboto,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0A0C10"><tr><td align="center">
+<table width="520" cellpadding="0" cellspacing="0" style="background:#12151C;border:1px solid rgba(185,140,255,0.25);border-radius:14px;margin:28px 0">
+<tr><td style="padding:24px 30px 8px">
+  <div style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#B98CFF">◆ RESET · CLARITY PROTOCOL</div>
+</td></tr>
+<tr><td style="padding:8px 30px 26px;color:#E8EDF2">
+  <h1 style="margin:0 0 12px;font-size:26px;color:#E8EDF2;font-weight:700">One tap keeps your streak.</h1>
+  <p style="font-size:15px;line-height:1.6;color:#B8C2CF;margin:0 0 14px"><b style="color:#fff">${imminent}</b> isn't confirmed clean yet. The system auto-logs it as a relapse ${when} unless you confirm.</p>
+  ${olderLine}
+  <div style="background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.28);border-radius:10px;padding:14px 16px;margin:14px 0;font-family:'Courier New',monospace;font-size:13px;color:#FF9A9A;line-height:1.8">If it fires:<br>• streak → <b style="color:#fff">0</b><br>• <b style="color:#fff">50 km walk + 200 km cycle</b> in 7 days<br>• one task starts <b style="color:#fff">tonight</b></div>
+  <a href="https://firstlight.live/reset.html" style="display:block;text-align:center;background:#00E676;color:#0A0C10;font-weight:700;font-family:'Courier New',monospace;letter-spacing:1px;text-decoration:none;padding:15px;border-radius:10px;font-size:14px">CONFIRM CLEAN → reset.html</a>
+  <p style="font-size:13px;line-height:1.6;color:#8A94A3;margin:18px 0 0">If you did slip — that's data, not failure. Log it honestly on the page; the story is what breaks the pattern.</p>
+  <p style="font-size:11px;color:#5A6675;margin:16px 0 0;font-family:'Courier New',monospace">— ${final ? 'Final call' : 'Reminder'} · sent before the noon sweep · private</p>
+</td></tr>
+</table></td></tr></table></body></html>`
+  const text = `RESET — ${imminent} isn't confirmed clean. Auto-logs as a relapse ${when} (streak → 0, 50 km walk + 200 km cycle in 7 days, one starts tonight). Confirm: https://firstlight.live/reset.html`
+
+  await _sendEmail(subject, html, text)
+  return { sent: true, stage: final ? 'final' : 'early', imminent, atRisk: atRisk.length }
 }
 
 async function emailWeeklyRecap() {
@@ -3507,6 +3834,156 @@ Deno.serve(async (req) => {
     }
   }
 
+  // ── Instagram OAuth code exchange (called by /ig-connect.html after login) ──
+  // GET ?action=ig-connect&code=XXX — the ONLY way to mint a fresh 60-day token.
+  // Facebook will not let a server extend an already-long-lived token, so when the
+  // 60 days run out a human has to log in once; this endpoint turns that into two
+  // clicks. Same auth posture as strava-connect: the one-time code IS the secret.
+  if (action === 'ig-connect') {
+    const code = url.searchParams.get('code')
+    if (!code) return new Response(JSON.stringify({ success: false, error: 'missing ?code=' }), { status: 400, headers })
+    const appId = await getSecret('ig_app_id')
+    const appSecret = await getSecret('ig_app_secret')
+    if (!appId || !appSecret) return new Response(JSON.stringify({ success: false, error: 'ig_app_id/ig_app_secret missing from secrets' }), { status: 500, headers })
+    try {
+      // 1 · authorization code → short-lived user token (~2h)
+      const shortResp = await fetch(
+        `https://graph.facebook.com/v21.0/oauth/access_token?client_id=${appId}&client_secret=${appSecret}` +
+        `&redirect_uri=${encodeURIComponent(IG_REDIRECT_URI)}&code=${encodeURIComponent(code)}`
+      ).then(r => r.json())
+      if (!shortResp.access_token) {
+        return new Response(JSON.stringify({ success: false, error: shortResp.error?.message || 'code exchange failed', detail: shortResp }), { status: 400, headers })
+      }
+
+      // 2 · short-lived → long-lived (60d). This step only extends when the input is
+      //     short-lived, which is exactly the case here — that's why re-auth works
+      //     and the nightly self-refresh doesn't.
+      const longResp = await fetch(
+        `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token` +
+        `&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortResp.access_token}`
+      ).then(r => r.json())
+      let finalToken = longResp.access_token || shortResp.access_token
+
+      // 2b · promote to the PAGE token, which never expires — so this login is the
+      //      last one ever needed. Falls back to the 60-day user token on failure.
+      let promotedToPage = false
+      const pageConv = await derivePermanentPageToken(finalToken, appId, appSecret, [])
+      if (pageConv) { finalToken = pageConv.token; promotedToPage = true }
+
+      // 3 · confirm what we actually got before overwriting a working secret
+      const dbg = await fetch(
+        `https://graph.facebook.com/v21.0/debug_token?input_token=${finalToken}&access_token=${appId}|${appSecret}`
+      ).then(r => r.json())
+      const expiresAt = dbg?.data?.expires_at || 0
+      const daysLeft = dbg?.data?.is_valid && expiresAt === 0
+        ? NEVER_EXPIRES_DAYS
+        : Math.floor((expiresAt - Date.now() / 1000) / 86400)
+      const scopes: string[] = dbg?.data?.scopes || []
+      if (!dbg?.data?.is_valid) {
+        return new Response(JSON.stringify({ success: false, error: 'exchanged token is not valid', detail: dbg?.data?.error || dbg }), { status: 400, headers })
+      }
+      if (!scopes.includes('instagram_content_publish')) {
+        return new Response(JSON.stringify({ success: false, error: 'token is missing instagram_content_publish — re-run the login and accept every permission', scopes }), { status: 400, headers })
+      }
+
+      // 4 · prove the token can actually see the IG account before we commit it
+      const acct = await fetch(
+        `https://graph.facebook.com/v21.0/${IG_ACCOUNT_ID}?fields=id,username&access_token=${encodeURIComponent(finalToken)}`
+      ).then(r => r.json())
+      if (acct.error) {
+        return new Response(JSON.stringify({ success: false, error: `token cannot reach IG account: ${acct.error.message}`, detail: acct.error }), { status: 400, headers })
+      }
+
+      await setSecret('ig_access', finalToken)
+      await supaUpsert('config', {
+        key: 'IG_TOKEN_HEALTH',
+        value: JSON.stringify({ valid: true, days_left: daysLeft, never_expires: daysLeft === NEVER_EXPIRES_DAYS, checked_at: new Date().toISOString(), expires_at: expiresAt })
+      }, 'key')
+      return new Response(JSON.stringify({ success: true, username: acct.username, days_left: daysLeft, never_expires: daysLeft === NEVER_EXPIRES_DAYS, promoted_to_page_token: promotedToPage }), { headers })
+    } catch (e) {
+      return new Response(JSON.stringify({ success: false, error: (e as Error).message }), { status: 500, headers })
+    }
+  }
+
+  // ── Store a manually-issued IG token (admin only) ──────────────────────────
+  // POST ?action=ig-store-token  { "token": "..." }
+  // Two jobs:
+  //   · Business Manager System User tokens (never expire, so they never arrive via
+  //     an OAuth redirect) — stored as-is.
+  //   · A short-lived token pasted straight out of Graph API Explorer — auto-upgraded
+  //     to a 60-day long-lived one first. Short→long IS extendable, unlike long→long,
+  //     so this is the one exchange that actually buys time.
+  // Validates scope + account reach before storing, so a bad paste can't take
+  // publishing down — the existing secret survives every rejection path below.
+  if (action === 'ig-store-token') {
+    if (!isAuthed) return new Response(JSON.stringify({ success: false, error: 'unauthorized' }), { status: 401, headers })
+    try {
+      const body = await req.json()
+      let token = String(body.token || '').trim()
+      if (!token) return new Response(JSON.stringify({ success: false, error: 'missing token' }), { status: 400, headers })
+      const appId = await getSecret('ig_app_id')
+      const appSecret = await getSecret('ig_app_secret')
+      const inspect = (t: string) => fetch(
+        `https://graph.facebook.com/v21.0/debug_token?input_token=${t}&access_token=${appId}|${appSecret}`
+      ).then(r => r.json())
+
+      let dbg = await inspect(token)
+      if (!dbg?.data?.is_valid) {
+        return new Response(JSON.stringify({ success: false, error: 'token is not valid', detail: dbg?.data?.error || dbg }), { status: 400, headers })
+      }
+
+      // Short-lived (< 50d of life)? Upgrade to the full 60 days before storing.
+      let upgraded = false
+      const initialExpiry = dbg.data.expires_at || 0
+      const initialDays = initialExpiry === 0 ? NEVER_EXPIRES_DAYS : Math.floor((initialExpiry - Date.now() / 1000) / 86400)
+      if (initialDays < 50) {
+        const long = await fetch(
+          `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token` +
+          `&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${token}`
+        ).then(r => r.json())
+        if (long.access_token) {
+          const longDbg = await inspect(long.access_token)
+          const longExpiry = longDbg?.data?.expires_at || 0
+          const longDays = longExpiry === 0 ? NEVER_EXPIRES_DAYS : Math.floor((longExpiry - Date.now() / 1000) / 86400)
+          if (longDbg?.data?.is_valid && longDays > initialDays) {
+            token = long.access_token
+            dbg = longDbg
+            upgraded = true
+          }
+        }
+      }
+
+      const scopes: string[] = dbg?.data?.scopes || []
+      if (!scopes.includes('instagram_content_publish')) {
+        return new Response(JSON.stringify({ success: false, error: 'token is missing instagram_content_publish', scopes }), { status: 400, headers })
+      }
+
+      // Promote to the never-expiring PAGE token so this is the LAST time a token is
+      // ever pasted in. Best-effort: if it can't be derived, the validated user token
+      // still gets stored and the nightly sync retries the promotion.
+      let permanent = false
+      const conv = await derivePermanentPageToken(token, appId || '', appSecret || '', [])
+      if (conv) { token = conv.token; dbg = await inspect(token); permanent = true }
+
+      const acct = await fetch(
+        `https://graph.facebook.com/v21.0/${IG_ACCOUNT_ID}?fields=id,username&access_token=${encodeURIComponent(token)}`
+      ).then(r => r.json())
+      if (acct.error) {
+        return new Response(JSON.stringify({ success: false, error: `token cannot reach IG account: ${acct.error.message}` }), { status: 400, headers })
+      }
+      const expiresAt = dbg.data.expires_at || 0
+      const daysLeft = expiresAt === 0 ? NEVER_EXPIRES_DAYS : Math.floor((expiresAt - Date.now() / 1000) / 86400)
+      await setSecret('ig_access', token)
+      await supaUpsert('config', {
+        key: 'IG_TOKEN_HEALTH',
+        value: JSON.stringify({ valid: true, days_left: daysLeft, never_expires: expiresAt === 0, checked_at: new Date().toISOString(), expires_at: expiresAt })
+      }, 'key')
+      return new Response(JSON.stringify({ success: true, username: acct.username, days_left: daysLeft, never_expires: expiresAt === 0, upgraded, promoted_to_page_token: permanent, token_type: dbg.data.type }), { headers })
+    } catch (e) {
+      return new Response(JSON.stringify({ success: false, error: (e as Error).message }), { status: 500, headers })
+    }
+  }
+
   // Health ingest — uses its own secret. Routes on EITHER ?action=health-ingest
   // OR the mere presence of the x-webhook-secret header, so clients (e.g. Health
   // Auto Export) that drop/mangle the URL query string still reach this handler
@@ -3659,10 +4136,13 @@ Deno.serve(async (req) => {
       if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return new Response(JSON.stringify({ error: 'republish requires ?date=YYYY-MM-DD' }), { status: 400, headers })
       }
+      // ?day=N — force the printed day number (chapter-boundary back-fills; see judgeToday).
+      const dayParam = parseInt(url.searchParams.get('day') || '', 10)
+      const dayOverride = Number.isFinite(dayParam) && dayParam > 0 ? dayParam : undefined
       const dry = url.searchParams.get('dry') === '1' || url.searchParams.get('dryRun') === '1'
       if (dry) {
         try { await syncStrava([]) } catch (_e) { /* tolerate — judge still reports */ }
-        const v = await judgeToday({ date })
+        const v = await judgeToday({ date, dayOverride })
         let polyline: string | null = null
         if (v.matched) {
           const { data } = await supaAdmin
@@ -3673,11 +4153,11 @@ Deno.serve(async (req) => {
           polyline = data?.summary_polyline || null
         }
         return new Response(JSON.stringify({
-          dryRun: true, date, verdict: v.verdict, matched: v.matched,
-          hasGps: !!polyline, polylineLen: polyline ? polyline.length : 0
+          dryRun: true, date, verdict: v.verdict, chapterDay: v.chapterDay, dayOverride: dayOverride ?? null,
+          matched: v.matched, hasGps: !!polyline, polylineLen: polyline ? polyline.length : 0
         }, null, 2), { headers })
       }
-      const result = await runVerdict({ date, republish: true })
+      const result = await runVerdict({ date, republish: true, dayOverride })
       return new Response(JSON.stringify(result, null, 2), { headers })
     }
 
@@ -3725,6 +4205,10 @@ Deno.serve(async (req) => {
     }
     if (action === 'email-weekly') {
       const r = await emailWeeklyRecap()
+      return new Response(JSON.stringify(r), { headers })
+    }
+    if (action === 'reset-reminder') {
+      const r = await emailResetReminder()
       return new Response(JSON.stringify(r), { headers })
     }
 

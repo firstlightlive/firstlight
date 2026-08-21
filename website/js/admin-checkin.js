@@ -249,7 +249,6 @@ function renderCheckin() {
       var satTasks = [
         { id: 'sat_laundry', label: 'Laundry — wash + dry' },
         { id: 'sat_batch_cook', label: 'Batch cook — larger portions for Sunday' },
-        { id: 'sat_steam', label: 'Steam bath — 15-20 min + cold rinse' },
         { id: 'sat_hammam', label: 'Hammam scrub — kessa mitt full body' },
         { id: 'sat_hair_oil', label: 'Brahmi/Bhringraj hair oiling — leave overnight' },
         { id: 'sat_face_mask', label: 'Kesar + raw milk face mask — 15 min' },
@@ -267,9 +266,9 @@ function renderCheckin() {
       html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:8px">SUNDAY — CAN RETURN HOME AFTER 1 PM</div>';
       var sunTasks = [
         { id: 'sun_abhyanga', label: 'Abhyanga full body self-massage — 10-15 min' },
+        { id: 'sun_temple', label: 'Temple visit' },
         { id: 'sun_park', label: 'Park or nature sit — 1 hour minimum (Shinrin-yoku)' },
         { id: 'sun_friluftsliv', label: 'Friluftsliv — 20-30 min purposeless walk' },
-        { id: 'sun_steam', label: 'Steam bath — second compulsory session' },
         { id: 'sun_face_mask', label: 'Kesar + raw milk face mask' },
         { id: 'sun_hair', label: 'Brahmi or bhringraj hair oiling' },
         { id: 'sun_perma', label: 'PERMA weekly audit — P E R M A each 1-10' },

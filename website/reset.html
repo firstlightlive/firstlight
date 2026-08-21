@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* FL-PRIVATE-GATE */(function(){try{var s=JSON.parse(localStorage.getItem("fl_supabase_session")||"null");if(!s||!s.access_token||(s.expires_at&&s.expires_at*1000<Date.now()))location.replace("login.html");}catch(e){location.replace("login.html");}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>RESET · Clarity Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0A0C10;--card:#12151C;--card2:#171b24;--line:rgba(255,255,255,0.08);
+    --text:#E8EDF2;--dim:#7A8699;--faint:#5A6675;--cyan:#00D4FF;--gold:#F5A623;--green:#00E676;--red:#FF5252;--violet:#B98CFF}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .mono{font-family:'IBM Plex Mono',monospace}
+  a{color:inherit;text-decoration:none}
+  header{position:sticky;top:0;z-index:20;background:rgba(10,12,16,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px clamp(16px,4vw,32px)}
+  .hrow{display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto;gap:12px}
+  .brand{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(12px,3.4vw,15px);letter-spacing:2px;color:var(--violet)}
+  .brand small{color:var(--dim);font-weight:500}
+  .day{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim)}
+  .wrap{max-width:900px;margin:0 auto;padding:clamp(16px,4vw,32px)}
+
+  /* Streak hero */
+  .hero{background:linear-gradient(180deg,#0e1620,#12151C);border:1px solid rgba(0,230,118,0.28);border-radius:16px;padding:26px 20px;margin-bottom:18px;text-align:center}
+  .hero.dirty{border-color:rgba(255,82,82,0.3);background:linear-gradient(180deg,#1a1013,#12151C)}
+  .hero .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--green);font-weight:700;text-transform:uppercase}
+  .hero.dirty .lbl{color:var(--red)}
+  .hero .big{font-family:'IBM Plex Mono',monospace;font-size:clamp(56px,17vw,96px);font-weight:700;line-height:1;margin:4px 0 2px}
+  .hero .sub{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}
+  .stat{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 6px}
+  .stat b{display:block;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:700}
+  .stat span{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--faint);text-transform:uppercase}
+  @media(max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  .sec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .sec h2{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin:0 0 4px}
+  .sec .hint{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);margin-bottom:14px;line-height:1.6}
+  .countdown{color:var(--gold)}
+
+  /* Deadline banner */
+  .deadline{border-radius:12px;padding:14px 16px;margin-bottom:16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.55;border:1px solid var(--line)}
+  .deadline.warn{border-color:rgba(245,166,35,0.5);background:rgba(245,166,35,0.08);color:var(--gold)}
+  .deadline.ok{border-color:rgba(0,230,118,0.4);background:rgba(0,230,118,0.07);color:var(--green)}
+  .deadline b{color:var(--text)}
+
+  .btn{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1px;border-radius:10px;padding:0 18px;min-height:48px;width:100%;border:none;cursor:pointer;touch-action:manipulation;margin-top:12px}
+  .btn:active{transform:scale(.99)}
+  .btn.clean{background:var(--green);color:#0A0C10}
+  .btn.done{background:var(--card2);color:var(--green);border:1px solid rgba(0,230,118,0.4)}
+  .btn.warn{background:var(--gold);color:#0A0C10}
+  .btn.danger{background:var(--red);color:#0A0C10}
+  .btn.ghost{background:var(--card2);color:var(--dim);border:1px solid var(--line)}
+  .btn2{display:inline-flex;width:auto;min-height:40px;padding:0 14px;font-size:12px}
+
+  /* Punishment card */
+  .pun{border:1px solid rgba(255,82,82,0.28);border-radius:12px;padding:14px;margin-bottom:12px;background:rgba(255,82,82,0.04)}
+  .pun.clear{border-color:rgba(0,230,118,0.35);background:rgba(0,230,118,0.05)}
+  .pun .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim)}
+  .pun .dl{font-weight:700}
+  .pun .dl.over{color:var(--red)}
+  .bar{height:9px;border-radius:6px;background:var(--card2);overflow:hidden;margin:6px 0 2px}
+  .bar > i{display:block;height:100%;background:var(--green);border-radius:6px;transition:width .3s}
+  .barlbl{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim);display:flex;justify-content:space-between}
+  .burn{display:flex;gap:8px;margin-top:8px;align-items:flex-end}
+  .burn .f{flex:1}
+  .burn label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--faint);display:block;margin-bottom:3px}
+  input,select,textarea{background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:10px;width:100%}
+  input[type=number]{text-align:center}
+  textarea{min-height:96px;resize:vertical;line-height:1.55;font-family:'Inter',sans-serif;font-size:14px}
+  .night{margin-top:10px;padding:10px 12px;border-radius:9px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .night.pending{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.4);color:var(--red)}
+  .night.go{background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.35);color:var(--green)}
+
+  /* Chips */
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 4px}
+  .chip{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:8px 12px;border-radius:20px;border:1px solid var(--line);background:var(--card2);color:var(--dim);cursor:pointer;touch-action:manipulation;min-height:36px;display:inline-flex;align-items:center}
+  .chip.on{border-color:var(--violet);color:var(--violet);background:rgba(185,140,255,0.12)}
+  .field{margin-bottom:12px}
+  .field > label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--faint);text-transform:uppercase;display:block;margin-bottom:6px}
+
+  /* Manifesto */
+  .manifesto{white-space:pre-wrap;font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;color:var(--text)}
+  .manifesto.empty{color:var(--faint);font-style:italic}
+
+  /* Patterns */
+  .patrow{display:flex;flex-wrap:wrap;gap:7px}
+  .pat{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:7px 11px;border-radius:8px;background:var(--card2);border:1px solid var(--line);color:var(--dim)}
+  .pat b{color:var(--gold)}
+
+  /* Ledger */
+  .led{border-bottom:1px solid var(--line);padding:11px 0}
+  .led:last-child{border-bottom:none}
+  .led .lh{display:flex;justify-content:space-between;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;cursor:pointer;align-items:center}
+  .led .lh .badge{font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:5px;text-transform:uppercase}
+  .badge.man{background:rgba(255,82,82,0.15);color:var(--red)}
+  .badge.auto{background:rgba(245,166,35,0.15);color:var(--gold)}
+  .led .body{display:none;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim);line-height:1.65;padding:8px 0 2px}
+  .led .body.open{display:block}
+  .led .body .story{font-family:'Inter',sans-serif;font-size:13.5px;color:var(--text);white-space:pre-wrap;margin-top:6px;padding-left:10px;border-left:2px solid var(--line)}
+  .kv{color:var(--faint)} .kv b{color:var(--text);font-weight:600}
+
+  /* Urge modal + floating button */
+  .urgeFab{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:40;background:var(--red);color:#0A0C10;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;letter-spacing:1px;border:none;border-radius:30px;padding:14px 22px;box-shadow:0 8px 26px rgba(0,0,0,.5);cursor:pointer;touch-action:manipulation}
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(4,6,10,0.9);display:none;align-items:center;justify-content:center;padding:18px}
+  .overlay.show{display:flex}
+  .modal{background:var(--card);border:1px solid rgba(185,140,255,0.35);border-radius:16px;max-width:520px;width:100%;max-height:86vh;overflow:auto;padding:22px}
+  .modal h3{font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--violet);margin:0 0 10px}
+  .modal .why{font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;white-space:pre-wrap;background:var(--card2);border-radius:10px;padding:14px;margin-bottom:12px;max-height:34vh;overflow:auto}
+  .modal .cost{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--red);line-height:1.7;background:rgba(255,82,82,0.07);border:1px solid rgba(255,82,82,0.25);border-radius:10px;padding:12px;margin-bottom:12px}
+
+  .note{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);line-height:1.6;margin-top:10px}
+  .savedmsg{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--green);margin-top:8px;min-height:14px}
+  .foot{text-align:center;color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:26px 0 90px}
+  .foot a{color:var(--dim)}
+  .synced{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--faint);text-align:center;margin:-6px 0 14px}
+</style>
+</head>
+<body>
+<header><div class="hrow">
+  <a class="brand" href="index.html">◆ RESET <small>· clarity protocol</small></a>
+  <div class="day" id="dayline">—</div>
+</div></header>
+
+<div class="wrap">
+
+  <!-- Streak hero -->
+  <div class="hero" id="hero">
+    <div class="lbl" id="heroLbl">DAYS CLEAN</div>
+    <div class="big" id="heroDays">—</div>
+    <div class="sub" id="heroSub">loading…</div>
+    <div class="stats">
+      <div class="stat"><b id="sBest">—</b><span>best run</span></div>
+      <div class="stat"><b id="sUrges">—</b><span>urges beaten</span></div>
+      <div class="stat"><b id="sSlips">—</b><span>relapses</span></div>
+      <div class="stat"><b id="sOwed">—</b><span>km owed</span></div>
+    </div>
+  </div>
+  <div class="synced" id="syncState"></div>
+
+  <!-- Deadline / daily check-in -->
+  <div class="deadline" id="deadlineBox">—</div>
+  <div class="sec">
+    <h2>Daily Check-In</h2>
+    <div class="hint">Confirm each day clean before <b class="countdown">12:00 noon</b> the next day. Miss it and the system assumes a relapse — streak to zero + <b style="color:var(--red)">50 km walk + 200 km cycle</b>, one starting tonight.<br>📧 You'll get an email at <b>09:00</b> &amp; a last call at <b>11:30 IST</b> if a day is still unconfirmed — so a genuine "forgot" never silently becomes a relapse.</div>
+    <div id="checkinArea"></div>
+    <div class="savedmsg" id="ciMsg"></div>
+  </div>
+
+  <!-- Active punishment -->
+  <div class="sec" id="punSec" style="display:none">
+    <h2>Penance Owed</h2>
+    <div class="hint">Debts are paid in distance, within 7 days. At least one task starts the night it's assigned.</div>
+    <div id="punList"></div>
+  </div>
+
+  <!-- Log a relapse -->
+  <div class="sec">
+    <h2>Log a Relapse — honestly</h2>
+    <div class="hint">Naming it is how you disarm it. This is private. No shame — data.</div>
+    <div class="field"><label>When</label><input type="date" id="rDate"></div>
+    <div class="field"><label>What pulled the trigger? (tap all)</label><div class="chips" id="rTriggers"></div></div>
+    <div class="field"><label>Site / app (comma-separated — surfaces the pattern to block)</label><input type="text" id="rSites" placeholder="e.g. instagram, xvideos, reddit"></div>
+    <div class="field"><label>Feeling right before</label><div class="chips" id="rMoodBefore"></div></div>
+    <div class="field"><label>Feeling right after</label><div class="chips" id="rMoodAfter"></div></div>
+    <div class="field"><label>How long (minutes)</label><input type="number" id="rDur" inputmode="numeric" min="0" placeholder="0"></div>
+    <div class="field"><label>The story — what happened, and why did you do it?</label>
+      <textarea id="rStory" placeholder="What were you feeling right before? What did you tell yourself? What actually triggered it? What would you do differently next time?"></textarea></div>
+    <button class="btn danger" id="rSubmit">LOG IT · RESET STREAK · ASSIGN PENANCE</button>
+    <div class="savedmsg" id="rMsg"></div>
+  </div>
+
+  <!-- Why I want to be free -->
+  <div class="sec">
+    <h2>Why I Want To Be Free</h2>
+    <div class="hint">Your own words. Read this when the urge hits — it's the first thing the panic button shows you.</div>
+    <div class="manifesto empty" id="manifestoView">Tap edit and write, in your own words, why this matters. Who you're becoming. What it's costing you. What you'll gain.</div>
+    <textarea id="manifestoEdit" style="display:none" placeholder="Because I want to be present. Because it steals my mornings and my focus. Because the man I'm building doesn't need this. Because…"></textarea>
+    <button class="btn ghost btn2" id="manifestoBtn">EDIT</button>
+    <span class="savedmsg" id="mMsg" style="display:inline-block;margin-left:10px"></span>
+  </div>
+
+  <!-- Patterns -->
+  <div class="sec" id="patSec" style="display:none">
+    <h2>Your Patterns</h2>
+    <div class="hint">Where it comes from. Block the sites. Plan around the triggers.</div>
+    <div class="field"><label>Trigger frequency</label><div class="patrow" id="patTriggers"></div></div>
+    <div class="field" style="margin-bottom:0"><label>Sites to block</label><div class="patrow" id="patSites"></div></div>
+  </div>
+
+  <!-- Ledger -->
+  <div class="sec">
+    <h2>The Ledger — every relapse, its story</h2>
+    <div id="ledger"></div>
+  </div>
+
+  <div class="sec">
+    <button class="btn ghost btn2" id="exportBtn">EXPORT BACKUP (JSON)</button>
+  </div>
+
+  <div class="foot">Private · on-device + your Supabase · no shame, only data.<br><a href="index.html">← FIRST LIGHT</a> · <a href="discipline.html">discipline</a></div>
+</div>
+
+<button class="urgeFab" id="urgeFab">🛑 I'M HAVING AN URGE</button>
+
+<div class="overlay" id="urgeModal">
+  <div class="modal">
+    <h3>◆ HOLD. Breathe. Read this first.</h3>
+    <div class="why" id="urgeWhy"></div>
+    <div class="cost">If you act on this now:<br>• Your <b id="urgeStreak">—</b>-day streak → <b>0</b><br>• Penance: <b>50 km walk + 200 km cycle</b> in 7 days<br>• One task starts <b>tonight</b>.<br><br>The urge peaks and passes in minutes. You've beaten it before.</div>
+    <button class="btn clean" id="urgeBeat">✓ I BEAT IT — LOG THE WIN</button>
+    <button class="btn warn" id="urgeWalk">👟 I'M MOVING RIGHT NOW (walk / pushups)</button>
+    <button class="btn ghost" id="urgeClose">close</button>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/fl-authread.js?v=20260716"></script>
+<script>
+(function(){
+  'use strict';
+  var FL = window.FL || {};
+  var SUPA = FL.SUPABASE_URL || localStorage.getItem('fl_supabase_url') || '';
+  var ANON = FL.SUPABASE_ANON_KEY || localStorage.getItem('fl_supabase_key') || '';
+  var CYCLE_KM = 200, WALK_KM = 50, WEEK = 7;
+
+  // ── constant option lists ──
+  var TRIGGERS = ['bored','stressed','lonely','tired','anxious','urge / horny','late-night scroll','notification','after alcohol','argument','celebration','no reason'];
+  var MOODS_BEFORE = ['bored','stressed','lonely','tired','numb','anxious','restless','fine'];
+  var MOODS_AFTER  = ['shame','empty','relief','regret','tired','numb','disgust','calm'];
+
+  // ── IST date/time helpers (tz-safe) ──
+  function istParts(){
+    var d=new Date();
+    var ds=d.toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'});          // YYYY-MM-DD
+    var ts=d.toLocaleTimeString('en-GB',{timeZone:'Asia/Kolkata',hour12:false}); // HH:MM:SS
+    var p=ts.split(':');
+    return {date:ds, h:+p[0], m:+p[1], mins:(+p[0])*60+(+p[1])};
+  }
+  function addDays(ds,n){var p=ds.split('-');var d=new Date(Date.UTC(+p[0],+p[1]-1,+p[2],12));d.setUTCDate(d.getUTCDate()+n);
+    return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');}
+  function diffDays(a,b){var pa=a.split('-'),pb=b.split('-');
+    return Math.round((Date.UTC(+pa[0],+pa[1]-1,+pa[2])-Date.UTC(+pb[0],+pb[1]-1,+pb[2]))/86400000);}
+  function pretty(ds){var p=ds.split('-');return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]+' '+(+p[2])+', '+p[0];}
+  function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+
+  // ── REST layer (fl-authread upgrades Authorization to the session JWT) ──
+  function H(extra){var h={apikey:ANON,'Content-Type':'application/json'};if(extra)for(var k in extra)h[k]=extra[k];return h;}
+  function rGet(table,q){return fetch(SUPA+'/rest/v1/'+table+'?'+(q||'select=*'),{headers:H()}).then(function(r){return r.ok?r.json():[];});}
+  function rUpsert(table,body,oc){return fetch(SUPA+'/rest/v1/'+table+(oc?('?on_conflict='+oc):''),
+    {method:'POST',headers:H({Prefer:'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
+  function rInsert(table,body){return fetch(SUPA+'/rest/v1/'+table,
+    {method:'POST',headers:H({Prefer:'return=representation'}),body:JSON.stringify(body)})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
+  function rPatch(table,q,body){return fetch(SUPA+'/rest/v1/'+table+'?'+q,
+    {method:'PATCH',headers:H({Prefer:'return=representation'}),body:JSON.stringify(body)})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
+  function rDelete(table,q){return fetch(SUPA+'/rest/v1/'+table+'?'+q,{method:'DELETE',headers:H()})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return true;});}
+
+  // ── offline queue (writes that failed get replayed on next load / online) ──
+  function loadQ(){try{return JSON.parse(localStorage.getItem('fl_reset_q')||'[]');}catch(e){return [];}}
+  function saveQ(q){localStorage.setItem('fl_reset_q',JSON.stringify(q));}
+  function enqueue(it){var q=loadQ();q.push(it);saveQ(q);}
+  function replay(it){
+    if(it.kind==='upsert')return rUpsert(it.table,it.body,it.oc);
+    if(it.kind==='insert')return rInsert(it.table,it.body);
+    if(it.kind==='patch') return rPatch(it.table,it.q,it.body);
+    if(it.kind==='delete')return rDelete(it.table,it.q);
+    return Promise.resolve();
+  }
+  function flushQueue(){
+    var q=loadQ();if(!q.length)return Promise.resolve();
+    var chain=Promise.resolve(), ok=[];
+    q.forEach(function(it){chain=chain.then(function(){return replay(it).then(function(){},function(){ok.push(it);});});});
+    return chain.then(function(){saveQ(ok);});
+  }
+  // write-through: try REST, enqueue on failure
+  function wUpsert(table,body,oc){return rUpsert(table,body,oc).catch(function(){enqueue({kind:'upsert',table:table,body:body,oc:oc});});}
+  function wInsert(table,body){return rInsert(table,body).catch(function(){enqueue({kind:'insert',table:table,body:body});});}
+  function wPatch(table,q,body){return rPatch(table,q,body).catch(function(){enqueue({kind:'patch',table:table,q:q,body:body});});}
+  function wDelete(table,q){return rDelete(table,q).catch(function(){enqueue({kind:'delete',table:table,q:q});});}
+
+  // ── state ──
+  var state={start:null, manifesto:'', days:{}, relapses:[], punishments:[], urges:[]};
+  function cacheSave(){try{localStorage.setItem('fl_reset',JSON.stringify(state));}catch(e){}}
+  function cacheLoad(){try{var s=JSON.parse(localStorage.getItem('fl_reset')||'null');if(s)state=s;}catch(e){}}
+
+  // form working memory
+  var form={triggers:[], moodBefore:'', moodAfter:''};
+
+  // ── derived ──
+  function relapseOn(d){for(var i=0;i<state.relapses.length;i++)if(state.relapses[i].occurred_on===d)return state.relapses[i];return null;}
+  function lastRelapseDate(){var m=null;state.relapses.forEach(function(r){if(!m||r.occurred_on>m)m=r.occurred_on;});return m;}
+  function cleanStreak(today){var lr=lastRelapseDate();var o=lr||state.start;var n=diffDays(today,o);return Math.max(0,n);}
+  function bestStreak(today){
+    var pts=state.relapses.map(function(r){return r.occurred_on;}).sort();
+    var prev=state.start, best=0;
+    pts.forEach(function(r){best=Math.max(best,diffDays(r,prev));prev=r;});
+    best=Math.max(best,diffDays(today,prev));
+    return Math.max(best,cleanStreak(today));
+  }
+  function kmOwed(){var t=0;state.punishments.forEach(function(p){if(!isCleared(p))t+=Math.max(0,p.cycle_km-p.cycle_done)+Math.max(0,p.walk_km-p.walk_done);});return Math.round(t);}
+  function isCleared(p){return p.cycle_done>=p.cycle_km && p.walk_done>=p.walk_km;}
+  function urgesBeaten(){var n=0;state.urges.forEach(function(u){if(u.beaten)n++;});return n;}
+
+  // ══════════════════════════════════════
+  // LOAD
+  // ══════════════════════════════════════
+  function loadAll(){
+    return Promise.all([
+      rGet('reset_state','id=eq.me'),
+      rGet('reset_days','select=d,clean&order=d.desc'),
+      rGet('reset_relapses','select=*&order=occurred_on.desc'),
+      rGet('reset_punishments','select=*&order=deadline.asc'),
+      rGet('reset_urges','select=*&order=occurred_at.desc&limit=500')
+    ]).then(function(res){
+      var st=res[0]&&res[0][0];
+      state.start=(st&&st.start_date)||state.start||istParts().date;
+      state.manifesto=(st&&st.manifesto)||'';
+      state.days={}; (res[1]||[]).forEach(function(r){if(r.clean)state.days[r.d]=true;});
+      state.relapses=res[2]||[];
+      state.punishments=res[3]||[];
+      state.urges=res[4]||[];
+      // ensure singleton exists with a start date
+      if(!st){ wUpsert('reset_state',{id:'me',start_date:state.start},'id'); }
+      cacheSave();
+      return true;
+    });
+  }
+
+  // ══════════════════════════════════════
+  // CLIENT NOON SWEEP (mirrors reset_noon_sweep())
+  // ══════════════════════════════════════
+  function noonSweep(){
+    var p=istParts(), today=p.date;
+    var cutoff = p.mins>=720 ? addDays(today,-1) : addDays(today,-2);
+    if(diffDays(cutoff,state.start)<0) return Promise.resolve(false);
+    var d=state.start, guard=0, added=false, jobs=[];
+    while(diffDays(cutoff,d)>=0 && guard<800){
+      if(!state.days[d] && !relapseOn(d)){
+        var rel={occurred_on:d,triggers:['missed-checkin'],story:'Auto-logged: no clean-confirmation by 12:00 noon deadline.',auto:true};
+        state.relapses.push(rel);
+        var pun={relapse_on:d,assigned_on:d,deadline:addDays(d,WEEK),cycle_km:CYCLE_KM,walk_km:WALK_KM,cycle_done:0,walk_done:0,night_started:false};
+        state.punishments.push(pun);
+        jobs.push(wUpsert('reset_relapses',rel,'occurred_on'));
+        jobs.push(wUpsert('reset_punishments',pun,'relapse_on'));
+        added=true;
+      }
+      d=addDays(d,1); guard++;
+    }
+    if(added)cacheSave();
+    return Promise.all(jobs).then(function(){return added;});
+  }
+
+  // ══════════════════════════════════════
+  // RENDER
+  // ══════════════════════════════════════
+  function render(){
+    var p=istParts(), today=p.date, yday=addDays(today,-1);
+    document.getElementById('dayline').textContent='DAY '+(diffDays(today,state.start)+1);
+
+    // hero
+    var streak=cleanStreak(today), dirty=(lastRelapseDate()===today);
+    document.getElementById('heroDays').textContent=streak;
+    document.getElementById('heroLbl').textContent=dirty?'RESET — DAY ZERO':'DAYS CLEAN';
+    document.getElementById('hero').className='hero'+(dirty?' dirty':'');
+    var lr=lastRelapseDate();
+    document.getElementById('heroSub').textContent=lr?('clean since '+pretty(addDays(lr,1))):('protocol began '+pretty(state.start));
+    document.getElementById('sBest').textContent=bestStreak(today);
+    document.getElementById('sUrges').textContent=urgesBeaten();
+    document.getElementById('sSlips').textContent=state.relapses.length;
+    document.getElementById('sOwed').textContent=kmOwed();
+
+    renderDeadline(today,yday,p);
+    renderPunishments(today);
+    renderManifesto();
+    renderPatterns();
+    renderLedger();
+  }
+
+  function renderDeadline(today,yday,p){
+    var box=document.getElementById('deadlineBox'), area=document.getElementById('checkinArea');
+    var todayClean=!!state.days[today], ydayClean=!!state.days[yday], ydayRel=!!relapseOn(yday), beforeNoon=p.mins<720;
+    var pendingY = !ydayClean && !ydayRel && beforeNoon && diffDays(yday,state.start)>=0;
+
+    var html='';
+    if(pendingY){
+      var mins=720-p.mins;
+      box.className='deadline warn';
+      box.innerHTML='⚠ <b>Yesterday ('+pretty(yday)+') isn\'t confirmed.</b> Confirm it clean before <b>12:00 noon today</b> — <span class="countdown">'+Math.floor(mins/60)+'h '+(mins%60)+'m left</span> — or the system auto-logs a relapse.';
+      html+='<button class="btn warn" data-confirm="'+yday+'">CONFIRM YESTERDAY WAS CLEAN</button>';
+    } else {
+      var toNoon=(1440-p.mins)+720; // to tomorrow noon
+      box.className='deadline ok';
+      box.innerHTML='Today\'s deadline: <b>12:00 noon tomorrow</b> · <span class="countdown">'+Math.floor(toNoon/60)+'h '+(toNoon%60)+'m</span> to confirm today clean.';
+    }
+    if(relapseOn(today)){
+      html+='<button class="btn ghost" disabled>Today is logged as a relapse. Tomorrow is a clean slate — begin again.</button>';
+    } else if(todayClean){
+      html+='<button class="btn done" disabled>✓ TODAY CONFIRMED CLEAN — '+pretty(today)+'</button>';
+    } else {
+      html+='<button class="btn clean" data-confirm="'+today+'">I STAYED CLEAN TODAY ('+pretty(today)+')</button>';
+    }
+    area.innerHTML=html;
+  }
+
+  function renderPunishments(today){
+    var open=state.punishments.filter(function(p){return !isCleared(p);})
+              .sort(function(a,b){return a.deadline<b.deadline?-1:1;});
+    var sec=document.getElementById('punSec'), list=document.getElementById('punList');
+    if(!open.length){ sec.style.display='none'; return; }
+    sec.style.display='block'; list.innerHTML='';
+    open.forEach(function(p){
+      var left=diffDays(p.deadline,today), over=left<0;
+      var cyPct=Math.min(100,Math.round(p.cycle_done/p.cycle_km*100));
+      var wkPct=Math.min(100,Math.round(p.walk_done/p.walk_km*100));
+      var night=p.night_started
+        ? '<div class="night go">✓ Night task started</div>'
+        : '<div class="night pending"><span>⚠ ONE TASK MUST START TONIGHT</span><button class="btn done btn2" data-night="'+p.relapse_on+'">START NOW ✓</button></div>';
+      list.insertAdjacentHTML('beforeend',
+        '<div class="pun">'
+        +'<div class="top"><span>Assigned '+pretty(p.assigned_on)+(relapseOn(p.relapse_on)&&relapseOn(p.relapse_on).auto?' · auto':'')+'</span>'
+        +'<span class="dl'+(over?' over':'')+'">'+(over?('OVERDUE by '+Math.abs(left)+'d'):(left+'d left'))+'</span></div>'
+        +'<div class="barlbl"><span>🚴 CYCLE</span><span>'+Math.round(p.cycle_done)+' / '+p.cycle_km+' km</span></div><div class="bar"><i style="width:'+cyPct+'%"></i></div>'
+        +'<div class="barlbl"><span>🚶 WALK</span><span>'+Math.round(p.walk_done)+' / '+p.walk_km+' km</span></div><div class="bar"><i style="width:'+wkPct+'%"></i></div>'
+        +night
+        +'<div class="burn">'
+          +'<div class="f"><label>+ CYCLE KM</label><input type="number" inputmode="decimal" min="0" placeholder="0" data-burn="cycle" data-on="'+p.relapse_on+'"></div>'
+          +'<div class="f"><label>+ WALK KM</label><input type="number" inputmode="decimal" min="0" placeholder="0" data-burn="walk" data-on="'+p.relapse_on+'"></div>'
+          +'<button class="btn done btn2" data-burnadd="'+p.relapse_on+'" style="margin-top:0">ADD</button>'
+        +'</div></div>');
+    });
+  }
+
+  function renderManifesto(){
+    var v=document.getElementById('manifestoView');
+    if(state.manifesto && state.manifesto.trim()){ v.textContent=state.manifesto; v.className='manifesto'; }
+    else { v.className='manifesto empty'; }
+  }
+
+  function renderPatterns(){
+    if(!state.relapses.length){document.getElementById('patSec').style.display='none';return;}
+    document.getElementById('patSec').style.display='block';
+    var tc={}, sc={};
+    state.relapses.forEach(function(r){
+      (r.triggers||[]).forEach(function(t){if(t!=='missed-checkin')tc[t]=(tc[t]||0)+1;});
+      (r.sites||[]).forEach(function(s){s=s.trim();if(s)sc[s.toLowerCase()]=(sc[s.toLowerCase()]||0)+1;});
+    });
+    function chips(map,el,empty){
+      var keys=Object.keys(map).sort(function(a,b){return map[b]-map[a];});
+      var box=document.getElementById(el);
+      if(!keys.length){box.innerHTML='<span class="pat" style="color:var(--faint)">'+empty+'</span>';return;}
+      box.innerHTML=keys.map(function(k){return '<span class="pat">'+esc(k)+' <b>×'+map[k]+'</b></span>';}).join('');
+    }
+    chips(tc,'patTriggers','no triggers logged yet');
+    chips(sc,'patSites','no sites logged yet');
+  }
+
+  function renderLedger(){
+    var el=document.getElementById('ledger');
+    if(!state.relapses.length){el.innerHTML='<div class="hint" style="margin:0">No relapses logged. Keep it that way. 🟢</div>';return;}
+    var rows=state.relapses.slice().sort(function(a,b){return a.occurred_on<b.occurred_on?1:-1;});
+    el.innerHTML=rows.map(function(r,i){
+      var trg=(r.triggers||[]).filter(function(t){return t!=='missed-checkin';});
+      var body=''
+        + (trg.length?'<div class="kv">triggers: <b>'+trg.map(esc).join(', ')+'</b></div>':'')
+        + ((r.sites&&r.sites.length)?'<div class="kv">sites: <b>'+r.sites.map(esc).join(', ')+'</b></div>':'')
+        + ((r.mood_before||r.mood_after)?'<div class="kv">mood: <b>'+esc(r.mood_before||'?')+'</b> → <b>'+esc(r.mood_after||'?')+'</b></div>':'')
+        + (r.duration_min?'<div class="kv">duration: <b>'+r.duration_min+' min</b></div>':'')
+        + (r.story?'<div class="story">'+esc(r.story)+'</div>':'');
+      return '<div class="led"><div class="lh" data-led="'+i+'">'
+        +'<span>'+(r.auto?'⚠ ':'')+pretty(r.occurred_on)+'</span>'
+        +'<span class="badge '+(r.auto?'auto':'man')+'">'+(r.auto?'auto':'logged')+'</span></div>'
+        +'<div class="body" id="ledb'+i+'">'+(body||'<span class="kv">no detail recorded</span>')+'</div></div>';
+    }).join('');
+  }
+
+  // ══════════════════════════════════════
+  // ACTIONS
+  // ══════════════════════════════════════
+  function confirmClean(d){
+    state.days[d]=true;
+    // if a relapse was logged for that same day, clearing implies it wasn't — but we don't auto-remove; user controls that.
+    cacheSave();
+    var row={d:d,clean:true,confirmed_at:new Date().toISOString()};
+    wUpsert('reset_days',row,'d');
+    document.getElementById('ciMsg').textContent='✓ '+pretty(d)+' confirmed clean.';
+    render();
+  }
+
+  function submitRelapse(){
+    var d=document.getElementById('rDate').value||istParts().date;
+    var sites=(document.getElementById('rSites').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var dur=parseInt(document.getElementById('rDur').value,10);
+    var rel={
+      occurred_on:d,
+      occurred_at:new Date().toISOString(),
+      triggers:form.triggers.slice(),
+      sites:sites,
+      duration_min:isNaN(dur)?null:dur,
+      mood_before:form.moodBefore||null,
+      mood_after:form.moodAfter||null,
+      story:(document.getElementById('rStory').value||'').trim()||null,
+      auto:false
+    };
+    // update state (replace any existing relapse on that day)
+    state.relapses=state.relapses.filter(function(r){return r.occurred_on!==d;});
+    state.relapses.push(rel);
+    delete state.days[d];
+    var existingPun=state.punishments.filter(function(x){return x.relapse_on===d;})[0];
+    if(!existingPun){
+      var np={relapse_on:d,assigned_on:d,deadline:addDays(d,WEEK),cycle_km:CYCLE_KM,walk_km:WALK_KM,cycle_done:0,walk_done:0,night_started:false};
+      state.punishments.push(np);
+      wUpsert('reset_punishments',np,'relapse_on');
+    }
+    cacheSave();
+    wUpsert('reset_relapses',rel,'occurred_on');
+    wDelete('reset_days','d=eq.'+d);
+    // reset form
+    form={triggers:[],moodBefore:'',moodAfter:''};
+    document.getElementById('rSites').value='';document.getElementById('rDur').value='';document.getElementById('rStory').value='';
+    document.getElementById('rDate').value=istParts().date;
+    buildChips();
+    document.getElementById('rMsg').textContent='Logged. Streak reset. Penance assigned — start one task tonight. This is data, not failure.';
+    render();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function burnAdd(on){
+    var p=state.punishments.filter(function(x){return x.relapse_on===on;})[0]; if(!p)return;
+    var ci=document.querySelector('input[data-burn="cycle"][data-on="'+on+'"]');
+    var wi=document.querySelector('input[data-burn="walk"][data-on="'+on+'"]');
+    var c=parseFloat(ci&&ci.value)||0, w=parseFloat(wi&&wi.value)||0;
+    if(c<=0&&w<=0)return;
+    p.cycle_done=Math.round((p.cycle_done+c)*10)/10;
+    p.walk_done=Math.round((p.walk_done+w)*10)/10;
+    p.cleared=isCleared(p);
+    cacheSave();
+    wPatch('reset_punishments','relapse_on=eq.'+on,{cycle_done:p.cycle_done,walk_done:p.walk_done});
+    render();
+  }
+  function startNight(on){
+    var p=state.punishments.filter(function(x){return x.relapse_on===on;})[0]; if(!p)return;
+    p.night_started=true; cacheSave();
+    wPatch('reset_punishments','relapse_on=eq.'+on,{night_started:true});
+    render();
+  }
+
+  function saveManifesto(txt){
+    state.manifesto=txt; cacheSave();
+    wUpsert('reset_state',{id:'me',manifesto:txt,start_date:state.start},'id');
+  }
+
+  function logUrge(note){
+    var u={occurred_at:new Date().toISOString(),note:note||null,beaten:true};
+    state.urges.push(u); cacheSave();
+    wInsert('reset_urges',u);
+    render();
+  }
+
+  // ══════════════════════════════════════
+  // WIRING
+  // ══════════════════════════════════════
+  function buildChips(){
+    function fill(elId,list,mode){
+      var box=document.getElementById(elId);
+      box.innerHTML=list.map(function(t){
+        var on = mode==='trig' ? form.triggers.indexOf(t)>=0
+               : mode==='mb'   ? form.moodBefore===t
+               : form.moodAfter===t;
+        return '<span class="chip'+(on?' on':'')+'" data-chip="'+mode+'" data-val="'+esc(t)+'">'+esc(t)+'</span>';
+      }).join('');
+    }
+    fill('rTriggers',TRIGGERS,'trig');
+    fill('rMoodBefore',MOODS_BEFORE,'mb');
+    fill('rMoodAfter',MOODS_AFTER,'ma');
+  }
+
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    var chip=t.closest('[data-chip]');
+    if(chip){
+      var mode=chip.getAttribute('data-chip'), val=chip.getAttribute('data-val');
+      if(mode==='trig'){var i=form.triggers.indexOf(val);if(i>=0)form.triggers.splice(i,1);else form.triggers.push(val);}
+      else if(mode==='mb'){form.moodBefore=(form.moodBefore===val)?'':val;}
+      else if(mode==='ma'){form.moodAfter=(form.moodAfter===val)?'':val;}
+      buildChips(); return;
+    }
+    var cf=t.closest('[data-confirm]'); if(cf){confirmClean(cf.getAttribute('data-confirm'));return;}
+    var na=t.closest('[data-night]'); if(na){startNight(na.getAttribute('data-night'));return;}
+    var ba=t.closest('[data-burnadd]'); if(ba){burnAdd(ba.getAttribute('data-burnadd'));return;}
+    var ld=t.closest('[data-led]'); if(ld){var b=document.getElementById('ledb'+ld.getAttribute('data-led'));if(b)b.classList.toggle('open');return;}
+  });
+
+  document.getElementById('rSubmit').addEventListener('click',submitRelapse);
+
+  // manifesto edit toggle
+  var mEditing=false;
+  document.getElementById('manifestoBtn').addEventListener('click',function(){
+    var view=document.getElementById('manifestoView'), edit=document.getElementById('manifestoEdit'), btn=this;
+    if(!mEditing){ edit.value=state.manifesto||''; view.style.display='none'; edit.style.display='block'; btn.textContent='SAVE'; edit.focus(); mEditing=true; }
+    else { saveManifesto(edit.value.trim()); edit.style.display='none'; view.style.display='block'; btn.textContent='EDIT'; mEditing=false; renderManifesto();
+      document.getElementById('mMsg').textContent='saved ✓'; setTimeout(function(){document.getElementById('mMsg').textContent='';},2000); }
+  });
+
+  // urge modal
+  function openUrge(){
+    document.getElementById('urgeWhy').textContent = (state.manifesto&&state.manifesto.trim()) ? state.manifesto
+      : 'You haven\'t written your why yet. Do it now — it\'s the anchor you\'ll reach for in this exact moment. For now: remember who you\'re becoming. This urge is a wave. Waves pass.';
+    document.getElementById('urgeStreak').textContent=cleanStreak(istParts().date);
+    document.getElementById('urgeModal').classList.add('show');
+  }
+  function closeUrge(){document.getElementById('urgeModal').classList.remove('show');}
+  document.getElementById('urgeFab').addEventListener('click',openUrge);
+  document.getElementById('urgeClose').addEventListener('click',closeUrge);
+  document.getElementById('urgeBeat').addEventListener('click',function(){logUrge('beat the urge');closeUrge();document.getElementById('ciMsg').textContent='💪 Urge beaten. That rep counts. Streak intact.';window.scrollTo({top:0,behavior:'smooth'});});
+  document.getElementById('urgeWalk').addEventListener('click',function(){logUrge('moved instead — walk / pushups');closeUrge();document.getElementById('ciMsg').textContent='👟 Go. Move now. Come back proud.';});
+  document.getElementById('urgeModal').addEventListener('click',function(e){if(e.target===this)closeUrge();});
+
+  document.getElementById('exportBtn').addEventListener('click',function(){
+    var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='reset-backup-'+istParts().date+'.json';
+    document.body.appendChild(a);a.click();a.remove();
+  });
+
+  window.addEventListener('online',function(){flushQueue().then(function(){loadAll().then(render);});});
+
+  // ── boot ──
+  document.getElementById('rDate').value=istParts().date;
+  buildChips();
+  cacheLoad();
+  if(state.start){ render(); document.getElementById('syncState').textContent='cached · syncing…'; }
+
+  if(!SUPA||!ANON){
+    document.getElementById('syncState').textContent='⚠ config missing — running on-device only';
+    if(!state.start){state.start=istParts().date;} render();
+  } else {
+    flushQueue()
+      .then(loadAll)
+      .then(noonSweep)
+      .then(function(){ document.getElementById('syncState').textContent='✓ synced to your Supabase · private'; render(); })
+      .catch(function(e){ document.getElementById('syncState').textContent='⚠ offline — showing cached data'; if(!state.start)state.start=istParts().date; render(); });
+  }
+})();
+</script>
+</body>
+</html>

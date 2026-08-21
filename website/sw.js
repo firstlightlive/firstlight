@@ -6,7 +6,7 @@
 // IMPORTANT: bump SHELL_VERSION on every deploy that ships changes to the
 // precached files (HTML/CSS/JS in SHELL_ASSETS). Pre-deploy check warns if
 // you forget. Without a bump, installed PWAs stay pinned to the prior cache.
-const SHELL_VERSION = 'fl-shell-v19';
+const SHELL_VERSION = 'fl-shell-v22';
 const SUPA_CACHE   = 'fl-supa-reads-v3';
 const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 
@@ -19,7 +19,7 @@ const SHELL_ASSETS = [
   '/login',
   '/index.html',
   '/styles.css',
-  '/app.js?v=20260619a',
+  '/app.js?v=20260727a',
   '/manifest.json',
   '/icon-512.png',
   '/js/config.js',
@@ -37,7 +37,7 @@ const SHELL_ASSETS = [
   '/js/admin-food.js',
   '/js/admin-checkin.js',
   '/js/admin-journal.js',
-  '/js/admin-rituals.js?v=20260619a',
+  '/js/admin-rituals.js?v=20260727a',
   '/js/admin-tomorrow.js',
   '/js/admin-reading.js?v=1776408664',
   '/js/admin-body-weight.js',
@@ -50,7 +50,7 @@ const SHELL_ASSETS = [
   '/js/admin-ekadashi.js',
   '/js/admin-streaks.js',
   '/js/admin-content.js',
-  '/js/admin-recap.js?v=20260619a',
+  '/js/admin-recap.js?v=20260727a',
   '/js/admin-dailyproof.js?v=20260619b',
   '/js/admin-editor.js',
   '/js/admin-analytics.js',
@@ -309,3 +309,35 @@ function bumpAttempts(db, id) {
     tx.onerror = () => res();
   });
 }
+
+// ═══════════════════════════════════════════════════════
+// Breaking-news push (payload-less tickle — fetch the live headline on receipt)
+// ═══════════════════════════════════════════════════════
+self.addEventListener('push', (event) => {
+  event.waitUntil((async () => {
+    let title = '⚡ FirstLight · Breaking';
+    let body = 'A major story just broke. Tap to read.';
+    try {
+      const r = await fetch('/api/brief');
+      const d = await r.json();
+      if (d && d.top && d.top[0]) {
+        body = d.top[0].title;
+        title = '⚡ ' + (d.top[0].sources ? d.top[0].sources + ' sources · ' : '') + 'FirstLight';
+      }
+    } catch (e) { /* offline / fetch failed — show the generic alert */ }
+    await self.registration.showNotification(title, {
+      body: body, icon: '/icon-512.png', badge: '/icon-512.png',
+      tag: 'fl-breaking', renotify: true, data: { url: '/brief.html' }
+    });
+  })());
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/brief.html';
+  event.waitUntil((async () => {
+    const cl = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of cl) { if (c.url.indexOf('/brief.html') > -1 && 'focus' in c) return c.focus(); }
+    if (clients.openWindow) return clients.openWindow(url);
+  })());
+});

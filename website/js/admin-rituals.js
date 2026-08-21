@@ -2,12 +2,13 @@
 // FIRST LIGHT — RITUALS
 // ═══════════════════════════════════════════
 
-var RITUAL_VERSION = '2026-07-19-v6'; // bump to auto-reset stored defs on next load
+var RITUAL_VERSION = '2026-07-27-v8'; // bump to auto-reset stored defs on next load
 
 var RITUAL_DEFAULTS = {
   morning: [
     // WAKE — ORAL CARE (3:30-3:40)
     { id: 'm_alarm', tier: 1, block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:30', title: 'Alarm \u2014 Wake immediately', desc: 'Zero negotiation. The alarm is a command, not a suggestion. Feet on cold floor activates cortisol awakening response. No snooze. Ever. 3:30 AM is decided at 8:45 PM the night before.', cat: 'BIOHACK' },
+    { id: 'm_gratitude_wake', block: 'WAKE — ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:30', title: 'Wake gratitude - thank the universe', desc: 'On waking, before the feet hit the floor: thank the universe for this life, thank everyone, and thank all five elements - earth, water, fire, air, ether.', cat: 'SACRED' },
     { id: 'm_tongue_scraper', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:31', title: 'Tongue scraper (copper)', desc: 'Removes Ama (toxins). 30 seconds. Before any water or food enters the mouth. Ayurvedic morning detox.', cat: 'AYUR' },
     { id: 'm_oil_pull', block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:32', title: 'Oil pull (coconut oil)', desc: 'Start swishing immediately before any water. Standing in bathroom. Mouth completely dry. Pulls bacteria, whitens teeth, strengthens gums. 3-4 min.', cat: 'AYUR' },
     { id: 'm_cold_dive', tier: 1, block: 'WAKE \u2014 ORAL CARE (3:30-3:40)', blockId: 'mblk0', time: '3:33', title: 'Cold water dive reflex', desc: 'While still swishing oil. Vagus nerve activated. Full wakefulness. Resets nervous system. BIOHACK.', cat: 'BIOHACK' },
@@ -20,33 +21,39 @@ var RITUAL_DEFAULTS = {
     { id: 'm_pranayama', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:12', title: 'Pranayama (Nadi Shodhana)', desc: 'Nadi Shodhana or Kapalabhati. Open air rooftop. Phone away. 5 min compressed. SACRED.', cat: 'SACRED' },
     { id: 'm_japa', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:17', title: 'Japa (108 beads)', desc: 'Mala or silent. Phone away. Full presence. Do not suppress. Pure witnessing. Japa = concentration. This = equanimity.', cat: 'SACRED' },
     { id: 'm_thai_meditation', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:23', title: 'Thai forest meditation', desc: 'Sit still after Japa. Close eyes. A sound arises \u2014 note: sound. A thought \u2014 thinking. A sensation \u2014 sensation. Do not follow. Do not suppress. 3 min open awareness.', cat: 'MIND' },
+    { id: 'm_hooponopono', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:24', title: "Ho'oponopono prayer (morning)", desc: "I love you. I'm sorry. Please forgive me. Thank you. Morning forgiveness - clear resentment before the day begins.", cat: 'SACRED' },
     { id: 'm_earthing', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:25', title: 'Earthing \u2014 bare feet on ground (SUNDAY ONLY)', desc: 'SUNDAY ONLY \u2014 not possible on weekdays. Eyes open to sky. 3 things spoken aloud. Step onto grass or earth. Bare skin contact. Morning gratitude is an opening, not a review.', cat: 'BIOHACK', active: false },
     { id: 'm_brahmacharya', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:26', title: 'Brahmacharya mala (intention set)', desc: '', cat: 'SACRED' },
     { id: 'm_collagen', block: 'BRAHMA MUHURTA (4:10-4:28)', blockId: 'mblk1', time: '4:27', title: 'Collagen peptides + lemon water', desc: 'Rooftop, empty stomach. Amino acids peak ~5:20 AM = mid-run. Vitamin C is the direct co-factor for collagen synthesis. 30 min clear gap before food.', cat: 'FUEL' },
     // PRE-RUN — SUPPLEMENTS (4:28-4:35)
     { id: 'm_carnitine_creatine', tier: 1, block: 'PRE-RUN \u2014 SUPPLEMENTS (4:28-4:35)', blockId: 'mblk2', time: '4:28', title: 'L-Carnitine + Creatine', desc: 'Drop tablet, dissolve 60 sec, add Creatine 5g, stir. Rinse glass. L-Carnitine 2000mg activates in 5-8 min. Run at 4:35 AM. FUEL.', cat: 'BIOHACK' },
     { id: 'm_ikigai', block: 'PRE-RUN \u2014 SUPPLEMENTS (4:28-4:35)', blockId: 'mblk2', time: '4:30', title: 'Ikigai spoken aloud', desc: 'I am not trying to win. I am refusing to stop. Said with conviction. Every single morning.', cat: 'MIND' },
-    { id: 'm_sattu', block: 'PRE-RUN \u2014 SUPPLEMENTS (4:28-4:35)', blockId: 'mblk2', time: '4:31', title: 'Sattu drink', desc: '100g Sattu + 350ml water + half lemon + pinch of salt. Takes under a minute. Drink steadily while driving.', cat: 'FUEL' },
+    { id: 'm_visualization', tier: 1, block: 'PRE-RUN — SUPPLEMENTS (4:28-4:35)', blockId: 'mblk2', time: '4:32', title: '2-min visualization - see the day executed', desc: 'Two minutes, eyes closed. Vividly rehearse the day going exactly as planned - the run, the work, the wins. Mental rehearsal primes the nervous system. Every single morning.', cat: 'MIND' },
+    { id: 'm_sattu', block: 'PRE-RUN \u2014 SUPPLEMENTS (4:28-4:35)', blockId: 'mblk2', time: '4:31', title: 'Sattu drink', desc: '100g Sattu + 350ml water + half lemon + pinch of salt. Takes under a minute. Drink steadily while driving.', cat: 'FUEL', active: false },
     { id: 'm_box_breathing', block: 'PRE-RUN \u2014 SUPPLEMENTS (4:28-4:35)', blockId: 'mblk2', time: '4:33', title: 'Box breathing (4-4-4-4)', desc: 'Alert neutrality. Engine on, car stationary. 5 rounds. Then go. Navy SEAL protocol.', cat: 'MIND' },
     // POST GYM — RECOVERY (7:00-7:40)
     { id: 'm_postworkout_meal', block: 'POST GYM \u2014 RECOVERY (7:00-7:40)', blockId: 'mblk4', time: '7:05', title: 'Post-workout meal FIRST (protein + carbs)', desc: 'EAT BEFORE HOT SHOWER. 20-40g protein + fast carbs within 20-30 min of gym end = anabolic window. Eggs / whey / paneer + banana or rice. mTOR pathway is open NOW. Hot shower after eating = vasodilation delivers nutrients to muscles. Science: PMC11780495 (2024).', cat: 'FUEL' },
     { id: 'm_hot_shower', block: 'POST GYM \u2014 RECOVERY (7:00-7:40)', blockId: 'mblk4', time: '7:20', title: 'Hot shower (38-42\u00b0C, 10 min)', desc: 'AFTER cool-down + meal. 38-42°C for 10 min. Vasodilation: blood vessels expand, nutrients delivered to worked muscles. Growth hormone mild pulse. Cortisol drops. Does NOT suppress mTOR (unlike cold after gym). Science: Scandinavian J Medicine 2024.', cat: 'SKIN' },
     { id: 'm_moisturiser', block: 'POST GYM \u2014 RECOVERY (7:00-7:40)', blockId: 'mblk4', time: '7:30', title: 'Moisturiser + sunscreen', desc: '', cat: 'SKIN' },
-    { id: 'm_free_writing', block: 'POST GYM \u2014 RECOVERY (7:00-7:40)', blockId: 'mblk4', time: '7:35', title: 'Free writing (commute/office)', desc: '', cat: 'MIND' },
+    { id: 'm_free_writing', block: 'POST GYM \u2014 RECOVERY (7:00-7:40)', blockId: 'mblk4', time: '7:35', title: 'Free writing', desc: '', cat: 'MIND' },
     // AT OFFICE — BREAKFAST (7:45-8:10)
     { id: 'm_ginger_shot', block: 'AT OFFICE \u2014 BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '7:45', title: 'Ginger lime shot', desc: '', cat: 'AYUR' },
     { id: 'm_oats_paneer', block: 'AT OFFICE \u2014 BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '7:50', title: 'Oats + paneer breakfast', desc: 'Post-gym meal at 7:05 already covers nutrition. This is removed from daily tracking.', cat: 'FUEL', active: false },
     { id: 'm_shata_pada', block: 'AT OFFICE \u2014 BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '7:58', title: 'Shata Pada (100 steps after meal)', desc: '', cat: 'AYUR' },
     { id: 'm_sunlight', tier: 1, block: 'AT OFFICE \u2014 BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '8:02', title: 'Sunlight exposure (5 min)', desc: '', cat: 'BIOHACK' },
     { id: 'm_vitamins', tier: 1, block: 'AT OFFICE \u2014 BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '8:04', title: 'Vitamins (D3+K2, Omega-3)', desc: '', cat: 'BIOHACK' },
+    { id: 'm_coffee', block: 'AT OFFICE — BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '8:05', title: 'Phone-free coffee - no screen, full presence', desc: 'One coffee, no phone, no screen. Sit with it, full presence. Morning only - no coffee after 12 PM (sleep hygiene).', cat: 'MIND' },
     { id: 'm_cdp_choline', block: 'AT OFFICE \u2014 BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '8:06', title: 'CDP-Choline', desc: 'Not required daily \u2014 disabled from routine tracking. Re-enable manually on days of use.', cat: 'BIOHACK', active: false },
-    { id: 'm_review_blocks', block: 'AT OFFICE \u2014 BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '8:10', title: 'Review time blocks for the day', desc: '', cat: 'MIND' }
+    { id: 'm_review_blocks', block: 'AT OFFICE \u2014 BREAKFAST (7:45-8:10)', blockId: 'mblk6', time: '8:10', title: 'Review time blocks for the day', desc: '', cat: 'MIND' },
+    { id: 'm_deep_work', tier: 1, block: 'DEEP WORK (8:15-11:45)', blockId: 'mblk7', time: '8:15', title: 'Deep work session - phone away, single task', desc: 'The hardest cognitive block of the day. Phone in another room, notifications off, one task, no switching. Cal Newport deep work - this is where the real output happens. Protect it like the morning workout.', cat: 'MIND' },
+    { id: 'm_deep_study', tier: 1, block: 'DEEP STUDY + COMMUTE (10:30-12:00)', blockId: 'mblk8', time: '10:30', title: '1-hour deep study - NO electronics on', desc: 'One focused hour of study/learning with zero electronic devices switched on. Book, notes, pen. Single subject, pure input. Compounds over months.', cat: 'MIND' },
+    { id: 'm_leave_office', block: 'DEEP STUDY + COMMUTE (10:30-12:00)', blockId: 'mblk8', time: '11:50', title: 'Leave for office - 12:00 PM only (lighter traffic)', desc: 'Office starts at 12 PM, never before. Morning is home: workout, breakfast, then straight into deep work + study in sittings. Leave ~11:50 for lighter traffic.', cat: 'MOVE' }
   ],
   evening: [
     // EVENING — 7 PM (work ends 7 PM hard stop)
     { id: 'e_laptop_close', tier: 1, block: 'EVENING \u2014 7 PM SHUTDOWN', blockId: 'eblk0', time: '7:00', title: 'Laptop close \u2014 HARD STOP', desc: 'Work ends at 7 PM. Non-negotiable. Treated like the morning run \u2014 no exceptions, no "just 5 more minutes". 8:30 PM sleep is decided here.', cat: 'SLEEP' },
     { id: 'e_internet_off', block: 'EVENING \u2014 7 PM SHUTDOWN', blockId: 'eblk0', time: '7:02', title: 'Internet OFF', desc: '', cat: 'SLEEP' },
-    { id: 'e_sprout_mix', block: 'EVENING \u2014 7 PM SHUTDOWN', blockId: 'eblk0', time: '7:05', title: 'Sprout mix (moong/chana)', desc: 'Last food of the day. 1.5h before sleep. Light meal = stomach clear by 8:30 PM. Empty stomach sleep = full recovery mode. Growth hormone maximised. Evening Covenant begins.', cat: 'FUEL' },
+    { id: 'e_sprout_mix', block: 'EVENING \u2014 7 PM SHUTDOWN', blockId: 'eblk0', time: '7:05', title: 'Sprout mix (moong/chana)', desc: 'Last food of the day. 1.5h before sleep. Light meal = stomach clear by 8:30 PM. Empty stomach sleep = full recovery mode. Growth hormone maximised. Evening Covenant begins.', cat: 'FUEL', active: false },
     { id: 'e_shata_pada', block: 'EVENING \u2014 7 PM SHUTDOWN', blockId: 'eblk0', time: '7:10', title: 'Shata Pada (100 steps)', desc: '', cat: 'AYUR' },
     // NIGHT PREP (7:12-7:22)
     { id: 'e_tomorrow_plan', block: 'NIGHT PREP (7:12-7:22)', blockId: 'eblk1', time: '7:12', title: 'Tomorrow planning (time blocks)', desc: 'Write tomorrow\'s plan NOW so 3:30 AM wake has zero decision-making. Pre-decide everything.', cat: 'MIND' },
@@ -70,6 +77,7 @@ var RITUAL_DEFAULTS = {
     { id: 'e_warm_milk', block: 'WIND DOWN + SLEEP (7:50-8:05)', blockId: 'eblk3', time: '7:52', title: 'Warm milk + Ashwagandha', desc: '400-500ml + turmeric + black pepper + Ashwagandha 600mg + Jatamansi + 2 tbsp cottage cheese. Sip slowly. Casein protein overnight = muscle repair.', cat: 'AYUR' },
     // DAY CLOSE (8:05)
     { id: 'e_night_prep_confirm', block: 'DAY CLOSE (8:05)', blockId: 'eblk4', time: '8:05', title: 'Night prep confirmed \u2713', desc: '', cat: 'MIND' },
+    { id: 'e_electronics_charge', block: 'DAY CLOSE (8:05)', blockId: 'eblk4', time: '8:06', title: 'All electronics on charge - OUTSIDE bedroom', desc: 'Every device (phone, watch, laptop) plugged in to charge OUTSIDE the bedroom. Bedroom is a no-device zone - removes the 3:30 AM temptation and the +10 km bedroom-device penalty.', cat: 'SLEEP' },
     // REFLECTION + SLEEP (8:05-8:45)
     { id: 'e_roman_examen', block: 'REFLECTION + SLEEP (8:05-8:45)', blockId: 'eblk5', time: '8:05', title: 'Roman Examen (review of conscience)', desc: '3 min written. What aligned. What did not. What changes tomorrow. Final line: Tomorrow I will improve [one specific micro-thing] by 1%. Kaizen. 1% daily = 37x better in one year.', cat: 'SACRED' },
     { id: 'e_3_wins', block: 'REFLECTION + SLEEP (8:05-8:45)', blockId: 'eblk5', time: '8:08', title: '3 Wins of the day', desc: '3 wins written + "This happened because..." Internal locus of control. Harvard: strongest longevity predictor.', cat: 'MIND' },
@@ -78,6 +86,7 @@ var RITUAL_DEFAULTS = {
     { id: 'e_trataka', block: 'REFLECTION + SLEEP (8:05-8:45)', blockId: 'eblk5', time: '8:18', title: 'Trataka (candle gazing)', desc: 'Fixed gaze on flame. 5 min. Sharpens concentration, improves eyesight, calms mind. SACRED.', cat: 'SACRED' },
     { id: 'e_hooponopono', block: 'REFLECTION + SLEEP (8:05-8:45)', blockId: 'eblk5', time: '8:22', title: "Ho\u2019oponopono prayer", desc: "4 phrases directed at anyone with mild irritation: I love you. I\u2019m sorry. Please forgive me. Thank you. Held resentment = chronic cortisol = accelerated aging. 3 min Hawaiian forgiveness.", cat: 'SACRED' },
     { id: 'e_cyclic_sighing', tier: 1, block: 'REFLECTION + SLEEP (8:05-8:45)', blockId: 'eblk5', time: '8:25', title: 'Cyclic sighing (5 min)', desc: '', cat: 'SLEEP' },
+    { id: 'e_oral_care', block: 'REFLECTION + SLEEP (8:05-8:45)', blockId: 'eblk5', time: '8:40', title: 'Evening oral care - brush + interdental', desc: 'Two-minute fluoride brushing + interdental cleaning (floss or interdental brush). Last thing before bed. Overnight clean teeth prevent decay and gum disease.', cat: 'AYUR' },
     { id: 'e_lights_out', tier: 1, block: 'REFLECTION + SLEEP (8:05-8:45)', blockId: 'eblk5', time: '8:45', title: 'LIGHTS OUT', desc: '3:30 AM is decided here. 8:45 PM \u2192 3:30 AM = ~6h45m sleep (evidence-corrected up from 6h). The morning is won or lost in the first 60 seconds of this moment.', cat: 'SLEEP' }
   ],
   midday: [
@@ -88,7 +97,7 @@ var RITUAL_DEFAULTS = {
     { id: 'mid_stretch', block: 'PRE-LUNCH RESET (12:00-1:25)', blockId: 'midblk0', time: '1:00', title: 'Standing stretch (5 min)', desc: 'Neck rolls, shoulder shrugs, hip flexor stretch, hamstring stretch. Counter the damage of sitting. Every joint.', cat: 'MOVE' },
     { id: 'mid_breathwork', block: 'PRE-LUNCH RESET (12:00-1:25)', blockId: 'midblk0', time: '1:10', title: 'Box breathing (2 min)', desc: '4-4-4-4 pattern. Resets cortisol after morning deep work blocks. Parasympathetic activation before lunch.', cat: 'MIND' },
     // LUNCH WINDOW (1:30-2:00)
-    { id: 'mid_lunch', tier: 1, block: 'LUNCH WINDOW (1:30-2:00)', blockId: 'midblk1', time: '1:30', title: 'Lunch — dal, roti, sabzi, salad', desc: 'No white rice. No fried items. Food code applies. Eat mindfully — no phone, no laptop. Chew 32 times. Last solid meal before 6 PM sprout mix.', cat: 'FUEL' },
+    { id: 'mid_lunch', tier: 1, block: 'LUNCH WINDOW (1:30-2:00)', blockId: 'midblk1', time: '2:00', title: 'Lunch — dal, roti, sabzi, salad', desc: 'EXACTLY 2:00 PM - do not extend, ever. Rice OK. No fried items. Food code applies. Eat mindfully — no phone, no laptop. Chew 32 times. Last solid meal before 6 PM sprout mix.', cat: 'FUEL' },
     { id: 'mid_shata_pada', block: 'LUNCH WINDOW (1:30-2:00)', blockId: 'midblk1', time: '1:50', title: 'Shata Pada (100 steps after lunch)', desc: 'Walk 100 steps after every meal. Vagbhata prescription. Aids digestion, prevents insulin spikes. Non-negotiable.', cat: 'AYUR' },
     { id: 'mid_triphala_water', block: 'LUNCH WINDOW (1:30-2:00)', blockId: 'midblk1', time: '1:55', title: 'Warm water (copper vessel)', desc: 'Sip warm water 15-20 min after lunch. Never cold water with meals — kills Agni. Ayurvedic digestive fire protection.', cat: 'AYUR' },
     // AFTERNOON FUEL (3:30-4:00)

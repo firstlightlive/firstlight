@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* FL-PRIVATE-GATE */(function(){try{var s=JSON.parse(localStorage.getItem("fl_supabase_session")||"null");if(!s||!s.access_token||(s.expires_at&&s.expires_at*1000<Date.now()))location.replace("login.html");}catch(e){location.replace("login.html");}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Morning Brief — First Light</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0C10; --card:#12151C; --line:rgba(255,255,255,0.07);
+    --text:#E8EDF2; --dim:#7A8699; --faint:#5A6675;
+    --cyan:#00D4FF; --gold:#F5A623; --green:#00E676; --red:#FF5252;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0; background:var(--bg); color:var(--text);
+    font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased}
+  a{color:inherit; text-decoration:none}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+
+  header{position:sticky; top:0; z-index:20; background:rgba(10,12,16,0.82);
+    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line); padding:14px clamp(16px,4vw,40px)}
+  .hrow{display:flex; align-items:center; justify-content:space-between; gap:12px; max-width:1200px; margin:0 auto}
+  .brand{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:clamp(13px,3.5vw,16px);
+    letter-spacing:3px; color:var(--gold); display:flex; align-items:center; gap:8px}
+  .brand small{color:var(--dim); font-weight:500; letter-spacing:2px}
+  .hactions{display:flex; align-items:center; gap:8px}
+  .btn{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:1px;
+    color:var(--text); background:var(--card); border:1px solid var(--line); border-radius:8px;
+    padding:0 14px; height:40px; min-width:44px; display:inline-flex; align-items:center; gap:6px;
+    cursor:pointer; touch-action:manipulation; transition:border-color .15s,color .15s}
+  .btn:hover{border-color:var(--cyan); color:var(--cyan)}
+  .btn.spin svg{animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  .wrap{max-width:1200px; margin:0 auto; padding:clamp(16px,4vw,40px)}
+  .dateline{font-family:'IBM Plex Mono',monospace; color:var(--dim); font-size:13px; letter-spacing:1px; margin:2px 0 22px}
+  #updated{color:var(--faint); font-size:11px}
+
+  .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(16px,3vw,28px)}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+
+  .sect{min-width:0}
+  .sect h2{font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:700; letter-spacing:2px;
+    text-transform:uppercase; margin:0 0 12px; padding-bottom:10px; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:8px}
+  .dot{width:7px; height:7px; border-radius:50%; flex:0 0 auto}
+  .sect[data-k="ai"] .dot{background:var(--cyan)} .sect[data-k="ai"] h2{color:var(--cyan)}
+  .sect[data-k="data"] .dot{background:var(--green)} .sect[data-k="data"] h2{color:var(--green)}
+  .sect[data-k="markets"] .dot{background:var(--gold)} .sect[data-k="markets"] h2{color:var(--gold)}
+  .sect[data-k="world"] .dot{background:#B98CFF} .sect[data-k="world"] h2{color:#B98CFF}
+
+  .card{display:block; background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:13px 15px; margin-bottom:10px; transition:border-color .15s,transform .08s}
+  .card:hover{border-color:rgba(255,255,255,0.18)}
+  .card:active{transform:scale(.995)}
+  .card .t{font-size:14.5px; font-weight:500; line-height:1.4; color:var(--text)}
+  .card .m{margin-top:7px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--faint);
+    letter-spacing:.3px; display:flex; gap:8px; flex-wrap:wrap}
+  .card .m .src{color:var(--dim); text-transform:uppercase}
+
+  .msg{grid-column:1/-1; text-align:center; color:var(--dim); font-family:'IBM Plex Mono',monospace;
+    font-size:13px; padding:60px 20px; line-height:1.7}
+  .msg b{color:var(--gold)}
+  .skeleton{height:64px; background:linear-gradient(90deg,#12151C,#1a1e27,#12151C);
+    background-size:200% 100%; animation:sh 1.3s infinite; border-radius:10px; margin-bottom:10px}
+  @keyframes sh{to{background-position:-200% 0}}
+  .snote{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--faint); padding:8px 0}
+  .foot{text-align:center; color:var(--faint); font-family:'IBM Plex Mono',monospace; font-size:11px;
+    letter-spacing:1px; padding:36px 0 20px}
+  .foot a{color:var(--dim)}
+
+  .topband{margin:0 0 28px}
+  .topband .th{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; letter-spacing:2px;
+    color:var(--red); text-transform:uppercase; display:flex; align-items:center; gap:8px; margin-bottom:12px}
+  .topband .th::before{content:''; width:7px; height:7px; border-radius:50%; background:var(--red); box-shadow:0 0 9px var(--red)}
+  .topgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+  @media(max-width:900px){.topgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.topgrid{grid-template-columns:1fr}}
+  .topcard{display:block; background:linear-gradient(180deg,#181119,#12151C); border:1px solid rgba(255,82,82,0.22);
+    border-radius:10px; padding:14px 15px; transition:border-color .15s}
+  .topcard:hover{border-color:rgba(255,82,82,0.5)}
+  .topcard .t{font-size:14.5px; font-weight:600; line-height:1.38; color:var(--text)}
+  .topcard .m{margin-top:9px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--faint);
+    display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .badge{background:rgba(255,82,82,0.14); color:#ff8a8a; border-radius:4px; padding:2px 6px; font-size:10px; font-weight:700; letter-spacing:.5px}
+  #sources{color:var(--faint)} #sources b{color:var(--green)}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <a class="brand" href="index.html">◆ FIRST LIGHT <small>· BRIEF</small></a>
+    <div class="hactions">
+      <button class="btn" id="alerts" aria-label="Enable breaking-news alerts">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span id="alertsLabel">ALERTS</span>
+      </button>
+      <button class="btn" id="refresh" aria-label="Refresh">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+        <span>REFRESH</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="dateline"><span id="today">—</span> &nbsp;·&nbsp; <span id="updated"></span><span id="sources"></span></div>
+  <div id="top"></div>
+  <div class="grid" id="grid">
+    <div class="sect"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+    <div class="sect"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+    <div class="sect"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+    <div class="sect"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+  </div>
+  <div class="foot">5-minute skim, then go build. · <a href="index.html">← back to FIRST LIGHT</a></div>
+</div>
+
+<script>
+(function(){
+  var grid = document.getElementById('grid');
+  var refreshBtn = document.getElementById('refresh');
+
+  // date line (IST)
+  try {
+    var now = new Date();
+    document.getElementById('today').textContent =
+      now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Kolkata'});
+  } catch(e){}
+
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  function timeAgo(iso){
+    if(!iso) return '';
+    var d = new Date(iso.replace(' ','T')+ (/[zZ]|[+-]\d\d:?\d\d$/.test(iso)?'':'Z'));
+    var s = (Date.now()-d.getTime())/1000;
+    if(isNaN(s)) return '';
+    if(s<3600) return Math.max(1,Math.round(s/60))+'m ago';
+    if(s<86400) return Math.round(s/3600)+'h ago';
+    return Math.round(s/86400)+'d ago';
+  }
+
+  function render(data){
+    var up = data && data.updatedAt ? new Date(data.updatedAt) : null;
+    document.getElementById('updated').textContent = up ? ('updated '+up.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kolkata'})) : '';
+    if(data && typeof data.sourcesLive==='number'){
+      document.getElementById('sources').innerHTML = ' · <b>'+data.sourcesLive+'</b>/'+esc(data.sourcesTotal)+' sources live';
+    }
+    // TOP STORIES band (cross-source corroboration = major news)
+    var topEl = document.getElementById('top');
+    if(data && data.top && data.top.length){
+      var th = '<div class="topband"><div class="th">TOP STORIES · DON’T MISS</div><div class="topgrid">';
+      data.top.forEach(function(a){
+        th += '<a class="topcard" href="'+esc(a.link)+'" target="_blank" rel="noopener noreferrer">'
+           +  '<div class="t">'+esc(a.title)+'</div>'
+           +  '<div class="m"><span class="badge">'+esc(a.sources)+' SOURCES</span><span>'+esc(a.source||'')+'</span><span>'+esc(timeAgo(a.pubDate))+'</span></div></a>';
+      });
+      topEl.innerHTML = th + '</div></div>';
+    } else { topEl.innerHTML = ''; }
+    if(!data || !data.feeds || !data.feeds.length){
+      grid.innerHTML = '<div class="msg">'+(data && data.error ? esc(data.error) : 'No brief available.')+'</div>';
+      return;
+    }
+    var html = '';
+    data.feeds.forEach(function(f){
+      html += '<div class="sect" data-k="'+esc(f.key)+'"><h2><span class="dot"></span>'+esc(f.label)+'</h2>';
+      if(f.items && f.items.length){
+        f.items.forEach(function(a){
+          html += '<a class="card" href="'+esc(a.link)+'" target="_blank" rel="noopener noreferrer">'
+               +  '<div class="t">'+esc(a.title)+'</div>'
+               +  '<div class="m"><span class="src">'+esc(a.source||'')+'</span><span>'+esc(timeAgo(a.pubDate))+'</span></div></a>';
+        });
+      } else {
+        html += '<div class="snote">'+(f.error ? '⚠ '+esc(f.error) : 'Nothing right now.')+'</div>';
+      }
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function load(bypass){
+    if(bypass){ refreshBtn.classList.add('spin'); }
+    fetch('/api/brief'+(bypass?'?refresh=1':''),{headers:{'Accept':'application/json'}})
+      .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
+      .then(function(res){
+        if(res.status===503){ grid.innerHTML='<div class="msg"><b>News key not set yet.</b><br>Add your NewsData.io key as the Worker secret <b>NEWS_API_KEY</b>, then refresh.</div>'; return; }
+        render(res.j);
+      })
+      .catch(function(e){ grid.innerHTML='<div class="msg">Couldn’t load the brief.<br><small>'+esc(e.message)+'</small></div>'; })
+      .finally(function(){ refreshBtn.classList.remove('spin'); });
+  }
+
+  refreshBtn.addEventListener('click', function(){ load(true); });
+  load(false);
+
+  // Auto-refresh every 15 min while the tab is visible (left-open tab stays current).
+  setInterval(function(){ if(document.visibilityState==='visible') load(false); }, 15*60*1000);
+  // Refresh immediately when you switch back to the tab after >5 min away.
+  var lastLoad = Date.now();
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState==='visible' && Date.now()-lastLoad > 5*60*1000){ lastLoad=Date.now(); load(false); }
+  });
+
+  // ── Breaking-news push: subscribe this device ──
+  var alertsBtn = document.getElementById('alerts');
+  var alertsLabel = document.getElementById('alertsLabel');
+  function urlB64ToU8(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); var pad='='.repeat((4-s.length%4)%4); var b=atob(s+pad); var u=new Uint8Array(b.length); for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i); return u; }
+  function setAlerts(t){ alertsLabel.textContent=t; }
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)){
+    if(alertsBtn) alertsBtn.style.display='none';
+  } else {
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(reg) return reg.pushManager.getSubscription();
+    }).then(function(s){ if(s) setAlerts('ON'); }).catch(function(){});
+    alertsBtn.addEventListener('click', function(){
+      (async function(){
+        try{
+          setAlerts('…');
+          var reg = await navigator.serviceWorker.getRegistration() || await navigator.serviceWorker.register('/sw.js');
+          await navigator.serviceWorker.ready;
+          var perm = await Notification.requestPermission();
+          if(perm!=='granted'){ setAlerts('BLOCKED'); return; }
+          var kr = await fetch('/api/push/key'); var kd = await kr.json();
+          if(!kd || !kd.key){ setAlerts('N/A'); return; }
+          var sub = await reg.pushManager.getSubscription();
+          if(!sub){ sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToU8(kd.key) }); }
+          await fetch('/api/push/subscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(sub) });
+          setAlerts('ON');
+        }catch(e){ setAlerts('RETRY'); }
+      })();
+    });
+  }
+})();
+</script>
+</body>
+</html>

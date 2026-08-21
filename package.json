@@ -4,9 +4,11 @@
   "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev"
+    "dev": "wrangler dev",
+    "test:reset": "bash scripts/test-reset.sh"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.5",
     "puppeteer": "^25.1.0",
     "wrangler": "^4.20.0"
   },

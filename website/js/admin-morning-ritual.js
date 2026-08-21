@@ -97,7 +97,7 @@
     ctx.textAlign='left'; ctx.textBaseline='top';
     ctx.fillStyle=GOLD; ctx.font='700 30px '+MONO; ctx.fillText('◆ FIRST LIGHT', 64, 60);
     ctx.textAlign='right'; ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='600 20px '+MONO;
-    ctx.fillText('CHAPTER 03 · DAY '+day, W-64, 66);
+    ctx.fillText('CHAPTER 04 · DAY '+day, W-64, 66);
     ctx.textAlign='left';
   }
 
@@ -265,7 +265,7 @@
 
     el.innerHTML=
       '<div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:8px">'+
-        '<div><div class="cc-panel-title">MORNING RITUAL</div><div class="cc-panel-sub">Chapter 03 · 5K before first light — selfie · route · stats</div></div>'+
+        '<div><div class="cc-panel-title">MORNING RITUAL</div><div class="cc-panel-sub">Chapter 04 · any workout anchors the day — selfie · route · stats</div></div>'+
         '<div style="text-align:right"><div style="font:700 13px '+MONO+';letter-spacing:1px;color:'+(q.ok?GREEN:GOLD)+'">'+(q.ok?'✓ QUALIFIES':'○ '+esc(q.why))+'</div>'+
           '<div style="font:600 9px '+MONO+';letter-spacing:2px;color:var(--text-muted)">DAY '+day+' · RUN BEFORE 6 AM</div></div>'+
       '</div>'+

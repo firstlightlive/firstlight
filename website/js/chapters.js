@@ -28,6 +28,18 @@ window.FL_CHAPTERS = [
     escalations: 'FLAT — NO ESCALATION',
     status: 'COMPLETE',
     closingNote: 'Any motion, every day — walk, run, cycle, swim, or a sweat session. The chapter that kept the streak alive through injury and dead sensors, then handed off to the morning run.'
+  },
+  {
+    id: 3,
+    name: 'FIRST LIGHT',
+    start: '2026-07-19',
+    end: '2026-07-26',
+    days: 8,
+    rule: 'ONE FROM THE MENU · AIM BEFORE 6AM',
+    stakePerDay: 1500,
+    escalations: 'FLAT — NO ESCALATION',
+    status: 'COMPLETE',
+    closingNote: 'Eight days chasing the 6 AM mark. One miss (Jul 25), paid. Short, but it set the anchor the day counter still runs from — the streak never reset when DISCIPLINE took over on Jul 27.'
   }
 ];
 
@@ -40,22 +52,34 @@ window.FL_BREAK = {
 };
 
 window.FL_CURRENT_CHAPTER = {
-  id: 3,
-  name: 'FIRST LIGHT',
-  start: '2026-07-19',
-  rule: 'ONE FROM THE MENU · AIM BEFORE 6AM',
-  stakePerDay: 1500,
-  escalations: 'FLAT — NO ESCALATION',
+  id: 4,
+  name: 'DISCIPLINE',
+  start: '2026-07-27',
+  // dayEpoch ≠ start. The chapter's IDENTITY begins Jul 27; the DAY NUMBER keeps
+  // counting from Jul 19 because the streak never broke at the handover. Must stay
+  // equal to FL_DEFAULTS.STREAK_START (app.js) and DAY_EPOCH (the edge function).
+  // Anything rendering a day number reads dayEpoch — never start.
+  dayEpoch: '2026-07-19',
+  rule: 'ANY WORKOUT ANCHORS THE DAY · 5 RITUALS',
+  stakePerDay: 0,
+  escalations: 'NONE — PENANCE IS DISTANCE',
   status: 'ACTIVE',
-  charity: { name: 'Akshaya Patra', upi: 'donate@akshayapatra' },
-  menu: [
-    '5 km walk or run',
-    '10 km cycle',
-    '1 km swim',
-    '30 min HR-elevated session (gym / boxing / yoga / HIIT)'
+  penance: 'THE PUNISHMENT CYCLE — km, not ₹',
+  rituals: [
+    'Wake before 4:00 AM (watch-tracked) — miss = 30 km cycle',
+    'Meditation at 3:40 AM — miss = 30 km cycle',
+    'Workout, daily — miss = 100 km cycle',
+    'Journal, daily — miss = 30 km cycle',
+    'Sleep 5.5 hours — miss = 30 km cycle'
+  ],
+  prohibitions: [
+    'Masturbation / porn — 100 km cycle',
+    'Solid food at night — 30 km walk',
+    'Phone in any room — 50 km cycle',
+    'Daytime sleep (4 AM – 5 PM) — 30 km cycle'
   ],
   exemption: 'HOSPITALIZATION ONLY',
-  notes: 'One activity from the menu, every day — 5 km walk/run, 10 km cycle, 1 km swim, or a 30-min session. Start it before first light (6:00 AM local) to earn the day its "first light" mark; but any menu activity before midnight keeps the streak alive. Miss entirely = ₹1,500 to Akshaya Patra (1 child fed for a full academic year), receipt published. Only exemption: hospitalization.'
+  notes: 'No money this chapter. Every miss and every violation is paid in DISTANCE — the Punishment Cycle, logged in discipline.html. Any workout anchors the day; the 5 rituals and the prohibitions carry their own km. Unlogged by 11:59 PM IST = every punishment applies automatically. Only exemption: hospitalization.'
 };
 
 window.FL_LIFETIME = {

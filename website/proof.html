@@ -321,17 +321,17 @@
 
   <script src="js/config.js"></script>
 <script src="js/fl-authread.js?v=20260716"></script>
-  <script src="js/chapters.js?v=20260619a"></script>
-  <script src="app.js?v=20260619a"></script>
+  <script src="js/chapters.js?v=20260727a"></script>
+  <script src="app.js?v=20260819a"></script>
   <script>
   (function(){
     const dayNum = getDayNumber();
 
     // ── Chapter registry — closed chapters from chapters.js + the live one ──
     var CHAPTERS = [];
-    (window.FL_CHAPTERS || []).forEach(function(c) { CHAPTERS.push({ id: c.id, name: c.name, start: c.start, end: c.end, live: false }); });
-    if (window.FL_CURRENT_CHAPTER) CHAPTERS.push({ id: window.FL_CURRENT_CHAPTER.id, name: window.FL_CURRENT_CHAPTER.name, start: window.FL_CURRENT_CHAPTER.start, end: null, live: true });
-    if (!CHAPTERS.length) CHAPTERS.push({ id: 1, name: 'STREAK', start: (window.FL && FL.STREAK_START) || '2026-06-20', end: null, live: true });
+    (window.FL_CHAPTERS || []).forEach(function(c) { CHAPTERS.push({ id: c.id, name: c.name, start: c.start, end: c.end, dayEpoch: c.dayEpoch || c.start, live: false }); });
+    if (window.FL_CURRENT_CHAPTER) CHAPTERS.push({ id: window.FL_CURRENT_CHAPTER.id, name: window.FL_CURRENT_CHAPTER.name, start: window.FL_CURRENT_CHAPTER.start, end: null, dayEpoch: window.FL_CURRENT_CHAPTER.dayEpoch || window.FL_CURRENT_CHAPTER.start, live: true });
+    if (!CHAPTERS.length) CHAPTERS.push({ id: 1, name: 'STREAK', start: (window.FL && FL.STREAK_START) || '2026-07-19', end: null, live: true });
 
     function chapterOf(dateStr) {
       for (var i = CHAPTERS.length - 1; i >= 0; i--) {
@@ -340,8 +340,13 @@
       }
       return null;
     }
+    // Counts from the chapter's dayEpoch, NOT its start. Chapter 04 begins Jul 27
+    // but its day numbers continue from Jul 19 — the streak didn't reset at the
+    // handover, so neither does the number. Closed chapters have no dayEpoch and
+    // fall back to start, preserving their frozen 1..N archive numbering.
     function dayInChapter(dateStr, c) {
-      return Math.floor((new Date(dateStr + 'T00:00:00+05:30') - new Date(c.start + 'T00:00:00+05:30')) / 86400000) + 1;
+      var epoch = c.dayEpoch || c.start;
+      return Math.floor((new Date(dateStr + 'T00:00:00+05:30') - new Date(epoch + 'T00:00:00+05:30')) / 86400000) + 1;
     }
     var chapterRows = [];
     var _selChapter = CHAPTERS[CHAPTERS.length - 1].id;
@@ -522,8 +527,15 @@
       // Lifetime header numbers
       var lifeEl = document.getElementById('proofLifetimeDays');
       if (lifeEl) {
+        // getDayNumber() already counts every day from the epoch (Jul 19) to today,
+        // which spans closed Chapter 03 as well as live Chapter 04. Summing a closed
+        // chapter that ends on/after the epoch would count those days twice.
+        var epoch = (window.FL && FL.STREAK_START) || '2026-07-19';
         var closed = 0;
-        (window.FL_CHAPTERS || []).forEach(function(c) { closed += (c.days || 0); });
+        (window.FL_CHAPTERS || []).forEach(function(c) {
+          if (c.end && c.end >= epoch) return;   // already inside getDayNumber()'s span
+          closed += (c.days || 0);
+        });
         var cur = (typeof getDayNumber === 'function') ? Math.max(0, getDayNumber()) : 0;
         lifeEl.textContent = closed + cur;
       }
@@ -546,8 +558,12 @@
       return d.toISOString().slice(0, 10);
     }
     function computeStakeFor(chapter) {
-      if (!chapter || !chapter.live) return null;   // ₹1,500 held model applies to the live chapter only
-      var STAKE = 1500;
+      if (!chapter || !chapter.live) return null;   // the ₹ held model applies to the live chapter only
+      // Chapter 04 DISCIPLINE carries NO money — penance is distance (the Punishment
+      // Cycle). stakePerDay 0 → no ₹ figures at all; the cards fall back to "—"
+      // rather than printing a meaningless ₹0.
+      var STAKE = (typeof chapter.stakePerDay === 'number') ? chapter.stakePerDay : 1500;
+      if (!STAKE) return null;
       var todayStr = _todayIST();
       var proofDates = {};
       allRows.forEach(function(r) { if (r.chapter === chapter.id) proofDates[r.date] = true; });
@@ -745,7 +761,7 @@
     _proofRows = rows;
 
     // Build day-by-day timeline for the chapter's date range (capped at 730 cells per render)
-    var startStr = (chapter && chapter.start) || ((window.FL && FL.STREAK_START) || '2026-06-20');
+    var startStr = (chapter && chapter.start) || ((window.FL && FL.STREAK_START) || '2026-07-19');
     var endStr = (chapter && chapter.end) || null;
     var chStart = new Date(startStr + 'T00:30:00+05:30');
     var chEnd = endStr ? new Date(endStr + 'T00:30:00+05:30') : null;

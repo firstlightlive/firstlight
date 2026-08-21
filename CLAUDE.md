@@ -55,3 +55,9 @@
 - Public tables (instagram_posts, strava_activities, proof_archive, slips, comments) allow anon SELECT
 - Slips are immutable — no delete, no core field update
 - .gitignore must cover: .strava_*, .ig_*, .env, *.secret
+
+### Anti-Spam Rules (Strava + Instagram) — added 2026-07-24
+Automated classifiers on Strava AND Instagram pattern-match a promotional footprint. Same footprint got IG restricted (scam-pattern captions) + drew Strava's club-spam warning (Jul 2026). Robust rule: **remove the fuel — no promo where a platform can see it.**
+- **Strava (behavioral — the named violation):** NEVER post firstlight.live / @firstlightlive / any CTA into Strava club feeds or discussions. Not reworded, not less — zero. Keep activity titles/descriptions clean (no links, no handle). FirstLight has NO code that posts to Strava (verified) — so any Strava spam is manual; the fix is behavioral + Garmin/Strava activity-name settings.
+- **Instagram captions:** NO external links in published captions. `_generateCaption()` + `_generateMonthlyCaption()` carry identity + proof stats + niche rotated hashtags ONLY. firstlight.live is a login wall (private site) → driving traffic there + ₹/charity language = scam-classifier bait. The `strava.com/activities/…` link was also removed (ties IG↔Strava). Do NOT reintroduce `firstlight.live`, `@handle`, or `.\n.\n` hashtag curtains into any IG-published caption.
+- Emails (mail@firstlight.live) may keep links — they go to the operator, not a public feed.

@@ -41,8 +41,12 @@ function initTheme() {
 
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
+  // THE public day counter — Day 1 = Sun 19 Jul 2026. CONTINUOUS: chapters change
+  // the rule and the branding, they never restart this number. Must stay equal to
+  // DAY_EPOCH in supabase/functions/firstlight-sync/index.ts, or the site and the
+  // Instagram captions print different day numbers for the same day.
   STREAK_START: '2026-07-19',
-  STAKE_PER_DAY: 1500,
+  STAKE_PER_DAY: 0,            // Chapter 04 — NO money. Penance is DISTANCE (Punishment Cycle → discipline.html)
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',
   INSTAGRAM_URL: 'https://www.instagram.com/firstlightlive',
@@ -2566,7 +2570,7 @@ async function updateDaysMissed() {
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
 
   // Chapter dates (string-based for ISO-8601 safety)
-  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-07-19' — current chapter (03 FIRST LIGHT)
+  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-07-19' — continuous day-counter epoch
 
   // Count slips per chapter (string comparison, no timezone issues)
   var priorSlips = slips.filter(function(slip) {

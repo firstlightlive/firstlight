@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* FL-PRIVATE-GATE */(function(){try{var s=JSON.parse(localStorage.getItem("fl_supabase_session")||"null");if(!s||!s.access_token||(s.expires_at&&s.expires_at*1000<Date.now()))location.replace("login.html");}catch(e){location.replace("login.html");}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Chapter 04 · DISCIPLINE</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0A0C10;--card:#12151C;--card2:#171b24;--line:rgba(255,255,255,0.08);
+    --text:#E8EDF2;--dim:#7A8699;--faint:#5A6675;--cyan:#00D4FF;--gold:#F5A623;--green:#00E676;--red:#FF5252;--violet:#B98CFF}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .mono{font-family:'IBM Plex Mono',monospace}
+  a{color:inherit;text-decoration:none}
+  header{position:sticky;top:0;z-index:20;background:rgba(10,12,16,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px clamp(16px,4vw,32px)}
+  .hrow{display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto;gap:12px}
+  .brand{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(12px,3.4vw,15px);letter-spacing:2px;color:var(--gold)}
+  .brand small{color:var(--dim);font-weight:500}
+  .day{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim)}
+  .wrap{max-width:900px;margin:0 auto;padding:clamp(16px,4vw,32px)}
+
+  /* Debt headline */
+  .debt{background:linear-gradient(180deg,#1a1013,#12151C);border:1px solid rgba(255,82,82,0.3);border-radius:14px;padding:22px;margin-bottom:22px;text-align:center}
+  .debt .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--red);font-weight:700;text-transform:uppercase}
+  .debt .tot{font-family:'IBM Plex Mono',monospace;font-size:clamp(40px,11vw,64px);font-weight:700;line-height:1.05;margin:6px 0;color:var(--text)}
+  .debt .tot small{font-size:0.4em;color:var(--dim);font-weight:500}
+  .debt .split{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--dim)}
+  .debt .split b{color:var(--text)}
+  .debt.clear{border-color:rgba(0,230,118,0.35)}
+  .debt.clear .lbl{color:var(--green)}
+
+  .sec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .sec h2{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin:0 0 4px}
+  .sec .hint{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);margin-bottom:14px}
+  .countdown{color:var(--gold)}
+
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .row .nm{font-size:14.5px;font-weight:500}
+  .row .nm span{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);margin-top:2px}
+  .toggle{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.5px;border:1px solid var(--line);border-radius:8px;padding:0 12px;height:38px;min-width:84px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:var(--card2);color:var(--dim);touch-action:manipulation;transition:.12s}
+  .toggle.good{border-color:rgba(0,230,118,0.5);color:var(--green);background:rgba(0,230,118,0.08)}
+  .toggle.bad{border-color:rgba(255,82,82,0.55);color:var(--red);background:rgba(255,82,82,0.1)}
+  .wakealt{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--faint);margin-left:8px;cursor:pointer;text-decoration:underline}
+
+  .cost{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:70px;text-align:right}
+  .btn{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1px;border-radius:10px;padding:0 18px;height:46px;width:100%;border:none;cursor:pointer;touch-action:manipulation;margin-top:14px}
+  .btn.log{background:var(--gold);color:#0A0C10}
+  .btn.clear{background:var(--green);color:#0A0C10}
+  .btn:active{transform:scale(.99)}
+  .clearrow{display:flex;gap:8px;margin-top:6px}
+  .clearrow input{flex:1;min-width:0;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:0 10px;height:44px;text-align:center}
+  .clearrow label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--faint);display:block;text-align:center;margin-bottom:4px}
+  .note{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);line-height:1.6;margin-top:10px}
+  .hist{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim);padding:8px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+  .hist.auto{color:var(--red)}
+  .foot{text-align:center;color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:30px 0 16px}
+  .foot a{color:var(--dim)}
+</style>
+</head>
+<body>
+<header><div class="hrow">
+  <a class="brand" href="index.html">◆ CHAPTER 04 <small>· DISCIPLINE</small></a>
+  <div class="day" id="dayline">—</div>
+</div></header>
+
+<div class="wrap">
+  <div class="debt" id="debt">
+    <div class="lbl">PUNISHMENT CYCLE — KM OWED</div>
+    <div class="tot" id="debtTotal">0 <small>km</small></div>
+    <div class="split"><span>🚴 <b id="dC">0</b> cycle</span><span>🏃 <b id="dR">0</b> run</span><span>🚶 <b id="dW">0</b> walk</span></div>
+  </div>
+
+  <a class="sec" href="reset.html" style="display:block;border-color:rgba(185,140,255,0.3)">
+    <h2 style="color:#B98CFF">◆ Reset · Clarity Protocol</h2>
+    <div class="hint" style="margin:0">Private porn / compulsion recovery — clean-streak, the noon rule, honest relapse log &amp; penance, your "why". Tap to open →</div>
+  </a>
+
+  <div class="sec">
+    <h2>Today's Log</h2>
+    <div class="hint">Log before <b class="countdown" id="cd">11:59 PM</b> — miss it and <b style="color:var(--red)">every</b> punishment applies automatically.</div>
+    <div id="rituals"></div>
+    <div id="prohibitions" style="margin-top:6px"></div>
+    <div class="cost" id="todayCost" style="text-align:left;margin-top:12px">Penance today: 0 km</div>
+    <button class="btn log" id="logBtn">LOG THE DAY</button>
+    <div class="note" id="logState"></div>
+  </div>
+
+  <div class="sec">
+    <h2>Burn It Down</h2>
+    <div class="hint">Log distance completed — it clears the debt.</div>
+    <div class="clearrow">
+      <div style="flex:1"><label>CYCLE</label><input id="clC" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+      <div style="flex:1"><label>RUN</label><input id="clR" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+      <div style="flex:1"><label>WALK</label><input id="clW" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+    </div>
+    <button class="btn clear" id="clearBtn">CLEAR THAT MUCH</button>
+  </div>
+
+  <div class="sec">
+    <h2>Ledger</h2>
+    <div id="hist"></div>
+  </div>
+
+  <div class="foot">No money. Debts are paid in distance. · <a href="index.html">← FIRST LIGHT</a> · <a href="reset.html">reset tracker</a></div>
+</div>
+
+<script>
+(function(){
+  var START='2026-07-19';  // day-counter epoch — Ch04 begins Jul 27 but the number never reset
+  // ── Penance rules (edit here to retune) ──
+  var RITUALS=[
+    {k:'wake',       nm:'Wake',       sub:'before 4:00 AM · watch-tracked', miss:{cycle:30}, altWalk:15},
+    {k:'meditation', nm:'Meditation', sub:'3:40 AM · compulsory',      miss:{cycle:30}},
+    {k:'workout',    nm:'Workout',    sub:'daily · else +100 km cycle', miss:{cycle:100}},
+    {k:'journal',    nm:'Journal',    sub:'daily',                     miss:{cycle:30}},
+    {k:'sleep',      nm:'Sleep 5.5h', sub:'5.5 hours',                 miss:{cycle:30}}
+  ];
+  var PROHIB=[
+    {k:'masturbation', nm:'Masturbation / Porn',  sub:'100 km cycle / 14 days',  cost:{cycle:100}},
+    {k:'nightFood',    nm:'Solid food at night', sub:'clean = good',           cost:{walk:30}},
+    {k:'phoneAnyRoom', nm:'Phone in any room',  sub:'phone-free rooms',       cost:{cycle:50}},
+    {k:'daySleep',     nm:'Daytime sleep',       sub:'none 4 AM–5 PM · watch',  cost:{cycle:30}}
+  ];
+
+  function istToday(){ // YYYY-MM-DD in IST
+    var s=new Date().toLocaleString('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'});
+    return s.slice(0,10);
+  }
+  function dayNum(d){ return Math.floor((new Date(d+'T00:00:00')-new Date(START+'T00:00:00'))/86400000)+1; }
+  function load(){ try{return JSON.parse(localStorage.getItem('fl_ch4_log')||'{}');}catch(e){return {};} }
+  function save(o){ localStorage.setItem('fl_ch4_log', JSON.stringify(o)); }
+  function loadCleared(){ try{return JSON.parse(localStorage.getItem('fl_ch4_cleared')||'{"cycle":0,"run":0,"walk":0}');}catch(e){return {cycle:0,run:0,walk:0};} }
+  function saveCleared(c){ localStorage.setItem('fl_ch4_cleared', JSON.stringify(c)); }
+  function add(a,b){ a.cycle=(a.cycle||0)+(b.cycle||0); a.run=(a.run||0)+(b.run||0); a.walk=(a.walk||0)+(b.walk||0); return a; }
+
+  // penance for a given day-entry (or worst-case if entry null / unlogged)
+  function penance(e){
+    var p={cycle:0,run:0,walk:0};
+    RITUALS.forEach(function(r){
+      var done = e ? e[r.k] : false;
+      if(!done){ if(r.k==='wake' && e && e.wakeAsWalk){ p.walk+=r.altWalk; } else { add(p,r.miss); } }
+    });
+    PROHIB.forEach(function(pr){
+      var bad = e ? e[pr.k] : true; // unlogged → assume violated
+      if(bad) add(p,pr.cost);
+    });
+    return p;
+  }
+
+  var log=load(), cleared=loadCleared(), today=istToday();
+  var todayEntry = log[today] || {wake:false,meditation:false,workout:false,journal:false,sleep:false,masturbation:false,nightFood:false,bedroomDevice:false,wakeAsWalk:false,logged:false};
+
+  // ── 11:59 auto-default: any PAST day with no logged entry = all punishments ──
+  (function autoDefault(){
+    var d=new Date(START+'T00:00:00');
+    var end=new Date(today+'T00:00:00');
+    var changed=false;
+    while(d<end){
+      var ds=d.toLocaleDateString('en-CA');
+      if(!log[ds] || !log[ds].logged){
+        log[ds]={autoDefault:true,logged:true,wake:false,meditation:false,workout:false,journal:false,sleep:false,masturbation:true,nightFood:true,bedroomDevice:true,penance:penance(null)};
+        changed=true;
+      }
+      d.setDate(d.getDate()+1);
+    }
+    if(changed) save(log);
+  })();
+
+  function totalOwed(){
+    var t={cycle:0,run:0,walk:0};
+    Object.keys(log).forEach(function(ds){ if(log[ds] && log[ds].penance) add(t,log[ds].penance); });
+    return {cycle:Math.max(0,t.cycle-cleared.cycle), run:Math.max(0,t.run-cleared.run), walk:Math.max(0,t.walk-cleared.walk)};
+  }
+
+  function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function render(){
+    document.getElementById('dayline').textContent='DAY '+dayNum(today);
+    var rit=document.getElementById('rituals'); rit.innerHTML='';
+    RITUALS.forEach(function(r){
+      var on=todayEntry[r.k];
+      var alt = r.k==='wake' ? '<span class="wakealt" data-alt="1">'+(todayEntry.wakeAsWalk?'✓ pay as 15km walk':'pay as walk?')+'</span>' : '';
+      rit.insertAdjacentHTML('beforeend',
+        '<div class="row"><div class="nm">'+r.nm+'<span>'+r.sub+'</span></div>'
+        +'<div><button class="toggle '+(on?'good':'bad')+'" data-r="'+r.k+'">'+(on?'DONE':'MISSED')+'</button>'+alt+'</div></div>');
+    });
+    var pro=document.getElementById('prohibitions'); pro.innerHTML='';
+    PROHIB.forEach(function(pr){
+      var bad=todayEntry[pr.k];
+      pro.insertAdjacentHTML('beforeend',
+        '<div class="row"><div class="nm">'+pr.nm+'<span>'+pr.sub+'</span></div>'
+        +'<button class="toggle '+(bad?'bad':'good')+'" data-p="'+pr.k+'">'+(bad?'HAPPENED':'CLEAN')+'</button></div>');
+    });
+    var tp=penance(todayEntry);
+    document.getElementById('todayCost').textContent='Penance today: '+(tp.cycle||0)+' cycle · '+(tp.run||0)+' run · '+(tp.walk||0)+' walk';
+    var owed=totalOwed(), tot=owed.cycle+owed.run+owed.walk;
+    document.getElementById('debtTotal').innerHTML=tot+' <small>km</small>';
+    document.getElementById('dC').textContent=owed.cycle; document.getElementById('dR').textContent=owed.run; document.getElementById('dW').textContent=owed.walk;
+    document.getElementById('debt').className='debt'+(tot===0?' clear':'');
+    document.getElementById('logState').textContent = todayEntry.logged ? '✓ Logged. Re-log to update.' : 'Not logged yet today.';
+    // history
+    var h=document.getElementById('hist'); h.innerHTML='';
+    Object.keys(log).sort().reverse().slice(0,10).forEach(function(ds){
+      var e=log[ds], p=e.penance||penance(e), s=(p.cycle||0)+(p.run||0)+(p.walk||0);
+      h.insertAdjacentHTML('beforeend','<div class="hist'+(e.autoDefault?' auto':'')+'"><span>Day '+dayNum(ds)+' · '+ds+(e.autoDefault?' · auto (unlogged)':'')+'</span><span>'+(s>0?('+'+s+' km'):'clean ✓')+'</span></div>');
+    });
+    if(!Object.keys(log).length) h.innerHTML='<div class="hist"><span>No entries yet.</span></div>';
+  }
+
+  document.getElementById('rituals').addEventListener('click',function(e){
+    var b=e.target.closest('[data-r]'); if(b){ var k=b.getAttribute('data-r'); todayEntry[k]=!todayEntry[k]; render(); return; }
+    var alt=e.target.closest('[data-alt]'); if(alt){ todayEntry.wakeAsWalk=!todayEntry.wakeAsWalk; render(); }
+  });
+  document.getElementById('prohibitions').addEventListener('click',function(e){
+    var b=e.target.closest('[data-p]'); if(!b)return; var k=b.getAttribute('data-p'); todayEntry[k]=!todayEntry[k]; render();
+  });
+  document.getElementById('logBtn').addEventListener('click',function(){
+    todayEntry.logged=true; todayEntry.penance=penance(todayEntry); log[today]=todayEntry; save(log); render();
+    document.getElementById('logState').textContent='✓ Day logged at '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kolkata'})+'.';
+  });
+  document.getElementById('clearBtn').addEventListener('click',function(){
+    var c=+document.getElementById('clC').value||0, r=+document.getElementById('clR').value||0, w=+document.getElementById('clW').value||0;
+    cleared.cycle+=c; cleared.run+=r; cleared.walk+=w; saveCleared(cleared);
+    document.getElementById('clC').value=''; document.getElementById('clR').value=''; document.getElementById('clW').value='';
+    render();
+  });
+
+  // countdown to 23:59 IST
+  function tick(){
+    var now=new Date(), istNow=new Date(now.toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+    var end=new Date(istNow); end.setHours(23,59,0,0);
+    var ms=end-istNow; if(ms<0){ document.getElementById('cd').textContent='past due'; return; }
+    var h=Math.floor(ms/3600000), m=Math.floor(ms%3600000/60000);
+    document.getElementById('cd').textContent=h+'h '+m+'m left';
+  }
+  tick(); setInterval(tick,60000);
+  render();
+})();
+</script>
+</body>
+</html>

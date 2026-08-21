@@ -22,6 +22,12 @@ export interface Env {
   RENDER_KEY?: string  // optional shared secret for /api/render
   ADMIN_KEY?: string   // required for /api/upload (admin-only photo uploads)
   MAPBOX_TOKEN?: string // for fetching basemap on WIN_ROUTE slides
+  NEWS_API_KEY?: string // NewsData.io key for /api/brief (Productivity Suite morning brief)
+  RESEND_API_KEY?: string // Resend key for the emailed brief digest (cron)
+  BRIEF_EMAIL_TO?: string // recipient of the emailed brief
+  VAPID_PUBLIC_KEY?: string  // Web Push — base64url raw public key (served to client)
+  VAPID_PRIVATE_JWK?: string // Web Push — EC P-256 private key as JWK JSON (secret)
+  VAPID_SUBJECT?: string     // Web Push — mailto: contact for VAPID
 }
 
 let _wasmInited = false
@@ -33,9 +39,258 @@ async function ensureResvg(): Promise<void> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Productivity Suite — Morning Brief (/api/brief)
+// ─────────────────────────────────────────────────────────────────────────────
+interface BriefItem { title: string; link: string; pubDate: string | null; source: string; cat: string }
+
+// ── RSS WIRE MESH — the "never miss" backbone. Direct from each outlet's own
+// feed (free, unlimited, no intermediary that can drop a story). Redundant by
+// design: a story a source misses, three others carry. cat ∈ world|markets|ai|data.
+interface RssSource { name: string; url: string; cat: string }
+const RSS_SOURCES: RssSource[] = [
+  // WORLD + INDIA (the major-news core)
+  { name: 'BBC World',       url: 'http://feeds.bbci.co.uk/news/world/rss.xml',                       cat: 'world' },
+  { name: 'Al Jazeera',      url: 'https://www.aljazeera.com/xml/rss/all.xml',                        cat: 'world' },
+  { name: 'Guardian World',  url: 'https://www.theguardian.com/world/rss',                            cat: 'world' },
+  { name: 'NYT World',       url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',           cat: 'world' },
+  { name: 'NPR World',       url: 'https://feeds.npr.org/1004/rss.xml',                               cat: 'world' },
+  { name: 'The Hindu',       url: 'https://www.thehindu.com/news/national/feeder/default.rss',        cat: 'world' },
+  { name: 'Times of India',  url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',       cat: 'world' },
+  { name: 'Indian Express',  url: 'https://indianexpress.com/feed/',                                  cat: 'world' },
+  { name: 'NDTV',            url: 'https://feeds.feedburner.com/ndtvnews-top-stories',                cat: 'world' },
+  // MARKETS + BUSINESS
+  { name: 'ET Markets',      url: 'https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms', cat: 'markets' },
+  { name: 'Livemint',        url: 'https://www.livemint.com/rss/markets',                             cat: 'markets' },
+  { name: 'CNBC Finance',    url: 'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664', cat: 'markets' },
+  { name: 'BBC Business',    url: 'http://feeds.bbci.co.uk/news/business/rss.xml',                    cat: 'markets' },
+  // AI + TOOLING
+  { name: 'Hacker News',     url: 'https://hnrss.org/frontpage',                                      cat: 'ai' },
+  { name: 'TechCrunch',      url: 'https://techcrunch.com/feed/',                                     cat: 'ai' },
+  { name: 'The Verge',       url: 'https://www.theverge.com/rss/index.xml',                           cat: 'ai' },
+  { name: 'Ars Technica',    url: 'https://feeds.arstechnica.com/arstechnica/index',                  cat: 'ai' },
+  { name: 'VentureBeat AI',  url: 'https://venturebeat.com/category/ai/feed/',                        cat: 'ai' },
+  // DATA + CLOUD
+  { name: 'The New Stack',   url: 'https://thenewstack.io/feed/',                                     cat: 'data' },
+  { name: 'InfoWorld',       url: 'https://www.infoworld.com/index.rss',                              cat: 'data' },
+]
+
+// NewsData.io — optional supplement (trending + keyword niches). System works
+// fully WITHOUT it (RSS mesh alone), so "never miss" never depends on one API.
+const NEWSDATA_FEEDS = [
+  { cat: 'ai',      q: 'artificial intelligence OR OpenAI OR Anthropic OR LLM' },
+  { cat: 'data',    q: 'cloud computing OR "data engineering" OR Snowflake OR Kubernetes' },
+  { cat: 'markets', category: 'business', country: 'in' },
+]
+
+function _decodeEntities(s: string): string {
+  return s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&').replace(/&#0?39;|&apos;/g, "'").replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
+    .replace(/&#(\d+);/g, (_m, n) => String.fromCharCode(+n)).trim()
+}
+function _tag(block: string, tag: string): string {
+  const m = block.match(new RegExp('<' + tag + '[^>]*>([\\s\\S]*?)</' + tag + '>', 'i'))
+  return m ? _decodeEntities(m[1]) : ''
+}
+function _parseFeed(xml: string, source: string, cat: string): BriefItem[] {
+  const blocks = xml.match(/<(item|entry)\b[\s\S]*?<\/\1>/gi) || []
+  const out: BriefItem[] = []
+  for (const b of blocks.slice(0, 8)) {
+    const title = _tag(b, 'title')
+    let link = _tag(b, 'link')
+    if (!link) { const m = b.match(/<link[^>]*href="([^"]+)"/i); if (m) link = m[1] }
+    const pub = _tag(b, 'pubDate') || _tag(b, 'published') || _tag(b, 'updated') || _tag(b, 'dc:date') || null
+    if (title && link) out.push({ title, link: link.trim(), pubDate: pub, source, cat })
+  }
+  return out
+}
+async function _fetchRss(s: RssSource): Promise<BriefItem[]> {
+  const r = await fetch(s.url, { headers: { 'User-Agent': 'FirstLightBrief/1.0', 'Accept': 'application/rss+xml, application/xml, text/xml' }, cf: { cacheTtl: 600 } })
+  if (!r.ok) return []
+  return _parseFeed(await r.text(), s.name, s.cat)
+}
+async function _fetchNewsData(feed: Record<string, string>, apiKey: string): Promise<BriefItem[]> {
+  const params = new URLSearchParams({ apikey: apiKey, language: 'en' })
+  for (const k of ['q', 'category', 'country']) if (feed[k]) params.set(k, feed[k])
+  const r = await fetch(`https://newsdata.io/api/1/latest?${params.toString()}`, { headers: { 'Accept': 'application/json' } })
+  const j = await r.json() as Record<string, any>
+  if (j.status !== 'success' || !Array.isArray(j.results)) return []
+  return j.results.slice(0, 6)
+    .map((a: Record<string, any>): BriefItem => ({ title: a.title, link: a.link, pubDate: a.pubDate || null, source: a.source_id || 'newsdata', cat: feed.cat }))
+    .filter((x: BriefItem) => x.title && x.link)
+}
+
+const _STOP = new Set('the a an of to in on for and or with as at by is are was be from after over amid says say new how why what will into out up down not you your his her its their this that has have had also more than get got'.split(' '))
+function _sig(title: string): string[] {
+  return title.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(w => w.length >= 4 && !_STOP.has(w))
+}
+// Cross-source corroboration = importance. A story carried by ≥2 independent
+// sources (sharing ≥2 significant keywords) is "major". Ranked by source count.
+function _topStories(items: BriefItem[]): Record<string, unknown>[] {
+  const ws = items.map(it => ({ it, s: _sig(it.title) }))
+  const used = new Array(ws.length).fill(false)
+  const clusters: { rep: BriefItem; count: number }[] = []
+  for (let i = 0; i < ws.length; i++) {
+    if (used[i]) continue
+    used[i] = true
+    const srcs = new Set([ws[i].it.source])
+    for (let j = i + 1; j < ws.length; j++) {
+      if (used[j]) continue
+      const shared = ws[j].s.filter(w => ws[i].s.includes(w)).length
+      if (shared >= 2) { srcs.add(ws[j].it.source); used[j] = true }
+    }
+    clusters.push({ rep: ws[i].it, count: srcs.size })
+  }
+  return clusters.filter(c => c.count >= 2).sort((a, b) => b.count - a.count).slice(0, 6)
+    .map(c => ({ title: c.rep.title, link: c.rep.link, source: c.rep.source, pubDate: c.rep.pubDate, sources: c.count }))
+}
+function _norm(t: string): string { return t.toLowerCase().replace(/[^a-z0-9]/g, '') }
+function _ts(d: string | null): number { const n = d ? Date.parse(d) : NaN; return isNaN(n) ? 0 : n }
+
+interface BriefData { updatedAt: string; sourcesLive: number; sourcesTotal: number; top: Record<string, unknown>[]; feeds: { key: string; label: string; items: BriefItem[] }[] }
+async function computeBrief(env: Env): Promise<BriefData> {
+  // Resilient fan-out: one dead feed never sinks the brief (allSettled).
+  const all: BriefItem[] = []
+  const rss = await Promise.allSettled(RSS_SOURCES.map(_fetchRss))
+  rss.forEach(r => { if (r.status === 'fulfilled') all.push(...r.value) })
+  let liveApis = rss.filter(r => r.status === 'fulfilled' && r.value.length).length
+  if (env.NEWS_API_KEY) {
+    const nd = await Promise.allSettled(NEWSDATA_FEEDS.map(f => _fetchNewsData(f, env.NEWS_API_KEY as string)))
+    nd.forEach(r => { if (r.status === 'fulfilled') { all.push(...r.value); if (r.value.length) liveApis++ } })
+  }
+  const SECTIONS = [
+    { key: 'world', label: 'World & India' }, { key: 'markets', label: 'Markets & Business' },
+    { key: 'ai', label: 'AI & Tooling' }, { key: 'data', label: 'Data & Cloud' },
+  ]
+  const feeds = SECTIONS.map(sec => {
+    const seen = new Set<string>()
+    const items = all.filter(x => x.cat === sec.key)
+      .filter(x => { const k = _norm(x.title); if (!k || seen.has(k)) return false; seen.add(k); return true })
+      .sort((a, b) => _ts(b.pubDate) - _ts(a.pubDate))
+      .slice(0, 10)
+    return { key: sec.key, label: sec.label, items }
+  })
+  const top = _topStories(all.filter(x => x.cat === 'world' || x.cat === 'markets'))
+  return { updatedAt: new Date().toISOString(), sourcesLive: liveApis, sourcesTotal: RSS_SOURCES.length + (env.NEWS_API_KEY ? NEWSDATA_FEEDS.length : 0), top, feeds }
+}
+
+async function handleBrief(request: Request, env: Env): Promise<Response> {
+  const bypass = new URL(request.url).searchParams.get('refresh') === '1'
+  const cache = caches.default
+  const cacheKey = new Request('https://brief.internal/cache/v2')
+  if (!bypass) {
+    const hit = await cache.match(cacheKey)
+    if (hit) return hit
+  }
+  const resp = jsonResponse(await computeBrief(env))
+  resp.headers.set('Cache-Control', 'public, max-age=1800')
+  try { await cache.put(cacheKey, resp.clone()) } catch (_e) { /* best-effort */ }
+  return resp
+}
+
+// ── Emailed brief (Cron Trigger). Links are allowed in email (goes to the
+// operator's inbox, not a public feed — see CLAUDE.md anti-spam rules).
+function _emailEsc(s: string): string {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' } as Record<string, string>)[c])
+}
+function _briefEmailHtml(data: BriefData, kind: string): string {
+  const top = (data.top || []) as Array<Record<string, any>>
+  const topHtml = top.slice(0, 6).map((t, i) =>
+    `<tr><td style="padding:8px 0;border-bottom:1px solid #1e232c;">
+      <a href="${_emailEsc(t.link)}" style="color:#E8EDF2;text-decoration:none;font-size:15px;font-weight:600;line-height:1.4;">${i + 1}. ${_emailEsc(t.title)}</a>
+      <div style="color:#6b7686;font-family:monospace;font-size:11px;margin-top:4px;">${_emailEsc(t.source || '')} · covered by ${_emailEsc(t.sources)} sources</div>
+    </td></tr>`).join('')
+  const sects = (data.feeds || []).map(f => {
+    const rows = f.items.slice(0, 4).map(a =>
+      `<li style="margin:5px 0;"><a href="${_emailEsc(a.link)}" style="color:#9fb0c4;text-decoration:none;font-size:13px;">${_emailEsc(a.title)}</a></li>`).join('')
+    if (!rows) return ''
+    return `<div style="margin-top:20px;"><div style="color:#00D4FF;font-family:monospace;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">${_emailEsc(f.label)}</div><ul style="margin:8px 0 0;padding-left:18px;">${rows}</ul></div>`
+  }).join('')
+  return `<div style="background:#0A0C10;padding:28px 22px;font-family:Arial,sans-serif;max-width:640px;margin:0 auto;">
+    <div style="font-family:monospace;color:#F5A623;font-weight:700;letter-spacing:3px;font-size:15px;">◆ FIRST LIGHT · BRIEF</div>
+    <div style="color:#6b7686;font-family:monospace;font-size:12px;margin-top:4px;">${kind === 'digest' ? 'Daily digest' : 'New major story'} · ${data.sourcesLive}/${data.sourcesTotal} sources live</div>
+    <div style="color:#FF5252;font-family:monospace;font-size:12px;font-weight:700;letter-spacing:1px;margin-top:24px;">TOP STORIES · DON'T MISS</div>
+    <table style="width:100%;border-collapse:collapse;margin-top:6px;">${topHtml || '<tr><td style="color:#6b7686;font-size:13px;padding:8px 0;">No corroborated top stories right now.</td></tr>'}</table>
+    ${sects}
+    <div style="margin-top:26px;padding-top:16px;border-top:1px solid #1e232c;">
+      <a href="https://firstlight.live/brief.html" style="color:#00D4FF;font-family:monospace;font-size:12px;text-decoration:none;">Open the full brief →</a>
+      <span style="color:#4a5563;font-family:monospace;font-size:11px;"> · 5-min skim, then go build.</span>
+    </div>
+  </div>`
+}
+async function _sendBriefEmail(env: Env, data: BriefData, kind: string): Promise<void> {
+  const subj = kind === 'digest'
+    ? `☀ FirstLight Brief — ${(data.top[0] as any)?.title ? _emailEsc(String((data.top[0] as any).title)).slice(0, 60) : 'Top stories'}`
+    : `⚡ New major story — ${_emailEsc(String((data.top[0] as any)?.title || 'FirstLight Brief')).slice(0, 60)}`
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: 'FirstLight Brief <mail@firstlight.live>', to: [env.BRIEF_EMAIL_TO], subject: subj, html: _briefEmailHtml(data, kind) }),
+  })
+}
+// Hourly cron: always send at the two digest slots (~7:00 & ~19:00 IST); the
+// other hours send ONLY if the corroborated top-story set changed (dedup via R2)
+// — aggressive coverage without spamming the inbox with identical mails.
+async function runBriefEmail(scheduledTime: number, env: Env): Promise<void> {
+  if (!env.RESEND_API_KEY || !env.BRIEF_EMAIL_TO) return
+  const data = await computeBrief(env)
+  const sig = (data.top || []).map(t => (t as any).title).join('|').slice(0, 700)
+  let last = ''
+  try { const o = await env.PROOFS.get('brief/email-state.json'); if (o) last = ((await o.json()) as Record<string, string>).sig || '' } catch (_e) { /* first run */ }
+  const hourUtc = new Date(scheduledTime).getUTCHours()
+  const isDigest = hourUtc === 1 || hourUtc === 13 // ~06:30 & ~18:30 IST
+  const changed = !!sig && sig !== last
+  if (!isDigest && !changed) return
+  await _sendBriefEmail(env, data, isDigest ? 'digest' : 'update')
+  if (changed) await pushBreaking(env) // real-time breaking-news push on a genuinely new top story
+  try { await env.PROOFS.put('brief/email-state.json', JSON.stringify({ sig, at: new Date().toISOString() })) } catch (_e) { /* best-effort */ }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Web Push (breaking-news alerts) — payload-less "tickle" + VAPID auth only.
+// The service worker fetches the actual headline from /api/brief on receipt,
+// so we skip RFC-8291 payload encryption entirely (far more robust in a Worker).
+// ─────────────────────────────────────────────────────────────────────────────
+interface PushSub { endpoint: string; keys?: Record<string, string> }
+function _u8ToB64u(u: Uint8Array): string {
+  let s = ''; for (let i = 0; i < u.length; i++) s += String.fromCharCode(u[i])
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+async function _vapidAuthHeader(endpoint: string, env: Env): Promise<string> {
+  const aud = new URL(endpoint).origin
+  const enc = (o: unknown) => _u8ToB64u(new TextEncoder().encode(JSON.stringify(o)))
+  const signingInput = `${enc({ typ: 'JWT', alg: 'ES256' })}.${enc({ aud, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: env.VAPID_SUBJECT || 'mailto:mail@firstlight.live' })}`
+  const jwk = JSON.parse(env.VAPID_PRIVATE_JWK as string)
+  const key = await crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign'])
+  const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, new TextEncoder().encode(signingInput))
+  return `vapid t=${signingInput}.${_u8ToB64u(new Uint8Array(sig))}, k=${env.VAPID_PUBLIC_KEY}`
+}
+async function _loadSubs(env: Env): Promise<PushSub[]> {
+  try { const o = await env.PROOFS.get('brief/push-subs.json'); if (o) return (await o.json()) as PushSub[] } catch (_e) { /* none yet */ }
+  return []
+}
+async function pushBreaking(env: Env): Promise<void> {
+  if (!env.VAPID_PRIVATE_JWK || !env.VAPID_PUBLIC_KEY) return
+  const subs = await _loadSubs(env)
+  if (!subs.length) return
+  const keep: PushSub[] = []
+  for (const s of subs) {
+    try {
+      const r = await fetch(s.endpoint, { method: 'POST', headers: { 'Authorization': await _vapidAuthHeader(s.endpoint, env), 'TTL': '3600', 'Content-Length': '0', 'Urgency': 'high' } })
+      if (r.status !== 404 && r.status !== 410) keep.push(s) // prune expired subscriptions
+    } catch (_e) { keep.push(s) }
+  }
+  if (keep.length !== subs.length) { try { await env.PROOFS.put('brief/push-subs.json', JSON.stringify(keep)) } catch (_e) { /* best-effort */ } }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Public routes
 // ─────────────────────────────────────────────────────────────────────────────
 export default {
+  // Cron Trigger — emailed brief (hourly during waking hours; see runBriefEmail).
+  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(runBriefEmail(event.scheduledTime, env))
+  },
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
     const path = url.pathname
@@ -49,6 +304,27 @@ export default {
     try {
       if (path === '/api/health') {
         return jsonResponse({ status: 'ok', service: 'firstlight-worker', timestamp: new Date().toISOString() })
+      }
+
+      // Morning brief — Productivity Suite. Server-side pulls NewsData.io per
+      // category so the API key never touches the client. 30-min Cache-API cache
+      // keeps credit use low. GET /api/brief[?refresh=1]
+      if (path === '/api/brief') {
+        return handleBrief(request, env)
+      }
+
+      // Web Push — VAPID public key for the client subscribe flow
+      if (path === '/api/push/key') {
+        return jsonResponse({ key: env.VAPID_PUBLIC_KEY || null })
+      }
+      // Web Push — register a browser subscription for breaking-news alerts
+      if (path === '/api/push/subscribe' && request.method === 'POST') {
+        const sub = await request.json() as PushSub
+        if (!sub || !sub.endpoint) return jsonResponse({ error: 'bad subscription' }, 400)
+        const subs = await _loadSubs(env)
+        if (!subs.find(s => s.endpoint === sub.endpoint)) subs.push(sub)
+        try { await env.PROOFS.put('brief/push-subs.json', JSON.stringify(subs)) } catch (_e) { /* best-effort */ }
+        return jsonResponse({ ok: true, count: subs.length })
       }
 
       // Generate + upload a proof image, return public URL.
@@ -459,7 +735,7 @@ function renderWinSvg(req: RenderRequest): string {
   <!-- URL -->
   <text x="${W / 2}" y="${H - (isStory ? 140 : 80)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(24)}" font-weight="500"
-        fill="${t.dim}" letter-spacing="6">firstlight.live</text>
+        fill="${t.dim}" letter-spacing="6"></text>
 </svg>`
 }
 
@@ -531,7 +807,7 @@ function renderMissSvg(req: RenderRequest): string {
   <!-- URL -->
   <text x="${W / 2}" y="${H - (isStory ? 140 : 80)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(24)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="6">firstlight.live</text>
+        fill="${COLORS.dim}" letter-spacing="6"></text>
 </svg>`
 }
 
@@ -770,7 +1046,7 @@ async function renderWinRouteSvg(req: RenderRequest, env: Env): Promise<string> 
   <!-- Footer brand -->
   <text x="${W / 2}" y="${H - 22}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 16 : 12}" font-weight="500"
-        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
+        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT</text>
 </svg>`
 }
 
@@ -838,7 +1114,7 @@ function _recapFooter(): string {
   return `
   <text x="${W_REC / 2}" y="${H_REC - 50}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>`
+        fill="${COLORS.dim}" letter-spacing="5">◆ FIRST LIGHT</text>`
 }
 
 // SLIDE 1 — Cover/Hero
@@ -1163,7 +1439,7 @@ function _kickoffBg(extra: string = ''): string {
   <rect width="1080" height="1080" fill="url(#halo2)"/>`
 }
 
-function _kickoffFooter(text = '◆ FIRST LIGHT  ·  firstlight.live'): string {
+function _kickoffFooter(text = '◆ FIRST LIGHT'): string {
   return `
   <text x="540" y="1030" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
@@ -1204,7 +1480,7 @@ function renderKickoffHeroSvg(req: RenderRequest): string {
         font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
         fill="${COLORS.gold}" letter-spacing="6">SWIPE  →</text>
 
-  ${_kickoffFooter('firstlight.live')}
+  ${_kickoffFooter('◆ FIRST LIGHT')}
 </svg>`
 }
 
@@ -1249,7 +1525,7 @@ function renderKickoffPromiseSvg(_req: RenderRequest): string {
         font-family="'Roboto Mono', monospace" font-size="28" font-weight="700"
         fill="${COLORS.gold}" letter-spacing="8">AKSHAYA  PATRA</text>
 
-  ${_kickoffFooter('firstlight.live')}
+  ${_kickoffFooter('◆ FIRST LIGHT')}
 </svg>`
 }
 
@@ -1326,7 +1602,7 @@ function renderKickoffMenuSvg(_req: RenderRequest): string {
         font-family="'Roboto Mono', monospace" font-size="16" font-weight="500"
         fill="${COLORS.dim}" letter-spacing="5">BENGALURU  ·  20.06.2026</text>
 
-  ${_kickoffFooter('firstlight.live')}
+  ${_kickoffFooter('◆ FIRST LIGHT')}
 </svg>`
 }
 
@@ -1451,7 +1727,7 @@ function renderMultiHeroSvg(req: RenderRequest): string {
   <!-- URL -->
   <text x="${W / 2}" y="${H - (isStory ? 140 : 80)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(24)}" font-weight="500"
-        fill="${t.dim}" letter-spacing="6">firstlight.live</text>
+        fill="${t.dim}" letter-spacing="6"></text>
 </svg>`
 }
 
@@ -1557,7 +1833,7 @@ async function renderMultiMapSvg(req: RenderRequest, env: Env): Promise<string> 
   <!-- Footer -->
   <text x="${W / 2}" y="${H - 28}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 18 : 14}" font-weight="500"
-        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
+        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT</text>
 </svg>`
 }
 
@@ -1623,7 +1899,7 @@ function renderMultiGridSvg(req: RenderRequest): string {
   <!-- Footer -->
   <text x="${W / 2}" y="${H - 50}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${req.orientation === 'story' ? 22 : 18}" font-weight="500"
-        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
+        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT</text>
 </svg>`
 }
 
@@ -1741,7 +2017,7 @@ function renderMultiSummarySvg(req: RenderRequest): string {
   <!-- Footer brand -->
   <text x="${W / 2}" y="${H - (isStory ? 60 : 50)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${isStory ? 22 : 18}" font-weight="500"
-        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT  ·  firstlight.live</text>
+        fill="${t.dim}" letter-spacing="5">◆ FIRST LIGHT</text>
 </svg>`
 }
 

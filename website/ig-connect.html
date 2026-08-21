@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Connect Instagram — First Light</title>
+<style>
+  html,body{margin:0;height:100%;background:#0A0C10;color:#E8EDF2;
+    font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+  .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:40px 24px;box-sizing:border-box}
+  .mark{font-size:12px;letter-spacing:4px;color:#F5A623;margin-bottom:28px}
+  .spin{width:44px;height:44px;border:3px solid rgba(245,166,35,0.2);border-top-color:#F5A623;
+    border-radius:50%;animation:s 0.9s linear infinite;margin:0 auto 24px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  #msg{font-size:18px;line-height:1.6;max-width:520px}
+  .ok{color:#00E676}.err{color:#FF5252}
+  .detail{font-size:11px;color:#5a6b80;margin-top:16px;max-width:520px;word-break:break-word;line-height:1.6}
+  a{color:#00D4FF}
+  .btn{display:inline-block;margin-top:8px;padding:16px 32px;min-height:44px;box-sizing:border-box;
+    background:#F5A623;color:#0A0C10;font-weight:700;letter-spacing:1px;text-decoration:none;
+    border-radius:6px;font-size:15px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .note{font-size:12px;color:#5a6b80;margin-top:28px;max-width:460px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mark">◆ FIRST LIGHT · INSTAGRAM</div>
+  <div class="spin" id="spin"></div>
+  <div id="msg">Connecting Instagram…</div>
+  <div class="detail" id="detail"></div>
+  <div class="note" id="note"></div>
+</div>
+<script>
+  var SUPA = "https://edgnudrbysybefbqyijq.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ251ZHJieXN5YmVmYnF5aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTExNjEsImV4cCI6MjA5MTgyNzE2MX0.UOTH1J-022hwSQZ2QkpiRxw3wtctaVsJQEBoLYYMkHk";
+  var APP_ID = "1283217454024129";
+  var REDIRECT = "https://firstlight.live/ig-connect.html";
+  var SCOPES = [
+    "instagram_basic",
+    "instagram_content_publish",
+    "instagram_manage_comments",
+    "pages_show_list",
+    "pages_read_engagement",
+    "business_management"
+  ].join(",");
+
+  function done(cls, text, detail){
+    document.getElementById('spin').style.display='none';
+    var m=document.getElementById('msg'); m.className=cls; m.innerHTML=text;
+    if(detail) document.getElementById('detail').textContent=detail;
+  }
+
+  var p = new URLSearchParams(location.search);
+  var code = p.get('code'), err = p.get('error_description') || p.get('error');
+
+  if(err){
+    done('err','❌ Facebook said: '+err+'<br><small>Every permission must be left ON — publishing needs all of them.</small>');
+  } else if(!code){
+    // No code yet → this is the landing state. Offer the login button.
+    var authUrl = "https://www.facebook.com/v21.0/dialog/oauth"
+      + "?client_id=" + APP_ID
+      + "&redirect_uri=" + encodeURIComponent(REDIRECT)
+      + "&response_type=code"
+      + "&scope=" + encodeURIComponent(SCOPES);
+    document.getElementById('spin').style.display='none';
+    document.getElementById('msg').innerHTML =
+      'Instagram publishing needs a fresh token.<br><br><a class="btn" href="'+authUrl+'">LOG IN WITH FACEBOOK</a>';
+    document.getElementById('note').innerHTML =
+      'Log in as the account that manages <b>@firstlightlive</b>. Leave every permission switched ON — '
+      + 'if <b>instagram_content_publish</b> is declined, the daily proof post cannot run.<br><br>'
+      + 'This login is converted automatically into a Facebook <b>Page</b> token, which never expires — '
+      + 'so this should be the last time you ever have to do it.';
+  } else {
+    fetch(SUPA + "/functions/v1/firstlight-sync?action=ig-connect&code=" + encodeURIComponent(code),
+      { method:"POST", headers:{ "Authorization":"Bearer "+ANON, "Content-Type":"application/json" } })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d && d.success){
+          var life = d.never_expires
+            ? 'Token <b>never expires</b>'+(d.promoted_to_page_token?' (promoted to the Page token)':'')+' — no more logins.'
+            : 'Token good for '+d.days_left+' days. The nightly sync will keep trying to make it permanent.';
+          done('ok','✅ Connected as <b>@'+(d.username||'firstlightlive')+'</b><br><small>'+life+' You can close this tab.</small>');
+        } else {
+          done('err','❌ '+((d&&d.error)||'Connection failed'), d&&d.detail? JSON.stringify(d.detail).slice(0,400):'');
+        }
+      })
+      .catch(function(e){ done('err','❌ '+e.message); });
+  }
+</script>
+</body>
+</html>

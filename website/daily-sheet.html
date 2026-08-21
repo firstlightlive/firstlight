@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* FL-PRIVATE-GATE */(function(){try{var s=JSON.parse(localStorage.getItem("fl_supabase_session")||"null");if(!s||!s.access_token||(s.expires_at&&s.expires_at*1000<Date.now()))location.replace("login.html");}catch(e){location.replace("login.html");}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Daily Sheet — Chapter 04 · DISCIPLINE</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#14181d;--dim:#5a6675;--line:#cbd2db;--red:#c0392b;--accent:#0a7d5a}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#3a3f47}
+  body{font-family:'IBM Plex Mono',ui-monospace,monospace;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar{max-width:1000px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;gap:10px}
+  .bar a,.bar button{font-family:inherit;font-size:12px;font-weight:700;letter-spacing:1px;border:1px solid #6b7280;background:#22262c;color:#e8edf2;border-radius:8px;padding:9px 16px;cursor:pointer;text-decoration:none}
+  .bar .print{background:#F5A623;color:#111;border-color:#F5A623}
+
+  .sheet{max-width:1000px;margin:0 auto 30px;background:#fff;padding:26px 30px;box-shadow:0 6px 30px rgba(0,0,0,.4)}
+  .meta{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:10px}
+  .meta h1{font-size:17px;letter-spacing:2px;margin:0}
+  .meta .sub{font-size:10px;color:var(--dim);letter-spacing:1px;margin-top:2px}
+  .meta .day{text-align:right;font-size:10px;color:var(--dim);letter-spacing:1px}
+  .meta .day b{display:block;font-size:26px;color:var(--ink)}
+  .motto{text-align:center;font-size:10px;letter-spacing:2px;color:var(--dim);font-style:italic;margin:8px 0 14px}
+
+  /* Covenant box */
+  .cov{border:1.5px solid var(--red);border-radius:8px;padding:12px 14px;margin-bottom:16px;background:#fdf4f3}
+  .cov .ct{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--red);margin-bottom:8px;text-transform:uppercase}
+  .cov .grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 22px}
+  .cov .r{display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0}
+  .cov .r .cb{width:15px;height:15px;border:2px solid var(--ink);border-radius:3px;flex:0 0 auto}
+  .cov .r .cost{margin-left:auto;font-size:9.5px;color:var(--red);font-weight:600}
+  .cov .pen{font-size:9.5px;color:#7a3a34;margin-top:8px;line-height:1.5}
+  .todayrule{border:2px solid var(--accent);background:#e7f5ef;border-radius:8px;padding:9px 13px;margin-bottom:15px;font-size:11.5px;color:#12241d;display:flex;align-items:baseline;gap:7px;font-weight:500}
+  .todayrule b{color:var(--accent);white-space:nowrap;font-weight:700}
+  .todayrule .fl{flex:1;border-bottom:1px solid var(--ink);height:13px}
+  .readout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+  @media(max-width:640px){.readout{grid-template-columns:1fr}}
+  .rcol{border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#f6f8fb;break-inside:avoid}
+  .rh{font-size:9.5px;font-weight:700;letter-spacing:1px;color:var(--accent);margin-bottom:5px;text-transform:uppercase}
+  .rl{font-size:9px;line-height:1.5;color:#2f3742;margin:2.5px 0}
+  .rl b{color:var(--ink)}
+  .train{border:1px solid var(--line);border-radius:8px;padding:9px 12px;margin-bottom:16px;background:#fbfaf5}
+  .train .rh{color:#b5811a}
+  .tr{display:flex;align-items:baseline;gap:8px;font-size:10px;padding:3.5px 0}
+  .tr b{flex:0 0 46px;font-size:9.5px}
+  .tr .fl{flex:1;border-bottom:1px dotted var(--ink);height:13px}
+  .tr .cap{color:var(--dim);font-size:8px;flex:0 0 auto}
+  .tr .cbc{width:12px;height:12px;border:1.5px solid var(--ink);border-radius:50%;flex:0 0 auto;position:relative;top:2px}
+  .tr .ex{flex:1;font-size:8.5px;color:#3a4250;line-height:1.4}
+
+  .period{margin-top:16px;break-inside:avoid}
+  .ph{font-size:12px;font-weight:700;letter-spacing:2px;border-bottom:1.5px solid var(--ink);padding-bottom:4px;margin-bottom:8px;display:flex;justify-content:space-between}
+  .ph small{color:var(--dim);font-weight:500;letter-spacing:1px}
+  .cols{column-count:2;column-gap:24px}
+  @media(max-width:640px){.cols{column-count:1}}
+  .blk{break-inside:avoid;margin-bottom:9px}
+  .blkh{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--accent);text-transform:uppercase;margin-bottom:2px}
+  .ri{display:flex;align-items:baseline;gap:7px;padding:1.5px 0;font-size:10px;line-height:1.35}
+  .ri .cb{width:11px;height:11px;border:1.5px solid var(--ink);border-radius:2px;flex:0 0 auto;position:relative;top:1px}
+  .ri .tm{color:var(--dim);font-size:8.5px;flex:0 0 34px}
+  .ri .ti{flex:1}
+  .ri .ti b{color:var(--red)}
+  .foot{margin-top:16px;border-top:2px solid var(--ink);padding-top:10px;text-align:center;font-size:11px;font-weight:700;letter-spacing:1px}
+  .foot .big{color:var(--red)}
+  .p25{column-count:4;column-gap:16px;margin-top:2px}
+  .p25 span{display:block;font-size:9px;line-height:1.5;color:#3a4250;break-inside:avoid;padding:0.5px 0}
+  .p25 b{color:var(--accent);display:inline-block;min-width:16px}
+
+  @media print{
+    html,body{background:#fff}
+    .bar{display:none}
+    .sheet{box-shadow:none;margin:0;max-width:100%;padding:0}
+    .cols{column-count:4;column-gap:11px}
+    body{font-size:7.6px}
+    .motto{margin:5px 0 9px}
+    .cov{padding:7px 9px;margin-bottom:9px}
+    .cov .r{font-size:9.5px;padding:2px 0}
+    .todayrule{font-size:9px;padding:6px 9px;margin-bottom:10px}
+    .readout{gap:8px;margin-bottom:9px}
+    .rcol{padding:6px 8px}
+    .rl{font-size:7.8px;margin:1.5px 0}
+    .train{padding:6px 8px;margin-bottom:9px}
+    .period{margin-top:8px}
+    .ph{font-size:10px;padding-bottom:3px;margin-bottom:5px}
+    .blk{margin-bottom:5px}
+    .blkh{font-size:7px;margin-bottom:1px}
+    .ri{padding:0.6px 0;font-size:7.6px;line-height:1.22}
+    .ri .cb{width:8.5px;height:8.5px}
+    .ri .tm{font-size:6.8px;flex:0 0 26px}
+    .foot{margin-top:9px;padding-top:7px;font-size:9px}
+    .p25{column-count:5;column-gap:10px}
+    .p25 span{font-size:7px;line-height:1.32}
+    @page{margin:6.5mm}
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="discipline.html">← Tracker</a>
+  <button class="print" id="printBtn">🖨 PRINT</button>
+</div>
+
+<div class="sheet">
+  <div class="meta">
+    <div><h1>◆ CHAPTER 04 · DISCIPLINE</h1><div class="sub">FIRST LIGHT — the full daily protocol</div></div>
+    <div class="day">DAY <b>_____</b><br>DATE ____________</div>
+  </div>
+  <div class="motto">No money. Debts are paid in distance.</div>
+
+  <!-- CHAPTER 04 COVENANT -->
+  <div class="cov">
+    <div class="ct">The Covenant — the 5 that anchor the day</div>
+    <div class="grid">
+      <div class="r"><span class="cb"></span>WAKE before 4:00 AM <span class="cost">miss = 30 km cycle · or 15 km walk</span></div>
+      <div class="r"><span class="cb"></span>MEDITATION 3:40 AM <span class="cost">miss = +30 km cycle</span></div>
+      <div class="r"><span class="cb"></span>WORKOUT <span class="cost">miss = +100 km cycle</span></div>
+      <div class="r"><span class="cb"></span>JOURNAL <span class="cost">miss = +30 km cycle</span></div>
+      <div class="r"><span class="cb"></span>SLEEP 5.5H <span class="cost">miss = +30 km cycle</span></div>
+    </div>
+    <div class="pen"><b>Stay clean</b> — tick only if you slipped: &nbsp; ☐ <b>Masturbation / Porn</b> → 100 km cycle within 14 days (else +10 km/day) &nbsp; ☐ Solid food at night → +30 km walk &nbsp; ☐ <b>Phone in ANY room</b> → +50 km cycle &nbsp; ☐ Daytime sleep 4 AM–5 PM → +30 km cycle. &nbsp; <b>Forget to log the day = ALL of it applies.</b></div>
+  </div>
+
+  <!-- READOUT — speak aloud / food code / anchors -->
+  <div class="todayrule"><b>◇ 25 MORNING RULE</b> &nbsp;Today's rule from the 25 Daily Rules. <b>Read. Absorb. Apply.</b> &nbsp;→&nbsp;#<span style="display:inline-block;border-bottom:1px solid #14181d;width:22px"></span>&nbsp;<span class="fl"></span></div>
+
+  <div class="readout">
+    <div class="rcol">
+      <div class="rh">◇ Speak Aloud</div>
+      <div class="rl"><b>On waking:</b> Thanks — universe, everyone, five elements.</div>
+      <div class="rl"><b>Morning · Ikigai:</b> "I am not trying to win. I am refusing to stop."</div>
+      <div class="rl"><b>Pre-workout:</b> Box breathing 4-4-4-4 ×5 → go.</div>
+      <div class="rl"><b>7 PM:</b> "Shutdown complete."</div>
+      <div class="rl"><b>Morning & Night · Ho'oponopono:</b> "I love you. I'm sorry. Please forgive me. Thank you."</div>
+      <div class="rl"><b>Kaizen:</b> "Tomorrow I improve one thing by 1%."</div>
+    </div>
+    <div class="rcol">
+      <div class="rh">◇ Food Code</div>
+      <div class="rl">Rice OK · no fried · no processed sugar</div>
+      <div class="rl">Chew 32× · no phone/laptop while eating</div>
+      <div class="rl"><b>Hara Hachi Bu</b> — eat to 80% full</div>
+      <div class="rl"><b>Last solid meal before 6 PM</b> (then sprout mix)</div>
+      <div class="rl">Shata Pada — 100 steps after every meal</div>
+      <div class="rl">Warm water only w/ meals — never cold (Agni)</div>
+    </div>
+    <div class="rcol">
+      <div class="rh">◇ Anchors</div>
+      <div class="rl"><b>Sleep:</b> 5.5h — lights out ~10 PM → wake 3:30 AM</div>
+      <div class="rl"><b>Wake before 4 AM</b> — no snooze, ever</div>
+      <div class="rl"><b>No sleep 4 AM – 5 PM</b> (watch-tracked)</div>
+      <div class="rl"><b>Brahmacharya</b> — Ojas conserved & raised</div>
+      <div class="rl">3:30 AM is decided at 8:45 PM the night before</div>
+      <div class="rl">★ = tier-1, non-negotiable</div>
+    </div>
+  </div>
+
+  <!-- WRITE (fill through the day) -->
+  <div class="train">
+    <div class="rh">◇ Write — fill through the day</div>
+    <div class="tr"><b>3:45 Micro-gratitude</b><span class="fl"></span><span class="cap">one thing</span></div>
+    <div class="tr"><b>Night · 3 wins</b><span class="fl"></span></div>
+    <div class="tr"><b>Tomorrow, 1% better</b><span class="fl"></span></div>
+  </div>
+
+  <div class="period"><div class="ph"><span>☀ MORNING</span><small id="mCount"></small></div><div class="cols" id="morning"></div></div>
+  <div class="period"><div class="ph"><span>◐ MIDDAY</span><small id="midCount"></small></div><div class="cols" id="midday"></div></div>
+  <div class="period"><div class="ph"><span>☾ EVENING</span><small id="eCount"></small></div><div class="cols" id="evening"></div></div>
+  <div class="period"><div class="ph"><span>◆ WEEKEND</span><small>Sat + Sun only</small></div><div class="cols" id="weekend"></div></div>
+
+  <div class="period"><div class="ph"><span>◇ 25 LONGEVITY PILLARS</span><small>the foundation — read weekly</small></div>
+    <div class="p25">
+      <span><b>1</b>Wake before sunrise</span>
+      <span><b>2</b>Tongue scraping (copper)</span>
+      <span><b>3</b>Oil pulling (Gandusha)</span>
+      <span><b>4</b>Cold water exposure</span>
+      <span><b>5</b>Pranayama (Nadi Shodhana)</span>
+      <span><b>6</b>Meditation (Vipassana)</span>
+      <span><b>7</b>Zone-2 cardio</span>
+      <span><b>8</b>Sunlight — first 30 min</span>
+      <span><b>9</b>Hara Hachi Bu (eat to 80%)</span>
+      <span><b>10</b>Triphala before bed</span>
+      <span><b>11</b>Ashwagandha</span>
+      <span><b>12</b>Green tea (matcha)</span>
+      <span><b>13</b>Turmeric + black pepper</span>
+      <span><b>14</b>Intermittent fasting (16:8)</span>
+      <span><b>15</b>Abhyanga (oil massage)</span>
+      <span><b>16</b>Sleep — before 10 PM</span>
+      <span><b>17</b>Nasya (nasal oil)</span>
+      <span><b>18</b>Strength training 3×/wk</span>
+      <span><b>19</b>Forest bathing (weekly)</span>
+      <span><b>20</b>Ekadashi fast (2×/mo)</span>
+      <span><b>21</b>Qigong / Tai Chi</span>
+      <span><b>22</b>Earthing / grounding</span>
+      <span><b>23</b>Amla (daily)</span>
+      <span><b>24</b>Japa / mantra</span>
+      <span><b>25</b>Ikigai — purpose</span>
+    </div>
+  </div>
+
+  <div class="period"><div class="ph"><span>◇ KEY PRACTICES — how to do them</span></div>
+    <div class="p25">
+      <span><b>Box breathing:</b> in 4 · hold 4 · out 4 · hold 4 — ×5 rounds</span>
+      <span><b>Cyclic sighing:</b> 2 short nose inhales → 1 long mouth exhale — 5 min</span>
+      <span><b>Nadi Shodhana:</b> alternate-nostril, equal in/out — 5 min</span>
+      <span><b>Kapalabhati:</b> sharp exhales, passive inhale — 30–50</span>
+      <span><b>Trataka:</b> steady gaze on candle flame, no blink — 5 min</span>
+      <span><b>Marma:</b> Ajna · Hridaya · Nabhi — 30s each, clockwise</span>
+      <span><b>Mula Bandha:</b> root lock — engage 10s, release — 10 reps</span>
+      <span><b>Shata Pada:</b> 100 gentle steps after every meal</span>
+      <span><b>Abhyanga:</b> warm oil, toward the heart, 10–15 min</span>
+      <span><b>Cold dive reflex:</b> face in cold water — resets the vagus nerve</span>
+    </div>
+  </div>
+
+  <div class="foot">Tick through the day · LOG IN THE SYSTEM BEFORE <span class="big">11:59 PM</span> — or all punishments apply.</div>
+</div>
+
+<script src="js/admin-rituals.js"></script>
+<script>
+(function(){
+  var START='2026-07-19';  // day-counter epoch — Ch04 begins Jul 27 but the number never reset
+  function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function ritualHtml(r){
+    return '<div class="ri"><span class="cb"></span><span class="tm">'+esc(r.time||'')+'</span><span class="ti">'+esc(r.title)+(r.tier===1?' <b>★</b>':'')+'</span></div>';
+  }
+  function renderPeriod(period, id, countId){
+    var defs=[];
+    try{ defs=(typeof getRitualDefs==='function'?getRitualDefs(period):[])||[]; }catch(e){ defs=[]; }
+    defs=defs.filter(function(r){ return r.active!==false; });
+    var blocks={}, order=[];
+    defs.forEach(function(r){ var b=r.block||''; if(!blocks[b]){blocks[b]=[];order.push(b);} blocks[b].push(r); });
+    var html='';
+    order.forEach(function(b){
+      html+='<div class="blk"><div class="blkh">'+esc(b)+'</div>';
+      blocks[b].forEach(function(r){ html+=ritualHtml(r); });
+      html+='</div>';
+    });
+    document.getElementById(id).innerHTML = html || '<div class="ri"><span class="ti" style="color:#999">— none —</span></div>';
+    if(countId) document.getElementById(countId).textContent = defs.length+' items';
+  }
+  renderPeriod('morning','morning','mCount');
+  renderPeriod('midday','midday','midCount');
+  renderPeriod('evening','evening','eCount');
+
+  // Weekend tasks (static — from admin-checkin.js)
+  var SAT=['Laundry — wash + dry','Batch cook — larger portions for Sunday','Hammam scrub — kessa mitt full body','Brahmi/Bhringraj hair oiling — overnight','Kesar + raw milk face mask — 15 min','Car interior clean'];
+  var SUN=['Abhyanga full body self-massage — 10-15 min','Temple visit','Park or nature sit — 1h min (Shinrin-yoku)','Friluftsliv — 20-30 min purposeless walk','Kesar + raw milk face mask','Brahmi/bhringraj hair oiling','PERMA weekly audit — P E R M A each 1-10','Grocery + weekly prep + soak methi','Full room reset + clothes fold','Rest — minimal tasks only'];
+  var wk='<div class="blk"><div class="blkh">Saturday</div>';
+  SAT.forEach(function(t){ wk+='<div class="ri"><span class="cb"></span><span class="tm">SAT</span><span class="ti">'+esc(t)+'</span></div>'; });
+  wk+='</div><div class="blk"><div class="blkh">Sunday</div>';
+  SUN.forEach(function(t){ wk+='<div class="ri"><span class="cb"></span><span class="tm">SUN</span><span class="ti">'+esc(t)+'</span></div>'; });
+  wk+='</div>';
+  document.getElementById('weekend').innerHTML=wk;
+
+  document.getElementById('printBtn').addEventListener('click',function(){window.print();});
+})();
+</script>
+</body>
+</html>

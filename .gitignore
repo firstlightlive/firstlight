@@ -20,6 +20,10 @@ Thumbs.db
 # Node
 node_modules/
 
+# Python
+__pycache__/
+*.pyc
+
 # Local config
 .claude/
 
@@ -43,3 +47,5 @@ firstlight-ipad-app*.zip
 
 # Payment screenshots (PII) — keep local, never commit to the PUBLIC repo
 website/day12/assets/
+scripts/.vapid.json
+scripts/.deploy-brief.sh

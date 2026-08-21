@@ -9,6 +9,12 @@
   "observability": {
     "enabled": true
   },
+  // Emailed brief — fires hourly at :30 past, 00:30–17:30 UTC (= 06:00–23:00 IST).
+  // runBriefEmail() sends a guaranteed digest at the ~07:00 & ~19:00 IST slots and,
+  // in between, emails ONLY when the corroborated top-story set changes.
+  "triggers": {
+    "crons": ["30 0-17 * * *"]
+  },
   "assets": {
     "directory": "website",
     "binding": "ASSETS",
