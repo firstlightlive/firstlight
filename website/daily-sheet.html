@@ -126,6 +126,9 @@
   @media(max-width:640px){.two{grid-template-columns:1fr}}
   .park{border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#fff}
   .park .pl{border-bottom:1px dotted var(--line);height:17px}
+  .meta .day .wr{display:inline-block;border-bottom:1.5px solid var(--ink);min-width:56px;height:24px;vertical-align:-6px}
+  .meta .day .wrd{display:inline-block;border-bottom:1px solid var(--ink);min-width:118px;height:12px}
+  @media print{ .meta .day .wr{height:20px;min-width:48px} .meta .day .wrd{min-width:104px} }
   .rampnote{font-size:8.5px;color:#8a5a10;background:#fff3d6;border:1px solid #e3c98a;border-radius:5px;padding:4px 8px;margin:-3px 0 7px;line-height:1.45}
 
   @media print{
@@ -189,7 +192,7 @@
 <div class="sheet">
   <div class="meta">
     <div><h1>◆ CHAPTER 05 · RETURN</h1><div class="sub">FIRST LIGHT — the full daily protocol</div></div>
-    <div class="day">DAY <b id="dayNum">_____</b><br>DATE <span id="dateOut">____________</span><span id="dayFor"></span></div>
+    <div class="day">DAY <span class="wr"></span><br>DATE <span class="wrd"></span></div>
   </div>
   <div class="motto">HM SEP 27 · TMM JAN 17 · 70.3 FEB 17 · 100K DEC 27 · IRONMAN JAN 28</div>
 
@@ -197,7 +200,7 @@
   <div class="cov">
     <div class="ct">The Covenant — the 5 that anchor the day</div>
     <div class="grid">
-      <div class="r"><span class="cb"></span>WAKE before <b id="covWake">4:30 AM</b></div>
+      <div class="r"><span class="cb"></span>WAKE before <b id="covWake">4:30 AM</b> <span id="covWk" style="color:var(--dim);font-size:9px"></span></div>
       <div class="r"><span class="cb"></span>MEDITATION — Brahma Muhurta, <b id="covMed">4:45</b> AM</div>
       <div class="r"><span class="cb"></span>WORKOUT</div>
       <div class="r"><span class="cb"></span>JOURNAL</div>
@@ -343,7 +346,7 @@
 <div class="sheet page2">
   <div class="meta">
     <div><h1>◇ HOURLY RESET · WORK FROM HOME</h1><div class="sub">55 minutes of work · 5 minutes of reset · the day is built one block at a time</div></div>
-    <div class="day">DAY <b id="dayNum2">_____</b><br>DATE <span id="dateOut2">____________</span></div>
+    <div class="day">DAY <span class="wr"></span><br>DATE <span class="wrd"></span></div>
   </div>
 
   <div class="prot">
@@ -455,11 +458,10 @@
   var sheetFor=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   var forTomorrow = now.getHours()>=19;               // night prep prints tomorrow's sheet
   if(forTomorrow) sheetFor.setDate(sheetFor.getDate()+1);
-  var dayNum=Math.round((sheetFor-parseYMD(START))/86400000)+1;
-  var dateStr=DOW[sheetFor.getDay()]+' '+pad(sheetFor.getDate())+' '+MON[sheetFor.getMonth()]+' '+sheetFor.getFullYear();
-  ['dayNum','dayNum2'].forEach(function(id){var e=document.getElementById(id); if(e) e.textContent = dayNum>0?dayNum:'\u2014';});
-  ['dateOut','dateOut2'].forEach(function(id){var e=document.getElementById(id); if(e) e.textContent=dateStr;});
-  var df=document.getElementById('dayFor'); if(df&&forTomorrow) df.textContent=' \u00b7 printed for tomorrow';
+  // DAY and DATE are deliberately NOT printed. This is a template: print a stack
+  // once and hand-write them each morning. sheetFor survives only to pick which
+  // ramp week the covenant times show \u2014 see the ramp note for the caveat when
+  // printing more than one week ahead.
 
   // ── Return ramp ── wake/lights-out step back to 3:30 over three weeks
   var RAMP=[
@@ -471,6 +473,9 @@
   for(var i=0;i<RAMP.length;i++){ if(!RAMP[i].to || sheetFor<=parseYMD(RAMP[i].to)){ phase=RAMP[i]; break; } }
   function setTxt(id,v){var e=document.getElementById(id); if(e) e.textContent=v;}
   setTxt('covWake',phase.wake); setTxt('covMed',phase.med); setTxt('wMicro',phase.med);
+  // Stamp the ramp week on the covenant: a printed stack cannot know which week it
+  // is being filled in, so it says which week its times belong to.
+  setTxt('covWk', phase.w==='W3' ? '' : '('+phase.w+' \u2014 see ramp)');
   setTxt('covLights',phase.lights); setTxt('covLights2',phase.lights);
   var rr=document.getElementById('rampRows');
   if(rr){
