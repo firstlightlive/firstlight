@@ -397,20 +397,28 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS'; dayOve
   // 1. Apple Health — PRIMARY
   const apple = await _pullAppleForDate(date)
 
-  // 2. Strava — DISABLED by default (APPLE-ONLY mode, 2026-07-24). The Strava API
-  //    app (client 226450) is tied to the WRONG athlete — a secondary account
-  //    (1669656814), not the followers account (206338460) — and the API path was
-  //    abandoned after repeated OAuth callback-domain failures. If left on, the
-  //    judge would "prefer Strava's candidates" and post the wrong account's data
-  //    (or miss a real Apple workout). FirstLight now runs on Apple Health as the
-  //    SOLE source. Re-enable ONLY if a correct-account token is ever restored, by
-  //    setting the secret strava_source_enabled='true'.
+  // 2. Strava — gated on strava_source_enabled.
+  //    HISTORY: a Jul 2026 note here claimed the API app was bound to the WRONG
+  //    athlete (secondary 1669656814 rather than the followers account
+  //    206338460) and that Strava had been switched off for judging. Re-tested
+  //    2026-09-12 via ?action=strava-whoami: the token resolves to athlete
+  //    206338460 — the followers account — and strava_source_enabled is already
+  //    'true'. Both halves of that note were stale. Verify with strava-whoami
+  //    before believing any future claim about which account this token holds.
   let strava: StravaActivityLite[] | null = null
+  let stravaStatus: 'disabled' | 'no-token' | 'error' | 'ok' = 'disabled'
   if ((await getSecret('strava_source_enabled')) === 'true') {
     try {
       const token = await _stravaAccessToken()
-      if (token) strava = await _pullStravaForDate(date, token)
-    } catch (_e) { /* banned/unreachable — Apple carries the day */ }
+      if (!token) {
+        stravaStatus = 'no-token'
+      } else {
+        strava = await _pullStravaForDate(date, token)
+        stravaStatus = 'ok'
+      }
+    } catch (_e) {
+      stravaStatus = 'error'   // banned/unreachable — Apple carries the day
+    }
   }
 
   // 3. Activity Studio manual uploads — always unioned in (they exist in no
@@ -426,11 +434,26 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS'; dayOve
     ...manual
   ]
 
-  // Infra guard: NO source has any data channel for this date
+  // Infra guard: NO source has any data channel for this date.
+  //
+  // ⚠️ This deliberately treats "Strava returned 0 activities" the same as
+  // "Strava could not be reached", so a silent Apple + an empty Strava yields
+  // PENDING, never MISS. That is why nine untrained days (Sep 4-12 2026)
+  // produced no slips. It is the safe direction to err, but it does mean a
+  // genuine rest day is never auto-declared a MISS while health_daily is quiet.
+  // Changing it changes when MISSes publish — do it deliberately, not as a
+  // side effect.
   if (apple === null && (strava === null || strava.length === 0) && manual.length === 0) {
+    // The old copy said "Strava unavailable" whichever of these was true, which
+    // reads as a broken integration on a day the athlete simply did not train.
+    const stravaMsg =
+      stravaStatus === 'ok'       ? 'Strava reachable, reported 0 activities'
+    : stravaStatus === 'disabled' ? 'Strava not consulted (strava_source_enabled is not true)'
+    : stravaStatus === 'no-token' ? 'Strava token missing from secrets'
+    :                               'Strava API call failed'
     return {
       verdict: 'PENDING', date, chapterDay: day, candidates: [],
-      pendingReason: 'No data from Apple Health (no health_daily row — check Health Auto Export) and Strava unavailable — NOT declaring MISS on infra failure'
+      pendingReason: `No Apple Health data (no health_daily row — check Health Auto Export); ${stravaMsg}; no manual entry. NOT declaring MISS without a confirmed data channel.`
     }
   }
 
@@ -4264,6 +4287,40 @@ Deno.serve(async (req) => {
 
     if (action === 'refresh-token') {
       await syncInstagram(log)
+    }
+
+    // ── STRAVA IDENTITY CHECK ───────────────────────────────────────────────
+    // Strava was disabled as a JUDGING source in Jul 2026 on the grounds that
+    // the API app was bound to a secondary athlete rather than the followers
+    // account, and would therefore judge on the wrong person's data. That claim
+    // was never re-tested. This answers it with a fact instead of a comment:
+    // it asks Strava who the stored token actually belongs to.
+    // Read-only — it publishes nothing and changes no state.
+    if (action === 'strava-whoami') {
+      const token = await _stravaAccessToken()
+      if (!token) {
+        return new Response(JSON.stringify({ ok: false, error: 'No Strava token — check secrets' }), { headers })
+      }
+      const r = await fetch('https://www.strava.com/api/v3/athlete', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const a = await r.json()
+      if (!r.ok) {
+        return new Response(JSON.stringify({ ok: false, status: r.status, error: a }), { headers })
+      }
+      const EXPECTED_FOLLOWERS_ATHLETE = 206338460   // the public account
+      const KNOWN_SECONDARY_ATHLETE = 1669656814     // the one the Jul note blamed
+      return new Response(JSON.stringify({
+        ok: true,
+        athlete_id: a.id,
+        username: a.username,
+        name: [a.firstname, a.lastname].filter(Boolean).join(' '),
+        follower_count: a.follower_count,
+        friend_count: a.friend_count,
+        is_followers_account: a.id === EXPECTED_FOLLOWERS_ATHLETE,
+        is_known_secondary: a.id === KNOWN_SECONDARY_ATHLETE,
+        judging_source_enabled: (await getSecret('strava_source_enabled')) === 'true'
+      }), { headers })
     }
 
     if (action === 'backfill-strava-calories') {
