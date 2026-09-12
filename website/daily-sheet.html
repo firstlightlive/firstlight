@@ -109,8 +109,8 @@
   .bt th{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);border-bottom:1.5px solid var(--ink);padding:4px 3px;text-align:left;font-weight:700}
   .bt td{border-bottom:1px solid var(--line);padding:0;height:26px}
   .bt td.n{text-align:center;font-weight:700;color:var(--dim);width:22px}
-  .bt td.tm{font-size:8.5px;color:var(--dim);width:52px;padding-left:3px}
-  .bt td.lb{font-size:7.5px;letter-spacing:.5px;color:var(--dim);width:64px}
+  .bt td.tm{font-size:8.5px;color:var(--dim);width:64px;padding-left:3px;white-space:nowrap}
+  .bt td.lb{font-size:7.5px;letter-spacing:.5px;color:var(--dim);width:60px;padding-left:2px}
   .bt td.one{border-left:1px dotted var(--line);min-width:150px}
   .bt td.k{text-align:center;width:30px;border-left:1px dotted var(--line)}
   .bt td.k .cb{display:inline-block;width:12px;height:12px;border:1.5px solid var(--ink);border-radius:3px}
@@ -198,7 +198,7 @@
     <div class="ct">The Covenant — the 5 that anchor the day</div>
     <div class="grid">
       <div class="r"><span class="cb"></span>WAKE before <b id="covWake">4:30 AM</b></div>
-      <div class="r"><span class="cb"></span>MEDITATION — Brahma Muhurta, <b id="covMed">4:45</b></div>
+      <div class="r"><span class="cb"></span>MEDITATION — Brahma Muhurta, <b id="covMed">4:45</b> AM</div>
       <div class="r"><span class="cb"></span>WORKOUT</div>
       <div class="r"><span class="cb"></span>JOURNAL</div>
       <div class="r"><span class="cb"></span>SLEEP 6.5H+ — lights out <b id="covLights">9:45 PM</b></div>
@@ -223,7 +223,7 @@
     <div class="lwr"><b>1.</b> Drop to <b>KEYSTONE</b>. Do not attempt the full chain — it will eat the 9:00 open.</div>
     <div class="lwr"><b>2.</b> Sit <b>3 minutes</b> in place of the full Brahma Muhurta block. Three minutes counts.</div>
     <div class="lwr"><b>3.</b> Rejoin at the next <b>FIXED</b> event below. Everything between them is compressible.</div>
-    <div class="fix">FIXED — <b>6:00</b> in the water · <b>9:00</b> market open · <b>7:00 PM</b> laptop close + phone off · <b id="covLights2">9:45 PM</b> lights out</div>
+    <div class="fix">FIXED — <b>6:00 AM</b> in the water · <b>9:00 AM</b> market open · <b>7:00 PM</b> laptop close + phone off · <b id="covLights2">9:45 PM</b> lights out</div>
     <div class="pen"><b>Never</b> push rituals into the night to “finish” the day. That buys one checkbox with tomorrow’s morning — it is how nine days get lost.</div>
   </div>
 
@@ -278,7 +278,7 @@
   <!-- WRITE (fill through the day) -->
   <div class="train">
     <div class="rh">◇ Write — fill through the day</div>
-    <div class="tr"><b><span id="wMicro">4:45</span> Micro-gratitude</b><span class="fl"></span><span class="cap">one thing</span></div>
+    <div class="tr"><b><span id="wMicro">4:45</span> AM Micro-gratitude</b><span class="fl"></span><span class="cap">one thing</span></div>
     <div class="tr"><b>Night · 3 wins</b><span class="fl"></span></div>
     <div class="tr"><b>Tomorrow, 1% better</b><span class="fl"></span></div>
   </div>
@@ -336,7 +336,7 @@
   </div>
 
 
-  <div class="foot">LOG THE DAY 6:40–<span class="big">6:55 PM</span> · PHONE OFF 7:00 → ON 9:00 · One clock, every day.</div>
+  <div class="foot">LOG THE DAY 6:40–<span class="big">6:55 PM</span> · PHONE OFF 7:00 PM → ON 9:00 AM · One clock, every day.</div>
 </div>
 
 <!-- ═══ PAGE 2 — HOURLY RESET (work from home) ═══ -->
@@ -413,6 +413,10 @@
   function ritualHtml(r){
     return '<div class="ri"><span class="cb"></span><span class="tm">'+esc(r.time||'')+'</span><span class="ti">'+esc(r.title)+(r.tier===1?' <b>★</b>':'')+'</span></div>';
   }
+  // Every ritual time inside a period shares one meridiem (morning 3am-10am,
+  // midday 12pm-5pm, evening 7pm-8pm), so it is stated ONCE in the header rather
+  // than suffixed onto ~90 rows, which would cost a column of width and a page.
+  var MERIDIEM={morning:'ALL TIMES AM', midday:'ALL TIMES PM', evening:'ALL TIMES PM'};
   function renderPeriod(period, id, countId){
     var defs=[];
     try{ defs=(typeof getRitualDefs==='function'?getRitualDefs(period):[])||[]; }catch(e){ defs=[]; }
@@ -426,7 +430,7 @@
       html+='</div>';
     });
     document.getElementById(id).innerHTML = html || '<div class="ri"><span class="ti" style="color:#999">— none —</span></div>';
-    if(countId) document.getElementById(countId).textContent = defs.length+' items';
+    if(countId) document.getElementById(countId).textContent = defs.length+' items \u00b7 '+(MERIDIEM[period]||'');
   }
   renderPeriod('morning','morning','mCount');
   renderPeriod('midday','midday','midCount');
@@ -503,15 +507,15 @@
   // Muhurta chain runs to ~5:05, so a 4:15 block is impossible and only ONE short
   // session fits before the 5:40 pre-train. Week 3 gets both blocks back.
   var STUDY={
-    W1:[['5:05','STUDY 40min'],['\u2014','']],
-    W2:[['4:35','STUDY 65min'],['\u2014','']],
-    W3:[['4:15','STUDY 1+2'],['5:15','STUDY 1+2']]
+    W1:[['5:05 AM','STUDY 40min'],['\u2014','']],
+    W2:[['4:35 AM','STUDY 65min'],['\u2014','']],
+    W3:[['4:15 AM','STUDY 1+2'],['5:15 AM','STUDY 1+2']]
   };
   var st=STUDY[phase.w]||STUDY.W3;
   var BLOCKS=[
-    st[0], st[1], ['7:50','STUDY 2 / GYM'],
-    ['9:00','MARKET'],['10:00','MARKET'],['11:00','MARKET'],['12:00','MARKET'],
-    ['2:00','MARKET'],['3:05','STUDY 3'],['4:05','FLEX']
+    st[0], st[1], ['7:50 AM','STUDY 2 / GYM'],
+    ['9:00 AM','MARKET'],['10:00 AM','MARKET'],['11:00 AM','MARKET'],['12:00 PM','MARKET'],
+    ['2:00 PM','MARKET'],['3:05 PM','STUDY 3'],['4:05 PM','FLEX']
   ];
   // A dead block is not a row you can fill, so it is dropped outright rather than
   // printed with empty checkboxes: in a ramp week the day is out of 9, not 10, and
