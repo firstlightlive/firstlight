@@ -61,6 +61,18 @@ window.FL_CURRENT_CHAPTER = {
   // Must stay equal to FL_DEFAULTS.STREAK_START (app.js) and DAY_EPOCH (the edge
   // function). Anything rendering a day number reads dayEpoch — never start.
   dayEpoch: '2026-09-13',
+  // The chapter's day-counter RUNS, oldest first. A break resets the day NUMBER
+  // but not the chapter, so Chapter 04 has two runs. Any archived row is numbered
+  // against the run whose date range contains it — that is how rows published
+  // before the fever keep the day numbers they were published with. `dayEpoch`
+  // above is always the LIVE run's epoch and must equal the last entry here.
+  runs: [
+    // Jul 27 entered the counter at Day 9 (it continued from Chapter 03's Jul 19
+    // epoch — the streak did not reset at the handover) and reached Day 47 on Sep 3.
+    { from: '2026-07-27', to: '2026-09-03', epoch: '2026-07-19' },
+    // Fever break Sep 4–12: nine days, no training. Counter restarted at Day 1.
+    { from: '2026-09-13', to: null,         epoch: '2026-09-13' }
+  ],
   rule: 'ANY WORKOUT ANCHORS THE DAY · 5 RITUALS',
   stakePerDay: 0,
   escalations: 'NONE — PENANCE IS DISTANCE',

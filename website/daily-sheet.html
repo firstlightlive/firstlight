@@ -68,6 +68,66 @@
   .p25 span{display:block;font-size:9px;line-height:1.5;color:#3a4250;break-inside:avoid;padding:0.5px 0}
   .p25 b{color:var(--accent);display:inline-block;min-width:16px}
 
+  /* Day mode / late-wake / ramp */
+  .mode{border:1.5px solid var(--accent);border-radius:8px;padding:10px 13px;margin-bottom:12px;background:#f2faf7}
+  .mode .ct{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--accent);margin-bottom:7px;text-transform:uppercase}
+  .mgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 16px}
+  @media(max-width:640px){.mgrid{grid-template-columns:1fr}}
+  .mo{display:flex;align-items:baseline;gap:7px;font-size:10px}
+  .mo .cb{width:14px;height:14px;border:2px solid var(--ink);border-radius:3px;flex:0 0 auto;position:relative;top:2px}
+  .mo b{font-size:11px;letter-spacing:1px;flex:0 0 auto}
+  .mo .md{color:var(--dim);font-size:8.5px;line-height:1.35}
+  .lw{border:1.5px solid var(--red);border-radius:8px;padding:10px 13px;margin-bottom:12px;background:#fdf4f3}
+  .lw .ct{font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--red);margin-bottom:6px;text-transform:uppercase}
+  .lwr{font-size:9.5px;line-height:1.55;color:#2f3742;margin:2px 0}
+  .lwr b{color:var(--ink)}
+  .fix{font-size:9.5px;margin-top:6px;padding-top:6px;border-top:1px dotted #c9a49f;color:#2f3742}
+  .ramp{border:1px solid var(--line);border-radius:8px;padding:9px 12px;margin-bottom:14px;background:#fbfaf5}
+  .ramp .rh{color:#b5811a}
+  .rmr{display:flex;gap:10px;font-size:9.5px;padding:2.5px 0;align-items:baseline}
+  .rmr b{flex:0 0 26px}
+  .rmr span{flex:0 0 auto}
+  .rmr .dt{flex:0 0 86px;color:var(--dim)}
+  .rmr .cut{color:var(--dim);font-size:8.5px;margin-left:auto}
+  .rmr.now{background:#fff3d6;border-radius:4px;padding:3px 6px;margin:1px -6px;font-weight:600}
+
+  /* Page 2 — hourly reset */
+  .page2{page-break-before:always;break-before:page}
+  .prot{border:1.5px solid var(--accent);border-radius:8px;padding:11px 14px;margin-bottom:13px;background:#f2faf7}
+  .prot .ct{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--accent);margin-bottom:9px;text-transform:uppercase}
+  .pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:640px){.pgrid{grid-template-columns:1fr 1fr}}
+  .pi{text-align:center;border-right:1px dotted #a9c9bd;padding:0 6px}
+  .pi:last-child{border-right:0}
+  .pi b{display:block;font-size:24px;line-height:1;color:var(--accent)}
+  .pi span{display:block;font-size:9.5px;font-weight:700;letter-spacing:1px;margin-top:3px}
+  .pi small{display:block;font-size:8px;color:var(--dim);line-height:1.35;margin-top:3px}
+  .chain{margin-bottom:13px}
+  .chainrow{display:flex;gap:7px;margin-top:5px;flex-wrap:wrap}
+  .chainrow i{width:100%;max-width:52px;aspect-ratio:1/1;border:2px solid var(--ink);border-radius:6px;font-style:normal;font-size:9px;color:var(--dim);display:flex;align-items:flex-start;justify-content:flex-end;padding:2px 4px;flex:1 1 0}
+  .bt{width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:12px}
+  .bt th{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);border-bottom:1.5px solid var(--ink);padding:4px 3px;text-align:left;font-weight:700}
+  .bt td{border-bottom:1px solid var(--line);padding:0;height:26px}
+  .bt td.n{text-align:center;font-weight:700;color:var(--dim);width:22px}
+  .bt td.tm{font-size:8.5px;color:var(--dim);width:52px;padding-left:3px}
+  .bt td.lb{font-size:7.5px;letter-spacing:.5px;color:var(--dim);width:64px}
+  .bt td.one{border-left:1px dotted var(--line);min-width:150px}
+  .bt td.k{text-align:center;width:30px;border-left:1px dotted var(--line)}
+  .bt td.k .cb{display:inline-block;width:12px;height:12px;border:1.5px solid var(--ink);border-radius:3px}
+  .bt td.sc{width:48px;text-align:center;border-left:1px dotted var(--line);font-size:8px;color:var(--line)}
+  .bt td.ds{width:70px;border-left:1px dotted var(--line)}
+  .gauge{border:1.5px solid var(--ink);border-radius:8px;padding:10px 13px;margin-bottom:12px;background:#f6f8fb}
+  .gr{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:10px;align-items:baseline}
+  .gr .g{display:flex;align-items:baseline;gap:5px}
+  .gr .g b{font-size:8px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+  .gr .g u{text-decoration:none;border-bottom:1px solid var(--ink);min-width:34px;display:inline-block}
+  .gnote{font-size:8.5px;color:var(--dim);margin-top:7px;padding-top:6px;border-top:1px dotted var(--line);line-height:1.5}
+  .two{display:grid;grid-template-columns:1.15fr 1fr;gap:13px}
+  @media(max-width:640px){.two{grid-template-columns:1fr}}
+  .park{border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#fff}
+  .park .pl{border-bottom:1px dotted var(--line);height:17px}
+  .rampnote{font-size:8.5px;color:#8a5a10;background:#fff3d6;border:1px solid #e3c98a;border-radius:5px;padding:4px 8px;margin:-3px 0 7px;line-height:1.45}
+
   @media print{
     html,body{background:#fff}
     .bar{display:none}
@@ -94,9 +154,29 @@
     .p25 span{font-size:7.5px;line-height:1.36}
     /* B&W printer: everything black on white */
     *{color:#000 !important}
-    .cov,.todayrule,.rcol,.train{background:#fff !important;border-color:#000 !important}
-    .cov .ct,.rh,.blkh,.foot .big,.todayrule b,.ri .ti b,.p25 b{color:#000 !important}
-    @page{margin:6.5mm}
+    .cov,.todayrule,.rcol,.train,.mode,.lw,.ramp,.prot,.gauge,.park{background:#fff !important;border-color:#000 !important}
+    .cov .ct,.rh,.blkh,.foot .big,.todayrule b,.ri .ti b,.p25 b,.mode .ct,.lw .ct,.prot .ct,.pi b,.bt th{color:#000 !important}
+    .rmr.now{background:#fff !important;border:1px solid #000 !important}
+    .mode{padding:6px 9px;margin-bottom:6px}
+    .mo{font-size:9px}
+    .lw{padding:6px 9px;margin-bottom:6px}
+    .lwr,.fix{font-size:8.5px}
+    .ramp{padding:5px 8px;margin-bottom:6px}
+    .rmr{font-size:8.5px;padding:1.5px 0}
+    /* page 2 */
+    .page2 .cols{column-count:1}
+    .prot{padding:7px 10px;margin-bottom:8px}
+    .pi b{font-size:19px}
+    .pi span{font-size:8.5px}
+    .pi small{font-size:7px}
+    .chainrow i{max-width:44px}
+    .bt{font-size:8.5px;margin-bottom:8px}
+    .bt td{height:23px}
+    .gauge{padding:7px 10px;margin-bottom:8px}
+    .gnote{font-size:7.5px}
+    .park .pl{height:15px}
+    .rampnote{background:#fff !important;border:1px solid #000 !important;font-size:7.5px;padding:3px 6px}
+    @page{size:A4;margin:6.5mm}
   }
 </style>
 </head>
@@ -109,7 +189,7 @@
 <div class="sheet">
   <div class="meta">
     <div><h1>◆ CHAPTER 04 · DISCIPLINE</h1><div class="sub">FIRST LIGHT — the full daily protocol</div></div>
-    <div class="day">DAY <b>_____</b><br>DATE ____________</div>
+    <div class="day">DAY <b id="dayNum">_____</b><br>DATE <span id="dateOut">____________</span><span id="dayFor"></span></div>
   </div>
   <div class="motto">HM SEP 27 · TMM JAN 17 · 70.3 FEB 17 · 100K DEC 27 · IRONMAN JAN 28</div>
 
@@ -117,12 +197,40 @@
   <div class="cov">
     <div class="ct">The Covenant — the 5 that anchor the day</div>
     <div class="grid">
-      <div class="r"><span class="cb"></span>WAKE before 4:00 AM</div>
-      <div class="r"><span class="cb"></span>MEDITATION 3:45 AM</div>
+      <div class="r"><span class="cb"></span>WAKE before <b id="covWake">4:30 AM</b></div>
+      <div class="r"><span class="cb"></span>MEDITATION — Brahma Muhurta, <b id="covMed">4:45</b></div>
       <div class="r"><span class="cb"></span>WORKOUT</div>
       <div class="r"><span class="cb"></span>JOURNAL</div>
-      <div class="r"><span class="cb"></span>SLEEP 5.5H+</div>
+      <div class="r"><span class="cb"></span>SLEEP 6.5H+ — lights out <b id="covLights">9:45 PM</b></div>
     </div>
+    <div class="pen">The wake is won at <b>lights-out</b>, not at the alarm — that is the one to defend. Miss it and tomorrow is already decided.</div>
+  </div>
+
+  <!-- DAY MODE -->
+  <div class="mode">
+    <div class="ct">Day Mode — pick ONE at wake. All three keep the streak.</div>
+    <div class="mgrid">
+      <div class="mo"><span class="cb"></span><b>FULL</b><span class="md">everything on this sheet</span></div>
+      <div class="mo"><span class="cb"></span><b>KEYSTONE</b><span class="md">the ◆ KEY items only — late wake, travel, heavy load</span></div>
+      <div class="mo"><span class="cb"></span><b>ANCHOR</b><span class="md">the Covenant only — ill, wrecked, broken sleep</span></div>
+    </div>
+    <div class="pen">A smaller day is not a failed day. KEYSTONE and ANCHOR hold the streak and carry <b>no penance</b>. The only failed day is an unlogged one.</div>
+  </div>
+
+  <!-- LATE WAKE PROTOCOL -->
+  <div class="lw">
+    <div class="ct">If the morning is already lost — do NOT run the chain from where you woke</div>
+    <div class="lwr"><b>1.</b> Drop to <b>KEYSTONE</b>. Do not attempt the full chain — it will eat the 9:00 open.</div>
+    <div class="lwr"><b>2.</b> Sit <b>3 minutes</b> in place of the full Brahma Muhurta block. Three minutes counts.</div>
+    <div class="lwr"><b>3.</b> Rejoin at the next <b>FIXED</b> event below. Everything between them is compressible.</div>
+    <div class="fix">FIXED — <b>6:00</b> in the water · <b>9:00</b> market open · <b>7:00 PM</b> laptop close + phone off · <b id="covLights2">9:45 PM</b> lights out</div>
+    <div class="pen"><b>Never</b> push rituals into the night to “finish” the day. That buys one checkbox with tomorrow’s morning — it is how nine days get lost.</div>
+  </div>
+
+  <!-- RETURN RAMP -->
+  <div class="ramp">
+    <div class="rh">◇ Return Ramp — back from the fever break (Sep 4–12). The ramp costs study time, never ritual time.</div>
+    <div id="rampRows"></div>
   </div>
 
   <!-- READOUT — speak aloud / food code / anchors -->
@@ -156,13 +264,13 @@
     </div>
     <div class="rcol">
       <div class="rh">◇ Anchors</div>
-      <div class="rl"><b>Sleep:</b> lights out 8:45 · <b>Fri+Sat 8:30</b> → wake 3:30 (5.5h = covenant floor)</div>
-      <div class="rl"><b>Wake before 4 AM</b> — no snooze, ever</div>
+      <div class="rl"><b>Sleep:</b> lights out <b id="aLights">9:45 PM</b> · Fri+Sat 15 min earlier → wake <b id="aWake">4:30 AM</b> (<b>6.5h = covenant floor</b>)</div>
+      <div class="rl"><b>Wake before <span id="aWake2">4:30 AM</span></b> — no snooze, ever</div>
       <div class="rl"><b>Swim 6:00 SHARP daily exc WED</b> · WED long run 5AM · TUE run 4:15PM · TUE/THU/FRI gym 7:30 · SAT ride 60-90′ · SUN TRI (ride+brick) · market 9-3</div>
       <div class="rl">Races: HM Sep 27 · TMM Jan 17 · 70.3 Feb 17</div>
       <div class="rl"><b>No sleep 4 AM – 5 PM</b> (watch-tracked)</div>
       <div class="rl"><b>Brahmacharya</b> — Ojas conserved & raised</div>
-      <div class="rl">3:30 AM is decided at 8:45 PM the night before</div>
+      <div class="rl">The wake is decided at <b id="aLights2">9:45 PM</b> the night before — not at the alarm</div>
       <div class="rl">★ = tier-1, non-negotiable</div>
     </div>
   </div>
@@ -175,7 +283,9 @@
     <div class="tr"><b>Tomorrow, 1% better</b><span class="fl"></span></div>
   </div>
 
-  <div class="period"><div class="ph"><span>☀ MORNING</span><small id="mCount"></small></div><div class="cols" id="morning"></div></div>
+  <div class="period"><div class="ph"><span>☀ MORNING</span><small id="mCount"></small></div>
+    <div class="rampnote" id="rampNote"></div>
+    <div class="cols" id="morning"></div></div>
   <div class="period"><div class="ph"><span>◐ MIDDAY</span><small id="midCount"></small></div><div class="cols" id="midday"></div></div>
   <div class="period"><div class="ph"><span>☾ EVENING</span><small id="eCount"></small></div><div class="cols" id="evening"></div></div>
   <div class="period"><div class="ph"><span>◆ WEEKEND</span><small>Sat + Sun only</small></div><div class="cols" id="weekend"></div></div>
@@ -242,6 +352,72 @@
   <div class="foot">LOG THE DAY 6:40–<span class="big">6:55 PM</span> · PHONE OFF 7:00 → ON 9:00 · One clock, every day.</div>
 </div>
 
+<!-- ═══ PAGE 2 — HOURLY RESET (work from home) ═══ -->
+<div class="sheet page2">
+  <div class="meta">
+    <div><h1>◇ HOURLY RESET · WORK FROM HOME</h1><div class="sub">55 minutes of work · 5 minutes of reset · the day is built one block at a time</div></div>
+    <div class="day">DAY <b id="dayNum2">_____</b><br>DATE <span id="dateOut2">____________</span></div>
+  </div>
+
+  <div class="prot">
+    <div class="ct">The Reset — on your feet, no screen, no phone, finished before you sit back down</div>
+    <div class="pgrid">
+      <div class="pi"><b>10</b><span>ANULOM VILOM</span><small>left in · right out · right in · left out = 1 round · ~3 min</small></div>
+      <div class="pi"><b>10</b><span>PUSH-UPS</span><small>full range, chest to the floor, no rushing the last three</small></div>
+      <div class="pi"><b>10</b><span>SQUATS</span><small>bodyweight, heels down, hips to below the knee</small></div>
+      <div class="pi"><b>1</b><span>GLASS WATER</span><small>250 ml, drunk standing — not carried back to the desk</small></div>
+    </div>
+  </div>
+
+  <div class="chain">
+    <div class="rh">◇ The Chain — one box per <i>completed</i> block. An hour without the reset does not fill a box.</div>
+    <div class="chainrow" id="chainRow"></div>
+  </div>
+
+  <table class="bt">
+    <thead><tr>
+      <th></th><th>Start</th><th>Block</th><th>The ONE thing — written before you start</th>
+      <th>Brth</th><th>Push</th><th>Sqt</th><th>H₂O</th><th>Focus</th><th>Distractions</th>
+    </tr></thead>
+    <tbody id="btBody"></tbody>
+  </table>
+
+  <div class="gauge">
+    <div class="rh">◇ Day Gauge — fill at 6:40 PM with the log</div>
+    <div class="gr">
+      <div class="g"><b>Blocks</b><u></u>/10</div>
+      <div class="g"><b>Push-ups</b><u></u></div>
+      <div class="g"><b>Squats</b><u></u></div>
+      <div class="g"><b>Water</b><u></u> glasses · <u></u> L</div>
+      <div class="g"><b>Breath rounds</b><u></u></div>
+      <div class="g"><b>Avg focus</b><u></u>/5</div>
+      <div class="g"><b>Distractions</b><u></u></div>
+      <div class="g"><b>Longest chain</b><u></u></div>
+    </div>
+    <div class="gnote"><b>A full 10 blocks = 100 push-ups · 100 squats · 100 rounds of breath · 2.5 L water — before a single training session.</b> That is the compounding: none of it was a workout, all of it was a day. · <b>Training-day trim:</b> TUE (lower-body gym) → squats to 5 · THU (upper + core) → push-ups to 5 · WED (long run) → both to 5.</div>
+  </div>
+
+  <div class="two">
+    <div class="rcol">
+      <div class="rh">◇ Rules of the Block</div>
+      <div class="rl"><b>Name it first.</b> Write the ONE thing before the timer starts. If you cannot name it, you are not ready to start — that is a planning problem, not a focus problem.</div>
+      <div class="rl"><b>Phone in the hall drawer.</b> Not face-down, not in the room. Territory rule, same as 7 PM.</div>
+      <div class="rl"><b>Tally, don’t chase.</b> Every time attention breaks, make one mark. Counting it is what kills it — the mark is the whole intervention.</div>
+      <div class="rl"><b>Park it.</b> A thought that isn’t the ONE thing goes in the list → straight back to work. It will still be there at 6:40.</div>
+      <div class="rl"><b>The reset is not a break.</b> It is the thing that makes block 6 as sharp as block 1. Skipping it to “keep going” is how the afternoon dies.</div>
+      <div class="rl"><b>Never two in a row missed.</b> One skipped reset is a slip. Two is a new habit.</div>
+    </div>
+    <div class="park">
+      <div class="rh">◇ Park It — the thought goes here, you go back to work</div>
+      <div class="pl"></div><div class="pl"></div><div class="pl"></div><div class="pl"></div>
+      <div class="pl"></div><div class="pl"></div><div class="pl"></div><div class="pl"></div>
+      <div class="pl"></div><div class="pl"></div><div class="pl"></div><div class="pl"></div>
+    </div>
+  </div>
+
+  <div class="foot">THE CHAIN IS THE POINT · <span class="big">55 ON · 5 OFF</span> · Ten small resets beat one heroic hour.</div>
+</div>
+
 <script src="js/admin-rituals.js"></script>
 <script>
 (function(){
@@ -278,6 +454,81 @@
   SUN.forEach(function(t){ wk+='<div class="ri"><span class="cb"></span><span class="tm">SUN</span><span class="ti">'+esc(t)+'</span></div>'; });
   wk+='</div>';
   document.getElementById('weekend').innerHTML=wk;
+
+  // ── Day number + date ── printed at night prep (>=7 PM) it rolls to tomorrow
+  function pad(n){return (n<10?'0':'')+n;}
+  function parseYMD(x){var a=x.split('-');return new Date(+a[0],+a[1]-1,+a[2]);}
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var now=new Date();
+  var sheetFor=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  var forTomorrow = now.getHours()>=19;               // night prep prints tomorrow's sheet
+  if(forTomorrow) sheetFor.setDate(sheetFor.getDate()+1);
+  var dayNum=Math.round((sheetFor-parseYMD(START))/86400000)+1;
+  var dateStr=DOW[sheetFor.getDay()]+' '+pad(sheetFor.getDate())+' '+MON[sheetFor.getMonth()]+' '+sheetFor.getFullYear();
+  ['dayNum','dayNum2'].forEach(function(id){var e=document.getElementById(id); if(e) e.textContent = dayNum>0?dayNum:'\u2014';});
+  ['dateOut','dateOut2'].forEach(function(id){var e=document.getElementById(id); if(e) e.textContent=dateStr;});
+  var df=document.getElementById('dayFor'); if(df&&forTomorrow) df.textContent=' \u00b7 printed for tomorrow';
+
+  // ── Return ramp ── wake/lights-out step back to 3:30 over three weeks
+  var RAMP=[
+    {w:'W1', from:'2026-09-13', to:'2026-09-19', wake:'4:30 AM', med:'4:45', lights:'9:45 PM', cut:'Study 1+2 \u2192 40 min'},
+    {w:'W2', from:'2026-09-20', to:'2026-09-26', wake:'4:00 AM', med:'4:15', lights:'9:15 PM', cut:'Study 1+2 \u2192 65 min'},
+    {w:'W3', from:'2026-09-27', to:null,         wake:'3:30 AM', med:'3:45', lights:'8:45 PM', cut:'Study 1+2 \u2192 full 90 min'}
+  ];
+  var phase=RAMP[RAMP.length-1];
+  for(var i=0;i<RAMP.length;i++){ if(!RAMP[i].to || sheetFor<=parseYMD(RAMP[i].to)){ phase=RAMP[i]; break; } }
+  function setTxt(id,v){var e=document.getElementById(id); if(e) e.textContent=v;}
+  setTxt('covWake',phase.wake); setTxt('covMed',phase.med);
+  setTxt('covLights',phase.lights); setTxt('covLights2',phase.lights);
+  var rr=document.getElementById('rampRows');
+  if(rr){
+    var rh='';
+    RAMP.forEach(function(r){
+      var span = r.to ? (MON[parseYMD(r.from).getMonth()]+' '+parseYMD(r.from).getDate()+'\u2013'+parseYMD(r.to).getDate())
+                      : (MON[parseYMD(r.from).getMonth()]+' '+parseYMD(r.from).getDate()+' onward');
+      rh+='<div class="rmr'+(r===phase?' now':'')+'"><b>'+r.w+'</b><span class="dt">'+span+'</span>'+
+          '<span>wake <b>'+r.wake+'</b></span><span>lights out <b>'+r.lights+'</b></span>'+
+          '<span class="cut">'+r.cut+(r===phase?'  \u25c0 THIS WEEK':'')+'</span></div>';
+    });
+    rr.innerHTML=rh;
+  }
+
+  setTxt('aLights',phase.lights); setTxt('aLights2',phase.lights);
+  setTxt('aWake',phase.wake); setTxt('aWake2',phase.wake);
+
+  var rn=document.getElementById('rampNote');
+  if(rn){
+    if(phase.w==='W3'){
+      rn.style.display='none';
+    }else{
+      var off = phase.w==='W1' ? 60 : 30;
+      rn.innerHTML='<b>RAMP WEEK '+phase.w.slice(1)+' \u2014 the times below are the full 3:30 chain.</b> '+
+        'This week you wake at <b>'+phase.wake+'</b>: run the oral-care and Brahma Muhurta blocks in the order printed, just '+off+
+        ' min later. <b>Study 1+2 absorbs the entire cut</b> \u2014 nothing else shrinks. From <b>5:40 (pre-train)</b> onward the sheet is exact: the 6:00 water and the 9:00 open do not move.';
+    }
+  }
+
+  // ── Page 2 ── chain boxes + block rows
+  var chain=document.getElementById('chainRow');
+  if(chain){ var ch=''; for(var c=1;c<=10;c++) ch+='<i>'+c+'</i>'; chain.innerHTML=ch; }
+  var BLOCKS=[
+    ['4:15','STUDY 1+2'],['5:15','STUDY 1+2'],['7:50','STUDY 2 / GYM'],
+    ['9:00','MARKET'],['10:00','MARKET'],['11:00','MARKET'],['12:00','MARKET'],
+    ['2:00','MARKET'],['3:05','STUDY 3'],['4:05','FLEX']
+  ];
+  var tb=document.getElementById('btBody');
+  if(tb){
+    var th='';
+    BLOCKS.forEach(function(b,ix){
+      th+='<tr><td class="n">'+(ix+1)+'</td><td class="tm">'+b[0]+'</td><td class="lb">'+b[1]+'</td>'+
+          '<td class="one"></td>'+
+          '<td class="k"><span class="cb"></span></td><td class="k"><span class="cb"></span></td>'+
+          '<td class="k"><span class="cb"></span></td><td class="k"><span class="cb"></span></td>'+
+          '<td class="sc">1 2 3 4 5</td><td class="ds"></td></tr>';
+    });
+    tb.innerHTML=th;
+  }
 
   document.getElementById('printBtn').addEventListener('click',function(){window.print();});
 })();

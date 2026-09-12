@@ -329,8 +329,8 @@
 
     // ── Chapter registry — closed chapters from chapters.js + the live one ──
     var CHAPTERS = [];
-    (window.FL_CHAPTERS || []).forEach(function(c) { CHAPTERS.push({ id: c.id, name: c.name, start: c.start, end: c.end, dayEpoch: c.dayEpoch || c.start, live: false }); });
-    if (window.FL_CURRENT_CHAPTER) CHAPTERS.push({ id: window.FL_CURRENT_CHAPTER.id, name: window.FL_CURRENT_CHAPTER.name, start: window.FL_CURRENT_CHAPTER.start, end: null, dayEpoch: window.FL_CURRENT_CHAPTER.dayEpoch || window.FL_CURRENT_CHAPTER.start, live: true });
+    (window.FL_CHAPTERS || []).forEach(function(c) { CHAPTERS.push({ id: c.id, name: c.name, start: c.start, end: c.end, days: c.days, dayEpoch: c.dayEpoch || c.start, runs: c.runs || null, live: false }); });
+    if (window.FL_CURRENT_CHAPTER) CHAPTERS.push({ id: window.FL_CURRENT_CHAPTER.id, name: window.FL_CURRENT_CHAPTER.name, start: window.FL_CURRENT_CHAPTER.start, end: null, days: null, dayEpoch: window.FL_CURRENT_CHAPTER.dayEpoch || window.FL_CURRENT_CHAPTER.start, runs: window.FL_CURRENT_CHAPTER.runs || null, live: true });
     if (!CHAPTERS.length) CHAPTERS.push({ id: 1, name: 'STREAK', start: (window.FL && FL.STREAK_START) || '2026-09-13', end: null, live: true });
 
     function chapterOf(dateStr) {
@@ -340,12 +340,29 @@
       }
       return null;
     }
-    // Counts from the chapter's dayEpoch, NOT its start. Chapter 04 begins Jul 27
-    // but its day numbers continue from Jul 19 — the streak didn't reset at the
-    // handover, so neither does the number. Closed chapters have no dayEpoch and
-    // fall back to start, preserving their frozen 1..N archive numbering.
+    // Counts from the epoch of the RUN the row falls in, not the chapter start and
+    // not blindly from the live dayEpoch. A chapter can hold several runs (a break
+    // resets the day number, not the chapter), so a row from before a reset must be
+    // numbered against the epoch it was published under — otherwise every archived
+    // row goes negative the moment the counter restarts. Chapters with no `runs`
+    // fall back to dayEpoch, then start, preserving frozen 1..N archive numbering.
+    function epochFor(dateStr, c) {
+      if (c.runs && c.runs.length) {
+        for (var i = 0; i < c.runs.length; i++) {
+          var r = c.runs[i];
+          if (dateStr >= r.from && (!r.to || dateStr <= r.to)) return r.epoch;
+        }
+        // Outside every run (e.g. a logged day inside a break) — use the nearest
+        // run that had already started, so the number stays continuous, never negative.
+        for (var j = c.runs.length - 1; j >= 0; j--) {
+          if (dateStr >= c.runs[j].from) return c.runs[j].epoch;
+        }
+        return c.runs[0].epoch;
+      }
+      return c.dayEpoch || c.start;
+    }
     function dayInChapter(dateStr, c) {
-      var epoch = c.dayEpoch || c.start;
+      var epoch = epochFor(dateStr, c);
       return Math.floor((new Date(dateStr + 'T00:00:00+05:30') - new Date(epoch + 'T00:00:00+05:30')) / 86400000) + 1;
     }
     var chapterRows = [];
@@ -353,6 +370,10 @@
     const PER_PAGE = 30;
     let currentPage = 1;
     let allRows = [];
+    // Days the PROJECT has recorded, chapters and the gaps between them alike.
+    // allRows drops rows outside a chapter, but days trained between chapters
+    // still happened — see buildChapterTabs() for why they belong to the total.
+    var lifetimeDays = 0;
     let filteredRows = [];
     var _showAll = false;
 
@@ -421,6 +442,11 @@
       if (!data || !data.length) return;
 
       var streakData = data.filter(function(r) { return r.date; });
+      // Everything from the project's first day onward. Earlier rows are a bulk
+      // sleep-history import (203 rows, no activity on any of them, all synced in
+      // one batch long after the fact) — health data, not days of this project.
+      var projectStart = CHAPTERS.length ? CHAPTERS[0].start : '2026-02-10';
+      lifetimeDays = streakData.filter(function(r) { return r.date >= projectStart; }).length;
 
       allRows = streakData.map(function(r) {
         // Date → chapter. Gap days between chapters are not part of any record.
@@ -512,6 +538,10 @@
       if (el) {
         var html = '';
         CHAPTERS.forEach(function(c) {
+          // A chapter is as long as the days it can PROVE. Counted from verified
+          // rows, never from the hand-typed chapters.js figure — that number has
+          // already drifted from the archive (CH01: recorded 110, archive holds 117)
+          // and a tab that disagrees with the table under it is worse than no tab.
           var n = allRows.filter(function(r) { return r.chapter === c.id; }).length;
           html += '<button class="ch-tab" data-ch="' + c.id + '">CH ' + String(c.id).padStart(2, '0') + ' · ' + c.name + (c.live ? ' <span style="color:var(--green,#00E676)">● LIVE</span>' : ' (' + n + 'd)') + '</button>';
         });
@@ -527,17 +557,21 @@
       // Lifetime header numbers
       var lifeEl = document.getElementById('proofLifetimeDays');
       if (lifeEl) {
-        // getDayNumber() already counts every day from the epoch (Jul 19) to today,
-        // which spans closed Chapter 03 as well as live Chapter 04. Summing a closed
-        // chapter that ends on/after the epoch would count those days twice.
-        var epoch = (window.FL && FL.STREAK_START) || '2026-09-13';
-        var closed = 0;
-        (window.FL_CHAPTERS || []).forEach(function(c) {
-          if (c.end && c.end >= epoch) return;   // already inside getDayNumber()'s span
-          closed += (c.days || 0);
-        });
-        var cur = (typeof getDayNumber === 'function') ? Math.max(0, getDayNumber()) : 0;
-        lifeEl.textContent = closed + cur;
+        // Lifetime = every day the project has recorded since it began. One verified
+        // row = one day. Deliberately COUNTS the days that fall between chapters:
+        // after the Jun 9 break he kept training (5 km runs Jun 13-18, a 170 km ride
+        // on Jun 14) before Chapter 02 formally opened on Jun 20. Those days belong
+        // to no chapter, but they happened and they are proven — a life is bigger
+        // than its chapters, so the chapter tabs and this total need not agree.
+        // Note a row is a day even with no activity on it: Chapter 02 ran through
+        // injury and dead sensors, so "had a sensor reading" is not what made a day.
+        // Falls back to the frozen chapter record only if the archive failed to load
+        // — better a stale number than a headline reading "0 lifetime days".
+        var proven = lifetimeDays;
+        if (!proven) {
+          (window.FL_CHAPTERS || []).forEach(function(c) { proven += (c.days || 0); });
+        }
+        lifeEl.textContent = proven;
       }
       var ccEl = document.getElementById('proofChapterCount');
       if (ccEl) ccEl.textContent = CHAPTERS.length;
