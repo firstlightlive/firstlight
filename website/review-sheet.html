@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* FL-PRIVATE-GATE */(function(){try{var s=JSON.parse(localStorage.getItem("fl_supabase_session")||"null");if(!s||!s.access_token||(s.expires_at&&s.expires_at*1000<Date.now()))location.replace("login.html");}catch(e){location.replace("login.html");}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Review Sheet — Weekly + Monthly</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#14181d;--dim:#5a6675;--line:#cbd2db}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#3a3f47}
+  body{font-family:'IBM Plex Mono',ui-monospace,monospace;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar{max-width:1000px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;gap:10px}
+  .bar a,.bar button{font-family:inherit;font-size:12px;font-weight:700;letter-spacing:1px;border:1px solid #6b7280;background:#22262c;color:#e8edf2;border-radius:8px;padding:9px 16px;cursor:pointer;text-decoration:none}
+  .bar .print{background:#F5A623;color:#111;border-color:#F5A623}
+  .sheet{max-width:1000px;margin:0 auto 30px;background:#fff;padding:26px 30px;box-shadow:0 6px 30px rgba(0,0,0,.4)}
+  .meta{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:12px}
+  .meta h1{font-size:16px;letter-spacing:2px;margin:0}
+  .meta .sub{font-size:9.5px;color:var(--dim);letter-spacing:1px;margin-top:2px}
+  .meta .wk{font-size:10px;letter-spacing:1px;text-align:right}
+  .meta .wk b{font-size:14px}
+  .sec{border:1.2px solid var(--ink);border-radius:6px;padding:8px 11px;margin-bottom:10px;break-inside:avoid}
+  .sh{font-size:10.5px;font-weight:700;letter-spacing:1.5px;border-bottom:1px solid var(--ink);padding-bottom:3px;margin-bottom:6px;text-transform:uppercase}
+  .r{display:flex;align-items:baseline;gap:7px;font-size:9.5px;padding:2.2px 0;line-height:1.4}
+  .cb{width:11px;height:11px;border:1.6px solid var(--ink);border-radius:2px;flex:0 0 auto;position:relative;top:1px}
+  .fl{flex:1;border-bottom:1px dotted var(--ink);min-height:12px}
+  .fs{flex:0 0 52px;border-bottom:1px dotted var(--ink);min-height:12px}
+  .fm{flex:0 0 110px;border-bottom:1px dotted var(--ink);min-height:12px}
+  .lbl{color:#2f3742}
+  .lbl b{color:var(--ink)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 18px}
+  .scale{font-size:9.5px;letter-spacing:2px}
+  .note{font-size:8px;color:var(--dim);margin-top:2px}
+  .pgbrk{page-break-before:always}
+  .writebox{border-bottom:1px dotted var(--ink);min-height:13px;margin:4px 0}
+  @media print{
+    html,body{background:#fff}
+    .bar{display:none}
+    .sheet{box-shadow:none;margin:0;max-width:100%;padding:0}
+    body{font-size:9px}
+    *{color:#000 !important}
+    .sec{border-color:#000;padding:6px 10px;margin-bottom:8px}
+    .r{font-size:9.2px;padding:2px 0}
+    @page{margin:7mm}
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="daily-sheet.html">← Daily Sheet</a>
+  <button class="print" id="printBtn">🖨 PRINT</button>
+</div>
+
+<div class="sheet">
+
+  <!-- ═══════════ PAGE 1 — WEEKLY REVIEW ═══════════ -->
+  <div class="meta">
+    <div><h1>◆ WEEKLY REVIEW — SUNDAY</h1><div class="sub">FIRST LIGHT — audit the week, decide the next one · fill after the long run</div></div>
+    <div class="wk">WEEK OF <b>__________</b><br>SEASON WEEK #____ &nbsp; PHASE __________</div>
+  </div>
+
+  <div class="grid2">
+  <div class="sec">
+    <div class="sh">① Training Scorecard — planned vs done</div>
+    <div class="r"><span class="lbl"><b>Swims</b> (6)</span><span class="fs"></span><span class="lbl"><b>Gym</b> (3)</span><span class="fs"></span><span class="lbl"><b>Rides</b> (2)</span><span class="fs"></span></div>
+    <div class="r"><span class="lbl"><b>Runs</b> (3)</span><span class="fs"></span><span class="lbl"><b>Run km total</b></span><span class="fs"></span><span class="lbl"><b>Hours</b></span><span class="fs"></span></div>
+    <div class="r"><span class="cb"></span><span class="lbl"><b>LONG RUN done</b> — distance:</span><span class="fs"></span><span class="lbl">avg HR:</span><span class="fs"></span></div>
+    <div class="r"><span class="cb"></span><span class="lbl"><b>SUN ride + brick done</b> — km:</span><span class="fs"></span><span class="lbl">brick km:</span><span class="fs"></span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Easy runs stayed easy (HR ≤145)</span><span class="cb"></span><span class="lbl">110% run-cap respected</span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Calf micro-doses ×2</span><span class="cb"></span><span class="lbl">Down-week? → full REST Monday taken</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">② Body Signals</div>
+    <div class="r"><span class="lbl"><b>RHR trend</b> (7d)</span><span class="fs"></span><span class="lbl"><b>Weight</b></span><span class="fs"></span><span class="lbl">Δ vs last wk</span><span class="fs"></span></div>
+    <div class="r"><span class="lbl"><b>Sleep 8:45 hit</b> ___/7 nights</span><span class="lbl"><b>Wellness avg</b> (1-10)</span><span class="fs"></span></div>
+    <div class="r"><span class="lbl"><b>Niggles / pain</b> (site + severity 1-10):</span><span class="fl"></span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">HR flat + RPE up + pace down anywhere? (overreach signal — if yes: down-shift next week)</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">③ Study Scorecard — the two missions</div>
+    <div class="r"><span class="lbl"><b>Deep blocks done</b> ___/18</span><span class="lbl"><b>4:15 blocks unbroken</b> ___/7</span></div>
+    <div class="r"><span class="lbl"><b>② CODING:</b> new problems</span><span class="fs"></span><span class="lbl">re-solves cleared</span><span class="fs"></span><span class="lbl">retired</span><span class="fs"></span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Weekly MOCK done (think-aloud, observed)</span><span class="lbl">score/feel:</span><span class="fs"></span></div>
+    <div class="r"><span class="lbl"><b>① MARKET STUDY:</b> topic this week:</span><span class="fl"></span></div>
+    <div class="r"><span class="lbl">Error-log pattern of the week (comprehension / pattern-ID / implementation / communication):</span><span class="fm"></span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">④ Trading Process (not P&L)</div>
+    <div class="r"><span class="lbl"><b>Pre-market checklist</b> ___/5 days</span><span class="lbl"><b>3:05 written reflections</b> ___/5</span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Loss-day half-size rule triggered? — respected?</span><span class="cb"></span><span class="lbl">yes, followed</span></div>
+    <div class="r"><span class="lbl">Best decision of the week:</span><span class="fl"></span></div>
+    <div class="r"><span class="lbl">Worst PROCESS error (not outcome):</span><span class="fl"></span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">⑤ Fuel + System</div>
+    <div class="r"><span class="cb"></span><span class="lbl">Protein ×4 most days</span><span class="cb"></span><span class="lbl">Top-ups on big days</span><span class="cb"></span><span class="lbl">Caffeine cutoff NOON held</span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Menu cards written for next week</span><span class="cb"></span><span class="lbl">BigBasket ordered</span><span class="cb"></span><span class="lbl">SAT-eve bike loaded</span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Data logged all 7 days (Strava + system)</span><span class="cb"></span><span class="lbl">Shoes rotated</span></div>
+    <div class="r"><span class="lbl"><b>Screen time avg</b></span><span class="fs"></span><span class="lbl"><b>pickups</b></span><span class="fs"></span><span class="lbl"><b>Phone-off held</b> ___/7</span><span class="lbl"><b>Breaches paid</b></span><span class="fs"></span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">⑥ PERMA (each 1-10)</div>
+    <div class="r scale"><span class="lbl">P ___ &nbsp; E ___ &nbsp; R ___ &nbsp; M ___ &nbsp; A ___ &nbsp; · &nbsp; TOTAL ___/50</span></div>
+    <div class="r"><span class="lbl">vs last week: ↑ ↓ → &nbsp; why:</span><span class="fl"></span></div>
+  </div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">⑦ Close the week</div>
+    <div class="r"><span class="lbl"><b>3 WINS:</b> 1.</span><span class="fl"></span></div>
+    <div class="r"><span class="lbl">2.</span><span class="fl"></span><span class="lbl">3.</span><span class="fl"></span></div>
+    <div class="r"><span class="lbl"><b>ONE FIX for next week</b> (single, specific):</span><span class="fl"></span></div>
+    <div class="r"><span class="lbl"><b>NEXT WEEK</b> — long run dial:</span><span class="fs"></span><span class="lbl">ride dial:</span><span class="fs"></span><span class="lbl">race/down week?</span><span class="fm"></span></div>
+    <div class="r"><span class="lbl"><b>ONE FOCUS</b> for the week (write it, say it):</span><span class="fl"></span></div>
+  </div>
+
+  <!-- ═══════════ PAGE 2 — MONTHLY REVIEW ═══════════ -->
+  <div class="pgbrk"></div>
+  <div class="meta">
+    <div><h1>◆ MONTHLY REVIEW — LAST SUNDAY OF MONTH</h1><div class="sub">FIRST LIGHT — audit the month against the DIAL TABLE, set next month's dials</div></div>
+    <div class="wk">MONTH <b>__________</b><br>NEXT RACE __________ &nbsp; DAYS TO GO ____</div>
+  </div>
+
+  <div class="grid2">
+  <div class="sec">
+    <div class="sh">① Month vs the Dial Table</div>
+    <div class="r"><span class="lbl"><b>Long run peaked at</b></span><span class="fs"></span><span class="lbl">km &nbsp; <b>dial said</b></span><span class="fs"></span><span class="lbl">on track?</span><span class="cb"></span></div>
+    <div class="r"><span class="lbl"><b>Weekly run km avg</b></span><span class="fs"></span><span class="lbl"><b>Longest ride</b></span><span class="fs"></span><span class="lbl"><b>Swim km total</b></span><span class="fs"></span></div>
+    <div class="r"><span class="lbl"><b>Sessions missed</b> + why:</span><span class="fl"></span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Down week taken</span><span class="cb"></span><span class="lbl">Full rest Monday taken</span><span class="cb"></span><span class="lbl">1×/mo full brick done</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">② Body Ledger</div>
+    <div class="r"><span class="lbl"><b>Weight</b> start → end:</span><span class="fm"></span><span class="lbl"><b>RHR</b> month trend:</span><span class="fs"></span></div>
+    <div class="r"><span class="lbl"><b>Injuries / niggles</b> this month:</span><span class="fl"></span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Blood panel due? (every 6 mo: B12+MMA · ferritin · 25-OH-D · HbA1c · T · T3 · LFT) — booked:</span><span class="fs"></span></div>
+    <div class="r"><span class="lbl"><b>Sleep 8:45 hit rate</b> ___/30 &nbsp; · &nbsp; <b>avg wellness</b></span><span class="fs"></span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">③ Missions Ledger</div>
+    <div class="r"><span class="lbl"><b>② CODING:</b> problems retired (2 cold solves):</span><span class="fs"></span><span class="lbl">mocks done:</span><span class="fs"></span></div>
+    <div class="r"><span class="lbl">Weakest error category this month:</span><span class="fm"></span></div>
+    <div class="r"><span class="lbl"><b>① MARKET:</b> topics completed:</span><span class="fl"></span></div>
+    <div class="r"><span class="lbl"><b>Trading process:</b> checklist ___/20 days · reflections ___/20 · loss-rule violations:</span><span class="fs"></span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">④ Gear + Machine</div>
+    <div class="r"><span class="lbl"><b>Shoe A km</b></span><span class="fs"></span><span class="lbl"><b>Shoe B km</b></span><span class="fs"></span><span class="lbl">replace at ~600-800 km</span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Bike serviced / chain checked</span><span class="cb"></span><span class="lbl">Cameras + smart-lock OK</span><span class="cb"></span><span class="lbl">HAE sleep sync alive</span></div>
+    <div class="r"><span class="cb"></span><span class="lbl">Cook system running (cards working, quality OK)</span></div>
+  </div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">⑤ The honest month</div>
+    <div class="r"><span class="lbl"><b>What WORKED</b> (keep doing):</span><span class="fl"></span></div>
+    <div class="writebox"></div>
+    <div class="r"><span class="lbl"><b>What BROKE</b> (and the system fix, not the willpower fix):</span><span class="fl"></span></div>
+    <div class="writebox"></div>
+    <div class="r"><span class="lbl"><b>1% improvement</b> for next month (ONE thing):</span><span class="fl"></span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sh">⑥ Set next month — read the dial table, write it here</div>
+    <div class="r"><span class="lbl"><b>Long run dial:</b></span><span class="fm"></span><span class="lbl"><b>Ride dial:</b></span><span class="fm"></span></div>
+    <div class="r"><span class="lbl"><b>Tue quality dial:</b></span><span class="fm"></span><span class="lbl"><b>Swim dial:</b></span><span class="fm"></span></div>
+    <div class="r"><span class="lbl"><b>Focus of the month</b> (one sentence):</span><span class="fl"></span></div>
+    <div class="r"><span class="lbl"><b>Race-specific to-dos</b> (registration, logistics, kit):</span><span class="fl"></span></div>
+  </div>
+
+</div>
+<script>document.getElementById('printBtn').addEventListener('click',function(){window.print();});</script>
+</body>
+</html>

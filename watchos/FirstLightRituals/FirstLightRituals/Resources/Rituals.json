@@ -1,21 +1,21 @@
 {
-  "version": "2026-07-19-v6",
+  "version": "2026-08-23-v27",
   "generated_at_note": "run scripts/generate-watch-rituals.js to regenerate — do not hand-edit",
   "generated_from": [
     "website/js/admin-rituals.js",
     "website/js/admin-checkin.js"
   ],
   "total_active": {
-    "morning": 27,
-    "midday": 15,
-    "evening": 29
+    "morning": 42,
+    "midday": 17,
+    "evening": 31
   },
   "periods": {
     "morning": {
       "blocks": [
         {
           "id": "mblk0",
-          "name": "WAKE — ORAL CARE (3:30-3:40)",
+          "name": "WAKE — ORAL CARE (3:30-3:45)",
           "start24": "03:30",
           "items": [
             {
@@ -27,6 +27,16 @@
               "cat": "BIOHACK",
               "active": true,
               "tier": 1
+            },
+            {
+              "id": "m_gratitude_wake",
+              "time12": "3:30",
+              "time24": "03:30",
+              "title": "Wake gratitude - thank the universe",
+              "desc": "On waking, before the feet hit the floor: thank the universe for this life, thank everyone, and thank all five elements - earth, water, fire, air, ether.",
+              "cat": "SACRED",
+              "active": true,
+              "tier": 2
             },
             {
               "id": "m_tongue_scraper",
@@ -89,12 +99,22 @@
               "tier": 2
             },
             {
-              "id": "m_chyawanprash",
-              "time12": "3:38",
-              "time24": "03:38",
-              "title": "Chyawanprash (1 tsp)",
-              "desc": "2-3 min after fenugreek. Empty stomach. Amla Vit C absorbed by 4:27 AM when collagen arrives — direct co-factor for synthesis. Immunity. Ojas.",
-              "cat": "AYUR",
+              "id": "m_collagen",
+              "time12": "3:40",
+              "time24": "03:40",
+              "title": "Collagen 15g + amla (vit C)",
+              "desc": "MOVED from 4:27 — evidence window is 30-60 min BEFORE tendon loading (Shaw & Baar 2017), so peak aminoacidemia lands on the run/gym. Amla = the ~50mg vitamin C co-factor (lemon squeeze is only ~15mg). Verify dose is 15g.",
+              "cat": "FUEL",
+              "active": true,
+              "tier": 2
+            },
+            {
+              "id": "m_salt_water",
+              "time12": "3:42",
+              "time24": "03:42",
+              "title": "Pre-run hydration — 500-750ml + pinch of salt",
+              "desc": "You train after an 8h overnight fast in Indian humidity. ~400-500mg sodium (pinch of salt, nimbu optional). Cheapest performance + clarity fix in the protocol. ACSM fluid replacement.",
+              "cat": "FUEL",
               "active": true,
               "tier": 2
             }
@@ -102,13 +122,13 @@
         },
         {
           "id": "mblk1",
-          "name": "BRAHMA MUHURTA (4:10-4:28)",
-          "start24": "04:10",
+          "name": "BRAHMA MUHURTA (3:45-4:05)",
+          "start24": "03:45",
           "items": [
             {
               "id": "m_marma",
-              "time12": "4:10",
-              "time24": "04:10",
+              "time12": "3:45",
+              "time24": "03:45",
               "title": "Marma point self-massage",
               "desc": "Vagbhata. Ajna 30s, Hridaya 30s, Nabhi 30s clockwise. 2 min. Full body energy activated. Pressure points.",
               "cat": "AYUR",
@@ -117,8 +137,8 @@
             },
             {
               "id": "m_pranayama",
-              "time12": "4:12",
-              "time24": "04:12",
+              "time12": "3:47",
+              "time24": "03:47",
               "title": "Pranayama (Nadi Shodhana)",
               "desc": "Nadi Shodhana or Kapalabhati. Open air rooftop. Phone away. 5 min compressed. SACRED.",
               "cat": "SACRED",
@@ -127,8 +147,8 @@
             },
             {
               "id": "m_japa",
-              "time12": "4:17",
-              "time24": "04:17",
+              "time12": "3:52",
+              "time24": "03:52",
               "title": "Japa (108 beads)",
               "desc": "Mala or silent. Phone away. Full presence. Do not suppress. Pure witnessing. Japa = concentration. This = equanimity.",
               "cat": "SACRED",
@@ -137,8 +157,8 @@
             },
             {
               "id": "m_thai_meditation",
-              "time12": "4:23",
-              "time24": "04:23",
+              "time12": "3:58",
+              "time24": "03:58",
               "title": "Thai forest meditation",
               "desc": "Sit still after Japa. Close eyes. A sound arises — note: sound. A thought — thinking. A sensation — sensation. Do not follow. Do not suppress. 3 min open awareness.",
               "cat": "MIND",
@@ -146,9 +166,19 @@
               "tier": 2
             },
             {
+              "id": "m_hooponopono",
+              "time12": "4:00",
+              "time24": "04:00",
+              "title": "Ho'oponopono prayer (morning)",
+              "desc": "I love you. I'm sorry. Please forgive me. Thank you. Morning forgiveness - clear resentment before the day begins.",
+              "cat": "SACRED",
+              "active": true,
+              "tier": 2
+            },
+            {
               "id": "m_earthing",
-              "time12": "4:25",
-              "time24": "04:25",
+              "time12": "4:03",
+              "time24": "04:03",
               "title": "Earthing — bare feet on ground (SUNDAY ONLY)",
               "desc": "SUNDAY ONLY — not possible on weekdays. Eyes open to sky. 3 things spoken aloud. Step onto grass or earth. Bare skin contact. Morning gratitude is an opening, not a review.",
               "cat": "BIOHACK",
@@ -157,45 +187,82 @@
             },
             {
               "id": "m_brahmacharya",
-              "time12": "4:26",
-              "time24": "04:26",
+              "time12": "4:02",
+              "time24": "04:02",
               "title": "Brahmacharya mala (intention set)",
               "desc": "",
               "cat": "SACRED",
-              "active": true,
-              "tier": 2
-            },
-            {
-              "id": "m_collagen",
-              "time12": "4:27",
-              "time24": "04:27",
-              "title": "Collagen peptides + lemon water",
-              "desc": "Rooftop, empty stomach. Amino acids peak ~5:20 AM = mid-run. Vitamin C is the direct co-factor for collagen synthesis. 30 min clear gap before food.",
-              "cat": "FUEL",
               "active": true,
               "tier": 2
             }
           ]
         },
         {
-          "id": "mblk2",
-          "name": "PRE-RUN — SUPPLEMENTS (4:28-4:35)",
-          "start24": "04:28",
+          "id": "mblk1b",
+          "name": "STUDY 1+2 (4:05-5:45)",
+          "start24": "04:05",
           "items": [
             {
+              "id": "m_coffee",
+              "time12": "4:05",
+              "time24": "04:05",
+              "title": "Coffee + L-theanine — phone-free",
+              "desc": "MOVED from 8:05 — the caffeine curve now rises INTO Study 1 and still fuels the 6:00 session. ONLY caffeine of the day (curfew 2 PM; the 3:30 slot is decaf). L-theanine 100-200mg = the studied calm-focus combo.",
+              "cat": "MIND",
+              "active": true,
+              "tier": 2
+            },
+            {
+              "id": "m_study_12",
+              "time12": "4:15",
+              "time24": "04:15",
+              "title": "STUDY 1+2 — 90 min: INTERVIEW PREP + CODING",
+              "desc": "Mission ②: interview preparation & coding — the hardest material gets the deepest block. Phone in another room, no electronics. WEDNESDAY: 40 min only, long run rolls 5:00.",
+              "cat": "MIND",
+              "active": true,
+              "tier": 1
+            }
+          ]
+        },
+        {
+          "id": "mblk2",
+          "name": "PRE-TRAIN (5:40-6:00)",
+          "start24": "05:40",
+          "items": [
+            {
+              "id": "m_oats",
+              "time12": "5:40",
+              "time24": "05:40",
+              "title": "Oats bowl (pre-train fuel)",
+              "desc": "Small bowl before swim/run/gym. SUNDAY tri-day variant: short swim, then oats jar + banana in the car to the outskirts — long ride + brick run, 60g carbs/h on the bike. WEDNESDAY: bowl at 4:45 before the 5:00 long run.",
+              "cat": "FUEL",
+              "active": true,
+              "tier": 2
+            },
+            {
               "id": "m_carnitine_creatine",
-              "time12": "4:28",
-              "time24": "04:28",
-              "title": "L-Carnitine + Creatine",
-              "desc": "Drop tablet, dissolve 60 sec, add Creatine 5g, stir. Rinse glass. L-Carnitine 2000mg activates in 5-8 min. Run at 4:35 AM. FUEL.",
+              "time12": "5:45",
+              "time24": "05:45",
+              "title": "Creatine 5g (daily — rest days too)",
+              "desc": "Timing is irrelevant, DAILY saturation is everything — vegetarians have 20-30% lower stores and get the largest strength + cognition response (2024 meta-analyses). Never skip on rest days. L-carnitine moved to the 7:05 post-workout meal — fasted with water it never reaches muscle (needs carbs/insulin, Wall 2011 J Physiol).",
               "cat": "BIOHACK",
               "active": true,
               "tier": 1
             },
             {
+              "id": "m_hard_day_fuel",
+              "time12": "5:47",
+              "time24": "05:47",
+              "title": "Hard-day fuel — 2-3 dates / 1 banana",
+              "desc": "On interval / brick / long (>90 min) days — fasted stays only for easy Zone-2 ≤90 min (fasted training buys zero performance; IOC RED-S 2023). NEVER skip before punishment rides: 30-100km must always be fueled, 30-60g carbs/h during.",
+              "cat": "FUEL",
+              "active": true,
+              "tier": 2
+            },
+            {
               "id": "m_ikigai",
-              "time12": "4:30",
-              "time24": "04:30",
+              "time12": "5:48",
+              "time24": "05:48",
               "title": "Ikigai spoken aloud",
               "desc": "I am not trying to win. I am refusing to stop. Said with conviction. Every single morning.",
               "cat": "MIND",
@@ -203,19 +270,29 @@
               "tier": 2
             },
             {
+              "id": "m_visualization",
+              "time12": "5:50",
+              "time24": "05:50",
+              "title": "2-min visualization - see the day executed",
+              "desc": "Two minutes, eyes closed. Vividly rehearse the day going exactly as planned - the run, the work, the wins. Mental rehearsal primes the nervous system. Every single morning.",
+              "cat": "MIND",
+              "active": true,
+              "tier": 1
+            },
+            {
               "id": "m_sattu",
-              "time12": "4:31",
-              "time24": "04:31",
+              "time12": "5:48",
+              "time24": "05:48",
               "title": "Sattu drink",
               "desc": "100g Sattu + 350ml water + half lemon + pinch of salt. Takes under a minute. Drink steadily while driving.",
               "cat": "FUEL",
-              "active": true,
+              "active": false,
               "tier": 2
             },
             {
               "id": "m_box_breathing",
-              "time12": "4:33",
-              "time24": "04:33",
+              "time12": "5:52",
+              "time24": "05:52",
               "title": "Box breathing (4-4-4-4)",
               "desc": "Alert neutrality. Engine on, car stationary. 5 rounds. Then go. Navy SEAL protocol.",
               "cat": "MIND",
@@ -225,24 +302,58 @@
           ]
         },
         {
+          "id": "mblk2b",
+          "name": "RUNS — WEEKLY MAP",
+          "start24": "05:00",
+          "items": [
+            {
+              "id": "m_run_slot",
+              "time12": "5:00",
+              "time24": "05:00",
+              "title": "RUN — We LONG 5:00 AM · Tu easy 4:15 PM · Su brick",
+              "desc": "ONE long run per week: WEDNESDAY 5:00-7:00 AM (until Nov, then it swaps to Sunday and the ride shrinks). Tuesday 4:15 PM easy 40-50 min after market close — ends at the 5:30 recovery dinner. Sunday: brick 5-10k off the bike (15-21k version 1x/month max). Easy = 7:00-7:30/km, HR cap 145.",
+              "cat": "MOVE",
+              "active": true,
+              "tier": 1
+            }
+          ]
+        },
+        {
+          "id": "mblk2c",
+          "name": "SWIM (6:00-6:50)",
+          "start24": "06:00",
+          "items": [
+            {
+              "id": "m_swim_slot",
+              "time12": "6:00",
+              "time24": "06:00",
+              "title": "SWIM — daily except Wednesday",
+              "desc": "IN THE WATER AT 6:00 SHARP — scooty out the door 5:55. Skill sport: daily frequency, zero injury cost. Mon = easy recovery. Main sets Tue/Thu. Sat easy before the tempo ride. Sun short opener before the long ride + brick. Home ~7:00.",
+              "cat": "MOVE",
+              "active": true,
+              "tier": 1
+            }
+          ]
+        },
+        {
           "id": "mblk4",
-          "name": "POST GYM — RECOVERY (7:00-7:40)",
-          "start24": "07:05",
+          "name": "POST-TRAIN (7:15-7:45)",
+          "start24": "07:15",
           "items": [
             {
               "id": "m_postworkout_meal",
-              "time12": "7:05",
-              "time24": "07:05",
-              "title": "Post-workout meal FIRST (protein + carbs)",
-              "desc": "EAT BEFORE HOT SHOWER. 20-40g protein + fast carbs within 20-30 min of gym end = anabolic window. Eggs / whey / paneer + banana or rice. mTOR pathway is open NOW. Hot shower after eating = vasodilation delivers nutrients to muscles. Science: PMC11780495 (2024).",
+              "time12": "7:15",
+              "time24": "07:15",
+              "title": "Post-workout meal FIRST (whey + carbs) + L-carnitine",
+              "desc": "SELF-SERVE — never wait for the cook (he arrives 7:00-7:30, unpredictable): whey shake + yesterday-prepped poha/overnight oats from the fridge. Cook cooks LUNCH + tomorrow-morning prep, not breakfast. EAT BEFORE HOT SHOWER. 30-40g protein (whey/paneer — feeding 1 of 4, ~0.4g/kg each) + fast carbs within 20-30 min = anabolic window, doubly real after FASTED training (ISSN). Take L-carnitine HERE with the carbs — muscle uptake is insulin-dependent (Wall 2011). Hot shower after eating = vasodilation delivers nutrients.",
               "cat": "FUEL",
               "active": true,
               "tier": 2
             },
             {
               "id": "m_hot_shower",
-              "time12": "7:20",
-              "time24": "07:20",
+              "time12": "7:25",
+              "time24": "07:25",
               "title": "Hot shower (38-42°C, 10 min)",
               "desc": "AFTER cool-down + meal. 38-42°C for 10 min. Vasodilation: blood vessels expand, nutrients delivered to worked muscles. Growth hormone mild pulse. Cortisol drops. Does NOT suppress mTOR (unlike cold after gym). Science: Scandinavian J Medicine 2024.",
               "cat": "SKIN",
@@ -251,8 +362,8 @@
             },
             {
               "id": "m_moisturiser",
-              "time12": "7:30",
-              "time24": "07:30",
+              "time12": "7:35",
+              "time24": "07:35",
               "title": "Moisturiser + sunscreen",
               "desc": "",
               "cat": "SKIN",
@@ -261,25 +372,52 @@
             },
             {
               "id": "m_free_writing",
-              "time12": "7:35",
-              "time24": "07:35",
-              "title": "Free writing (commute/office)",
+              "time12": "7:42",
+              "time24": "07:42",
+              "title": "Free writing",
               "desc": "",
               "cat": "MIND",
+              "active": true,
+              "tier": 2
+            },
+            {
+              "id": "m_calf_dose",
+              "time12": "7:45",
+              "time24": "07:45",
+              "title": "Calf + soleus micro-dose — 15 min (We AM + Tu PM)",
+              "desc": "After the Wednesday long run (morning) and the Tuesday evening run, at home: heavy single-leg calf raises straight-knee + bent-knee (soleus) + hip stability. The soleus absorbs 6-8x bodyweight per stride — the #1 marathon-injury insurance. Non-negotiable through the entire run ramp.",
+              "cat": "MOVE",
               "active": true,
               "tier": 2
             }
           ]
         },
         {
+          "id": "mblk5b",
+          "name": "STUDY 2 / GYM (7:30-8:50)",
+          "start24": "07:50",
+          "items": [
+            {
+              "id": "m_study_3",
+              "time12": "7:50",
+              "time24": "07:50",
+              "title": "STUDY 2 — 60 min: STOCK MARKET (Tu/Th/Fr: GYM instead)",
+              "desc": "Mon/Wed/Sat: study 7:50-8:50. GYM ×3 — TUE lower body + calves · THU upper + core · FRI full-body LIGHT (never heavy legs before the weekend rides). Scooty, after breakfast; on gym days study slides to 3:05 post-market. Race-taper weeks: gym drops to 1×.",
+              "cat": "MIND",
+              "active": true,
+              "tier": 1
+            }
+          ]
+        },
+        {
           "id": "mblk6",
-          "name": "AT OFFICE — BREAKFAST (7:45-8:10)",
-          "start24": "07:45",
+          "name": "MID-MORNING (8:45-9:00)",
+          "start24": "08:45",
           "items": [
             {
               "id": "m_ginger_shot",
-              "time12": "7:45",
-              "time24": "07:45",
+              "time12": "8:45",
+              "time24": "08:45",
               "title": "Ginger lime shot",
               "desc": "",
               "cat": "AYUR",
@@ -287,9 +425,19 @@
               "tier": 2
             },
             {
+              "id": "m_chyawanprash",
+              "time12": "8:46",
+              "time24": "08:46",
+              "title": "Chyawanprash (1 tsp)",
+              "desc": "MOVED from 3:38 AM — 1 tsp is ~6-8g sugar; taken pre-dawn it broke the overnight fast before the entire training block. With breakfast the amla/immunity case stays, the fast stays intact.",
+              "cat": "AYUR",
+              "active": true,
+              "tier": 2
+            },
+            {
               "id": "m_oats_paneer",
-              "time12": "7:50",
-              "time24": "07:50",
+              "time12": "8:47",
+              "time24": "08:47",
               "title": "Oats + paneer breakfast",
               "desc": "Post-gym meal at 7:05 already covers nutrition. This is removed from daily tracking.",
               "cat": "FUEL",
@@ -298,8 +446,8 @@
             },
             {
               "id": "m_shata_pada",
-              "time12": "7:58",
-              "time24": "07:58",
+              "time12": "8:48",
+              "time24": "08:48",
               "title": "Shata Pada (100 steps after meal)",
               "desc": "",
               "cat": "AYUR",
@@ -308,8 +456,8 @@
             },
             {
               "id": "m_sunlight",
-              "time12": "8:02",
-              "time24": "08:02",
+              "time12": "8:50",
+              "time24": "08:50",
               "title": "Sunlight exposure (5 min)",
               "desc": "",
               "cat": "BIOHACK",
@@ -318,18 +466,18 @@
             },
             {
               "id": "m_vitamins",
-              "time12": "8:04",
-              "time24": "08:04",
-              "title": "Vitamins (D3+K2, Omega-3)",
-              "desc": "",
+              "time12": "8:52",
+              "time24": "08:52",
+              "title": "Vitamins (D3+K2, algal Omega-3 ≥1g, B12)",
+              "desc": "B12 250-500µg ADDED — 68-77% of unsupplemented lacto-vegetarians are functionally low; the single biggest vegetarian gap. Omega-3: verify label delivers ≥1000mg EPA+DHA (most veg caps are 200-300mg — switch to algal). D3 with a fat-containing meal is correct. Blood panel every 6 months: B12+MMA, ferritin, 25(OH)D, HbA1c, testosterone, T3, LFT.",
               "cat": "BIOHACK",
               "active": true,
               "tier": 1
             },
             {
               "id": "m_cdp_choline",
-              "time12": "8:06",
-              "time24": "08:06",
+              "time12": "8:53",
+              "time24": "08:53",
               "title": "CDP-Choline",
               "desc": "Not required daily — disabled from routine tracking. Re-enable manually on days of use.",
               "cat": "BIOHACK",
@@ -337,12 +485,93 @@
               "tier": 2
             },
             {
+              "id": "m_fruit_break",
+              "time12": "8:53",
+              "time24": "08:53",
+              "title": "Fruit break — jamun / pomegranate / berries",
+              "desc": "Daily anthocyanin serving (≥50-100g) — memory + executive-function RCTs; rotate jamun (season), pomegranate, black grapes, frozen blueberries, fresh amla.",
+              "cat": "FUEL",
+              "active": true,
+              "tier": 2
+            },
+            {
               "id": "m_review_blocks",
-              "time12": "8:10",
-              "time24": "08:10",
+              "time12": "8:54",
+              "time24": "08:54",
               "title": "Review time blocks for the day",
               "desc": "",
               "cat": "MIND",
+              "active": true,
+              "tier": 2
+            }
+          ]
+        },
+        {
+          "id": "mblk6b",
+          "name": "STUDY 3 (9:00-9:40)",
+          "start24": "09:00",
+          "items": [
+            {
+              "id": "m_study_extra",
+              "time12": "9:00",
+              "time24": "09:00",
+              "title": "STUDY 3 — moved to 3:05 PM (market opens 9:00)",
+              "desc": "MOVED post-market — see midday. Market 9:00-3:00 owns this slot now.",
+              "cat": "MIND",
+              "active": false,
+              "tier": 1
+            }
+          ]
+        },
+        {
+          "id": "mblk7",
+          "name": "MARKET (9:00-3:00)",
+          "start24": "09:00",
+          "items": [
+            {
+              "id": "m_deep_work",
+              "time12": "9:00",
+              "time24": "09:00",
+              "title": "MARKET OPEN — at the desk 9:00-3:00",
+              "desc": "Stock market hours, at the computer, untouchable. Deep-work discipline applies: phone away, no mid-session training thoughts. Lunch 1:30 at the desk (dabba).",
+              "cat": "MIND",
+              "active": true,
+              "tier": 1
+            }
+          ]
+        },
+        {
+          "id": "mblk8",
+          "name": "DESK PREP (8:45-9:00)",
+          "start24": "08:45",
+          "items": [
+            {
+              "id": "m_deep_study",
+              "time12": "10:30",
+              "time24": "10:30",
+              "title": "1-hour deep study - NO electronics on",
+              "desc": "SUPERSEDED by STUDY 1+2+3 blocks — off daily tracking. One focused hour of study/learning with zero electronic devices switched on. Book, notes, pen. Single subject, pure input. Compounds over months.",
+              "cat": "MIND",
+              "active": false,
+              "tier": 1
+            },
+            {
+              "id": "m_dabba",
+              "time12": "8:45",
+              "time24": "08:45",
+              "title": "Lunch dabba ready — desk lunch at 1:30",
+              "desc": "Cook arrives 7:00-7:30 (never exact — doesn't matter): SMART-LOCK CODE + entrance/kitchen CAMERA = he lets himself in, every entry logged, footage = accountability. You're usually home anyway (till 11:15). MENU CARD on the fridge decides what he cooks — never him. Dabba ready by ~9:30. Door closed for Study 2/3 — the card answers every question.",
+              "cat": "FUEL",
+              "active": true,
+              "tier": 2
+            },
+            {
+              "id": "m_leave_office",
+              "time12": "8:50",
+              "time24": "08:50",
+              "title": "Desk ready — market prep (office days: leave ~8:20)",
+              "desc": "At the computer by 9:00 sharp, market hours 9:00-3:00. Evening chain unchanged: whatever the day held, night prep 7:30 → lights out 8:45 (Fri/Sat 8:30).",
+              "cat": "MOVE",
               "active": true,
               "tier": 2
             }
@@ -418,8 +647,8 @@
               "id": "mid_lunch",
               "time12": "1:30",
               "time24": "13:30",
-              "title": "Lunch — dal, roti, sabzi, salad",
-              "desc": "No white rice. No fried items. Food code applies. Eat mindfully — no phone, no laptop. Chew 32 times. Last solid meal before 6 PM sprout mix.",
+              "title": "Lunch — salad+dal FIRST, paneer/dahi, roti LAST",
+              "desc": "EXACTLY 1:30 PM (time fixed — was listed 2:00 after the 1:50 post-lunch walk). EAT ORDER: salad + dal/paneer first, roti/rice last — cuts the glucose spike ~30-40% = no 2-4 PM fog. Millet (ragi/jowar/bajra) or brown rice > white rice. Paneer or dahi = protein feeding 2 of 4. No phone. Chew 32×.",
               "cat": "FUEL",
               "active": true,
               "tier": 1
@@ -447,6 +676,23 @@
           ]
         },
         {
+          "id": "midblk2a",
+          "name": "POST-MARKET (3:05-5:30)",
+          "start24": "15:05",
+          "items": [
+            {
+              "id": "mid_study3",
+              "time12": "3:05",
+              "time24": "15:05",
+              "title": "STUDY 3 — 40 min: MARKET REVIEW / flex (Tue: run 4:15 after)",
+              "desc": "Post-market sitting: day review + either mission → 2h30 study daily. On gym days this carries the market-study slot. Tuesday: easy run 4:15-5:15 PM after this, ending at the 5:30 recovery dinner.",
+              "cat": "MIND",
+              "active": true,
+              "tier": 1
+            }
+          ]
+        },
+        {
           "id": "midblk2",
           "name": "AFTERNOON FUEL (3:30-4:00)",
           "start24": "15:30",
@@ -455,8 +701,8 @@
               "id": "mid_green_tea",
               "time12": "3:30",
               "time24": "15:30",
-              "title": "Green tea + L-Theanine",
-              "desc": "Afternoon nootropic stack. L-Theanine 200mg + green tea. Calm focus without jitters. No coffee after 12 PM (sleep hygiene).",
+              "title": "DECAF green tea + L-Theanine",
+              "desc": "CAFFEINE CURFEW 2 PM — caffeine needs ~8.8h clearance before bed (Sleep Med Rev 2023 meta-analysis) and lights-out is 8:45. L-Theanine 200mg alone keeps the calm-focus effect; decaf keeps the ritual. Keep all tea ≥1h away from meals — tannins cut iron absorption 60-90% (vegetarian-critical).",
               "cat": "BIOHACK",
               "active": true,
               "tier": 2
@@ -529,6 +775,23 @@
               "tier": 2
             }
           ]
+        },
+        {
+          "id": "midblk4",
+          "name": "FUEL TOP-UP (5:00-5:30)",
+          "start24": "17:00",
+          "items": [
+            {
+              "id": "mid_dinner",
+              "time12": "5:00",
+              "time24": "17:00",
+              "title": "5 PM top-up — sattu shake / fruit + PB + 2 kiwis",
+              "desc": "MANDATORY on big days (We long run, Sat ride, Sun tri-day, Tue run), optional otherwise. SATURDAY = DOUBLE (sattu 5:00 AND fruit/poha before 6) — Saturday is the highest-carb day; Sunday's tri-day is fueled today. Lunch is the day's biggest meal (tell the cook: athlete portion); this is the last food before the cutoff. Night = milk + paneer only — the 30g casein pre-sleep dose. 2 kiwis: RCT −35% sleep latency. Blanch any sprouts.",
+              "cat": "FUEL",
+              "active": true,
+              "tier": 1
+            }
+          ]
         }
       ]
     },
@@ -544,8 +807,18 @@
               "time12": "7:00",
               "time24": "19:00",
               "title": "Laptop close — HARD STOP",
-              "desc": "Work ends at 7 PM. Non-negotiable. Treated like the morning run — no exceptions, no \"just 5 more minutes\". 8:30 PM sleep is decided here.",
+              "desc": "Work ends — OUT of the office by 6:45-7:00 sharp, no \"just 5 more minutes\". Home ~7:15. The 8:45 lights-out is decided here, at the office door, not at home.",
               "cat": "SLEEP",
+              "active": true,
+              "tier": 1
+            },
+            {
+              "id": "e_phone_off",
+              "time12": "7:01",
+              "time24": "19:01",
+              "title": "PHONE OFF → hall drawer (lives in the HALL, travels nowhere; ON 9:00)",
+              "desc": "TERRITORY RULE (phone-rituals/ rulebook): phone lives in the hall drawer or the car DASH MOUNT (nav only) — never rooms/hand/pocket. ONE touch: 6:40-6:55 PM (log day + SYNC Strava/HAE + OTPs + cook menu) + answered calls. Emergency use = in the CAR only (never inside house/office). Watch eSIM = the world's door. Breach price: 10km walk (touch) / 30km (left hall) / 50km (feed) — daytime, flat, no compounding. Evening rituals tick on PAPER; 9:05 catch-up.",
+              "cat": "MIND",
               "active": true,
               "tier": 1
             },
@@ -566,7 +839,7 @@
               "title": "Sprout mix (moong/chana)",
               "desc": "Last food of the day. 1.5h before sleep. Light meal = stomach clear by 8:30 PM. Empty stomach sleep = full recovery mode. Growth hormone maximised. Evening Covenant begins.",
               "cat": "FUEL",
-              "active": true,
+              "active": false,
               "tier": 2
             },
             {
@@ -600,7 +873,7 @@
               "id": "e_copper_vessel",
               "time12": "7:14",
               "time24": "19:14",
-              "title": "Fill copper vessel + soak methi",
+              "title": "Fill copper vessel + soak methi + oats",
               "desc": "",
               "cat": "AYUR",
               "active": true,
@@ -610,8 +883,8 @@
               "id": "e_gym_bag",
               "time12": "7:15",
               "time24": "19:15",
-              "title": "Gym bag packed",
-              "desc": "",
+              "title": "Kit packed — tomorrow's sport",
+              "desc": "Tomorrow's kit every evening. SATURDAY EVE: bottles mixed + fridged, bike INTO the car, tires + chain checked, oats jar packed — Sunday = tri day (swim → long ride → brick). Zero morning decisions.",
               "cat": "MOVE",
               "active": true,
               "tier": 2
@@ -727,8 +1000,8 @@
               "id": "e_shilajit",
               "time12": "7:45",
               "time24": "19:45",
-              "title": "Shilajit (purified resin)",
-              "desc": "Evening dose — 40 min after sprout mix. OR take in morning (pre-run fasted = also valid). Overnight recovery, testosterone, mitochondrial repair. Warm water, alone.",
+              "title": "Shilajit (ICP-MS COA-verified ONLY)",
+              "desc": "ONLY with a batch-specific heavy-metals certificate (Pb/As/Cd/Hg/Tl, independent lab, <1yr old) — 2024-25 testing found lead and thallium in \"purified\" resins; the word has no legal meaning. No COA = skip entirely (creatine + ashwagandha already cover its claimed benefits with better evidence). Max ONE dose/day. Warm water, alone.",
               "cat": "AYUR",
               "active": true,
               "tier": 2
@@ -754,8 +1027,8 @@
               "id": "e_mag_triphala",
               "time12": "7:50",
               "time24": "19:50",
-              "title": "Magnesium + Triphala + Glycine",
-              "desc": "Magnesium glycinate 400mg + Triphala + Glycine 3g. All in warm water. Glycine lowers core body temperature = sleep onset trigger. Completes collagen cycle.",
+              "title": "Magnesium glycinate + Glycine + Triphala (cycled)",
+              "desc": "Magnesium GLYCINATE only (oxide barely absorbs), ≤350mg elemental + Glycine 3g (RCT: lowers core temp, faster sleep onset). Triphala now CYCLED — 3 wk on / 1 wk off (chronic daily use risks laxative dependency + CYP450 interactions). All in warm water.",
               "cat": "BIOHACK",
               "active": true,
               "tier": 1
@@ -764,8 +1037,8 @@
               "id": "e_warm_milk",
               "time12": "7:52",
               "time24": "19:52",
-              "title": "Warm milk + Ashwagandha",
-              "desc": "400-500ml + turmeric + black pepper + Ashwagandha 600mg + Jatamansi + 2 tbsp cottage cheese. Sip slowly. Casein protein overnight = muscle repair.",
+              "title": "Milk + paneer + Ashwagandha — night closed",
+              "desc": "400-500ml + turmeric + black pepper + Ashwagandha 300-600mg ROOT extract only (India banned leaf in supplements, Apr 2026 — check label) + Jatamansi + 2 tbsp cottage cheese. CYCLE 8-12 wk on / 2-4 wk off; stop all herbals + get LFTs if dark urine/itching/jaundice (rare hepatotoxicity, LiverTox grade C). Casein overnight = muscle repair.",
               "cat": "AYUR",
               "active": true,
               "tier": 2
@@ -784,6 +1057,16 @@
               "title": "Night prep confirmed ✓",
               "desc": "",
               "cat": "MIND",
+              "active": true,
+              "tier": 2
+            },
+            {
+              "id": "e_electronics_charge",
+              "time12": "8:06",
+              "time24": "20:06",
+              "title": "All electronics on charge - OUTSIDE bedroom",
+              "desc": "Every device (phone, watch, laptop) plugged in to charge OUTSIDE the bedroom. Bedroom is a no-device zone - removes the 3:30 AM temptation and the +10 km bedroom-device penalty.",
+              "cat": "SLEEP",
               "active": true,
               "tier": 2
             }
@@ -865,11 +1148,21 @@
               "tier": 1
             },
             {
+              "id": "e_oral_care",
+              "time12": "8:40",
+              "time24": "20:40",
+              "title": "Evening oral care - brush + interdental",
+              "desc": "Two-minute fluoride brushing + interdental cleaning (floss or interdental brush). Last thing before bed. Overnight clean teeth prevent decay and gum disease.",
+              "cat": "AYUR",
+              "active": true,
+              "tier": 2
+            },
+            {
               "id": "e_lights_out",
               "time12": "8:45",
               "time24": "20:45",
               "title": "LIGHTS OUT",
-              "desc": "3:30 AM is decided here. 8:45 PM → 3:30 AM = ~6h45m sleep (evidence-corrected up from 6h). The morning is won or lost in the first 60 seconds of this moment.",
+              "desc": "3:30 AM is decided here. 8:45 PM → 3:30 AM = ~6h45m sleep (evidence-corrected up from 6h). The morning is won or lost in the first 60 seconds of this moment. FRI + SAT NIGHTS: lights out 8:30 — 7h before the weekend sessions (Sat tempo ride, Sun tri day).",
               "cat": "SLEEP",
               "active": true,
               "tier": 1
@@ -887,11 +1180,7 @@
       },
       {
         "id": "sat_batch_cook",
-        "label": "Batch cook — larger portions for Sunday"
-      },
-      {
-        "id": "sat_steam",
-        "label": "Steam bath — 15-20 min + cold rinse"
+        "label": "Sun-tri prep — bottles + bike in car · lights out 8:30"
       },
       {
         "id": "sat_hammam",
@@ -916,16 +1205,16 @@
         "label": "Abhyanga full body self-massage — 10-15 min"
       },
       {
+        "id": "sun_temple",
+        "label": "Temple visit"
+      },
+      {
         "id": "sun_park",
         "label": "Park or nature sit — 1 hour minimum (Shinrin-yoku)"
       },
       {
         "id": "sun_friluftsliv",
         "label": "Friluftsliv — 20-30 min purposeless walk"
-      },
-      {
-        "id": "sun_steam",
-        "label": "Steam bath — second compulsory session"
       },
       {
         "id": "sun_face_mask",
@@ -941,7 +1230,7 @@
       },
       {
         "id": "sun_grocery",
-        "label": "Grocery + weekly prep + soak methi"
+        "label": "Grocery + weekly prep + soak methi (+ jamun/kiwi/millet/sattu)"
       },
       {
         "id": "sun_room",

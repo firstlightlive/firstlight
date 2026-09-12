@@ -128,13 +128,13 @@ const seed = {
 
 // ── Assertions (fail loudly on drift) ───────────────────────────────────────
 function assert(cond, msg) { if (!cond) throw new Error(`ASSERT: ${msg}`); }
-assert(periods.morning.blocks.reduce((s, b) => s + b.items.length, 0) === 30, 'morning must have 30 items');
-assert(totalActive.morning === 27, `morning active must be 27, got ${totalActive.morning}`);
-assert(periods.midday.blocks.reduce((s, b) => s + b.items.length, 0) === 15, 'midday must have 15 items');
-assert(totalActive.midday === 15, `midday active must be 15, got ${totalActive.midday}`);
-assert(periods.evening.blocks.reduce((s, b) => s + b.items.length, 0) === 30, 'evening must have 30 items');
-assert(totalActive.evening === 29, `evening active must be 29, got ${totalActive.evening}`);
-assert(seed.weekend.saturday.length === 7, 'saturday must have 7 tasks');
+assert(periods.morning.blocks.reduce((s, b) => s + b.items.length, 0) === 48, 'morning must have 48 items');
+assert(totalActive.morning === 42, `morning active must be 42, got ${totalActive.morning}`);
+assert(periods.midday.blocks.reduce((s, b) => s + b.items.length, 0) === 17, 'midday must have 17 items');
+assert(totalActive.midday === 17, `midday active must be 17, got ${totalActive.midday}`);
+assert(periods.evening.blocks.reduce((s, b) => s + b.items.length, 0) === 33, 'evening must have 33 items');
+assert(totalActive.evening === 31, `evening active must be 31, got ${totalActive.evening}`);
+assert(seed.weekend.saturday.length === 6, 'saturday must have 6 tasks');
 assert(seed.weekend.sunday.length === 10, 'sunday must have 10 tasks');
 assert(seed.weekend.saturday.every(t => /^sat_[a-z_]+$/.test(t.id)), 'sat ids');
 assert(seed.weekend.sunday.every(t => /^sun_[a-z_]+$/.test(t.id)), 'sun ids');
@@ -147,7 +147,7 @@ assert(find('evening', 'e_laptop_close').time24 === '19:00', 'e_laptop_close 19:
 assert(find('evening', 'e_lights_out').time24 === '20:45', 'e_lights_out 20:45');
 const inactive = ['morning', 'midday', 'evening']
   .flatMap(p => periods[p].blocks.flatMap(b => b.items)).filter(i => !i.active).map(i => i.id).sort();
-assert(JSON.stringify(inactive) === JSON.stringify(['e_cold_dive', 'm_cdp_choline', 'm_earthing', 'm_oats_paneer']),
+assert(JSON.stringify(inactive) === JSON.stringify(['e_cold_dive', 'e_sprout_mix', 'm_cdp_choline', 'm_deep_study', 'm_earthing', 'm_oats_paneer', 'm_sattu', 'm_study_extra']),
   `inactive set drifted: ${inactive.join(',')}`);
 
 // ── Write ───────────────────────────────────────────────────────────────────
