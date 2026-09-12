@@ -472,12 +472,17 @@
         // Distance display
         var distStr = totalKm > 0 ? totalKm.toFixed(1) + ' km' : (r.gym ? 'Gym' : '—');
 
-        // Stake (HELD model): every logged day in the live chapter is a day you
-        // showed up → ₹1,500 held (unclaimed), ₹0 donated. Misses are gap days with
-        // no proof row; their donation is summed into the Claimed summary card (see
-        // computeStakeFor). Closed chapters used a different stake era → show CLOSED.
-        var stake = ch.live ? 1500 : null;
-        var claimedAmount = ch.live ? 0 : null;
+        // Stake (HELD model): a logged day in a MONEY chapter is a day you showed
+        // up → stakePerDay held (unclaimed), ₹0 donated. Read the rate off the
+        // chapter instead of hardcoding ₹1,500: Chapters 04 and 05 carry NO money
+        // (stakePerDay 0, penance is DISTANCE — the Punishment Cycle), so printing
+        // ₹1,500 a day here contradicted chapters.js, app.js STAKE_PER_DAY and the
+        // no-₹-on-public-surfaces rule all at once. A 0-stake chapter shows the
+        // same CLOSED dash a retired one does — there is no rupee column to fill.
+        var chStake = (window.FL_CURRENT_CHAPTER && ch.live && typeof window.FL_CURRENT_CHAPTER.stakePerDay === 'number')
+          ? window.FL_CURRENT_CHAPTER.stakePerDay : (ch.live ? 1500 : 0);
+        var stake = (ch.live && chStake > 0) ? chStake : null;
+        var claimedAmount = (ch.live && chStake > 0) ? 0 : null;
 
         return {
           day: dayIn,
