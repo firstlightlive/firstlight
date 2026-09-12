@@ -211,7 +211,7 @@
     <div class="ct">Day Mode — pick ONE at wake. All three keep the streak.</div>
     <div class="mgrid">
       <div class="mo"><span class="cb"></span><b>FULL</b><span class="md">everything on this sheet</span></div>
-      <div class="mo"><span class="cb"></span><b>KEYSTONE</b><span class="md">the ◆ KEY items only — late wake, travel, heavy load</span></div>
+      <div class="mo"><span class="cb"></span><b>KEYSTONE</b><span class="md">the ★ items only — late wake, travel, heavy load</span></div>
       <div class="mo"><span class="cb"></span><b>ANCHOR</b><span class="md">the Covenant only — ill, wrecked, broken sleep</span></div>
     </div>
     <div class="pen">A smaller day is not a failed day. KEYSTONE and ANCHOR hold the streak and carry <b>no penance</b>. The only failed day is an unlogged one.</div>
@@ -278,7 +278,7 @@
   <!-- WRITE (fill through the day) -->
   <div class="train">
     <div class="rh">◇ Write — fill through the day</div>
-    <div class="tr"><b>3:45 Micro-gratitude</b><span class="fl"></span><span class="cap">one thing</span></div>
+    <div class="tr"><b><span id="wMicro">4:45</span> Micro-gratitude</b><span class="fl"></span><span class="cap">one thing</span></div>
     <div class="tr"><b>Night · 3 wins</b><span class="fl"></span></div>
     <div class="tr"><b>Tomorrow, 1% better</b><span class="fl"></span></div>
   </div>
@@ -385,7 +385,7 @@
   <div class="gauge">
     <div class="rh">◇ Day Gauge — fill at 6:40 PM with the log</div>
     <div class="gr">
-      <div class="g"><b>Blocks</b><u></u>/10</div>
+      <div class="g"><b>Blocks</b><u></u><span id="gaugeDen">/10</span></div>
       <div class="g"><b>Push-ups</b><u></u></div>
       <div class="g"><b>Squats</b><u></u></div>
       <div class="g"><b>Water</b><u></u> glasses · <u></u> L</div>
@@ -394,7 +394,7 @@
       <div class="g"><b>Distractions</b><u></u></div>
       <div class="g"><b>Longest chain</b><u></u></div>
     </div>
-    <div class="gnote"><b>A full 10 blocks = 100 push-ups · 100 squats · 100 rounds of breath · 2.5 L water — before a single training session.</b> That is the compounding: none of it was a workout, all of it was a day. · <b>Training-day trim:</b> TUE (lower-body gym) → squats to 5 · THU (upper + core) → push-ups to 5 · WED (long run) → both to 5.</div>
+    <div class="gnote"><span id="gaugeTotals"><b>A full 10 blocks = 100 push-ups · 100 squats · 100 rounds of breath · 2.5 L water — before a single training session.</b></span> That is the compounding: none of it was a workout, all of it was a day. · <b>Training-day trim:</b> TUE (lower-body gym) → squats to 5 · THU (upper + core) → push-ups to 5 · WED (long run) → both to 5.</div>
   </div>
 
   <div class="two">
@@ -479,7 +479,7 @@
   var phase=RAMP[RAMP.length-1];
   for(var i=0;i<RAMP.length;i++){ if(!RAMP[i].to || sheetFor<=parseYMD(RAMP[i].to)){ phase=RAMP[i]; break; } }
   function setTxt(id,v){var e=document.getElementById(id); if(e) e.textContent=v;}
-  setTxt('covWake',phase.wake); setTxt('covMed',phase.med);
+  setTxt('covWake',phase.wake); setTxt('covMed',phase.med); setTxt('wMicro',phase.med);
   setTxt('covLights',phase.lights); setTxt('covLights2',phase.lights);
   var rr=document.getElementById('rampRows');
   if(rr){
@@ -505,18 +505,39 @@
       var off = phase.w==='W1' ? 60 : 30;
       rn.innerHTML='<b>RAMP WEEK '+phase.w.slice(1)+' \u2014 the times below are the full 3:30 chain.</b> '+
         'This week you wake at <b>'+phase.wake+'</b>: run the oral-care and Brahma Muhurta blocks in the order printed, just '+off+
-        ' min later. <b>Study 1+2 absorbs the entire cut</b> \u2014 nothing else shrinks. From <b>5:40 (pre-train)</b> onward the sheet is exact: the 6:00 water and the 9:00 open do not move.';
+        ' min later. <b>Study 1+2 absorbs the entire cut</b> \u2014 nothing else shrinks. From <b>5:40 (pre-train)</b> onward the sheet is exact: the 6:00 water and the 9:00 open do not move. '+
+        '<b>WEDNESDAY is the exception</b> \u2014 the long run goes at 5:00 and cannot shift, so there is NO study block: wake, minimum rituals, out the door.';
     }
   }
 
   // ── Page 2 ── chain boxes + block rows
   var chain=document.getElementById('chainRow');
-  if(chain){ var ch=''; for(var c=1;c<=10;c++) ch+='<i>'+c+'</i>'; chain.innerHTML=ch; }
+  // Morning study blocks track the ramp. At a 4:30 wake the oral-care + Brahma
+  // Muhurta chain runs to ~5:05, so a 4:15 block is impossible and only ONE short
+  // session fits before the 5:40 pre-train. Week 3 gets both blocks back.
+  var STUDY={
+    W1:[['5:05','STUDY 40min'],['\u2014','']],
+    W2:[['4:35','STUDY 65min'],['\u2014','']],
+    W3:[['4:15','STUDY 1+2'],['5:15','STUDY 1+2']]
+  };
+  var st=STUDY[phase.w]||STUDY.W3;
   var BLOCKS=[
-    ['4:15','STUDY 1+2'],['5:15','STUDY 1+2'],['7:50','STUDY 2 / GYM'],
+    st[0], st[1], ['7:50','STUDY 2 / GYM'],
     ['9:00','MARKET'],['10:00','MARKET'],['11:00','MARKET'],['12:00','MARKET'],
     ['2:00','MARKET'],['3:05','STUDY 3'],['4:05','FLEX']
   ];
+  // A dead block is not a row you can fill, so it is dropped outright rather than
+  // printed with empty checkboxes: in a ramp week the day is out of 9, not 10, and
+  // the row numbers, the chain and the gauge all agree on that.
+  BLOCKS=BLOCKS.filter(function(b){ return b[0]!=='\u2014'; });
+  var liveBlocks=BLOCKS.length;
+  if(chain){ var ch=''; for(var c=1;c<=liveBlocks;c++) ch+='<i>'+c+'</i>'; chain.innerHTML=ch; }
+  var gd=document.getElementById('gaugeDen'); if(gd) gd.textContent='/'+liveBlocks;
+  var gt=document.getElementById('gaugeTotals');
+  if(gt) gt.innerHTML='<b>A full '+liveBlocks+' blocks = '+(liveBlocks*10)+' push-ups \u00b7 '+(liveBlocks*10)+
+    ' squats \u00b7 '+(liveBlocks*10)+' rounds of breath \u00b7 '+(liveBlocks*0.25).toFixed(2).replace(/0$/,'')+
+    ' L water \u2014 before a single training session.</b>';
+
   var tb=document.getElementById('btBody');
   if(tb){
     var th='';
