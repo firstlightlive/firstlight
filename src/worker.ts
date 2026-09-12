@@ -479,7 +479,7 @@ interface RenderRequest {
   date: string                          // YYYY-MM-DD
   chapterDay: number
   chapter?: string                      // footer brand e.g. "CHAPTER 03 · FIRST LIGHT" — supplied by the edge fn (single source of truth for chapter identity)
-  variant: 'WIN' | 'MISS' | 'WIN_ROUTE' | 'WIN_MULTI_HERO' | 'WIN_MULTI_MAP' | 'WIN_MULTI_GRID' | 'WIN_MULTI_SUMMARY' | 'MONTHLY_RECAP' | 'CHAPTER_KICKOFF_HERO' | 'CHAPTER_KICKOFF_PROMISE' | 'CHAPTER_KICKOFF_MENU'
+  variant: 'WIN' | 'MISS' | 'WIN_ROUTE' | 'WIN_MULTI_HERO' | 'WIN_MULTI_MAP' | 'WIN_MULTI_GRID' | 'WIN_MULTI_SUMMARY' | 'MONTHLY_RECAP' | 'CHAPTER_KICKOFF_HERO' | 'CHAPTER_KICKOFF_PROMISE' | 'CHAPTER_KICKOFF_MENU' | 'RESTART_HERO' | 'RESTART_RECORD' | 'RESTART_RULE'
   orientation: 'post' | 'story'
   payload: {
     // WIN-specific (single activity)
@@ -500,14 +500,32 @@ interface RenderRequest {
     totalMin?: number
     totalKcal?: number
     // MISS-specific
-    charity?: string                    // 'Akshaya Patra'
+    penance?: string                    // Chapter 04 debt, e.g. '100 KM CYCLE'
     reason?: string                     // short failure reason
     // Monthly recap
     monthly?: MonthlyRecapPayload
     monthlySlide?: 1 | 2 | 3 | 4 | 5 | 6 | 7
     // Theme name — bucket-based palette rotation (see THEMES const)
     theme?: 'strava' | 'earth' | 'arctic' | 'gradient' | 'infrared' | 'neon'
+    // Restart announcement (RESTART_* variants)
+    restart?: RestartPayload
   }
+}
+
+// A break in the streak, told straight: what the old run reached, why it stopped,
+// how many days were lost, and the date the counter restarts from.
+interface RestartPayload {
+  lastDay: number                     // final day number of the retired run
+  lastDate: string                    // YYYY-MM-DD of the last logged session
+  breakDays: number                   // days with no training
+  breakFrom: string                   // YYYY-MM-DD first day down
+  breakTo: string                     // YYYY-MM-DD last day down
+  cause: string                       // short, honest reason e.g. 'FEVER'
+  startDate: string                   // YYYY-MM-DD of the new Day 1
+  rule: string                        // the rule the new run is held to
+  // Up to 6 daily non-negotiables. Strings still work; {label, km} also prices
+  // each one with the distance a miss costs.
+  rituals?: Array<string | { label: string; km?: number }>
 }
 
 interface MonthlyRecapPayload {
@@ -559,7 +577,16 @@ async function renderAndStore(req: RenderRequest, env: Env): Promise<RenderResul
             : req.variant === 'CHAPTER_KICKOFF_HERO'      ? renderKickoffHeroSvg(req)
             : req.variant === 'CHAPTER_KICKOFF_PROMISE'   ? renderKickoffPromiseSvg(req)
             : req.variant === 'CHAPTER_KICKOFF_MENU'      ? renderKickoffMenuSvg(req)
-            : renderMissSvg(req)
+            : req.variant === 'RESTART_HERO'              ? renderRestartHeroSvg(req)
+            : req.variant === 'RESTART_RECORD'            ? renderRestartRecordSvg(req)
+            : req.variant === 'RESTART_RULE'              ? renderRestartRuleSvg(req)
+            : req.variant === 'MISS'                      ? renderMissSvg(req)
+            // An unrecognised variant used to fall through to renderMissSvg, so a
+            // typo (or calling a variant before this Worker was deployed) silently
+            // published a MISS/charity slide under the requested name — and the
+            // immutable cache below then pinned that wrong image to the URL.
+            // Fail loudly instead.
+            : (() => { throw new Error(`Unknown render variant: ${req.variant}`) })()
 
   // Rasterize SVG → PNG via resvg-wasm. Fonts are passed as Uint8Array buffers
   // because the Workers runtime has no system fonts. loadSystemFonts is disabled.
@@ -593,9 +620,26 @@ async function renderAndStore(req: RenderRequest, env: Env): Promise<RenderResul
   // Public URL — always served through the Worker's /api/proofs route.
   // This avoids needing R2 public-access setup in the dashboard, gives us
   // Cloudflare edge caching, and keeps everything on firstlight.live for IG.
-  const publicUrl = `https://firstlight.live/api/proofs/${r2Key}`
+  //
+  // ?v= is a content fingerprint, and it is load-bearing. R2 keys are derived
+  // from (day, date, variant), so re-rendering the same slide overwrites the
+  // object — but /api/proofs serves `immutable, max-age=1y`, so the edge would
+  // happily keep serving the SUPERSEDED bytes for a year. Identical content
+  // keeps the same ?v= (still cached); changed content gets a new URL.
+  const publicUrl = `https://firstlight.live/api/proofs/${r2Key}?v=${_fingerprint(png)}`
 
   return { success: true, publicUrl, r2Key, bytesGenerated: png.byteLength }
+}
+
+// FNV-1a over the rendered bytes — short, stable, and good enough to tell one
+// version of a slide from another. Not a security hash.
+function _fingerprint(bytes: Uint8Array): string {
+  let h = 0x811c9dc5
+  for (let i = 0; i < bytes.length; i++) {
+    h ^= bytes[i]
+    h = Math.imul(h, 0x01000193) >>> 0
+  }
+  return h.toString(16).padStart(8, '0')
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -743,7 +787,12 @@ function renderMissSvg(req: RenderRequest): string {
   const W = 1080
   const H = req.orientation === 'story' ? 1920 : 1080
   const day = req.chapterDay
-  const charity = (req.payload.charity || 'Akshaya Patra').toUpperCase()
+  // Chapter 04 pays a miss in DISTANCE, not money. The charity/Rs framing that
+  // used to fill this slide is gone from every public surface: the site is a
+  // login wall, so "Rs + charity + a private link" is exactly the footprint the
+  // IG classifiers scored as a scam pattern (see CLAUDE.md "Anti-Spam Rules").
+  // payload.penance lets the engine name the debt; default to the standing rule.
+  const penance = (req.payload.penance || '100 KM CYCLE').toUpperCase()
 
   // Orientation-aware layout (same approach as WIN)
   const isStory = req.orientation === 'story'
@@ -784,23 +833,21 @@ function renderMissSvg(req: RenderRequest): string {
   <line x1="${W / 2 - 60}" y1="${cy + off(130)}" x2="${W / 2 + 60}" y2="${cy + off(130)}"
         stroke="${COLORS.gold}" stroke-width="3"/>
 
-  <!-- Charity-led headline — Akshaya Patra's exact ₹1,500 sponsorship unit -->
+  <!-- The debt, named. Distance — no money, no charity, no Rs. -->
   <text x="${W / 2}" y="${cy + off(195)}" text-anchor="middle"
-        font-family="'Roboto Mono', monospace" font-size="${fz(38)}" font-weight="700"
-        fill="${COLORS.gold}" letter-spacing="2">1 CHILD · 1 SCHOOL YEAR</text>
+        font-family="'Roboto Mono', monospace" font-size="${fz(30)}" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="6">MISSED</text>
 
-  <!-- Sub-line: ~200 meals -->
-  <text x="${W / 2}" y="${cy + off(245)}" text-anchor="middle"
+  <text x="${W / 2}" y="${cy + off(260)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(44)}" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="3">${escapeXml(penance)}</text>
+
+  <text x="${W / 2}" y="${cy + off(315)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(22)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="3">200 MID-DAY MEALS SPONSORED</text>
+        fill="${COLORS.dim}" letter-spacing="3">OWED. TO BE RIDDEN.</text>
 
-  <!-- Charity name -->
-  <text x="${W / 2}" y="${cy + off(300)}" text-anchor="middle"
-        font-family="'Roboto Mono', monospace" font-size="${fz(24)}" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="4">${escapeXml(charity).toUpperCase()}</text>
-
-  <!-- Quiet honesty line — no ₹ amount on image -->
-  <text x="${W / 2}" y="${cy + off(355)}" text-anchor="middle"
+  <!-- Quiet honesty line -->
+  <text x="${W / 2}" y="${cy + off(375)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(20)}" font-weight="500"
         fill="${COLORS.dim}" letter-spacing="3">BECAUSE I DIDN'T TRAIN</text>
 
@@ -1078,7 +1125,7 @@ function renderMonthlyRecapSvg(req: RenderRequest): string {
     case 3: return _recapSlide3TotalKm(req, m)
     case 4: return _recapSlide4SportBars(req, m)
     case 5: return _recapSlide5TimeEffort(req, m)
-    case 6: return _recapSlide6CharityImpact(req, m)
+    case 6: return _recapSlide6MissCost(req, m)
     case 7: return _recapSlide7Closing(req, m)
     default: return _recapSlide1Cover(req, m)
   }
@@ -1319,9 +1366,13 @@ function _recapSlide5TimeEffort(_req: RenderRequest, m: MonthlyRecapPayload): st
 </svg>`
 }
 
-// SLIDE 6 — Charity impact (the unique angle — failure = funded)
-function _recapSlide6CharityImpact(_req: RenderRequest, m: MonthlyRecapPayload): string {
-  const noMisses = m.donatedTotal === 0
+// SLIDE 6 — The cost of the month's misses.
+// Was "charity impact" (failure = funded). Chapter 04 pays in DISTANCE, so
+// there is no rupee figure to show — and donatedTotal is now always 0, which
+// would have pinned this slide to its clean-month branch forever. Branch on
+// missDays, the thing actually being reported.
+function _recapSlide6MissCost(_req: RenderRequest, m: MonthlyRecapPayload): string {
+  const noMisses = m.missDays === 0
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W_REC} ${H_REC}" width="${W_REC}" height="${H_REC}">
   ${_recapBg(`<linearGradient id="gold-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${COLORS.text}"/><stop offset="100%" stop-color="${COLORS.gold}"/></linearGradient>`)}
@@ -1343,24 +1394,21 @@ function _recapSlide6CharityImpact(_req: RenderRequest, m: MonthlyRecapPayload):
   ` : `
   <text x="${W_REC / 2}" y="320" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="22" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="4">${m.missDays} MISS${m.missDays === 1 ? '' : 'ES'} → DONATED</text>
+        fill="${COLORS.dim}" letter-spacing="4">DAYS THE STREAK BROKE</text>
 
   <text x="${W_REC / 2}" y="540" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="220" font-weight="700"
-        fill="url(#gold-grad)" letter-spacing="-4">${m.childrenFedYears}</text>
+        fill="url(#gold-grad)" letter-spacing="-4">${m.missDays}</text>
   <text x="${W_REC / 2}" y="610" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="34" font-weight="700"
-        fill="${COLORS.text}" letter-spacing="3">CHILD${m.childrenFedYears === 1 ? '' : 'REN'} · 1 SCHOOL YEAR</text>
-  <text x="${W_REC / 2}" y="660" text-anchor="middle"
-        font-family="'Roboto Mono', monospace" font-size="22" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="3">AKSHAYA PATRA · 200 MEALS EACH</text>
+        fill="${COLORS.text}" letter-spacing="3">MISS${m.missDays === 1 ? '' : 'ES'} THIS MONTH</text>
 
   <text x="${W_REC / 2}" y="800" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="28" font-weight="700"
-        fill="${COLORS.gold}" letter-spacing="3">Rs ${m.donatedTotal.toLocaleString('en-IN')} · PAID</text>
+        fill="${COLORS.gold}" letter-spacing="3">PAID IN DISTANCE</text>
   <text x="${W_REC / 2}" y="850" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="20" font-weight="500"
-        fill="${COLORS.dim}" letter-spacing="3">MISS COST CONVERTED INTO MEALS</text>
+        fill="${COLORS.dim}" letter-spacing="3">THE PUNISHMENT CYCLE</text>
   `}
 
   ${_recapFooter()}
@@ -1603,6 +1651,292 @@ function renderKickoffMenuSvg(_req: RenderRequest): string {
         fill="${COLORS.dim}" letter-spacing="5">BENGALURU  ·  20.06.2026</text>
 
   ${_kickoffFooter('◆ FIRST LIGHT')}
+</svg>`
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RESTART — the 3-slide announcement for a streak that broke and starts over.
+//
+// Design brief: the first cut was three centred text blocks on black — the same
+// layout three times, which read as monotonous. These three now each do a
+// DIFFERENT job and use a different composition:
+//   1 HERO   — asymmetric, left-rail, one enormous numeral
+//   2 LEDGER — the streak drawn as a 57-cell barcode: every held day, every
+//              broken day, and the restart, in one image
+//   3 RULE   — a priced grid: each ritual against the distance a miss costs
+//
+// Colour is a STATUS palette (held / broken / restart), not a series palette,
+// so each band is ALSO directly labelled — identity never rests on colour
+// alone. Validated on #0A0C10: CVD deutan ΔE 11.7, normal-vision ΔE 37.4,
+// contrast >= 3:1 all three. Darker steps were tested and scored WORSE on CVD
+// (ΔE 7.4), so the brand hues stand.
+//
+// Anti-spam (CLAUDE.md): NO link, NO @handle, NO Rs/charity on the canvas.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const HELD_GREEN = COLORS.green    // a day the streak held
+const BROKE_RED  = COLORS.red      // a day it did not
+const START_CYAN = COLORS.cyan     // the restart
+
+interface RestartRitualView { label: string; km: number }
+
+const RESTART_FALLBACK: RestartPayload = {
+  lastDay: 0, lastDate: '', breakDays: 0, breakFrom: '', breakTo: '',
+  cause: 'BREAK', startDate: '', rule: '', rituals: []
+}
+
+function _restart(req: RenderRequest): RestartPayload {
+  return req.payload.restart || RESTART_FALLBACK
+}
+
+function _ritualViews(r: RestartPayload): RestartRitualView[] {
+  return (r.rituals || []).slice(0, 6).map(x =>
+    typeof x === 'string' ? { label: x, km: 0 } : { label: x.label, km: x.km || 0 }
+  )
+}
+
+// The streak as a barcode: one cell per day, held → broken → restart. Cell width
+// is derived from the run length so a 47-day streak and a 300-day streak both
+// fill the same box.
+function _streakStrip(r: RestartPayload, y: number, h: number): string {
+  const held = Math.max(r.lastDay, 0)
+  const broke = Math.max(r.breakDays, 0)
+  const total = held + broke + 1
+  if (total < 2) return ''
+
+  const AVAIL = 960, X0 = 60
+  const gap = total > 90 ? 2 : total > 60 ? 3 : 5
+  const cw = (AVAIL - gap * (total - 1)) / total
+
+  let out = ''
+  for (let i = 0; i < total; i++) {
+    const x = X0 + i * (cw + gap)
+    if (i < held) {
+      out += `<rect x="${x.toFixed(2)}" y="${y}" width="${cw.toFixed(2)}" height="${h}" rx="2" fill="${HELD_GREEN}" fill-opacity="0.85"/>`
+    } else if (i < held + broke) {
+      // Broken days are hollow — an absence should look like an absence.
+      out += `<rect x="${x.toFixed(2)}" y="${y}" width="${cw.toFixed(2)}" height="${h}" rx="2" fill="${BROKE_RED}" fill-opacity="0.14" stroke="${BROKE_RED}" stroke-opacity="0.8" stroke-width="1.5"/>`
+    } else {
+      // The restart cell: taller and brighter, so the eye lands on it last.
+      out += `<rect x="${x.toFixed(2)}" y="${y - 10}" width="${cw.toFixed(2)}" height="${h + 20}" rx="2" fill="${START_CYAN}"/>`
+    }
+  }
+  return out
+}
+
+// ── SLIDE 1 · HERO ── asymmetric. One numeral, the break named, the strip teased.
+function renderRestartHeroSvg(req: RenderRequest): string {
+  const r = _restart(req)
+  const dayStr = String(req.chapterDay).padStart(2, '0')
+  const startLabel = r.startDate ? _prettyDateLabel(r.startDate) : _prettyDateLabel(req.date)
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  ${_kickoffBg(`<linearGradient id="hero" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${COLORS.text}"/><stop offset="100%" stop-color="${START_CYAN}"/></linearGradient>`)}
+
+  <!-- Left rail: brand, rotated out of the way of the numeral -->
+  <text x="60" y="96"
+        font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
+        fill="${START_CYAN}" letter-spacing="7">FIRST LIGHT</text>
+  <text x="60" y="132"
+        font-family="'Roboto Mono', monospace" font-size="17" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">${escapeXml(chapterBrand(req))}</text>
+  <line x1="60" y1="168" x2="1020" y2="168" stroke="${COLORS.dim}" stroke-opacity="0.25" stroke-width="1"/>
+
+  <!-- The break, stated before the number -->
+  <text x="60" y="268"
+        font-family="'Roboto Mono', monospace" font-size="30" font-weight="700"
+        fill="${BROKE_RED}" letter-spacing="5">THE STREAK BROKE</text>
+  <text x="60" y="312"
+        font-family="'Roboto Mono', monospace" font-size="21" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="3">${r.breakDays} DAYS DOWN  ·  ${escapeXml(r.cause.toUpperCase())}  ·  0 SESSIONS</text>
+
+  <!-- The numeral, left-anchored and oversized -->
+  <text x="44" y="690"
+        font-family="'Roboto Mono', monospace" font-size="380" font-weight="700"
+        fill="url(#hero)" letter-spacing="-10">${dayStr}</text>
+
+  <!-- Right-hand caption block, baseline-aligned to the numeral -->
+  <text x="1020" y="560" text-anchor="end"
+        font-family="'Roboto Mono', monospace" font-size="34" font-weight="700"
+        fill="${COLORS.text}" letter-spacing="7">DAY</text>
+  <text x="1020" y="628" text-anchor="end"
+        font-family="'Roboto Mono', monospace" font-size="34" font-weight="700"
+        fill="${COLORS.text}" letter-spacing="4">STARTS AGAIN</text>
+  <text x="1020" y="682" text-anchor="end"
+        font-family="'Roboto Mono', monospace" font-size="24" font-weight="500"
+        fill="${COLORS.gold}" letter-spacing="4">${startLabel}</text>
+
+  <!-- The whole story, teased as a thin strip -->
+  ${_streakStrip(r, 830, 34)}
+  <text x="60" y="812"
+        font-family="'Roboto Mono', monospace" font-size="15" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">EVERY DAY SINCE THE LAST RESET</text>
+  <text x="1020" y="812" text-anchor="end"
+        font-family="'Roboto Mono', monospace" font-size="15" font-weight="500"
+        fill="${COLORS.gold}" letter-spacing="4">SWIPE &gt;&gt;</text>
+
+  ${_tricolorBand(540, 980, 200, 6, 4)}
+</svg>`
+}
+
+// ── SLIDE 2 · LEDGER ── the data slide. The strip is the hero.
+function renderRestartRecordSvg(req: RenderRequest): string {
+  const r = _restart(req)
+  const held = Math.max(r.lastDay, 0)
+  const broke = Math.max(r.breakDays, 0)
+  const total = held + broke + 1
+  const AVAIL = 960, X0 = 60
+  const gap = total > 90 ? 2 : total > 60 ? 3 : 5
+  const cw = (AVAIL - gap * (total - 1)) / total
+
+  // Centre of each band, so the labels sit under what they describe.
+  const heldMid  = X0 + (held / 2) * (cw + gap)
+  const brokeMid = X0 + (held + broke / 2) * (cw + gap)
+  const startMid = X0 + (held + broke + 0.5) * (cw + gap)
+
+  // Legend — status colour ALWAYS paired with its word.
+  const legend = [
+    [HELD_GREEN, 'HELD'],
+    [BROKE_RED, 'BROKEN'],
+    [START_CYAN, 'DAY 1']
+  ].map(([c, label], i) => {
+    const x = 60 + i * 250
+    return `
+  <rect x="${x}" y="874" width="18" height="18" rx="3" fill="${c}"/>
+  <text x="${x + 30}" y="889"
+        font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="3">${label}</text>`
+  }).join('')
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  ${_kickoffBg()}
+
+  <text x="60" y="96"
+        font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
+        fill="${START_CYAN}" letter-spacing="7">THE LEDGER</text>
+  <text x="60" y="132"
+        font-family="'Roboto Mono', monospace" font-size="17" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">NO EDITS  ·  NO EXCUSES</text>
+  <line x1="60" y1="168" x2="1020" y2="168" stroke="${COLORS.dim}" stroke-opacity="0.25" stroke-width="1"/>
+
+  <!-- Headline numbers, three across -->
+  <text x="60" y="300"
+        font-family="'Roboto Mono', monospace" font-size="110" font-weight="700"
+        fill="${HELD_GREEN}" letter-spacing="-2">${held}</text>
+  <text x="60" y="344"
+        font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">DAYS HELD</text>
+
+  <text x="420" y="300"
+        font-family="'Roboto Mono', monospace" font-size="110" font-weight="700"
+        fill="${BROKE_RED}" letter-spacing="-2">${broke}</text>
+  <text x="420" y="344"
+        font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">DAYS DOWN</text>
+
+  <text x="780" y="300"
+        font-family="'Roboto Mono', monospace" font-size="110" font-weight="700"
+        fill="${COLORS.dim}" letter-spacing="-2">0</text>
+  <text x="780" y="344"
+        font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">SESSIONS</text>
+
+  <!-- The streak itself -->
+  <text x="60" y="462"
+        font-family="'Roboto Mono', monospace" font-size="18" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">ONE BAR = ONE DAY</text>
+
+  <!-- Day 1 is a SINGLE cell hard against the right margin. Centring its label
+       under the strip always overlapped the broken-band label beside it, so the
+       callout sits above the strip with a tick pointing down at the cell. -->
+  <text x="1020" y="456" text-anchor="end"
+        font-family="'Roboto Mono', monospace" font-size="22" font-weight="700"
+        fill="${START_CYAN}" letter-spacing="3">DAY 1</text>
+  <line x1="${startMid.toFixed(1)}" y1="468" x2="${startMid.toFixed(1)}" y2="492"
+        stroke="${START_CYAN}" stroke-width="2"/>
+  ${_streakStrip(r, 510, 190)}
+
+  <!-- Band labels, under the band each describes -->
+  <text x="${heldMid.toFixed(1)}" y="756" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="22" font-weight="700"
+        fill="${HELD_GREEN}" letter-spacing="3">${held} HELD</text>
+  <text x="${heldMid.toFixed(1)}" y="788" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="16" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="2">TO ${r.lastDate ? _prettyDateLabel(r.lastDate) : ''}</text>
+
+  <text x="${brokeMid.toFixed(1)}" y="756" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="22" font-weight="700"
+        fill="${BROKE_RED}" letter-spacing="3">${broke} DOWN</text>
+  <text x="${brokeMid.toFixed(1)}" y="788" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="16" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="2">${escapeXml(r.cause.toUpperCase())}</text>
+
+  ${legend}
+  ${_tricolorBand(540, 1010, 200, 6, 4)}
+</svg>`
+}
+
+// ── SLIDE 3 · RULE ── a priced grid: each ritual against what a miss costs.
+function renderRestartRuleSvg(req: RenderRequest): string {
+  const r = _restart(req)
+  const rituals = _ritualViews(r)
+
+  const rows = rituals.map((it, i) => {
+    const y = 420 + i * 86
+    return `
+  <text x="60" y="${y}"
+        font-family="'Roboto Mono', monospace" font-size="22" font-weight="700"
+        fill="${START_CYAN}" letter-spacing="2">${String(i + 1).padStart(2, '0')}</text>
+  <text x="130" y="${y}"
+        font-family="'Roboto Mono', monospace" font-size="27" font-weight="500"
+        fill="${COLORS.text}" letter-spacing="1">${escapeXml(it.label.toUpperCase())}</text>
+  ${it.km ? `<text x="1020" y="${y}" text-anchor="end"
+        font-family="'Roboto Mono', monospace" font-size="27" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="1">${it.km} KM</text>` : ''}
+  <line x1="60" y1="${y + 26}" x2="1020" y2="${y + 26}" stroke="${COLORS.dim}" stroke-opacity="0.15" stroke-width="1"/>`
+  }).join('')
+
+  const worst = rituals.reduce((a, b) => a + (b.km || 0), 0)
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  ${_kickoffBg()}
+
+  <text x="60" y="96"
+        font-family="'Roboto Mono', monospace" font-size="26" font-weight="700"
+        fill="${START_CYAN}" letter-spacing="7">THE RULE</text>
+  <text x="60" y="132"
+        font-family="'Roboto Mono', monospace" font-size="17" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">${escapeXml(chapterBrand(req))}</text>
+  <line x1="60" y1="168" x2="1020" y2="168" stroke="${COLORS.dim}" stroke-opacity="0.25" stroke-width="1"/>
+
+  <text x="60" y="262"
+        font-family="'Roboto Mono', monospace" font-size="40" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="2">${escapeXml(r.rule.toUpperCase())}</text>
+
+  <!-- Column heads -->
+  <text x="130" y="360"
+        font-family="'Roboto Mono', monospace" font-size="17" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">DAILY, NON-NEGOTIABLE</text>
+  <text x="1020" y="360" text-anchor="end"
+        font-family="'Roboto Mono', monospace" font-size="17" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">A MISS COSTS</text>
+  ${rows}
+
+  <text x="60" y="${420 + rituals.length * 86 + 48}"
+        font-family="'Roboto Mono', monospace" font-size="20" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="3">WORST DAY</text>
+  <text x="1020" y="${420 + rituals.length * 86 + 48}" text-anchor="end"
+        font-family="'Roboto Mono', monospace" font-size="30" font-weight="700"
+        fill="${BROKE_RED}" letter-spacing="2">${worst} KM OWED</text>
+
+  <text x="540" y="${420 + rituals.length * 86 + 118}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="24" font-weight="700"
+        fill="${COLORS.text}" letter-spacing="4">PAID IN DISTANCE, NOT WORDS</text>
+
+  ${_tricolorBand(540, 1010, 200, 6, 4)}
 </svg>`
 }
 

@@ -55,11 +55,12 @@ window.FL_CURRENT_CHAPTER = {
   id: 4,
   name: 'DISCIPLINE',
   start: '2026-07-27',
-  // dayEpoch ≠ start. The chapter's IDENTITY begins Jul 27; the DAY NUMBER keeps
-  // counting from Jul 19 because the streak never broke at the handover. Must stay
-  // equal to FL_DEFAULTS.STREAK_START (app.js) and DAY_EPOCH (the edge function).
-  // Anything rendering a day number reads dayEpoch — never start.
-  dayEpoch: '2026-07-19',
+  // dayEpoch != start. The chapter's IDENTITY began Jul 27. The DAY NUMBER was
+  // reset by the fever break (Sep 4-12, 2026 — nine days, no training): Day 1 =
+  // Sat 13 Sep 2026. Chapter rules, stakes and closed history are unchanged.
+  // Must stay equal to FL_DEFAULTS.STREAK_START (app.js) and DAY_EPOCH (the edge
+  // function). Anything rendering a day number reads dayEpoch — never start.
+  dayEpoch: '2026-09-13',
   rule: 'ANY WORKOUT ANCHORS THE DAY · 5 RITUALS',
   stakePerDay: 0,
   escalations: 'NONE — PENANCE IS DISTANCE',

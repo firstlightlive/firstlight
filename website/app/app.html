@@ -215,7 +215,12 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
 <script src="../js/config.js"></script>
 <script>
 // ── CONFIG ──
-const STREAK_START='2026-06-13';
+// Day-counter epoch. This page is self-contained (it does NOT load app.js), so
+// it carries its own copy and has silently drifted before — it still read
+// 2026-06-13 after two resets, and would have stamped Day 92 on generated
+// content the same day the site said Day 1. Keep equal to
+// FL_DEFAULTS.STREAK_START (../app.js); scripts/deploy-all.sh now gates on it.
+const STREAK_START='2026-09-13';
 const STAKE_SCHEDULE=[[Infinity,15000]];
 const SB_URL=FL.SUPABASE_URL;
 const SB_KEY=FL.SUPABASE_ANON_KEY;

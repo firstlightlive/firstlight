@@ -38,22 +38,22 @@ const CHAPTER_3_CUTOFF_HOUR = 6           // run must START before 06:00 local
 // sleep 6h) + prohibitions live in the tracker. NO Instagram (ig_publish_enabled='false').
 const CHAPTER_4_START = new Date('2026-07-27T00:00:00+05:30')
 
-// ── THE PUBLIC DAY COUNTER — CONTINUOUS, NEVER RESETS ──────────────────────
+// ── THE PUBLIC DAY COUNTER ─────────────────────────────────────────────────
 // DAY_EPOCH is the single anchor for every day number the outside world sees:
-// IG captions, rendered slides, proof_archive.day_number, instagram_posts.
-// day_number and all five emails. Day 1 = 2026-07-19, forever.
+// IG captions, rendered slides, proof_archive.day_number, instagram_posts
+// .day_number and all five emails.
 //
-// A CHAPTER CHANGES THE RULE AND THE FOOTER BRANDING. IT DOES NOT RESTART THE
-// NUMBER. When CHAPTER_4_START (2026-07-27) was added, chapterDay() reset to 1
-// and the feed silently walked backwards 8 days — Aug 18 printed Day 23 instead
-// of Day 31, and captions, proof_archive and instagram_posts all disagreed with
-// each other because the IG-sync rewriter (see _syncIgPosts) recomputes
-// day_number on every pass and clobbered the dayOverride republishes.
+// RESET 2026-09-13. The counter ran continuously from 2026-07-19 (Day 1) to
+// 2026-09-03 (Day 47), then a fever stopped training for nine days (Sep 4-12,
+// no activity, no posts). The streak broke, so the number restarts: Day 1 =
+// Sat 13 Sep 2026. chapterDay() keeps the Jul 19 epoch as a fallback branch so
+// every archived row from the old era still renders its original number.
 //
-// ⚠️ ADDING CHAPTER 5/6/7…: add the start date to chapterOf() and a label to
-// CHAPTER_BRAND. DO NOT add a branch to chapterDay(). There is deliberately
-// exactly one live-era formula below and it must stay that way.
-const DAY_EPOCH = CHAPTER_3_START   // 2026-07-19 = Day 1
+// ⚠️ A NEW CHAPTER DOES NOT RESET THIS. Only a real break does. Adding Chapter
+// 5/6/7…: add the start date to chapterOf() and a label to CHAPTER_BRAND; do
+// NOT add a branch to chapterDay(). Must stay equal to FL_DEFAULTS.STREAK_START
+// (website/app.js) and FL_CURRENT_CHAPTER.dayEpoch (website/js/chapters.js).
+const DAY_EPOCH = new Date('2026-09-13T00:00:00+05:30')
 
 // Pull the day number a published caption actually prints ("...\n\nDay 31.\n...").
 // Used by the IG sync so a late post's stored day_number mirrors what the public
@@ -73,8 +73,12 @@ function chapterOf(date: Date | string): number {
 }
 function chapterDay(date: Date | string): number {
   const d = (date instanceof Date) ? date : new Date(date)
-  // LIVE ERA — one formula, no chapter boundaries. Never add a branch above this.
+  // LIVE ERA — from the post-fever restart (Sep 13, 2026). One formula, no
+  // chapter boundaries. Never add a branch above this.
   if (d.getTime() >= DAY_EPOCH.getTime()) return Math.floor((d.getTime() - DAY_EPOCH.getTime()) / 86400000) + 1
+  // RETIRED CONTINUOUS ERA — Jul 19 2026 (Day 1) through Sep 12 2026 (Day 56).
+  // Frozen so archived rows and old captions still resolve to their own numbers.
+  if (d.getTime() >= CHAPTER_3_START.getTime()) return Math.floor((d.getTime() - CHAPTER_3_START.getTime()) / 86400000) + 1
   // CLOSED chapters keep their frozen historical per-chapter numbering so the
   // archived rows and the monument cards in chapters.js still line up.
   if (d.getTime() >= CHAPTER_2_START.getTime()) return Math.floor((d.getTime() - CHAPTER_2_START.getTime()) / 86400000) + 1
@@ -487,7 +491,17 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS'; dayOve
 // ═══════════════════════════════════════════════════════════════════════════
 
 const AKSHAYA_PATRA = 'Akshaya Patra'
-const STAKE_AMOUNT = 1500
+const STAKE_AMOUNT = 1500   // Chapters 01-03 only. Retained for the historical
+                            // ledger + monthly maths; NOT charged in Chapter 04.
+
+// ── CHAPTER 04 · PENANCE IS DISTANCE ───────────────────────────────────────
+// No money this chapter: a missed workout is repaid on the bike (see
+// FL_CURRENT_CHAPTER.rituals in website/js/chapters.js and discipline.html).
+// The charity/Rs framing is gone from every PUBLIC surface — the site is a
+// login wall, so "Rs + charity + private link" is the exact footprint that got
+// Instagram to restrict this account (CLAUDE.md "Anti-Spam Rules").
+const MISS_PENANCE_KM = 100
+const MISS_PENANCE_LABEL = `${MISS_PENANCE_KM} km cycle`
 // IG_ACCOUNT_ID already declared at top of file
 
 // CF Worker base URL — overridden via secrets if domain differs
@@ -546,7 +560,7 @@ async function _renderVerdictImage(verdict: VerdictResult, orientation: 'post' |
       ...(theme ? { theme } : {})
     }
   } else if (verdict.verdict === 'MISS') {
-    payload.payload = { charity: AKSHAYA_PATRA, reason: verdict.reason }
+    payload.payload = { penance: MISS_PENANCE_LABEL, reason: verdict.reason }
   } else {
     payload.payload = {}
   }
@@ -821,9 +835,9 @@ const HASHTAGS_BY_SPORT: Record<string, string[]> = {
   hrSession: ['#strengthtraining', '#fitnessindia', '#hometraining', '#ironmantraining', '#strava']
 }
 
-// MISS-only hashtag set. #akshayapatra ONLY appears on miss days, so the
-// charity gets visibility on the donation post but the WIN posts stay clean.
-const MISS_HASHTAGS = ['#akshayapatra', '#feedingindia', '#middaymeal', '#accountability', '#runnersofindia']
+// MISS-only hashtag set. The charity tags (#akshayapatra / #feedingindia /
+// #middaymeal) are gone with the donation flow — Chapter 04 pays in distance.
+const MISS_HASHTAGS = ['#accountability', '#discipline', '#runnersofindia', '#indianrunners', '#consistency']
 
 function _pickFromPool<T>(pool: T[], dayN: number): T {
   return pool[Math.abs(dayN) % pool.length]
@@ -847,8 +861,19 @@ const BUCKET_EMOJI: Record<string, string> = {
 // Multi-sport hashtag pool — taps the broader endurance/triathlon audience
 const MULTI_HASHTAGS = ['#triathlonindia', '#ironmantraining', '#runnersofindia', '#multisport', '#strava']
 
+// Activity date printed in every caption (2026-08-23: date on the post makes
+// the archive self-tracking). Manual parse — no Date() timezone traps.
+function _fmtCaptionDate(iso: string): string {
+  const parts = String(iso || '').split('-')
+  if (parts.length !== 3) return ''
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  return `${parseInt(parts[2], 10)} ${M[parseInt(parts[1], 10) - 1]} ${parts[0]}`
+}
+
 function _generateCaption(verdict: VerdictResult): string {
   const day = verdict.chapterDay
+  const dateStr = _fmtCaptionDate(verdict.date)
+  const dayLine = dateStr ? `Day ${day} · ${dateStr}.` : `Day ${day}.`
 
   if (verdict.verdict === 'WIN' && verdict.matched) {
     const all = verdict.allMatched || [verdict.matched]
@@ -880,7 +905,7 @@ function _generateCaption(verdict: VerdictResult): string {
         tags = (HASHTAGS_BY_SPORT[buckets[0]] || HASHTAGS_BY_SPORT.run).slice(0, 3)
           .concat((HASHTAGS_BY_SPORT[buckets[1]] || HASHTAGS_BY_SPORT.run).slice(0, 2))
       }
-      return `${opener}\n\nDay ${day}.\n${bullets}\n\nThe body stacked.\n\n${tags.join(' ')}`
+      return `${opener}\n\n${dayLine}\n${bullets}\n\nThe body stacked.\n\n${tags.join(' ')}`
     }
 
     // Single activity (original)
@@ -905,17 +930,17 @@ function _generateCaption(verdict: VerdictResult): string {
     // classifiers. That footprint is what got IG restricted and drew Strava's
     // club-spam flag. Identity + proof stats only; no link, no ".\n." hashtag
     // curtain. See CLAUDE.md "Anti-Spam Rules".
-    return `${opener}\n\nDay ${day}.\n${statLine}.\n\n${tags}`
+    return `${opener}\n\n${dayLine}\n${statLine}.\n\n${tags}`
   }
 
   if (verdict.verdict === 'MISS') {
-    // ₹1,500 is Akshaya Patra's exact sponsorship price: 1 child for 1 academic year (~200 school days).
+    // Chapter 04: the debt is distance. No rupees, no charity, no link.
     const opener = _pickFromPool(MISS_OPENERS, day).replace('{DAY}', String(day))
     const tags = MISS_HASHTAGS.join(' ')
-    return `${opener}\n\nDay ${day}.\n${AKSHAYA_PATRA} · 1 child · 1 school year · 200 mid-day meals.\nReceipt in comments. Back tomorrow.\n\n${tags}`
+    return `${opener}\n\n${dayLine}\nNo qualifying session. ${MISS_PENANCE_LABEL} owed, to be ridden.\nBack tomorrow.\n\n${tags}`
   }
 
-  return `Day ${day}`
+  return dateStr ? `Day ${day} · ${dateStr}` : `Day ${day}`
 }
 
 // Publish a single-image IG feed post via Graph API. Returns media_id.
@@ -1092,11 +1117,11 @@ async function _recordVerdict(verdict: VerdictResult, post?: PublishedPost): Pro
       description: `Auto-Forfeit · ${verdict.reason || 'No qualifying activity logged by 23:30 IST'}`,
       function_met: 'no',
       upstream_gap: 'Endurance menu floor not met across any logged Strava activity for the day.',
-      insight: `Day ${verdict.chapterDay} · auto-forfeit. ₹${STAKE_AMOUNT} → ${AKSHAYA_PATRA}.`,
-      penalty: 'charity_donation',
-      penalty_amount: STAKE_AMOUNT,
-      penalty_charity: AKSHAYA_PATRA,
-      penalty_km: 0,
+      insight: `Day ${verdict.chapterDay} · auto-forfeit. ${MISS_PENANCE_LABEL} owed.`,
+      penalty: 'punishment_cycle',
+      penalty_amount: 0,
+      penalty_charity: null,
+      penalty_km: MISS_PENANCE_KM,
       penalty_status: 'pending',
       proof_url: null,
       ig_post_id: post?.media_id || null,
@@ -1111,15 +1136,32 @@ async function _recordVerdict(verdict: VerdictResult, post?: PublishedPost): Pro
   }
 }
 
+// Resolve the REAL clickable post URL. media_id is the numeric Graph id —
+// instagram.com/p/<id>/ is a DEAD link (needs the shortcode). Ask Graph for
+// the permalink; fall back to the profile so the email link always works.
+// This is load-bearing: the operator verifies posts by EMAIL ONLY (no IG app).
+async function _fetchIgPermalink(mediaId: string | null | undefined): Promise<string> {
+  const profile = 'https://www.instagram.com/firstlightlive/'
+  if (!mediaId) return profile
+  try {
+    const igToken = await getSecret('ig_access')
+    if (!igToken) return profile
+    const resp = await fetch(`https://graph.facebook.com/v21.0/${mediaId}?fields=permalink&access_token=${encodeURIComponent(igToken)}`)
+    const d = await resp.json()
+    return (resp.ok && d.permalink) ? d.permalink : profile
+  } catch (_e) { return profile }
+}
+
 // Email helpers — reuse existing _sendEmail + _emailShell
 async function _emailVerdictWin(verdict: VerdictResult, post: PublishedPost) {
   const day = verdict.chapterDay
   const m = verdict.matched
   const stat = m ? (m.distanceKm ? `${m.distanceKm.toFixed(1)} km ${m.type}` : `${Math.round(m.durationMin)} min ${m.type}`) : 'logged'
-  const link = post.media_id ? `https://www.instagram.com/p/${post.media_id}/` : ''
+  const link = await _fetchIgPermalink(post.media_id)
   const html = _emailShell(`Day ${day} — WIN posted ✓`, `
     <p style="font-size:18px;color:#fff">${stat}.</p>
-    <p style="color:#888">Verdict written to ledger. IG post: <a href="${link}" style="color:#00D4FF">${post.media_id || 'unknown'}</a></p>
+    <p style="margin:20px 0"><a href="${link}" style="background:#00D4FF;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">VIEW THE POST ✓</a></p>
+    <p style="color:#888">Verdict written to ledger. Ledger: <a href="https://firstlight.live/accountability.html" style="color:#00D4FF">accountability</a></p>
     <p style="color:#888">Streak: Day ${day}.</p>
   `)
   await _sendEmail(`[FIRSTLIGHT] Day ${day} — WIN posted ✓`, html, `Day ${day} WIN posted. ${stat}. Link: ${link}`)
@@ -1127,20 +1169,20 @@ async function _emailVerdictWin(verdict: VerdictResult, post: PublishedPost) {
 
 async function _emailVerdictMiss(verdict: VerdictResult, post: PublishedPost) {
   const day = verdict.chapterDay
-  const upi = await _publishUpiLink() || 'upi://pay?pa=donate@akshayapatra&pn=Akshaya%20Patra&am=' + STAKE_AMOUNT
-  const link = post.media_id ? `https://www.instagram.com/p/${post.media_id}/` : ''
+  const link = await _fetchIgPermalink(post.media_id)
   const ledger = 'https://firstlight.live/accountability.html'
-  const html = _emailShell(`Day ${day} — MISS · ₹${STAKE_AMOUNT} → ${AKSHAYA_PATRA}`, `
+  const cycle = 'https://firstlight.live/discipline.html'
+  const html = _emailShell(`Day ${day} — MISS · ${MISS_PENANCE_LABEL} owed`, `
     <p style="font-size:18px;color:#fff">No qualifying activity today.</p>
     <p style="color:#888">${verdict.reason || ''}</p>
-    <p style="margin:24px 0 8px;color:#D4A843;font-weight:700">₹${STAKE_AMOUNT.toLocaleString('en-IN')} = 1 child sponsored at Akshaya Patra for 1 full academic year</p>
-    <p style="color:#888;font-size:12px;margin-bottom:24px">(≈ 200 mid-day meals over the school year. This is Akshaya Patra's official sponsorship unit.)</p>
-    <p style="margin-top:24px"><a href="${upi}" style="background:#F5A623;color:#000;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700">DONATE ₹${STAKE_AMOUNT.toLocaleString('en-IN')} VIA UPI</a></p>
-    <p style="color:#888;margin-top:24px">After donating, paste the screenshot as a comment under: <a href="${link}" style="color:#00D4FF">${link}</a></p>
+    <p style="margin:24px 0 8px;color:#D4A843;font-weight:700">${MISS_PENANCE_LABEL.toUpperCase()} — the Punishment Cycle</p>
+    <p style="color:#888;font-size:12px;margin-bottom:24px">No money this chapter. The debt is distance, and it is not cleared until it is ridden.</p>
+    <p style="margin-top:24px"><a href="${cycle}" style="background:#F5A623;color:#000;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700">LOG THE CYCLE</a></p>
+    <p style="color:#888;margin-top:24px">Posted: <a href="${link}" style="color:#00D4FF">${link}</a></p>
     <p style="color:#888">Ledger: <a href="${ledger}" style="color:#00D4FF">${ledger}</a></p>
   `)
-  await _sendEmail(`[FIRSTLIGHT] Day ${day} — MISS · ₹${STAKE_AMOUNT} → ${AKSHAYA_PATRA}`, html,
-    `Day ${day} MISS. Donate ₹${STAKE_AMOUNT} via UPI: ${upi}. Then comment receipt on: ${link}`)
+  await _sendEmail(`[FIRSTLIGHT] Day ${day} — MISS · ${MISS_PENANCE_LABEL} owed`, html,
+    `Day ${day} MISS. ${MISS_PENANCE_LABEL} owed — log it at ${cycle}. Posted: ${link}`)
 }
 
 // Sent when a MISS is HELD pending operator confirmation (miss-confirm gate).
@@ -1152,12 +1194,12 @@ async function _emailMissConfirmRequest(verdict: VerdictResult) {
     <p style="font-size:18px;color:#fff">The engine judged Day ${day} a MISS — but nothing has been posted publicly.</p>
     <p style="color:#888">${verdict.reason || ''}</p>
     <p style="margin:24px 0;color:#D4A843;font-weight:700">It's on the ledger and held private. Open your admin app to decide:</p>
-    <p style="color:#888">• <strong style="color:#fff">Confirm</strong> → the miss posts publicly and the ₹${STAKE_AMOUNT.toLocaleString('en-IN')} donation flow starts.<br>
+    <p style="color:#888">• <strong style="color:#fff">Confirm</strong> → the miss posts publicly and ${MISS_PENANCE_LABEL} goes on the Punishment Cycle.<br>
        • <strong style="color:#fff">Dispute</strong> (the run happened, the feed missed it) → do nothing. No public post goes out.</p>
     <p style="color:#888;margin-top:24px">Ledger: <a href="${ledger}" style="color:#00D4FF">${ledger}</a></p>
   `)
   await _sendEmail(`[FIRSTLIGHT ⏸] Day ${day} — MISS held, awaiting your confirmation`, html,
-    `Day ${day} judged MISS — held private, nothing posted. Open admin to Confirm (post + donate) or Dispute (do nothing).`)
+    `Day ${day} judged MISS — held private, nothing posted. Open admin to Confirm (post + owe ${MISS_PENANCE_LABEL}) or Dispute (do nothing).`)
 }
 
 async function _emailNudge(verdict: VerdictResult) {
@@ -3122,7 +3164,7 @@ async function uploadReceipt(body: Record<string, unknown>) {
   // 1. Read slip to get IG post id + amount
   const { data: slip, error: slipErr } = await supaAdmin
     .from('slips')
-    .select('id,client_id,date,penalty_amount,penalty_charity,ig_post_id,penalty_status')
+    .select('id,client_id,date,penalty_amount,penalty_charity,penalty_km,ig_post_id,penalty_status')
     .eq('client_id', clientId)
     .maybeSingle()
   if (slipErr || !slip) throw new Error(`Slip not found: ${slipErr?.message || clientId}`)
@@ -3171,9 +3213,11 @@ async function uploadReceipt(body: Record<string, unknown>) {
     // 4. Post text comment under the linked MISS post
     if (slip.ig_post_id) {
       try {
-        const amount = slip.penalty_amount || 1500
-        const charity = slip.penalty_charity || AKSHAYA_PATRA
-        const message = `₹${amount.toLocaleString('en-IN')} paid → ${charity} · 1 child sponsored for 1 academic year · receipt: firstlight.live/accountability`
+        // This is a PUBLIC Instagram comment, so it obeys the anti-spam rules:
+        // no firstlight.live link (the site is a login wall), no Rs, no charity.
+        // Chapter 04 clears a miss with distance, so state the distance.
+        const km = slip.penalty_km || MISS_PENANCE_KM
+        const message = `Debt cleared. ${km} km ridden.`
         const commentBody = `message=${encodeURIComponent(message)}&access_token=${encodeURIComponent(igToken)}`
         const cmtResp = await fetch(`https://graph.facebook.com/v21.0/${slip.ig_post_id}/comments`, {
           method: 'POST',
@@ -3267,7 +3311,7 @@ function _emailShell(title: string, bodyHtml: string, footer = ''): string {
 ${bodyHtml}
 </td></tr>
 <tr><td style="padding:24px 36px;border-top:1px solid rgba(212,168,67,0.18);background:#0E0C09">
-<div style="font-family:'Courier New',monospace;font-size:11px;color:rgba(212,168,67,0.55);letter-spacing:1px">₹1,500 / MISS → AKSHAYA PATRA · LOGGED PUBLIC · EVERY DAY</div>
+<div style="font-family:'Courier New',monospace;font-size:11px;color:rgba(212,168,67,0.55);letter-spacing:1px">MISS → ${MISS_PENANCE_LABEL.toUpperCase()} · LOGGED PUBLIC · EVERY DAY</div>
 <div style="font-family:Georgia,serif;font-size:24px;color:#D4A843;margin-top:8px"><a href="https://firstlight.live" style="color:#D4A843;text-decoration:none">firstlight.live</a></div>
 <div style="font-family:'Courier New',monospace;font-size:10px;color:rgba(212,168,67,0.4);margin-top:4px">@firstlightlive · CHAPTER 02 · ${footer}</div>
 </td></tr>
@@ -3278,11 +3322,11 @@ async function emailMorningReminder() {
   const dn = _daysSinceStart()
   const html = _emailShell(`Day ${String(dn).padStart(3, '0')}.`,
     `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 18px">A new day. Pick one.</p>
-<p>The menu — <b style="color:#D4A843">5 km walk · 5 km run · 10 km cycle · 1 km swim · 30 min HR session</b>. One activity today, or ₹1,500 to Akshaya Patra at midnight IST.</p>
+<p>The menu — <b style="color:#D4A843">5 km walk · 5 km run · 10 km cycle · 1 km swim · 30 min HR session</b>. One activity today, or ${MISS_PENANCE_LABEL} on the Punishment Cycle at midnight IST.</p>
 <p>The window is wide. The body chooses. The streak continues.</p>
 <p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Sent at 04:30 IST by the system you built.</p>`,
     'MORNING REMINDER')
-  await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')}. A new day. Pick one.`, html, `Day ${dn}. Pick one from the menu. Or ₹1,500 to Akshaya Patra. — firstlight.live`)
+  await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')}. A new day. Pick one.`, html, `Day ${dn}. Pick one from the menu. Or ${MISS_PENANCE_LABEL}. — firstlight.live`)
   return { sent: 'morning', day: dn }
 }
 
@@ -3337,7 +3381,7 @@ ${stats ? `<table cellpadding="12" cellspacing="0" style="width:100%;border-coll
 <tr><td style="border-bottom:1px dashed rgba(212,168,67,0.2);color:rgba(212,168,67,0.6);font-size:12px">TODAY</td><td style="border-bottom:1px dashed rgba(212,168,67,0.2);text-align:right;font-size:18px;color:#F0EAD8">${stats.km} KM · ${stats.min} MIN</td></tr>
 <tr><td style="color:rgba(212,168,67,0.6);font-size:12px">STREAK</td><td style="text-align:right;font-size:18px;color:#F0EAD8">DAY ${dn}</td></tr>
 </table>` : `<p>No qualifying activity logged yet. Menu: 5 km walk / 5 km run / 10 km cycle / 1 km swim / 30 min HR session. Window closes in 90 minutes.</p>`}
-<p style="margin-top:28px;font-family:Georgia,serif;font-size:22px;font-style:italic;color:#D4A843">${stats ? 'Verdict at 23:30 IST — system will publish + log.' : 'Last call. Move now, or ₹1,500 → Akshaya Patra at midnight.'}</p>
+<p style="margin-top:28px;font-family:Georgia,serif;font-size:22px;font-style:italic;color:#D4A843">${stats ? 'Verdict at 23:30 IST — system will publish + log.' : `Last call. Move now, or ${MISS_PENANCE_LABEL} at midnight.`}</p>
 <p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Sent at 22:00 IST. Engine verdict fires at 23:30.</p>`,
     'END-OF-DAY')
   await _sendEmail(`[FL] Day ${String(dn).padStart(3, '0')} · 90 min to verdict`, html, `Day ${dn} · 90 min till verdict — firstlight.live`)

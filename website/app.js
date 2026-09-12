@@ -41,11 +41,13 @@ function initTheme() {
 
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
-  // THE public day counter — Day 1 = Sun 19 Jul 2026. CONTINUOUS: chapters change
-  // the rule and the branding, they never restart this number. Must stay equal to
-  // DAY_EPOCH in supabase/functions/firstlight-sync/index.ts, or the site and the
-  // Instagram captions print different day numbers for the same day.
-  STREAK_START: '2026-07-19',
+  // THE public day counter. RESET after the fever break (Sep 4-12, 2026, no
+  // training): Day 1 = Sat 13 Sep 2026. The Jul 19 epoch retired with that break.
+  // Chapters change the rule and the branding; only a break resets this number.
+  // Must stay equal to DAY_EPOCH in supabase/functions/firstlight-sync/index.ts
+  // and FL_CURRENT_CHAPTER.dayEpoch in js/chapters.js, or the site, the emails
+  // and the Instagram captions print different day numbers for the same day.
+  STREAK_START: '2026-09-13',
   STAKE_PER_DAY: 0,            // Chapter 04 — NO money. Penance is DISTANCE (Punishment Cycle → discipline.html)
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',
@@ -81,6 +83,7 @@ function loadConfig() {
   try {
     const saved = JSON.parse(localStorage.getItem('fl_config') || '{}');
     var merged = Object.assign({}, FL_DEFAULTS, saved);
+    merged.STREAK_START = FL_DEFAULTS.STREAK_START; // Apply restart across cached devices.
     // Ensure Supabase credentials from config.js are never lost
     if (window.FL && window.FL.SUPABASE_URL) merged.SUPABASE_URL = window.FL.SUPABASE_URL;
     if (window.FL && window.FL.SUPABASE_ANON_KEY) merged.SUPABASE_ANON_KEY = window.FL.SUPABASE_ANON_KEY;
@@ -2570,7 +2573,7 @@ async function updateDaysMissed() {
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
 
   // Chapter dates (string-based for ISO-8601 safety)
-  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-07-19' — continuous day-counter epoch
+  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-09-13' — day-counter epoch (post-fever restart)
 
   // Count slips per chapter (string comparison, no timezone issues)
   var priorSlips = slips.filter(function(slip) {
@@ -2629,7 +2632,7 @@ async function updateClaimedAmount() {
     }
 
     // Only count current-chapter claims (from STREAK_START onwards, string-based for safety)
-    var streakStart = FL_DEFAULTS.STREAK_START; // '2026-07-19'
+    var streakStart = FL_DEFAULTS.STREAK_START; // '2026-09-13'
     console.log('[Claims] Streak start constant:', streakStart);
 
     var chapter2Claims = data.filter(function(c) {
