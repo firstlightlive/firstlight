@@ -329,8 +329,8 @@
 
     // ── Chapter registry — closed chapters from chapters.js + the live one ──
     var CHAPTERS = [];
-    (window.FL_CHAPTERS || []).forEach(function(c) { CHAPTERS.push({ id: c.id, name: c.name, start: c.start, end: c.end, days: c.days, dayEpoch: c.dayEpoch || c.start, runs: c.runs || null, live: false }); });
-    if (window.FL_CURRENT_CHAPTER) CHAPTERS.push({ id: window.FL_CURRENT_CHAPTER.id, name: window.FL_CURRENT_CHAPTER.name, start: window.FL_CURRENT_CHAPTER.start, end: null, days: null, dayEpoch: window.FL_CURRENT_CHAPTER.dayEpoch || window.FL_CURRENT_CHAPTER.start, runs: window.FL_CURRENT_CHAPTER.runs || null, live: true });
+    (window.FL_CHAPTERS || []).forEach(function(c) { CHAPTERS.push({ id: c.id, name: c.name, start: c.start, end: c.end, days: c.days, dayEpoch: c.dayEpoch || c.start, live: false }); });
+    if (window.FL_CURRENT_CHAPTER) CHAPTERS.push({ id: window.FL_CURRENT_CHAPTER.id, name: window.FL_CURRENT_CHAPTER.name, start: window.FL_CURRENT_CHAPTER.start, end: null, days: null, dayEpoch: window.FL_CURRENT_CHAPTER.dayEpoch || window.FL_CURRENT_CHAPTER.start, live: true });
     if (!CHAPTERS.length) CHAPTERS.push({ id: 1, name: 'STREAK', start: (window.FL && FL.STREAK_START) || '2026-09-13', end: null, live: true });
 
     function chapterOf(dateStr) {
@@ -340,29 +340,15 @@
       }
       return null;
     }
-    // Counts from the epoch of the RUN the row falls in, not the chapter start and
-    // not blindly from the live dayEpoch. A chapter can hold several runs (a break
-    // resets the day number, not the chapter), so a row from before a reset must be
-    // numbered against the epoch it was published under — otherwise every archived
-    // row goes negative the moment the counter restarts. Chapters with no `runs`
-    // fall back to dayEpoch, then start, preserving frozen 1..N archive numbering.
-    function epochFor(dateStr, c) {
-      if (c.runs && c.runs.length) {
-        for (var i = 0; i < c.runs.length; i++) {
-          var r = c.runs[i];
-          if (dateStr >= r.from && (!r.to || dateStr <= r.to)) return r.epoch;
-        }
-        // Outside every run (e.g. a logged day inside a break) — use the nearest
-        // run that had already started, so the number stays continuous, never negative.
-        for (var j = c.runs.length - 1; j >= 0; j--) {
-          if (dateStr >= c.runs[j].from) return c.runs[j].epoch;
-        }
-        return c.runs[0].epoch;
-      }
-      return c.dayEpoch || c.start;
-    }
+    // Counts from the chapter's dayEpoch, NOT its start. ONE chapter, ONE epoch:
+    // a break ends a chapter and the next one opens on the far side of it, so no
+    // chapter ever holds two day-counter runs. Chapter 04's numbers continued from
+    // Chapter 03's Jul 19 epoch (it opened at Day 9, closed at Day 47), which is
+    // why dayEpoch and start differ there and why archived rows must never be
+    // numbered from start. Chapters without a dayEpoch fall back to start,
+    // preserving their frozen 1..N archive numbering.
     function dayInChapter(dateStr, c) {
-      var epoch = epochFor(dateStr, c);
+      var epoch = c.dayEpoch || c.start;
       return Math.floor((new Date(dateStr + 'T00:00:00+05:30') - new Date(epoch + 'T00:00:00+05:30')) / 86400000) + 1;
     }
     var chapterRows = [];

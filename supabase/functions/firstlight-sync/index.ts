@@ -37,6 +37,9 @@ const CHAPTER_3_CUTOFF_HOUR = 6           // run must START before 06:00 local
 // logged in discipline.html). The 5 rituals (wake<4AM, meditation, workout, journal,
 // sleep 6h) + prohibitions live in the tracker. NO Instagram (ig_publish_enabled='false').
 const CHAPTER_4_START = new Date('2026-07-27T00:00:00+05:30')
+// Chapter 04 ended at the fever, not by choice. Sep 4-12 belong to NO chapter.
+const CHAPTER_4_END = new Date('2026-09-04T00:00:00+05:30')   // exclusive — Day 47 = Sep 3
+const CHAPTER_5_START = new Date('2026-09-13T00:00:00+05:30') // === DAY_EPOCH
 
 // ── THE PUBLIC DAY COUNTER ─────────────────────────────────────────────────
 // DAY_EPOCH is the single anchor for every day number the outside world sees:
@@ -65,7 +68,8 @@ function _captionDay(caption?: string | null): number | null {
 }
 function chapterOf(date: Date | string): number {
   const d = (date instanceof Date) ? date : new Date(date)
-  if (d.getTime() >= CHAPTER_4_START.getTime()) return 4
+  if (d.getTime() >= CHAPTER_5_START.getTime()) return 5
+  if (d.getTime() >= CHAPTER_4_START.getTime() && d.getTime() < CHAPTER_4_END.getTime()) return 4
   if (d.getTime() >= CHAPTER_3_START.getTime()) return 3
   if (d.getTime() >= CHAPTER_2_START.getTime()) return 2
   if (d.getTime() >= CHAPTER_1_START.getTime() && d.getTime() < CHAPTER_1_END.getTime()) return 1
@@ -95,6 +99,7 @@ const CHAPTER_BRAND: Record<number, string> = {
   2: 'CHAPTER 02 · ENDURANCE',
   3: 'CHAPTER 03 · FIRST LIGHT',
   4: 'CHAPTER 04 · DISCIPLINE',
+  5: 'CHAPTER 05 · RETURN',
 }
 function chapterBrand(date: Date | string): string {
   return CHAPTER_BRAND[chapterOf(date)] || 'FIRST LIGHT'
