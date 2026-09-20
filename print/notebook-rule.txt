@@ -13,7 +13,8 @@ NOT TODAY.
 5. Urge = a wave. Watch it pass. Move. It dies in 20 minutes.
 
 ── PUNISHMENT ──────────────────────────────
-Screen crossed the door ............ 100 km cycle
+Screen crossed the door ... 50 km cycle per hour (day) · 100/h (night)
+                          rounded up, min 1 hour — starts from zero
 Used it in the house ............... 200 km cycle
 Bedroom, or after 9:30 ............. 300 km cycle
 Lied / hid / guard off ............. 400 km cycle + 30 days no exceptions

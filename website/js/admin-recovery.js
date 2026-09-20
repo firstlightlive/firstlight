@@ -11,9 +11,8 @@
   var DAY1 = '2026-09-22'; // Must equal FL_DEFAULTS.STREAK_START · FL_CURRENT_CHAPTER.dayEpoch · DAY_EPOCH
 
   var PENALTY = {
-    baseCycleKm: 100,        // BASE penalty — any device crossing the door
-    extraHourDay: 50,        // cycle km per extra connected hour, daytime
-    extraHourNight: 100,     // cycle km per extra connected hour, night
+    hourDay: 50,             // cycle km per connected hour, daytime (no base — starts from zero)
+    hourNight: 100,          // cycle km per connected hour, after nightStart
     nightStart: '21:30',
     usedKm: 200,             // device used inside the house
     nightKm: 300,            // device in bedroom / after 21:30
@@ -204,7 +203,7 @@
 
     // Debt ledger
     html += sectionTitle('DEBT LEDGER — THE PENAL CODE');
-    html += '<div style="font:400 9px var(--font-mono);color:var(--text-dim,#6a6f78);margin-bottom:10px">BASE: ' + PENALTY.baseCycleKm + ' km cycle (any connection) +' + PENALTY.extraHourDay + ' km per extra hour (day) / +' + PENALTY.extraHourNight + ' km (night) · USED ' + PENALTY.usedKm + ' · NIGHT ' + PENALTY.nightKm + ' · LIE/TAMPER ' + PENALTY.lieKm + ' · NEVER-MISS-TWICE ' + PENALTY.doubleKm + ' · DNS ' + PENALTY.dnsKm + ' · unpaid doubles at ' + PENALTY.doubleHours + 'h. Pay: 1 km cycle/walk/run = 1 km off · 1 km swim = 4 km off. Mix freely.</div>';
+    html += '<div style="font:400 9px var(--font-mono);color:var(--text-dim,#6a6f78);margin-bottom:10px">CONNECTION (per hour, no base): ' + PENALTY.hourDay + ' km cycle/h day · ' + PENALTY.hourNight + ' km/h night (rounded up, min 1h) · USED ' + PENALTY.usedKm + ' · NIGHT ' + PENALTY.nightKm + ' · LIE/TAMPER ' + PENALTY.lieKm + ' · NEVER-MISS-TWICE ' + PENALTY.doubleKm + ' · DNS ' + PENALTY.dnsKm + ' · unpaid doubles at ' + PENALTY.doubleHours + 'h. Pay: 1 km cycle/walk/run = 1 km off · 1 km swim = 4 km off. Mix freely.</div>';
     html += '<div style="font:400 9px var(--font-mono);color:var(--cyan,#00D4FF);background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.15);border-radius:8px;padding:8px 10px;margin-bottom:12px">QUALIFIED PENANCE: dedicated session labeled PENANCE · outdoors, GPS-logged · EXTRA (above the daily ritual workout) · within 48h · proof to witness (Strava/photo) · one session = one debt, no double-dip · indoor counts HALF · witness marks PAID.</div>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:10px">' +
       '<div><label class="rc-label">TYPE</label><select id="rcDebtType" class="rc-input"><option value="connection">connection (door)</option><option value="used">used in house</option><option value="night">bedroom / night</option><option value="lie">lie / tamper</option><option value="dns">blocked site (dns)</option><option value="double">never-miss-twice</option></select></div>' +
@@ -298,8 +297,8 @@
       var night = $('rcDebtNight').value === '1';
       var km = 0;
       if (type === 'connection') {
-        var rate = night ? PENALTY.extraHourNight : PENALTY.extraHourDay;
-        km = PENALTY.baseCycleKm + Math.max(0, hours - 1) * rate;
+        var rate = night ? PENALTY.hourNight : PENALTY.hourDay;
+        km = hours * rate;
       } else if (type === 'used') { km = PENALTY.usedKm; }
       else if (type === 'night') { km = PENALTY.nightKm; }
       else if (type === 'lie') { km = PENALTY.lieKm; }

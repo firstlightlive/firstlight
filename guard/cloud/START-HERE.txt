@@ -23,7 +23,7 @@ WHAT YOU INSTALL NOW
         Action "Get Contents of URL" → Method POST →
         URL: https://ntfy.sh/firstlight-guard-c4533231770b952af0ea510565a3756f
         Headers: Title = GUARD: IPHONE IN HOUSE
-        Body: DEVICE IN HOUSE. 100 KM CYCLE DEBT OPENS.
+         Body: DEVICE IN HOUSE. PER-HOUR DEBT: 50 KM CYCLE/H DAY · 100/H NIGHT.
       Plus 2 heartbeat automations (Time of Day 08:00, 21:30):
         POST body: alive — current network: <Wi-Fi Name>
 
@@ -32,7 +32,7 @@ WHAT YOU INSTALL NOW
         Plus a time-based heartbeat macro 2x/day.
 
 THE RULES THE SNITCHES ENFORCE
-  - Join home WiFi        → alert in <60s → 100 km cycle debt opens
+   - Join home WiFi        → alert in <60s → per-hour debt opens (50/h day · 100/h night)
   - Still home            → reminder every 30 min
   - Heartbeat silence     → Level 4: 400 km + no exceptions 30 days
   - Days 1–90: WiFi OFF   → no network to join → devices are bricks

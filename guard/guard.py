@@ -44,8 +44,8 @@ CFG = os.path.join(HOME, "guard", "config.json")
 STATE = os.path.join(HOME, "guard", "state.json")
 
 # Per-hour debt in walk-km equivalents (config can override).
-KM_PER_HOUR_DAY = 10
-KM_PER_HOUR_NIGHT = 25
+KM_PER_HOUR_DAY = 50
+KM_PER_HOUR_NIGHT = 100
 
 
 def log(msg):

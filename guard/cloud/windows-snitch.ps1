@@ -27,7 +27,7 @@ if ($SSID -eq $HOMESSID) {
   $epoch = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
   if ($m -ne "home") {
     "home`n$epoch" | Set-Content $STATE
-    Post "GUARD: WINDOWS LAPTOP IN HOUSE" "WINDOWS LAPTOP joined home WiFi at $now. 100 KM CYCLE DEBT OPENS. Declared sessions only — witness decides."
+    Post "GUARD: WINDOWS LAPTOP IN HOUSE" "WINDOWS LAPTOP joined home WiFi at $now. PER-HOUR DEBT OPENS: 50 km cycle/h (day) · 100/h (night), rounded up, min 1h. Declared sessions only — witness decides."
   } elseif (($epoch - $p) -ge 1800) {
     "home`n$epoch" | Set-Content $STATE
     Post "GUARD REMINDER: WINDOWS LAPTOP still home" "Still on home WiFi since $now. Debt stands unless the session was pre-declared."

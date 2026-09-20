@@ -11,8 +11,8 @@ Only the five declared fingerprints can trigger anything.
 
 ## The punishment model (strict, per-hour)
 
-- Daytime connection:   10 km debt per connected hour (walk-equivalent)
-- Night (after 21:30):  25 km per hour
+- Daytime connection:   50 km debt per connected hour (no base — starts from zero)
+- Night (after 21:30):  100 km per hour
 
 Strict rules:
 - Any part of an hour counts as a full hour (rounded up, minimum 1).
@@ -22,12 +22,12 @@ Strict rules:
 - Guard switched off = heartbeat stops = tamper event (Level 4:
   75 km equivalent + no exceptions for 30 days).
 - STRICT DEVICES: the phones and tablet carry mult 2 — DOUBLE rates
-  (20 km/hour day, 50 km/hour night). They are never allowed at home.
+   (100 km/hour day, 200 km/hour night). They are never allowed at home.
   A device is caught even if it joins through the laptop's hotspot —
   its fingerprint appears on the network no matter how it connects.
 
 Example: phone connects at 21:40 and leaves at 22:05.
-That is 25 km (night rate, 1 hour, strict rounding).
+   That is 100 km (night rate, 1 hour, strict rounding).
 
 ## Payment — any combination
 
@@ -36,7 +36,7 @@ That is 25 km (night rate, 1 hour, strict rounding).
 - 2 km cycle  = 1 km debt
 - 1 km swim   = 4 km debt
 
-A 30 km debt could be paid as: 10 km walk + 10 km run + 20 km cycle
+   A 150 km debt could be paid as: 50 km walk + 50 km run + 100 km cycle
 + 1 km swim (= 10 + 10 + 10 + 4 = 34, more than enough). Proof is
 photo/Strava sent to the witness. The witness marks the debt paid.
 
@@ -355,7 +355,7 @@ device is not exempt — it belongs under "devices".
 1. The five MAC addresses (fill config.json during setup — steps above).
 2. The witness's ntfy topic (shared with them, kept secret from everyone else).
 3. A Raspberry Pi (or a computer person to set it up).
-4. Confirmation of the rates: 10 km/hour day, 25 km/hour night,
+4. Confirmation of the rates: 50 km/hour day, 100 km/hour night,
    48-hour doubling, tamper = heaviest level.
 
 ## IMPORTANT

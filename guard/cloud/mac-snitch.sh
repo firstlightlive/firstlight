@@ -34,7 +34,7 @@ if [ "$SSID" = "$HOMESSID" ]; then
   EPOCH=$(date +%s)
   if [ "$M" != "home" ]; then
     echo "home $EPOCH" > "$STATE"
-    post "GUARD: MACBOOK IN HOUSE" "MACBOOK joined home WiFi at $NOW. 100 KM CYCLE DEBT OPENS. Declared sessions only — witness decides."
+    post "GUARD: MACBOOK IN HOUSE" "MACBOOK joined home WiFi at $NOW. PER-HOUR DEBT OPENS: 50 km cycle/h (day) · 100/h (night), rounded up, min 1h. Declared sessions only — witness decides."
   elif [ $((EPOCH - P)) -ge 1800 ]; then
     echo "home $EPOCH" > "$STATE"
     post "GUARD REMINDER: MACBOOK still home" "MACBOOK still on home WiFi since $NOW. Debt stands unless the session was pre-declared."

@@ -6,7 +6,7 @@ launchd and Windows Task Scheduler all have triggers for exactly this:
 "when this device joins WiFi network X".
 
 ## What it detects
-- iPhone joins home WiFi   -> witness alerted in seconds -> 100 km cycle debt opens
+- iPhone joins home WiFi   -> witness alerted in seconds -> per-hour debt opens (50 km cycle/h day · 100/h night)
 - Android joins home WiFi  -> same
 - Mac joins home WiFi      -> same (mac-snitch.sh, launchd every 60s)
 - Windows laptop joins     -> same (windows-snitch.ps1, Task Scheduler every 60s)
@@ -25,7 +25,7 @@ launchd and Windows Task Scheduler all have triggers for exactly this:
    - Method: POST
    - URL: https://ntfy.sh/<TOPIC>
    - Headers: Title: GUARD: IPHONE IN HOUSE
-   - Body: DEVICE IN HOUSE — <time>. 100 KM CYCLE DEBT OPENS.
+   - Body: DEVICE IN HOUSE — <time>. PER-HOUR DEBT OPENS: 50 KM CYCLE/H DAY · 100/H NIGHT.
 
 3. Heartbeat automations (3x/day): Shortcuts -> Automation -> "Time of Day"
    (08:00, 14:00, 21:30) -> Run Immediately -> POST to the same topic:
@@ -71,7 +71,7 @@ MANUAL way (if you prefer):
 
 ## The witness's job
 - Install ntfy, subscribe to the topic.
-- "GUARD: ... IN HOUSE" alert = debt opens (100 km cycle base). Demand proof
+- "GUARD: ... IN HOUSE" alert = per-hour debt opens (50 km cycle/h day · 100/h night, rounded up, min 1h). Demand proof
   within 48h; no proof = doubles.
 - Heartbeats stop for >6 hours = the snitch was silenced. Call. If the
   automation was deliberately removed/disabled: Level 4 (400 km + no
