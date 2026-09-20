@@ -79,6 +79,15 @@ window.FL_BREAKS = [
     stakePaid: 0,
     acknowledged: true,
     closed: 'CH04 DISCIPLINE'
+  },
+  {
+    date: '2026-09-21',
+    through: '2026-09-21',
+    days: 1,
+    reason: 'Streak broken — overnight work, no workout. Reset announced; Day 1 = 22 Sep.',
+    stakePaid: 0,
+    acknowledged: true,
+    closed: 'CH05 RETURN (run 1)'
   }
 ];
 // Back-compat: the most recent break.
@@ -89,10 +98,11 @@ window.FL_CURRENT_CHAPTER = {
   name: 'RETURN',
   // ONE chapter, ONE epoch: start === dayEpoch. Chapter 04 ended at the fever
   // (Sep 3) and this chapter opened on the other side of it, so no chapter has to
-  // hold two day-counter runs. Must stay equal to FL_DEFAULTS.STREAK_START
+  // hold two day-counter runs. Run 1 (Sep 13–20) broke; run 2 restarts at Day 1
+  // on Sep 22 — same chapter label. Must stay equal to FL_DEFAULTS.STREAK_START
   // (app.js) and DAY_EPOCH (supabase/functions/firstlight-sync/index.ts).
-  start: '2026-09-13',
-  dayEpoch: '2026-09-13',
+  start: '2026-09-22',
+  dayEpoch: '2026-09-22',
   rule: 'ANY WORKOUT ANCHORS THE DAY · 5 RITUALS · 3 DAY MODES',
   stakePerDay: 0,
   escalations: 'NONE — PENANCE IS DISTANCE',

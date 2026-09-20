@@ -49,3 +49,7 @@ firstlight-ipad-app*.zip
 website/day12/assets/
 scripts/.vapid.json
 scripts/.deploy-brief.sh
+guard/cloud/WITNESS-TOPIC.txt
+wind-down.log
+guard/__pycache__/
+supabase/.temp/

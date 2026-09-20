@@ -1,0 +1,129 @@
+<!DOCTYPE html><html><head>
+  <meta name="robots" content="noindex,nofollow"><meta charset="UTF-8"><meta name="viewport" content="width=1080"><title>FIRST LIGHT — WIN v3 SUNRISE</title><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;font-family:'IBM Plex Mono',monospace;background:#01030A}
+
+/* ── THE SKY: night → dawn ── */
+.sky{position:absolute;inset:0 0 530px 0;
+ background:linear-gradient(180deg,#01030A 0%,#081120 38%,#12243C 60%,#243B5E 78%,#4A5A7A 92%,#8A6A58 100%)}
+.hglow{position:absolute;left:50%;top:760px;transform:translateX(-50%);width:1100px;height:200px;
+ background:radial-gradient(ellipse,rgba(252,76,2,0.35) 0%,rgba(245,166,35,0.18) 40%,transparent 70%);filter:blur(30px)}
+
+/* stars */
+.stars{position:absolute;inset:0 0 530px 0}
+.stars svg{width:100%;height:100%}
+.stars circle{fill:#FFFFFF}
+
+/* ── THE SUN: half-risen, day number inside ── */
+.sunclip{position:absolute;left:50%;top:470px;transform:translateX(-50%);width:620px;height:350px;overflow:hidden}
+.sun{position:absolute;left:50%;top:0;transform:translateX(-50%);width:620px;height:620px;border-radius:50%;
+ background:radial-gradient(circle at 50% 62%,#FFF6DE 0%,#FFE3A0 28%,#F5A623 58%,#FC4C02 88%);
+ box-shadow:0 0 140px rgba(245,166,35,0.55),0 0 60px rgba(252,76,2,0.4)}
+.suncore{position:absolute;left:50%;top:118px;transform:translateX(-50%);font-size:190px;font-weight:200;letter-spacing:-8px;line-height:1;
+ color:#2A1400;text-shadow:0 0 40px rgba(255,246,222,0.5)}
+.sunlbl{position:absolute;left:50%;top:268px;transform:translateX(-50%);font-size:16px;letter-spacing:10px;color:#3A1E00;font-weight:600}
+
+/* ── HORIZON ── */
+.horizon{position:absolute;top:819px;left:0;right:0;height:2px;
+ background:linear-gradient(90deg,transparent 5%,rgba(252,76,2,0.8) 30%,#FFD98A 50%,rgba(252,76,2,0.8) 70%,transparent 95%);
+ box-shadow:0 0 18px rgba(252,76,2,0.5)}
+
+/* ── THE GROUND + ROAD TO THE LIGHT ── */
+.ground{position:absolute;top:820px;left:0;right:0;bottom:0;background:linear-gradient(180deg,#07090F 0%,#04050A 40%,#020308 100%)}
+.road{position:absolute;top:0;left:0;width:100%;height:100%}
+.runner{position:absolute;left:50%;top:640px;transform:translateX(-50%)}
+.runner svg{display:block}
+.runlbl{position:absolute;top:700px;left:50%;transform:translateX(-50%);font-size:14px;letter-spacing:6px;color:rgba(255,217,138,0.8)}
+
+/* ground text */
+.gtxt{position:absolute;left:80px;right:80px;top:60px;text-align:center}
+.gtxt .l1{font-size:15px;letter-spacing:8px;color:rgba(255,255,255,0.5);margin-bottom:14px}
+.gtxt .l2{font-size:30px;font-weight:600;letter-spacing:4px;
+ background:linear-gradient(90deg,#FFD98A,#F5A623);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* stat HUD */
+.hud{position:absolute;left:80px;right:80px;top:200px;display:flex;gap:14px}
+.hud .h{flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:14px 16px;text-align:center}
+.hud .k{font-size:10px;letter-spacing:4px;color:rgba(255,255,255,0.38);margin-bottom:6px}
+.hud .v{font-size:22px;font-weight:600;color:#FFFFFF}
+.hud .h.c .v{color:#00D4FF}.hud .h.g .v{color:#F5A623}
+
+/* header */
+.hd{position:absolute;top:90px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.brand{font-size:15px;font-weight:600;letter-spacing:10px;color:rgba(255,255,255,0.85)}
+.brand b{color:#F5A623;font-weight:600}
+.meta{font-size:15px;letter-spacing:5px;color:rgba(255,255,255,0.5)}
+
+/* footer */
+.ft{position:absolute;bottom:90px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.tags{display:flex;gap:10px}
+.tags span{font-size:13px;letter-spacing:2px;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.1);border-radius:99px;padding:7px 14px}
+.dots{display:flex;gap:8px;align-items:center}
+.dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18)}
+.dots .on{background:#F5A623;box-shadow:0 0 8px rgba(245,166,35,0.7)}
+
+/* HUD frame */
+.frame{position:absolute;inset:26px;border:1px solid rgba(255,255,255,0.06);border-radius:18px;pointer-events:none;z-index:6}
+.corner{position:absolute;width:26px;height:26px;border-color:#F5A623;border-style:solid;opacity:0.7;z-index:6}
+.c1{top:14px;left:14px;border-width:2px 0 0 2px;border-radius:6px 0 0 0}
+.c2{top:14px;right:14px;border-width:2px 2px 0 0;border-radius:0 6px 0 0}
+.c3{bottom:14px;left:14px;border-width:0 0 2px 2px;border-radius:0 0 0 6px}
+.c4{bottom:14px;right:14px;border-width:0 2px 2px 0;border-radius:0 0 6px 0}
+
+.grain{position:absolute;inset:0;opacity:0.045;pointer-events:none;z-index:7;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+</style></head><body>
+<div class="s">
+ <div class="sky"></div>
+ <div class="stars"><svg viewBox="0 0 1080 820" preserveAspectRatio="none">
+  <circle cx="80" cy="90" r="1.6" opacity="0.7"/><circle cx="190" cy="210" r="1.2" opacity="0.45"/>
+  <circle cx="300" cy="70" r="1.8" opacity="0.6"/><circle cx="420" cy="180" r="1.1" opacity="0.4"/>
+  <circle cx="560" cy="60" r="1.5" opacity="0.55"/><circle cx="700" cy="150" r="1.2" opacity="0.4"/>
+  <circle cx="820" cy="80" r="1.7" opacity="0.6"/><circle cx="950" cy="200" r="1.3" opacity="0.45"/>
+  <circle cx="120" cy="330" r="1.2" opacity="0.35"/><circle cx="260" cy="420" r="1.4" opacity="0.3"/>
+  <circle cx="640" cy="380" r="1.2" opacity="0.3"/><circle cx="880" cy="330" r="1.5" opacity="0.35"/>
+  <circle cx="1010" cy="440" r="1.2" opacity="0.28"/><circle cx="460" cy="300" r="1.1" opacity="0.3"/>
+ </svg></div>
+ <div class="hglow"></div>
+
+ <div class="sunclip">
+  <div class="sun"></div>
+  <div class="suncore">7</div>
+  <div class="sunlbl">STREAK ALIVE</div>
+ </div>
+ <div class="horizon"></div>
+
+ <div class="ground">
+  <div class="road"><svg viewBox="0 0 1080 530" preserveAspectRatio="none">
+   <polygon points="170,530 910,530 612,0 468,0" fill="#0B0E16"/>
+   <path d="M540,0 L540,530" stroke="rgba(245,166,35,0.3)" stroke-width="4" stroke-dasharray="14 20"/>
+   <polygon points="170,530 910,530 612,0 468,0" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="2"/>
+  </svg></div>
+  <div class="runner"><svg width="60" height="90" viewBox="0 0 60 90">
+   <path d="M30,10 C30,10 26,22 34,26 M30,14 L44,20 M30,22 L24,44 L14,84 M30,22 L40,50 L56,80 M24,44 L38,52 L30,84" stroke="#FFD98A" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>
+  </svg></div>
+  <div class="runlbl">04:58 · BEFORE THE SUN</div>
+
+  <div class="gtxt">
+   <div class="l1">MON 21 SEP 2026</div>
+   <div class="l2">THE RUN STARTS IN THE DARK</div>
+  </div>
+
+  <div class="hud">
+   <div class="h c"><div class="k">DISTANCE</div><div class="v">12.4 KM</div></div>
+   <div class="h"><div class="k">TIME</div><div class="v">68 MIN</div></div>
+   <div class="h g"><div class="k">PACE</div><div class="v">5:29</div></div>
+   <div class="h"><div class="k">START</div><div class="v">04:58</div></div>
+  </div>
+ </div>
+
+ <div class="hd"><div class="brand">◆ FIRST <b>LIGHT</b></div><div class="meta">DAY 7 · SUNRISE RUN</div></div>
+ <div class="ft">
+  <div class="tags"><span>#firstlight</span><span>#sunriserun</span><span>#discipline</span></div>
+  <div class="dots"><span class="on"></span><span></span><span></span></div>
+ </div>
+ <div class="frame"></div><div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+ <div class="grain"></div>
+</div>
+</body></html>

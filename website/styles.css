@@ -1534,3 +1534,12 @@ input[type="range"]::-webkit-slider-thumb{
   .cm-reaction{min-height:44px}
 }
  
+
+/* ── RECOVERY PANEL (admin) ── */
+.rc-label{display:block;font:600 10px var(--font-mono);color:var(--text-muted);letter-spacing:1px;margin-bottom:6px}
+.rc-input{width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(0,212,255,0.12);border-radius:8px;color:var(--text);font:500 12px var(--font-mono);box-sizing:border-box}
+.rc-btn{padding:10px 18px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.4);border-radius:8px;color:var(--cyan);font:700 11px var(--font-mono);letter-spacing:1px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.rc-btn:hover{background:rgba(0,212,255,0.2)}
+.rc-btn-danger{background:rgba(255,82,82,0.08);border-color:rgba(255,82,82,0.45);color:var(--red)}
+.rc-btn-green{background:rgba(0,230,118,0.08);border-color:rgba(0,230,118,0.45);color:var(--green)}
+.rc-btn-small{padding:6px 10px;font-size:9px}

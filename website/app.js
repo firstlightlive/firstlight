@@ -41,13 +41,13 @@ function initTheme() {
 
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
-  // THE public day counter. RESET after the fever break (Sep 4-12, 2026, no
-  // training): Day 1 = Sat 13 Sep 2026. The Jul 19 epoch retired with that break.
+  // THE public day counter. RESET 2026-09-22 after the streak broke (Sep 20-21):
+  // Day 1 = Tue 22 Sep 2026. The Sep 13 epoch retired with that break.
   // Chapters change the rule and the branding; only a break resets this number.
   // Must stay equal to DAY_EPOCH in supabase/functions/firstlight-sync/index.ts
   // and FL_CURRENT_CHAPTER.dayEpoch in js/chapters.js, or the site, the emails
   // and the Instagram captions print different day numbers for the same day.
-  STREAK_START: '2026-09-13',
+  STREAK_START: '2026-09-22',
   STAKE_PER_DAY: 0,            // Chapter 04 — NO money. Penance is DISTANCE (Punishment Cycle → discipline.html)
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',

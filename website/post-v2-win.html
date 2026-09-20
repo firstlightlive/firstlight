@@ -1,0 +1,154 @@
+<!DOCTYPE html><html><head>
+  <meta name="robots" content="noindex,nofollow"><meta charset="UTF-8"><meta name="viewport" content="width=1080"><title>FIRST LIGHT — WIN v2</title><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;background:#05070C;font-family:'IBM Plex Mono',monospace}
+
+/* ── AURORA: layered colour fields, not flat fill ── */
+.s::before{content:'';position:absolute;top:-200px;left:-150px;width:900px;height:900px;border-radius:50%;
+ background:radial-gradient(circle,rgba(0,212,255,0.14) 0%,rgba(0,212,255,0.04) 35%,transparent 65%);filter:blur(50px)}
+.s::after{content:'';position:absolute;bottom:-250px;right:-200px;width:1000px;height:1000px;border-radius:50%;
+ background:radial-gradient(circle,rgba(252,76,2,0.16) 0%,rgba(252,76,2,0.05) 35%,transparent 65%);filter:blur(55px)}
+.aurora-gold{position:absolute;top:200px;right:-180px;width:700px;height:700px;border-radius:50%;
+ background:radial-gradient(circle,rgba(245,166,35,0.07) 0%,transparent 60%);filter:blur(45px)}
+
+/* ── TOPOGRAPHY: faint contour lines ── */
+.topo{position:absolute;inset:0;opacity:0.5}
+.topo svg{width:100%;height:100%}
+.topo path{fill:none;stroke:rgba(255,255,255,0.028);stroke-width:1.2}
+
+/* ── GPS ROUTE: the line that proves the work ── */
+.route{position:absolute;inset:0}
+.route path.trace{fill:none;stroke:url(#routeGrad);stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 14px rgba(0,212,255,0.35))}
+.route .start{fill:rgba(255,255,255,0.5)}
+.route .end{fill:#00D4FF;filter:drop-shadow(0 0 10px #00D4FF)}
+.route .pulse{fill:none;stroke:rgba(0,212,255,0.35);stroke-width:2;animation:none}
+.route text{fill:rgba(255,255,255,0.22);font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:3px}
+
+/* ── HUD FRAME ── */
+.frame{position:absolute;inset:26px;border:1px solid rgba(255,255,255,0.06);border-radius:18px;pointer-events:none}
+.corner{position:absolute;width:26px;height:26px;border-color:#00D4FF;border-style:solid;opacity:0.7}
+.c1{top:14px;left:14px;border-width:2px 0 0 2px;border-radius:6px 0 0 0}
+.c2{top:14px;right:14px;border-width:2px 2px 0 0;border-radius:0 6px 0 0}
+.c3{bottom:14px;left:14px;border-width:0 0 2px 2px;border-radius:0 0 0 6px}
+.c4{bottom:14px;right:14px;border-width:0 2px 2px 0;border-radius:0 0 6px 0}
+
+/* ── HEADER ── */
+.hd{position:absolute;top:96px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:15px;font-weight:600;letter-spacing:10px;color:rgba(255,255,255,0.85)}
+.brand b{color:#00D4FF;font-weight:600}
+.meta{font-size:15px;letter-spacing:5px;color:rgba(255,255,255,0.45)}
+
+/* ── HERO ── */
+.hero{position:absolute;top:300px;left:80px;right:80px;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.day{font-size:230px;font-weight:200;letter-spacing:-10px;line-height:0.9;
+ background:linear-gradient(180deg,#FFFFFF 0%,rgba(0,212,255,0.85) 55%,rgba(0,212,255,0.15) 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 0 60px rgba(0,212,255,0.18))}
+.dayunit{font-size:20px;letter-spacing:12px;color:rgba(0,212,255,0.55);margin-top:22px}
+.stat{text-align:right}
+.stat .km{font-size:130px;font-weight:300;letter-spacing:-6px;line-height:0.9;
+ background:linear-gradient(180deg,#FFFFFF 0%,#FC4C02 60%,rgba(252,76,2,0.25) 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 0 50px rgba(252,76,2,0.2))}
+.stat .unit{font-size:24px;letter-spacing:14px;color:rgba(252,76,2,0.55);margin-top:16px}
+.stat .what{font-size:15px;letter-spacing:6px;color:rgba(255,255,255,0.35);margin-top:12px}
+
+/* ── GLASS STAT CHIPS ── */
+.chips{position:absolute;top:820px;left:80px;right:80px;display:flex;gap:14px}
+.chip{flex:1;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.09);border-radius:14px;
+ padding:18px 20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.chip .k{font-size:11px;letter-spacing:4px;color:rgba(255,255,255,0.38);margin-bottom:8px}
+.chip .v{font-size:26px;font-weight:600;color:#FFFFFF;letter-spacing:1px}
+.chip.cyan .v{color:#00D4FF}.chip.gold .v{color:#F5A623}.chip.green .v{color:#00E676}
+
+/* ── PROGRESS TO NEXT MILESTONE ── */
+.prog{position:absolute;top:1010px;left:80px;right:80px}
+.prog .lbl{display:flex;justify-content:space-between;font-size:11px;letter-spacing:4px;color:rgba(255,255,255,0.4);margin-bottom:10px}
+.prog .lbl b{color:#F5A623;font-weight:600}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.07);overflow:hidden}
+.fill{height:100%;width:23%;border-radius:3px;background:linear-gradient(90deg,#00D4FF,#F5A623);box-shadow:0 0 12px rgba(245,166,35,0.5)}
+
+/* ── FOOTER ── */
+.ft{position:absolute;bottom:96px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center}
+.tags{display:flex;gap:10px}
+.tags span{font-size:13px;letter-spacing:2px;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:99px;padding:7px 14px}
+.dots{display:flex;gap:8px;align-items:center}
+.dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18)}
+.dots .on{background:#00D4FF;box-shadow:0 0 8px rgba(0,212,255,0.7)}
+
+/* ── TEXTURE: grain + scanlines ── */
+.grain{position:absolute;inset:0;opacity:0.05;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+.scan{position:absolute;inset:0;pointer-events:none;opacity:0.012;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.6) 3px,transparent 6px)}
+</style></head><body>
+<div class="s">
+ <div class="aurora-gold"></div>
+
+ <div class="topo"><svg viewBox="0 0 1080 1350" preserveAspectRatio="none">
+  <path d="M-50,300 C150,240 300,330 450,290 S760,210 1130,280"/>
+  <path d="M-50,380 C150,320 300,410 450,370 S760,290 1130,360"/>
+  <path d="M-50,470 C150,410 300,500 450,460 S760,380 1130,450"/>
+  <path d="M-50,620 C150,560 300,650 450,610 S760,530 1130,600"/>
+  <path d="M-50,760 C150,700 300,790 450,750 S760,670 1130,740"/>
+  <path d="M-50,900 C150,840 300,930 450,890 S760,810 1130,880"/>
+  <path d="M-50,1050 C150,990 300,1080 450,1040 S760,960 1130,1030"/>
+  <path d="M-50,1200 C150,1140 300,1230 450,1190 S760,1110 1130,1180"/>
+ </svg></div>
+
+ <div class="route"><svg viewBox="0 0 1080 1350" preserveAspectRatio="none">
+  <defs>
+   <linearGradient id="routeGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="rgba(0,212,255,0.15)"/>
+    <stop offset="60%" stop-color="#00D4FF"/>
+    <stop offset="100%" stop-color="#FC4C02"/>
+   </linearGradient>
+  </defs>
+  <path class="trace" d="M120,1180 C260,1130 330,1080 420,1010 S620,860 700,790 S900,640 960,560 S1030,480 1030,430"/>
+  <circle class="start" cx="120" cy="1180" r="7"/>
+  <circle class="end" cx="1030" cy="430" r="9"/>
+  <circle class="pulse" cx="1030" cy="430" r="18"/>
+  <text x="120" y="1220">START 04:58</text>
+  <text x="880" y="400">FINISH 06:06</text>
+ </svg></div>
+
+ <div class="frame"></div>
+ <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+
+ <div class="hd">
+  <div class="brand">◆ FIRST <b>LIGHT</b></div>
+  <div class="meta">DAY 7 · MON 21 SEP 2026</div>
+ </div>
+
+ <div class="hero">
+  <div>
+   <div class="day">7</div>
+   <div class="dayunit">DAYS · STREAK ALIVE</div>
+  </div>
+  <div class="stat">
+   <div class="km">12.4</div>
+   <div class="unit">KILOMETERS</div>
+   <div class="what">MORNING RUN · GPS</div>
+  </div>
+ </div>
+
+ <div class="chips">
+  <div class="chip cyan"><div class="k">TIME</div><div class="v">68 MIN</div></div>
+  <div class="chip"><div class="k">PACE</div><div class="v">5:29</div></div>
+  <div class="chip gold"><div class="k">HEART</div><div class="v">152</div></div>
+  <div class="chip green"><div class="k">STREAK</div><div class="v">7 DAYS</div></div>
+ </div>
+
+ <div class="prog">
+  <div class="lbl"><span>TO NEXT MILESTONE</span><b>DAY 30 — RUNNING WARDROBE</b></div>
+  <div class="bar"><div class="fill"></div></div>
+ </div>
+
+ <div class="ft">
+  <div class="tags"><span>#running</span><span>#discipline</span><span>#firstlight</span></div>
+  <div class="dots"><span class="on"></span><span></span><span></span></div>
+ </div>
+
+ <div class="grain"></div><div class="scan"></div>
+</div>
+</body></html>

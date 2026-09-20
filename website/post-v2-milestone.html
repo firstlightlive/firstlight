@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><head>
+  <meta name="robots" content="noindex,nofollow"><meta charset="UTF-8"><meta name="viewport" content="width=1080"><title>FIRST LIGHT — MILESTONE v2</title><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;background:#070A10;font-family:'IBM Plex Mono',monospace}
+
+/* Celebration: rising gold + cyan fields */
+.s::before{content:'';position:absolute;bottom:-350px;left:50%;transform:translateX(-50%);width:1200px;height:900px;border-radius:50%;
+ background:radial-gradient(circle,rgba(245,166,35,0.16) 0%,rgba(245,166,35,0.05) 35%,transparent 65%);filter:blur(55px)}
+.s::after{content:'';position:absolute;top:-200px;right:-150px;width:800px;height:800px;border-radius:50%;
+ background:radial-gradient(circle,rgba(0,212,255,0.12) 0%,transparent 60%);filter:blur(50px)}
+
+/* Radiant burst lines */
+.burst{position:absolute;inset:0;opacity:0.5}
+.burst svg{width:100%;height:100%}
+
+/* HUD frame */
+.frame{position:absolute;inset:26px;border:1px solid rgba(255,255,255,0.06);border-radius:18px;pointer-events:none}
+.corner{position:absolute;width:26px;height:26px;border-color:#F5A623;border-style:solid;opacity:0.8}
+.c1{top:14px;left:14px;border-width:2px 0 0 2px;border-radius:6px 0 0 0}
+.c2{top:14px;right:14px;border-width:2px 2px 0 0;border-radius:0 6px 0 0}
+.c3{bottom:14px;left:14px;border-width:0 0 2px 2px;border-radius:0 0 0 6px}
+.c4{bottom:14px;right:14px;border-width:0 2px 2px 0;border-radius:0 6px 0 0}
+
+/* Header */
+.hd{position:absolute;top:96px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:15px;font-weight:600;letter-spacing:10px;color:rgba(255,255,255,0.85)}
+.brand b{color:#F5A623;font-weight:600}
+.meta{font-size:15px;letter-spacing:5px;color:rgba(255,255,255,0.45)}
+
+/* Center stack */
+.center{position:absolute;top:0;bottom:0;left:80px;right:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.kicker{font-size:16px;letter-spacing:10px;color:rgba(255,255,255,0.45);margin-bottom:24px}
+.day{font-size:250px;font-weight:200;letter-spacing:-10px;line-height:0.9;
+ background:linear-gradient(180deg,#FFF3D6 0%,#F5A623 55%,rgba(245,166,35,0.15) 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 0 70px rgba(245,166,35,0.3))}
+.dayunit{font-size:24px;letter-spacing:14px;color:rgba(245,166,35,0.65);margin-top:24px}
+.earned{font-size:15px;letter-spacing:6px;color:rgba(0,230,118,0.8);margin-top:44px;border:1px solid rgba(0,230,118,0.35);border-radius:99px;padding:10px 22px;background:rgba(0,230,118,0.05)}
+.reward{font-size:20px;letter-spacing:3px;color:#FFFFFF;margin-top:34px;line-height:1.6}
+.reward b{color:#F5A623;font-weight:600}
+.next{font-size:13px;letter-spacing:4px;color:rgba(255,255,255,0.35);margin-top:26px}
+.next b{color:#00D4FF;font-weight:600}
+
+/* Footer */
+.ft{position:absolute;bottom:96px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center}
+.ftnote{font-size:13px;letter-spacing:3px;color:rgba(255,255,255,0.3)}
+.dots{display:flex;gap:8px;align-items:center}
+.dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18)}
+.dots .on{background:#F5A623;box-shadow:0 0 8px rgba(245,166,35,0.7)}
+
+.grain{position:absolute;inset:0;opacity:0.05;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+.scan{position:absolute;inset:0;pointer-events:none;opacity:0.012;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.6) 3px,transparent 6px)}
+</style></head><body>
+<div class="s">
+ <div class="burst"><svg viewBox="0 0 1080 1350" preserveAspectRatio="none">
+  <g stroke="rgba(245,166,35,0.12)" stroke-width="1.5">
+   <line x1="540" y1="700" x2="80" y2="150"/><line x1="540" y1="700" x2="260" y2="90"/>
+   <line x1="540" y1="700" x2="540" y2="60"/><line x1="540" y1="700" x2="820" y2="90"/>
+   <line x1="540" y1="700" x2="1000" y2="150"/><line x1="540" y1="700" x2="40" y2="420"/>
+   <line x1="540" y1="700" x2="1040" y2="420"/><line x1="540" y1="700" x2="60" y2="700"/>
+   <line x1="540" y1="700" x2="1020" y2="700"/><line x1="540" y1="700" x2="40" y2="980"/>
+   <line x1="540" y1="700" x2="1040" y2="980"/><line x1="540" y1="700" x2="80" y2="1250"/>
+   <line x1="540" y1="700" x2="260" y2="1310"/><line x1="540" y1="700" x2="540" y2="1340"/>
+   <line x1="540" y1="700" x2="820" y2="1310"/><line x1="540" y1="700" x2="1000" y2="1250"/>
+  </g>
+ </svg></div>
+ <div class="frame"></div>
+ <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+
+ <div class="hd">
+  <div class="brand">◆ FIRST <b>LIGHT</b></div>
+  <div class="meta">MILESTONE EARNED</div>
+ </div>
+
+ <div class="center">
+  <div class="kicker">30 STRAIGHT DAYS · ZERO MISSES</div>
+  <div class="day">30</div>
+  <div class="dayunit">DAYS</div>
+  <div class="earned">✓ REWARD UNLOCKED</div>
+  <div class="reward">LEG <b>COMPRESSION MACHINE</b><br>RECOVERY, EARNED.</div>
+  <div class="next">NEXT: <b>DAY 45 — INSTA360 + TRIP</b></div>
+ </div>
+
+ <div class="ft">
+  <div class="ftnote">NOT A FINISH LINE — A CHECKPOINT.</div>
+  <div class="dots"><span></span><span class="on"></span><span></span></div>
+ </div>
+
+ <div class="grain"></div><div class="scan"></div>
+</div>
+</body></html>

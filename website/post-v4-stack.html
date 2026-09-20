@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head>
+  <meta name="robots" content="noindex,nofollow"><meta charset="UTF-8"><meta name="viewport" content="width=1080"><title>FIRST LIGHT — STACK DAY v4 (triathlon lanes)</title><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;font-family:'IBM Plex Mono',monospace;background:#05070C}
+
+/* faint diagonal stripes like a results board */
+.board{position:absolute;inset:0;opacity:0.5;background:repeating-linear-gradient(-45deg,rgba(255,255,255,0.012) 0 28px,transparent 28px 56px)}
+.glow1{position:absolute;top:-200px;left:-150px;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 60%);filter:blur(50px)}
+.glow2{position:absolute;bottom:-250px;right:-150px;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(252,76,2,0.12) 0%,transparent 60%);filter:blur(55px)}
+
+/* header */
+.hd{position:absolute;top:90px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.brand{font-size:15px;font-weight:600;letter-spacing:10px;color:rgba(255,255,255,0.85)}
+.brand b{color:#00D4FF;font-weight:600}
+.meta{font-size:15px;letter-spacing:5px;color:rgba(255,255,255,0.5)}
+
+/* total */
+.total{position:absolute;top:180px;left:0;right:0;text-align:center}
+.total .t1{font-size:17px;letter-spacing:12px;color:rgba(255,255,255,0.45);margin-bottom:18px}
+.total .t2{font-size:100px;font-weight:200;letter-spacing:-4px;line-height:1;
+ background:linear-gradient(180deg,#FFFFFF 0%,#00D4FF 70%,rgba(0,212,255,0.2) 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent}
+.total .t3{font-size:15px;letter-spacing:6px;color:rgba(255,255,255,0.4);margin-top:14px}
+
+/* lanes */
+.lanes{position:absolute;top:560px;left:80px;right:80px;display:flex;flex-direction:column;gap:26px}
+.lane{border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:26px 30px;position:relative;overflow:hidden}
+.lane .fill{position:absolute;inset:0;border-radius:16px}
+.lane.run .fill{background:linear-gradient(90deg,rgba(252,76,2,0.14),rgba(252,76,2,0.02));}
+.lane.cycle .fill{background:linear-gradient(90deg,rgba(0,212,255,0.14),rgba(0,212,255,0.02));}
+.lane.swim .fill{background:linear-gradient(90deg,rgba(0,110,255,0.14),rgba(0,110,255,0.02));}
+.lane .row{position:relative;display:flex;align-items:baseline;justify-content:space-between}
+.lane .sport{font-size:20px;font-weight:600;letter-spacing:6px}
+.lane.run .sport{color:#FC4C02}.lane.cycle .sport{color:#00D4FF}.lane.swim .sport{color:#4DA3FF}
+.lane .stat{font-size:34px;font-weight:600;color:#FFFFFF;letter-spacing:1px}
+.lane .sub{position:relative;font-size:12px;letter-spacing:4px;color:rgba(255,255,255,0.4);margin-top:8px}
+.lane .bar{position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,0.07);margin-top:16px;overflow:hidden}
+.lane .bar i{display:block;height:100%;border-radius:3px}
+.lane.run .bar i{width:72%;background:#FC4C02;box-shadow:0 0 10px rgba(252,76,2,0.5)}
+.lane.cycle .bar i{width:100%;background:#00D4FF;box-shadow:0 0 10px rgba(0,212,255,0.5)}
+.lane.swim .bar i{width:48%;background:#4DA3FF;box-shadow:0 0 10px rgba(77,163,255,0.5)}
+
+/* footer */
+.ft{position:absolute;bottom:90px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.ftnote{font-size:15px;letter-spacing:4px;color:rgba(255,255,255,0.5)}
+.ftnote b{color:#00E676;font-weight:600}
+.dots{display:flex;gap:8px}
+.dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18)}
+.dots .on{background:#00D4FF;box-shadow:0 0 8px rgba(0,212,255,0.7)}
+
+.frame{position:absolute;inset:26px;border:1px solid rgba(255,255,255,0.06);border-radius:18px;pointer-events:none;z-index:6}
+.grain{position:absolute;inset:0;opacity:0.045;pointer-events:none;z-index:7;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+</style></head><body>
+<div class="s">
+ <div class="board"></div><div class="glow1"></div><div class="glow2"></div>
+
+ <div class="total">
+  <div class="t1">THE BODY STACKED</div>
+  <div class="t2">52.4 <span style="font-size:34px;letter-spacing:6px">KM</span></div>
+  <div class="t3">3 SPORTS · 4H 12M TOTAL</div>
+ </div>
+
+ <div class="lanes">
+  <div class="lane run"><div class="fill"></div>
+   <div class="row"><span class="sport">RUN</span><span class="stat">12.4 km</span></div>
+   <div class="sub">68 MIN · PACE 5:29 · 04:58 START</div>
+   <div class="bar"><i></i></div>
+  </div>
+  <div class="lane cycle"><div class="fill"></div>
+   <div class="row"><span class="sport">CYCLE</span><span class="stat">38.0 km</span></div>
+   <div class="sub">1H 54M · AVG 20.1 · HILLS PAID</div>
+   <div class="bar"><i></i></div>
+  </div>
+  <div class="lane swim"><div class="fill"></div>
+   <div class="row"><span class="sport">SWIM</span><span class="stat">2.0 km</span></div>
+   <div class="sub">52 MIN · 40 LAPS · POOL</div>
+   <div class="bar"><i></i></div>
+  </div>
+ </div>
+
+ <div class="hd"><div class="brand">◆ FIRST <b>LIGHT</b></div><div class="meta">STACK DAY · TRI MODE</div></div>
+ <div class="ft"><div class="ftnote">THREE SPORTS. ONE DAY. <b>ZERO EXCUSES.</b></div><div class="dots"><span class="on"></span><span></span><span></span></div></div>
+ <div class="frame"></div>
+ <div class="grain"></div>
+</div>
+</body></html>

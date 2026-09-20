@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head>
+  <meta name="robots" content="noindex,nofollow"><meta charset="UTF-8"><meta name="viewport" content="width=1080"><title>FIRST LIGHT — PENANCE RECEIPT v4 (paid)</title><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;font-family:'IBM Plex Mono',monospace;background:#0A0B0E}
+
+.glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:1100px;border-radius:50%;
+ background:radial-gradient(circle,rgba(0,230,118,0.07) 0%,rgba(245,166,35,0.04) 50%,transparent 70%);filter:blur(50px)}
+
+/* the receipt */
+.receipt{position:absolute;top:150px;left:50%;transform:translateX(-50%);width:640px;background:#F4F1E8;color:#16130C;
+ padding:60px 56px 50px;border-radius:6px;box-shadow:0 30px 80px rgba(0,0,0,0.6),0 0 60px rgba(245,166,35,0.08);
+ background-image:linear-gradient(180deg,rgba(22,19,12,0.02) 0%,transparent 8%)}
+.receipt .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:26px}
+.receipt .top .name{font-size:17px;font-weight:700;letter-spacing:5px}
+.receipt .top .no{font-size:11px;letter-spacing:2px;opacity:0.55}
+.receipt .hr{border:none;border-top:2px dashed rgba(22,19,12,0.35);margin:18px 0}
+.receipt .row{display:flex;justify-content:space-between;font-size:14px;letter-spacing:1px;margin:14px 0}
+.receipt .row .k{opacity:0.6}
+.receipt .row .v{font-weight:600}
+.receipt .row.total{font-size:22px;font-weight:700;margin-top:26px;letter-spacing:2px}
+.receipt .row.total .v{color:#B25A00}
+.receipt .foot{font-size:11px;letter-spacing:2px;opacity:0.5;margin-top:22px;line-height:2}
+.receipt .barcode{margin-top:26px;height:44px;background:repeating-linear-gradient(90deg,#16130C 0 3px,transparent 3px 6px,#16130C 6px 8px,transparent 8px 13px);opacity:0.8}
+
+/* PAID stamp */
+.stamp{position:absolute;top:330px;left:50%;transform:translateX(-50%) rotate(-10deg);
+ border:4px solid #00A34A;color:#00A34A;font-size:44px;font-weight:700;letter-spacing:10px;padding:10px 28px;border-radius:10px;
+ background:rgba(0,163,74,0.06);text-shadow:0 0 14px rgba(0,163,74,0.3)}
+
+/* copy above/below */
+.kicker{position:absolute;top:95px;left:0;right:0;text-align:center;font-size:15px;letter-spacing:10px;color:rgba(255,255,255,0.5)}
+.after{position:absolute;top:1030px;left:0;right:0;text-align:center}
+.after .l1{font-size:19px;font-weight:600;letter-spacing:5px;color:#FFFFFF}
+.after .l2{font-size:13px;letter-spacing:4px;color:rgba(255,255,255,0.4);margin-top:12px}
+
+.ft{position:absolute;bottom:90px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.ftnote{font-size:13px;letter-spacing:3px;color:rgba(255,255,255,0.35)}
+.dots{display:flex;gap:8px}
+.dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18)}
+.dots .on{background:#00E676;box-shadow:0 0 8px rgba(0,230,118,0.7)}
+
+.frame{position:absolute;inset:26px;border:1px solid rgba(255,255,255,0.06);border-radius:18px;pointer-events:none;z-index:6}
+.grain{position:absolute;inset:0;opacity:0.045;pointer-events:none;z-index:7;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+</style></head><body>
+<div class="s">
+ <div class="glow"></div>
+ <div class="kicker">DISCIPLINE LEDGER — RECEIPT</div>
+
+ <div class="receipt">
+  <div class="top"><span class="name">◆ FIRST LIGHT</span><span class="no">RECEIPT #047 · SEP 2026</span></div>
+  <hr class="hr">
+  <div class="row"><span class="k">DEBT OPENED</span><span class="v">100 KM CYCLE</span></div>
+  <div class="row"><span class="k">DEADLINE</span><span class="v">48 HOURS</span></div>
+  <div class="row"><span class="k">PAID</span><span class="v">100 KM · OUTDOORS · GPS</span></div>
+  <div class="row"><span class="k">TIME ON THE ROAD</span><span class="v">5H 40M</span></div>
+  <div class="row"><span class="k">WITNESS VERIFIED</span><span class="v">✓</span></div>
+  <hr class="hr">
+  <div class="row total"><span class="k">BALANCE</span><span class="v">0 KM</span></div>
+  <div class="foot">DISTANCE PAID. LEDGER CLEAR.<br>THE NEXT DAY STARTS AT 04:58.</div>
+  <div class="barcode"></div>
+ </div>
+
+ <div class="stamp">PAID IN FULL</div>
+
+ <div class="after">
+  <div class="l1">NOT A FAILURE — A DEBT, SETTLED.</div>
+  <div class="l2">TOMORROW, THE SUN RISES AGAIN.</div>
+ </div>
+
+ <div class="ft"><div class="ftnote">EVERY KM RETURNED IS A KM EARNED.</div><div class="dots"><span></span><span class="on"></span><span></span></div></div>
+ <div class="frame"></div>
+ <div class="grain"></div>
+</div>
+</body></html>

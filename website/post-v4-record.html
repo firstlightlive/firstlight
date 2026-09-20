@@ -1,0 +1,94 @@
+<!DOCTYPE html><html><head>
+  <meta name="robots" content="noindex,nofollow"><meta charset="UTF-8"><meta name="viewport" content="width=1080"><title>FIRST LIGHT — RECORD v4 (elevation data-art)</title><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;font-family:'IBM Plex Mono',monospace;background:#04060B}
+
+/* faint grid */
+.grid{position:absolute;inset:0;opacity:0.35;background-image:
+ linear-gradient(rgba(0,212,255,0.05) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(0,212,255,0.05) 1px,transparent 1px);
+ background-size:54px 54px}
+
+/* the elevation mountain — data as art */
+.mtn{position:absolute;top:240px;left:60px;right:60px;height:700px}
+.mtn svg{width:100%;height:100%}
+.axis{stroke:rgba(255,255,255,0.18);stroke-width:2}
+.axlab{fill:rgba(255,255,255,0.4);font-family:'IBM Plex Mono',monospace;font-size:17px;letter-spacing:2px}
+.peakdot{fill:#FC4C02;filter:drop-shadow(0 0 12px #FC4C02)}
+.peakring{fill:none;stroke:rgba(252,76,2,0.5);stroke-width:2}
+
+/* hero numbers */
+.kicker{position:absolute;top:120px;left:0;right:0;text-align:center;font-size:16px;letter-spacing:10px;color:rgba(0,212,255,0.6)}
+.bignum{position:absolute;top:150px;left:0;right:0;text-align:center;font-size:120px;font-weight:200;letter-spacing:-6px;line-height:1;
+ background:linear-gradient(180deg,#FFFFFF 0%,#FC4C02 65%,rgba(252,76,2,0.25) 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 0 50px rgba(252,76,2,0.25))}
+.bignum .u{font-size:30px;letter-spacing:8px;font-weight:300}
+
+/* chips */
+.chips{position:absolute;top:1010px;left:80px;right:80px;display:flex;gap:14px}
+.chip{flex:1;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:18px 20px;text-align:center}
+.chip .k{font-size:11px;letter-spacing:4px;color:rgba(255,255,255,0.38);margin-bottom:8px}
+.chip .v{font-size:26px;font-weight:600;color:#FFFFFF}
+.chip.c .v{color:#00D4FF}.chip.g .v{color:#F5A623}
+
+/* headline */
+.head{position:absolute;top:890px;left:0;right:0;text-align:center}
+.head .l1{font-size:20px;font-weight:600;letter-spacing:6px;
+ background:linear-gradient(90deg,#00D4FF,#FC4C02);-webkit-background-clip:text;background-clip:text;color:transparent}
+.head .l2{font-size:13px;letter-spacing:6px;color:rgba(255,255,255,0.4);margin-top:10px}
+
+/* frame */
+.hd{position:absolute;top:90px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.brand{font-size:15px;font-weight:600;letter-spacing:10px;color:rgba(255,255,255,0.85)}
+.brand b{color:#FC4C02;font-weight:600}
+.meta{font-size:15px;letter-spacing:5px;color:rgba(255,255,255,0.5)}
+.ft{position:absolute;bottom:90px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.tags{display:flex;gap:10px}
+.tags span{font-size:13px;letter-spacing:2px;color:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.1);border-radius:99px;padding:7px 14px}
+.dots{display:flex;gap:8px}
+.dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18)}
+.dots .on{background:#FC4C02;box-shadow:0 0 8px rgba(252,76,2,0.7)}
+.frame{position:absolute;inset:26px;border:1px solid rgba(255,255,255,0.06);border-radius:18px;pointer-events:none;z-index:6}
+.grain{position:absolute;inset:0;opacity:0.05;pointer-events:none;z-index:7;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+</style></head><body>
+<div class="s">
+ <div class="grid"></div>
+ <div class="kicker">LONGEST RIDE YET</div>
+ <div class="bignum">152<span class="u"> KM</span></div>
+
+ <div class="mtn"><svg viewBox="0 0 960 700" preserveAspectRatio="none">
+  <defs>
+   <linearGradient id="mtnGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="rgba(0,212,255,0.5)"/><stop offset="55%" stop-color="rgba(252,76,2,0.25)"/><stop offset="100%" stop-color="rgba(252,76,2,0.02)"/>
+   </linearGradient>
+   <linearGradient id="ridgeGrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#FC4C02"/>
+   </linearGradient>
+  </defs>
+  <line class="axis" x1="0" y1="620" x2="960" y2="620"/>
+  <path d="M0,620 C80,590 140,600 210,540 C280,480 320,500 380,420 C440,340 470,380 520,300 C570,220 600,260 650,190 C700,120 730,170 780,150 C830,130 900,160 960,140 L960,620 Z" fill="url(#mtnGrad)"/>
+  <path d="M0,620 C80,590 140,600 210,540 C280,480 320,500 380,420 C440,340 470,380 520,300 C570,220 600,260 650,190 C700,120 730,170 780,150 C830,130 900,160 960,140" fill="none" stroke="url(#ridgeGrad)" stroke-width="5" stroke-linecap="round" filter="drop-shadow(0 0 10px rgba(0,212,255,0.4))"/>
+  <circle class="peakdot" cx="650" cy="190" r="10"/>
+  <circle class="peakring" cx="650" cy="190" r="20"/>
+  <text class="axlab" x="0" y="660">0 KM</text><text class="axlab" x="420" y="660">80 KM</text><text class="axlab" x="840" y="660">152 KM</text>
+  <text class="axlab" x="600" y="140" fill="rgba(252,76,2,0.8)">▲ PEAK — 2,140 M</text>
+ </svg></div>
+
+ <div class="head"><div class="l1">THE ELEVATION REMEMBERS</div><div class="l2">EVERY METER CLIMBED STAYS CLIMBED</div></div>
+
+ <div class="chips">
+  <div class="chip c"><div class="k">MOVING TIME</div><div class="v">6H 42M</div></div>
+  <div class="chip"><div class="k">AVG SPEED</div><div class="v">22.7</div></div>
+  <div class="chip g"><div class="k">ELEV GAIN</div><div class="v">2,140 M</div></div>
+  <div class="chip"><div class="k">CALORIES</div><div class="v">4,820</div></div>
+ </div>
+
+ <div class="hd"><div class="brand">◆ FIRST <b>LIGHT</b></div><div class="meta">RECORD DAY · GPS VERIFIED</div></div>
+ <div class="ft"><div class="tags"><span>#cycling</span><span>#longestride</span><span>#endurance</span></div><div class="dots"><span class="on"></span><span></span><span></span></div></div>
+ <div class="frame"></div>
+ <div class="grain"></div>
+</div>
+</body></html>

@@ -23,6 +23,7 @@ function switchPanel(panelId) {
   }
   // Build dynamic panels
   if (panelId === 'dashboard') { if (typeof buildDashboardStats === 'function') buildDashboardStats(); if (typeof buildActionBands === 'function') buildActionBands(); }
+  if (panelId === 'recovery') renderRecovery();
   if (panelId === 'manage-rituals') loadRitualManager(currentMgrPeriod);
   if (panelId === 'weekly-review') buildWeeklyReview();
   if (panelId === 'monthly') buildCalHeatMap();

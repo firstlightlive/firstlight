@@ -1,0 +1,103 @@
+<!DOCTYPE html><html><head>
+  <meta name="robots" content="noindex,nofollow"><meta charset="UTF-8"><meta name="viewport" content="width=1080"><title>FIRST LIGHT — MISS v2</title><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;background:#0A0B0E;font-family:'IBM Plex Mono',monospace}
+
+/* Aurora — gold embers over deep charcoal, a faint red heartbeat below */
+.s::before{content:'';position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:1000px;height:700px;border-radius:50%;
+ background:radial-gradient(circle,rgba(245,166,35,0.12) 0%,rgba(245,166,35,0.03) 40%,transparent 65%);filter:blur(50px)}
+.s::after{content:'';position:absolute;bottom:-300px;left:-200px;width:900px;height:900px;border-radius:50%;
+ background:radial-gradient(circle,rgba(255,82,82,0.09) 0%,transparent 60%);filter:blur(60px)}
+.ember{position:absolute;bottom:150px;right:-150px;width:700px;height:700px;border-radius:50%;
+ background:radial-gradient(circle,rgba(245,166,35,0.06) 0%,transparent 55%);filter:blur(45px)}
+
+/* Topo */
+.topo{position:absolute;inset:0;opacity:0.6}
+.topo svg{width:100%;height:100%}
+.topo path{fill:none;stroke:rgba(255,255,255,0.022);stroke-width:1.2}
+
+/* Ledger ruled lines — the page looks like a discipline ledger */
+.ledger{position:absolute;inset:0;pointer-events:none}
+.ledger .l{position:absolute;left:80px;right:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent)}
+
+/* HUD frame */
+.frame{position:absolute;inset:26px;border:1px solid rgba(255,255,255,0.06);border-radius:18px;pointer-events:none}
+.corner{position:absolute;width:26px;height:26px;border-color:#F5A623;border-style:solid;opacity:0.7}
+.c1{top:14px;left:14px;border-width:2px 0 0 2px;border-radius:6px 0 0 0}
+.c2{top:14px;right:14px;border-width:2px 2px 0 0;border-radius:0 6px 0 0}
+.c3{bottom:14px;left:14px;border-width:0 0 2px 2px;border-radius:0 0 0 6px}
+.c4{bottom:14px;right:14px;border-width:0 2px 2px 0;border-radius:0 0 6px 0}
+
+/* Header */
+.hd{position:absolute;top:96px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:15px;font-weight:600;letter-spacing:10px;color:rgba(255,255,255,0.85)}
+.brand b{color:#F5A623;font-weight:600}
+.meta{font-size:15px;letter-spacing:5px;color:rgba(255,255,255,0.45)}
+
+/* Center stack */
+.center{position:absolute;top:0;bottom:0;left:80px;right:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.kicker{font-size:16px;letter-spacing:10px;color:rgba(255,255,255,0.4);margin-bottom:30px}
+.miss{font-size:210px;font-weight:200;letter-spacing:-8px;line-height:0.9;
+ background:linear-gradient(180deg,#FFFFFF 0%,rgba(255,255,255,0.55) 55%,rgba(255,255,255,0.12) 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent}
+.debt{font-size:120px;font-weight:600;letter-spacing:-4px;line-height:1;margin-top:40px;
+ background:linear-gradient(180deg,#FFD98A 0%,#F5A623 55%,rgba(245,166,35,0.25) 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 0 50px rgba(245,166,35,0.25))}
+.debtunit{font-size:22px;letter-spacing:12px;color:rgba(245,166,35,0.6);margin-top:16px}
+.line{font-size:19px;letter-spacing:8px;color:rgba(255,255,255,0.5);margin-top:50px}
+.line b{color:#00E676;font-weight:600}
+
+/* Payment modes */
+.modes{display:flex;gap:12px;margin-top:50px}
+.modes span{font-size:13px;letter-spacing:2px;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.12);border-radius:99px;padding:9px 16px}
+.modes .on{border-color:rgba(245,166,35,0.5);color:#F5A623;background:rgba(245,166,35,0.06)}
+
+/* Footer */
+.ft{position:absolute;bottom:96px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center}
+.ftnote{font-size:13px;letter-spacing:3px;color:rgba(255,255,255,0.3)}
+.dots{display:flex;gap:8px;align-items:center}
+.dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18)}
+.dots .on{background:#F5A623;box-shadow:0 0 8px rgba(245,166,35,0.7)}
+
+.grain{position:absolute;inset:0;opacity:0.05;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+.scan{position:absolute;inset:0;pointer-events:none;opacity:0.012;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.6) 3px,transparent 6px)}
+</style></head><body>
+<div class="s">
+ <div class="ember"></div>
+ <div class="topo"><svg viewBox="0 0 1080 1350" preserveAspectRatio="none">
+  <path d="M-50,260 C150,210 300,290 450,250 S760,180 1130,240"/>
+  <path d="M-50,420 C150,370 300,450 450,410 S760,340 1130,400"/>
+  <path d="M-50,600 C150,550 300,630 450,590 S760,520 1130,580"/>
+  <path d="M-50,820 C150,770 300,850 450,810 S760,740 1130,800"/>
+  <path d="M-50,1060 C150,1010 300,1090 450,1050 S760,980 1130,1040"/>
+  <path d="M-50,1260 C150,1210 300,1290 450,1250 S760,1180 1130,1240"/>
+ </svg></div>
+ <div class="ledger"><div class="l" style="top:38%"></div><div class="l" style="top:62%"></div></div>
+ <div class="frame"></div>
+ <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+
+ <div class="hd">
+  <div class="brand">◆ FIRST <b>LIGHT</b></div>
+  <div class="meta">DISCIPLINE LEDGER</div>
+ </div>
+
+ <div class="center">
+  <div class="kicker">MISS LOGGED — DAY 12</div>
+  <div class="miss">MISS</div>
+  <div class="debt">100 KM</div>
+  <div class="debtunit">CYCLE DEBT</div>
+  <div class="line">PAYING IN <b>DISTANCE</b>.</div>
+  <div class="modes"><span class="on">CYCLE ×2</span><span>WALK ×1</span><span>RUN ×1</span><span>SWIM ×4</span></div>
+ </div>
+
+ <div class="ft">
+  <div class="ftnote">NOT A FAILURE — A DEBT. PAID IN DISTANCE.</div>
+  <div class="dots"><span></span><span class="on"></span><span></span></div>
+ </div>
+
+ <div class="grain"></div><div class="scan"></div>
+</div>
+</body></html>

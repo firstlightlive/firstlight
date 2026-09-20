@@ -1,0 +1,19 @@
+{
+  "subnet": "192.168.0.0/24",
+  "devices": {
+    "vnt_laptop": {"mac": "C0:A8:10:4C:ED:6B", "mult": 1},
+    "mac_laptop": {"mac": "AA:BB:CC:DD:EE:01", "mult": 1},
+    "iphone":     {"mac": "AA:BB:CC:DD:EE:03", "mult": 2},
+    "phone2":     {"mac": "AA:BB:CC:55:EE:04", "mult": 2},
+    "tablet":     {"mac": "AA:BB:CC:DD:EE:05", "mult": 2}
+  },
+  "exempt_devices": {},
+  "exempt_note": "No device is exempt. The VNT was demoted: YouTube and Netflix on it are fuel (soft content feeds the same loop). It is watched like the Mac.",
+  "ntfy_topic": "firstlight-guard-REPLACE-WITH-RANDOM",
+  "night_start": "21:30",
+  "scan_interval_s": 60,
+  "realert_s": 1800,
+  "debt_hours": 48,
+  "km_per_hour_day": 10,
+  "km_per_hour_night": 25
+}

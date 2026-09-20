@@ -1,0 +1,47 @@
+════════════════════════════════════════════════
+ FIRST LIGHT — CLOUD GUARD · INSTALL KIT
+ Day 1 = Tue 22 Sep 2026 · 90 days full · WiFi OFF
+════════════════════════════════════════════════
+
+THE WITNESS TOPIC (give this ONE line to the witness):
+  firstlight-guard-c4533231770b952af0ea510565a3756f
+Witness: install the ntfy app (free) → subscribe to that topic.
+
+WHAT IS ALREADY LIVE
+  [x] MAC — snitch installed + running (launchd, every 60s).
+      Config: ~/.fl-snitch.conf (WiFi name + topic already filled).
+      It already fired its first test alert on the channel.
+
+WHAT YOU INSTALL NOW
+  [ ] WINDOWS — copy BOTH files to a USB stick:
+        install-windows.bat  +  windows-snitch.ps1
+      On the Windows laptop: double-click the .bat, answer 2 questions
+      (home WiFi name + the topic above). Done.
+
+  [ ] IPHONE — Shortcuts app → Automation → + → Wi-Fi →
+        "Network <HomeSSID> Joined" → Run Immediately:
+        Action "Get Contents of URL" → Method POST →
+        URL: https://ntfy.sh/firstlight-guard-c4533231770b952af0ea510565a3756f
+        Headers: Title = GUARD: IPHONE IN HOUSE
+        Body: DEVICE IN HOUSE. 100 KM CYCLE DEBT OPENS.
+      Plus 2 heartbeat automations (Time of Day 08:00, 21:30):
+        POST body: alive — current network: <Wi-Fi Name>
+
+  [ ] ANDROID — MacroDroid → trigger "WiFi connected to <HomeSSID>"
+        → action HTTP POST to the same URL, Title "GUARD: ANDROID IN HOUSE".
+        Plus a time-based heartbeat macro 2x/day.
+
+THE RULES THE SNITCHES ENFORCE
+  - Join home WiFi        → alert in <60s → 100 km cycle debt opens
+  - Still home            → reminder every 30 min
+  - Heartbeat silence     → Level 4: 400 km + no exceptions 30 days
+  - Days 1–90: WiFi OFF   → no network to join → devices are bricks
+  - Day 90: the Pi guard takes over, 24/7, un-silenceable
+
+THE NIGHT CHECKLIST (tonight)
+  1. Finish work        2. Devices OUT (office/car lockbox)
+  3. WiFi radios OFF (192.168.0.1 → Wireless → uncheck both → Save)
+  4. Witness subscribed  5. Sleep
+
+TOMORROW: the cycle. "Day 1, clean." NOT TODAY.
+════════════════════════════════════════════════
