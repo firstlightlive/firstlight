@@ -135,7 +135,7 @@
     // Mission mode — interviews / declared work windows
     html += '<div style="font:500 10px var(--font-mono);color:var(--cyan,#00D4FF);letter-spacing:1px;margin-bottom:8px">● MISSION MODE (interviews): the laptop NEVER crosses the door. Interviews happen at the office, a coworking cabin, or a rented quiet room — declared to the witness with time + place. The streak survives, and the flat stays dry.</div>';
     // Travel protocol — reward trips and hotels
-    html += '<div style="font:500 10px var(--font-mono);color:var(--cyan,#00D4FF);letter-spacing:1px;margin-bottom:16px">● TRAVEL PROTOCOL (reward trips, races, treks): declare dates + devices to the witness; hotel room = device at the desk, never in bed, bed = sleep only, nightly line continues from the trip. A declared trip is a reward, not a break.</div>';
+    html += '<div style="font:500 10px var(--font-mono);color:var(--cyan,#00D4FF);letter-spacing:1px;margin-bottom:16px">● TRAVEL PROTOCOL — SCREENS OFF WHEREVER I SLEEP: devices powered down from room-entry to morning; dumb phone stays ON (witness line, family, emergencies); day/transit use allowed out in the world. A declared trip is a reward, not a break.</div>';
 
     // Stat cards
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px">';
