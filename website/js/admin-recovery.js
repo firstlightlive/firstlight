@@ -8,7 +8,7 @@
   'use strict';
 
   var LS_KEY = 'fl_recovery_v1';
-  var DAY1 = '2026-09-22'; // Must equal FL_DEFAULTS.STREAK_START · FL_CURRENT_CHAPTER.dayEpoch · DAY_EPOCH
+  var DAY1 = '2026-09-23'; // Must equal FL_DEFAULTS.STREAK_START · FL_CURRENT_CHAPTER.dayEpoch · DAY_EPOCH
 
   var PENALTY = {
     hourDay: 50,             // cycle km per connected hour, daytime (no base — starts from zero)
@@ -125,12 +125,12 @@
     html += '<div style="font:500 10px var(--font-mono);color:var(--gold,#F5A623);letter-spacing:1px;margin-bottom:8px">' +
       '● GUARD STATUS: OFFLINE (Pi not deployed yet) — manual logging active. LAW FOR LIFE: the laptop never crosses the door, ever. No sessions at home. Only the 5 forced exceptions (illness · emergency · lockdown · festival · critical work), witnessed FIRST, daylight, table, logged, expires when the force ends. Interviews happen at the office or a coworking cabin.</div>';
     // Enforcement T-ZERO
-    var tz = new Date('2026-09-22T06:00:00+05:30').getTime();
+    var tz = new Date('2026-09-23T06:00:00+05:30').getTime();
     var nowMs = Date.now();
     html += '<div style="font:600 10px var(--font-mono);color:' + (nowMs < tz ? 'var(--gold,#F5A623)' : 'var(--green,#00E676)') + ';letter-spacing:1px;margin-bottom:16px">' +
       (nowMs < tz
         ? '⏳ WIND-DOWN WINDOW — ' + Math.max(1, Math.ceil((tz - nowMs) / 60000)) + ' min left. Finish the laptop jobs. Move devices OUT. At 06:00 IST the rule is LIVE.'
-        : '● ENFORCEMENT LIVE SINCE 06:00 IST TUE 22 SEP — no screens at home, WiFi OFF (permanent dead zone), bed = sleep only.') + '</div>';
+        : '● ENFORCEMENT LIVE SINCE 06:00 IST WED 23 SEP — no screens at home, WiFi OFF (permanent dead zone), bed = sleep only.') + '</div>';
     // Mission mode — interviews / declared work windows
     html += '<div style="font:500 10px var(--font-mono);color:var(--cyan,#00D4FF);letter-spacing:1px;margin-bottom:8px">● MISSION MODE (interviews): the laptop NEVER crosses the door. Interviews happen at the office, a coworking cabin, or a rented quiet room — declared to the witness with time + place. The streak survives, and the flat stays dry.</div>';
     // Travel protocol — reward trips and hotels

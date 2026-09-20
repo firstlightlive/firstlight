@@ -2,7 +2,7 @@
 # Wind-down watcher — samples the home network every 60s until 06:00 IST.
 # Logs which clients are still on WiFi. Stops itself at T-ZERO.
 LOG="/Users/Anupamlive/firstlight/wind-down.log"
-END_EPOCH=$(TZ=Asia/Kolkata date -j -f "%Y-%m-%d %H:%M:%S" "2026-09-22 06:00:00" "+%s" 2>/dev/null)
+END_EPOCH=$(TZ=Asia/Kolkata date -j -f "%Y-%m-%d %H:%M:%S" "2026-09-23 06:00:00" "+%s" 2>/dev/null)
 
 while true; do
   NOW_EPOCH=$(date "+%s")

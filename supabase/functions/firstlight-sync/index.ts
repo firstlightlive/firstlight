@@ -39,7 +39,7 @@ const CHAPTER_3_CUTOFF_HOUR = 6           // run must START before 06:00 local
 const CHAPTER_4_START = new Date('2026-07-27T00:00:00+05:30')
 // Chapter 04 ended at the fever, not by choice. Sep 4-12 belong to NO chapter.
 const CHAPTER_4_END = new Date('2026-09-04T00:00:00+05:30')   // exclusive — Day 47 = Sep 3
-const CHAPTER_5_START = new Date('2026-09-22T00:00:00+05:30') // === DAY_EPOCH (run 2)
+const CHAPTER_5_START = new Date('2026-09-23T00:00:00+05:30') // === DAY_EPOCH (run 2)
 
 // ── THE PUBLIC DAY COUNTER ─────────────────────────────────────────────────
 // DAY_EPOCH is the single anchor for every day number the outside world sees:
@@ -48,15 +48,16 @@ const CHAPTER_5_START = new Date('2026-09-22T00:00:00+05:30') // === DAY_EPOCH (
 //
 // RESET 2026-09-13, then again 2026-09-22. The counter ran from 2026-07-19
 // (Day 1) to 2026-09-03 (Day 47), then a fever stopped training for nine days
-// (Sep 4-12). The streak broke again on Sep 20-21 2026 — the ACTIVE epoch is
-// now Day 1 = Tue 22 Sep 2026. chapterDay() keeps the earlier epochs as
-// fallback branches so every archived row from an old era still renders its number.
+// (Sep 4-12). The streak broke again on Sep 20-21 2026; a rest day moved the
+// restart — the ACTIVE epoch is now Day 1 = Wed 23 Sep 2026. chapterDay() keeps
+// the earlier epochs as fallback branches so every archived row from an old era
+// still renders its number.
 //
 // ⚠️ A NEW CHAPTER DOES NOT RESET THIS. Only a real break does. Adding Chapter
 // 5/6/7…: add the start date to chapterOf() and a label to CHAPTER_BRAND; do
 // NOT add a branch to chapterDay(). Must stay equal to FL_DEFAULTS.STREAK_START
 // (website/app.js) and FL_CURRENT_CHAPTER.dayEpoch (website/js/chapters.js).
-const DAY_EPOCH = new Date('2026-09-22T00:00:00+05:30')
+const DAY_EPOCH = new Date('2026-09-23T00:00:00+05:30')
 
 // Pull the day number a published caption actually prints ("...\n\nDay 31.\n...").
 // Used by the IG sync so a late post's stored day_number mirrors what the public
