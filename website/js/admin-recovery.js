@@ -32,7 +32,7 @@
     { day: 45,  name: 'FORTY-FIVE',     reward: 'INSTA360 camera + a 4–5 day trip — SINGAPORE or DUBAI, your choice, filmed with the new camera — ~₹80,000 total, from savings' },
     { day: 60,  name: 'TWO MONTHS',     reward: 'Weekend trek + stay — ₹15,000 (humans + nature)' },
     { day: 75,  name: 'SEVENTY-FIVE',   reward: '15-day INDIA trip — ~₹50,000' },
-    { day: 90,  name: 'NINETY DAYS',    reward: 'THE GUARD ITSELF — Raspberry Pi deployed (watches WiFi, auto-debts, heartbeat) + MAC RETURNS: daylight, table, sealed 9:30, never bedroom, declared sessions + spa day — ₹15,000. Everything returns at once, under the machine’s eye.' },
+    { day: 90,  name: 'NINETY DAYS',    reward: 'THE GUARD ITSELF — Raspberry Pi deployed to watch the permanently dry house (tamper-evidence) + optional declared Mac sessions at the table, witnessed, device leaves with you + spa day — ₹15,000. The machine becomes the prize.' },
     { day: 120, name: 'ONE-TWENTY',     reward: 'Home gym setup — dumbbells, bench, resistance — ₹25,000 (your call; the ₹1.2L cycle you own is already the penance machine)' },
     { day: 180, name: 'HALF YEAR',      reward: '10-day INTERNATIONAL trip — a new country + ₹20,000 clothing shopping. Repeats every 180 clean days: next country each time.' }
   ];
@@ -124,14 +124,14 @@
 
     // Guard status
     html += '<div style="font:500 10px var(--font-mono);color:var(--gold,#F5A623);letter-spacing:1px;margin-bottom:8px">' +
-      '● GUARD STATUS: OFFLINE (Pi not deployed yet) — manual logging active. WIFI CLAUSE v3: 90 DAYS FULL — WiFi OFF, no device crosses the door, no loopholes. Mac + WiFi return on Day 90, under the guard’s watch.</div>';
+      '● GUARD STATUS: OFFLINE (Pi not deployed yet) — manual logging active. PERMANENT DEAD ZONE (owner’s choice): no device ever lives at home — not after 90 days, not ever. Sessions are declared to the witness, Ethernet at the table, and the device leaves with you.</div>';
     // Enforcement T-ZERO
     var tz = new Date('2026-09-22T06:00:00+05:30').getTime();
     var nowMs = Date.now();
     html += '<div style="font:600 10px var(--font-mono);color:' + (nowMs < tz ? 'var(--gold,#F5A623)' : 'var(--green,#00E676)') + ';letter-spacing:1px;margin-bottom:16px">' +
       (nowMs < tz
         ? '⏳ WIND-DOWN WINDOW — ' + Math.max(1, Math.ceil((tz - nowMs) / 60000)) + ' min left. Finish the laptop jobs. Move devices OUT. At 06:00 IST the rule is LIVE.'
-        : '● ENFORCEMENT LIVE SINCE 06:00 IST TUE 22 SEP — no screens at home, WiFi OFF (dead zone days 1–90), bed = sleep only.') + '</div>';
+        : '● ENFORCEMENT LIVE SINCE 06:00 IST TUE 22 SEP — no screens at home, WiFi OFF (permanent dead zone), bed = sleep only.') + '</div>';
 
     // Stat cards
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px">';
