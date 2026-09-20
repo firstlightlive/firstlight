@@ -20,8 +20,9 @@ Lied / hid / guard off ............. 400 km cycle + 30 days no exceptions
 Two slips in 7 days ................ 500 km cycle
 Unpaid after 48 hours .............. DOUBLES
 
-Pay with: cycle (2 km = 1) · walk (1 = 1) · run (1 = 1) · swim (1 km = 4)
-Proof to the witness. Deadline 48h.
+Pay with (1 km = 1 km off the debt):
+  cycle 1 = 1 · walk 1 = 1 · run 1 = 1 · swim 1 km = 4
+Mix freely. Proof to the witness. Deadline 48h.
 Never punished with: shame, resetting the clock, new oaths.
 
 Only quitting is failure. The clock never resets. NOT TODAY.
