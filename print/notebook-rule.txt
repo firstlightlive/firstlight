@@ -1,26 +1,35 @@
 ══════════════════════════════════════════
- THE RULE — 1 SENTENCE · THE PUNISHMENT — 5
+ THE RULE — 1 SENTENCE · THE PRICE — 5 LEVELS
 ══════════════════════════════════════════
 
 THE RULE
-No screen ever enters my house — not the laptop, not the
-phone, not any device — and in a hotel, every screen is
-switched OFF the moment I enter the room.
+No screen ever enters my house — and in a hotel,
+every screen switches OFF at the room door.
 
-THE PUNISHMENT
-1. Connected for an hour: 50 km cycle by day, 100 km cycle
-   by night — any part of an hour is a full hour.
-   (CONNECTED = device joined the home WiFi. Price = hours ×
-   rate. 2 daytime hours = 100 km. 10 minutes = still 50 km.)
-2. Used inside the house: 200 km cycle. Bedroom or after
-   9:30: 300 km cycle.
-   (USED = you actually opened/used it — flat price, no matter
-   how long. Bedroom or after 9:30 = 300 km flat.)
-   If more than one applies: the HEAVIEST price wins, never stacked.
-3. Lied or hid it: 400 km cycle and 30 days with no exceptions.
-4. Two slips in seven days: 500 km cycle. Unpaid within 48
-   hours: the debt doubles.
-5. Paid by cycle, walk, or run — kilometre for kilometre —
-   swim counts four times, proof to the witness.
+THE PRICE — pay the HIGHEST level that happened.
+Never add levels.
+
+L1 · Device inside the house (even untouched, just connected)
+     50 km per hour (day) · 100 km per hour (after 9:30)
+     Any part of an hour = a full hour.
+     Example: 2 daytime hours = 100 km. 30 minutes = 50 km.
+
+L2 · You USED the device (opened it, worked, browsed)
+     200 km — flat, no matter how long.
+
+L3 · Bedroom, OR used after 9:30 pm
+     300 km — flat.
+
+L4 · You LIED, hid it, or turned the guard off
+     400 km + 30 days with no exceptions.
+
+L5 · Two slips in 7 days
+     500 km.
+
+EXTRA · Unpaid after 48 hours → DOUBLES.
+
+PAYMENT
+cycle 1 km = 1 · walk 1 = 1 · run 1 = 1 · swim 1 km = 4
+Proof to the witness.
 
 NOT TODAY.
