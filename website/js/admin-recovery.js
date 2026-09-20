@@ -132,6 +132,8 @@
       (nowMs < tz
         ? '⏳ WIND-DOWN WINDOW — ' + Math.max(1, Math.ceil((tz - nowMs) / 60000)) + ' min left. Finish the laptop jobs. Move devices OUT. At 06:00 IST the rule is LIVE.'
         : '● ENFORCEMENT LIVE SINCE 06:00 IST TUE 22 SEP — no screens at home, WiFi OFF (permanent dead zone), bed = sleep only.') + '</div>';
+    // Mission mode — interviews / declared work windows
+    html += '<div style="font:500 10px var(--font-mono);color:var(--cyan,#00D4FF);letter-spacing:1px;margin-bottom:16px">● MISSION MODE (interviews / urgent work): declare the window to the witness FIRST — device at the table, Ethernet, declared times only, content rules unchanged, device leaves when the window ends. DECLARED ≠ BROKEN — the streak survives.</div>';
 
     // Stat cards
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px">';
