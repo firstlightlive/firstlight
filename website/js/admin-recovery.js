@@ -32,7 +32,7 @@
     { day: 45,  name: 'FORTY-FIVE',     reward: 'INSTA360 camera + a 4–5 day trip — SINGAPORE or DUBAI, your choice, filmed with the new camera — ~₹80,000 total, from savings' },
     { day: 60,  name: 'TWO MONTHS',     reward: 'Weekend trek + stay — ₹15,000 (humans + nature)' },
     { day: 75,  name: 'SEVENTY-FIVE',   reward: '15-day INDIA trip — ~₹50,000' },
-    { day: 90,  name: 'NINETY DAYS',    reward: 'THE GUARD ITSELF — Raspberry Pi deployed to watch the permanently dry house (tamper-evidence) + optional declared Mac sessions at the table, witnessed, device leaves with you + spa day — ₹15,000. The machine becomes the prize.' },
+    { day: 90,  name: 'NINETY DAYS',    reward: 'THE GUARD ITSELF — Raspberry Pi deployed to watch the permanently dry house + spa day — ₹15,000. The laptop never comes home — the machine is the only computer that ever lives here.' },
     { day: 120, name: 'ONE-TWENTY',     reward: 'Home gym setup — dumbbells, bench, resistance — ₹25,000 (your call; the ₹1.2L cycle you own is already the penance machine)' },
     { day: 180, name: 'HALF YEAR',      reward: '10-day INTERNATIONAL trip — a new country + ₹20,000 clothing shopping. Repeats every 180 clean days: next country each time.' }
   ];
@@ -124,7 +124,7 @@
 
     // Guard status
     html += '<div style="font:500 10px var(--font-mono);color:var(--gold,#F5A623);letter-spacing:1px;margin-bottom:8px">' +
-      '● GUARD STATUS: OFFLINE (Pi not deployed yet) — manual logging active. PERMANENT DEAD ZONE (owner’s choice): no device ever lives at home — not after 90 days, not ever. Sessions are declared to the witness, Ethernet at the table, and the device leaves with you.</div>';
+      '● GUARD STATUS: OFFLINE (Pi not deployed yet) — manual logging active. LAW FOR LIFE: the laptop never crosses the door, ever. No sessions at home. Only the 5 forced exceptions (illness · emergency · lockdown · festival · critical work), witnessed FIRST, daylight, table, logged, expires when the force ends. Interviews happen at the office or a coworking cabin.</div>';
     // Enforcement T-ZERO
     var tz = new Date('2026-09-22T06:00:00+05:30').getTime();
     var nowMs = Date.now();
@@ -133,7 +133,7 @@
         ? '⏳ WIND-DOWN WINDOW — ' + Math.max(1, Math.ceil((tz - nowMs) / 60000)) + ' min left. Finish the laptop jobs. Move devices OUT. At 06:00 IST the rule is LIVE.'
         : '● ENFORCEMENT LIVE SINCE 06:00 IST TUE 22 SEP — no screens at home, WiFi OFF (permanent dead zone), bed = sleep only.') + '</div>';
     // Mission mode — interviews / declared work windows
-    html += '<div style="font:500 10px var(--font-mono);color:var(--cyan,#00D4FF);letter-spacing:1px;margin-bottom:16px">● MISSION MODE (interviews / urgent work): declare the window to the witness FIRST — device at the table, Ethernet, declared times only, content rules unchanged, device leaves when the window ends. DECLARED ≠ BROKEN — the streak survives.</div>';
+    html += '<div style="font:500 10px var(--font-mono);color:var(--cyan,#00D4FF);letter-spacing:1px;margin-bottom:16px">● MISSION MODE (interviews): the laptop NEVER crosses the door. Interviews happen at the office, a coworking cabin, or a rented quiet room — declared to the witness with time + place. The streak survives, and the flat stays dry.</div>';
 
     // Stat cards
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px">';
