@@ -30,6 +30,12 @@
   .mark.clean{color:var(--green)} .mark.broken{color:var(--red)}
   .price{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);line-height:1.8;letter-spacing:1px;background:rgba(245,166,35,0.05);border:1px dashed rgba(245,166,35,0.3);border-radius:8px;padding:12px;margin-bottom:14px}
   .count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim);text-align:center;letter-spacing:2px}
+  .debt{margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#FFD6A0;background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.45);border-radius:8px;padding:12px;line-height:1.8;letter-spacing:1px}
+  .debt b{color:var(--red)}
+  .hist{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px;line-height:2.2}
+  .hist-h{display:block;color:var(--gold);letter-spacing:3px;margin-bottom:4px}
+  .hist-d{margin-right:14px}
+  .hist-d.g{color:var(--green)} .hist-d.r{color:var(--red)} .hist-d.d{color:var(--dim)}
   .flash{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--gold);border-radius:8px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;padding:10px 18px;opacity:0;transition:opacity .3s;pointer-events:none}
   .flash.on{opacity:1}
 </style>
@@ -42,7 +48,8 @@
   </header>
 
   <div class="deadline" id="deadline">You can update <b>any time of day</b>.<br>
-  Both rules marked by <b>11:59 PM</b> = day held. Nothing marked by <b>11:59 PM</b> = BOTH rules violated · punishment posted. No exceptions.</div>
+  All rules marked by <b>11:59 PM</b> = day held. Nothing marked by <b>11:59 PM</b> = ALL rules violated · punishment posted. No exceptions.<br>
+  <span style="color:var(--dim)">One email nudge at 9:30 PM if the day isn't marked yet.</span></div>
 
   <section class="card" id="card-screens">
     <div class="num">RULE 01</div>
@@ -86,6 +93,8 @@
   Unpaid after 48 hours → doubles. Vomiting does NOT erase it — the ride is still owed.</div>
 
   <div class="count" id="count"></div>
+  <div class="debt" id="debt" style="display:none"></div>
+  <div id="history" style="margin-top:18px"></div>
 </div>
 <div class="flash" id="flash">SAVED ✓</div>
 
@@ -158,6 +167,47 @@
           if(c.night) setMark('night',c.night);
         }catch(e){}
       }
+    }).catch(function(){});
+
+    // Today's debt (written by the 11:59 PM verdict)
+    fetch(SUPA_URL+'/rest/v1/config?select=value&key=eq.RULES_DEBT_'+today,{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    }).then(function(r){return r.json();}).then(function(rows){
+      if(rows&&rows.length){
+        try{
+          var d=JSON.parse(rows[0].value);
+          var km=d.km||0;
+          var el=document.getElementById('debt');
+          el.innerHTML='TODAY\'S DEBT: <b>'+km+' KM RIDE</b><br>pay — ride '+km+' km · walk/run '+Math.ceil(km/2)+' km · swim '+(km/10)+' km · gym/boxing '+(km/10)+' h<br>unpaid after 48 h → DOUBLES';
+          el.style.display='block';
+        }catch(e){}
+      }
+    }).catch(function(){});
+
+    // Last 7 days history
+    var days=[];
+    for(var i=1;i<=7;i++){
+      var dd=new Date(); dd.setDate(dd.getDate()-i);
+      days.push(dd.toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}));
+    }
+    fetch(SUPA_URL+'/rest/v1/config?select=key,value&key=in.('+days.map(function(d){return 'RULES_CHECKIN_'+d;}).join(',')+')',{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    }).then(function(r){return r.json();}).then(function(rows){
+      var byKey={};
+      (rows||[]).forEach(function(r){byKey[r.key]=r.value;});
+      var html='<div class="hist"><span class="hist-h">LAST 7 DAYS</span>';
+      days.forEach(function(ds){
+        var c={};
+        try{ c=JSON.parse(byKey['RULES_CHECKIN_'+ds]||'{}'); }catch(e){}
+        var allClean=(c.screens==='clean'&&c.food==='clean'&&c.night==='clean');
+        var anyBroken=(c.screens==='broken'||c.food==='broken'||c.night==='broken');
+        var anyMarked=!!(c.screens||c.food||c.night);
+        var sym=allClean?'✓':(anyBroken?'✗':(anyMarked?'~':'—'));
+        var cls=allClean?'g':(anyBroken?'r':'d');
+        html+='<span class="hist-d '+cls+'">'+ds.slice(5).replace('-','/')+' '+sym+'</span>';
+      });
+      html+='</div>';
+      document.getElementById('history').innerHTML=html;
     }).catch(function(){});
   }
 

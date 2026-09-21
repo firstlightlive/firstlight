@@ -44,10 +44,18 @@ BEGIN
   IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'rules-verdict') THEN
     PERFORM cron.unschedule('rules-verdict');
   END IF;
+  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'rules-reminder') THEN
+    PERFORM cron.unschedule('rules-reminder');
+  END IF;
 END $$;
+
+-- The reminder — 21:30 IST = 16:00 UTC, every day.
+-- Emails the operator if the day's rules are not fully marked yet
+-- (idempotent per day via RULES_REMIND_<date>).
+SELECT cron.schedule('rules-reminder', '0 16 * * *', $$SELECT public.firstlight_cron_call('rules-reminder')$$);
 
 -- The verdict — 23:59 IST = 18:29 UTC, every day
 SELECT cron.schedule('rules-verdict', '29 18 * * *', $$SELECT public.firstlight_cron_call('rules-verdict')$$);
 
 -- ── VERIFY ──
-SELECT jobname, schedule, command FROM cron.job WHERE jobname = 'rules-verdict';
+SELECT jobname, schedule, command FROM cron.job WHERE jobname LIKE 'rules-%' ORDER BY jobname;

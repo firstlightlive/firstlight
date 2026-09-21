@@ -4329,6 +4329,42 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, date, checkin: prev }), { headers })
     }
 
+    // ── RULES REMINDER — 21:30 IST email nudge if the day is not fully marked ──
+    // GET ?action=rules-reminder&date=YYYY-MM-DD  (cron: 16:00 UTC)
+    // Idempotent via RULES_REMIND_<date>. Deadline stays 11:59 PM — this only
+    // nudges the operator ~2.5h before it.
+    if (action === 'rules-reminder') {
+      const date = url.searchParams.get('date') || todayIST()
+      if (date < '2026-09-22') {
+        return new Response(JSON.stringify({ ok: true, skipped: true, date, reason: 'rules check-in starts 2026-09-22' }), { headers })
+      }
+      const { data: remRows } = await supaAdmin.from('config').select('value').eq('key', `RULES_REMIND_${date}`).limit(1)
+      if (remRows && remRows.length > 0) {
+        return new Response(JSON.stringify({ ok: true, alreadyReminded: true, date }), { headers })
+      }
+      const { data: chkRows } = await supaAdmin.from('config').select('value').eq('key', `RULES_CHECKIN_${date}`).limit(1)
+      let chk: { screens?: string; food?: string; night?: string } = {}
+      try { chk = chkRows && chkRows[0] ? JSON.parse((chkRows[0] as { value: string }).value) : {} } catch (_e) { chk = {} }
+      const unmarked = (['screens', 'food', 'night'] as const).filter(k => chk[k] !== 'clean' && chk[k] !== 'broken')
+      if (unmarked.length === 0) {
+        return new Response(JSON.stringify({ ok: true, done: true, date, reason: 'all rules marked' }), { headers })
+      }
+      const names: Record<string, string> = { screens: 'SCREENS — RULE 01', food: 'FOOD CODE — RULE 02', night: 'NIGHT FOOD — RULE 03' }
+      const list = unmarked.map(k => names[k]).join(' · ')
+      try {
+        await _sendEmail(`[FL] Rules not yet marked — ${date}`,
+          _emailShell('Rules check-in pending',
+            `<p style="font-size:16px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 18px">2.5 hours to the 11:59 PM deadline.</p>
+<p>Not yet marked: <b style="color:#D4A843">${list}</b></p>
+<p>Mark them CLEAN or BROKEN now — firstlight.live/rules.html. Anything unmarked at 11:59 PM is a violation and gets posted.</p>`),
+          `Rules not yet marked for ${date}: ${list}. Deadline 11:59 PM IST.`)
+        await supaUpsert('config', { key: `RULES_REMIND_${date}`, value: JSON.stringify({ ts: new Date().toISOString(), unmarked }) }, 'key')
+        return new Response(JSON.stringify({ ok: true, reminded: true, date, unmarked }), { headers })
+      } catch (e) {
+        return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers })
+      }
+    }
+
     // ── DAILY RULES VERDICT — 23:59 IST cron ──
     // GET ?action=rules-verdict&date=YYYY-MM-DD&dryRun=1
     // Reads RULES_CHECKIN_<date>; any rule not marked clean = violated → renders
@@ -4376,6 +4412,8 @@ Deno.serve(async (req) => {
       try {
         const pub = await _publishRuleSlides(urls, caption)
         await supaUpsert('config', { key: postedKey, value: JSON.stringify({ posted: violations.map(v => v.rule), media_id: pub.media_id, ts: new Date().toISOString() }) }, 'key')
+        const totalKm = violations.reduce((s, v) => s + v.km, 0)
+        await supaUpsert('config', { key: `RULES_DEBT_${date}`, value: JSON.stringify({ km: totalKm, rules: violations.map(v => v.rule), ts: new Date().toISOString() }) }, 'key')
         try {
           await _sendEmail(`[FL] Rules verdict ${date} — ${violations.length} rule${violations.length > 1 ? 's' : ''} broken`,
             _emailShell('Rules verdict', `<p style="font-family:'Courier New',monospace">${violations.map(v => `${v.rule} — ${v.km} KM`).join('<br>')}</p><p>Posted to Instagram. The debt is distance.</p>`),
