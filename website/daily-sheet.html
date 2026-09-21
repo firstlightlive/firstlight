@@ -411,7 +411,7 @@
 <script src="js/admin-rituals.js"></script>
 <script>
 (function(){
-  var START='2026-09-13';  // day-counter epoch — restarted after fever on Sep 13
+  var START='2026-09-23';  // day-counter epoch — run 2 of RETURN starts Day 1 on Sep 23
   function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function ritualHtml(r){
     return '<div class="ri"><span class="cb"></span><span class="tm">'+esc(r.time||'')+'</span><span class="ti">'+esc(r.title)+(r.tier===1?' <b>★</b>':'')+'</span></div>';

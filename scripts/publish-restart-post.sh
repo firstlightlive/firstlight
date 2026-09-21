@@ -23,8 +23,12 @@
 set -euo pipefail
 
 # ── The break being announced — edit these, everything else derives ──
+# ⚠️ POST_DATE updated to run 2 (Day 1 = Wed 23 Sep 2026). LAST_DAY / LAST_DATE /
+# BREAK_* / CAUSE below are still the OLD fever-break values — verify against
+# the record (run 1: wins through Sep 17 on the ledger; broke Sep 20-21; rest
+# day Sep 22) before publishing the restart carousel.
 DAY=1                            # the new Day 1
-POST_DATE='2026-09-13'           # date the new run starts
+POST_DATE='2026-09-23'           # date the new run starts
 CHAPTER='CHAPTER 05 · RETURN'
 LAST_DAY=47                      # day number the retired run reached
 LAST_DATE='2026-09-03'           # last logged session

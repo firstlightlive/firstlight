@@ -109,7 +109,7 @@
 
 <script>
 (function(){
-  var START='2026-09-13';  // day-counter epoch — restarted after fever on Sep 13
+  var START='2026-09-23';  // day-counter epoch — run 2 of RETURN starts Day 1 on Sep 23
   // ── Penance rules (edit here to retune) ──
   var RITUALS=[
     {k:'wake',       nm:'Wake',       sub:'before 4:00 AM · watch-tracked', miss:{cycle:30}, altWalk:15},
@@ -177,7 +177,7 @@
 
   function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function render(){
-    document.getElementById('dayline').textContent='DAY '+dayNum(today);
+    document.getElementById('dayline').textContent='DAY '+Math.max(0,dayNum(today));
     var rit=document.getElementById('rituals'); rit.innerHTML='';
     RITUALS.forEach(function(r){
       var on=todayEntry[r.k];

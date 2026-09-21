@@ -38,7 +38,9 @@ esac
 # Instagram captions print different day numbers for the same day. ──────────
 echo "── checking day-counter agreement ──"
 EPOCH_APP=$(sed -n "s/.*STREAK_START: '\([0-9-]*\)'.*/\1/p" website/app.js | head -1)
-EPOCH_CH=$(sed -n "s/.*dayEpoch: '\([0-9-]*\)'.*/\1/p" website/js/chapters.js | head -1)
+# tail -1: the LIVE chapter (FL_CURRENT_CHAPTER) is defined last; the first
+# dayEpoch match is an archived chapter's historical epoch (e.g. Chapter 04's).
+EPOCH_CH=$(sed -n "s/.*dayEpoch: '\([0-9-]*\)'.*/\1/p" website/js/chapters.js | tail -1)
 EPOCH_FN=$(sed -n "s/.*const DAY_EPOCH = new Date('\([0-9-]*\)T.*/\1/p" supabase/functions/firstlight-sync/index.ts | head -1)
 # The content generator is self-contained (no app.js) and has drifted before.
 EPOCH_GEN=$(sed -n "s/.*const STREAK_START='\([0-9-]*\)';.*/\1/p" website/app/app.html | head -1)

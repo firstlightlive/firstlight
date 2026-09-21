@@ -59,6 +59,15 @@ const CHAPTER_5_START = new Date('2026-09-23T00:00:00+05:30') // === DAY_EPOCH (
 // (website/app.js) and FL_CURRENT_CHAPTER.dayEpoch (website/js/chapters.js).
 const DAY_EPOCH = new Date('2026-09-23T00:00:00+05:30')
 
+// GAP DAYS — the orphan days between the last break and the new Day 1
+// (Sep 21-22 2026: run 1 broke Sep 20-21, rest day Sep 22, Day 1 = Sep 23).
+// chapterDay()'s retired-era fallback would number them 65/66, so every
+// day-numbered surface is guarded by _isGapDay(): the 04:30/06:30 emails send
+// a rest-day note, the 22:00 EOD + weekly recap are skipped, and the 21:00
+// nudge + 23:30 verdict record NOTHING (no ledger row, no slip, no IG post).
+// When the next break moves DAY_EPOCH, move GAP_START to the first orphan day.
+const GAP_START = new Date('2026-09-21T00:00:00+05:30')
+
 // Pull the day number a published caption actually prints ("...\n\nDay 31.\n...").
 // Used by the IG sync so a late post's stored day_number mirrors what the public
 // sees, rather than being recomputed from the post's timestamp.
@@ -218,6 +227,19 @@ function todayIST(): string {
   // Add IST offset (+5:30) to UTC clock, then read UTC parts
   const ist = new Date(now.getTime() + (5.5 * 3600000))
   return ist.toISOString().slice(0, 10)
+}
+
+// True while a date (default: today) falls between the last break and the new
+// Day 1 — days that belong to NO run. Nothing day-numbered may fire then.
+function _isGapDay(dateStr?: string): boolean {
+  const t = new Date(`${dateStr || todayIST()}T12:00:00+05:30`).getTime()
+  return t >= GAP_START.getTime() && t < DAY_EPOCH.getTime()
+}
+
+// Day 1 as a human label (e.g. 'Wednesday 2026-09-23'), derived from DAY_EPOCH.
+function _day1Label(): string {
+  return new Date(DAY_EPOCH.getTime()).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata', weekday: 'long' })
+    + ' ' + new Date(DAY_EPOCH.getTime()).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
 }
 
 // Returns the current hour in IST (0-23). Used by the too-early-to-judge guard.
@@ -1288,6 +1310,12 @@ async function runNudge(): Promise<EngineRunResult> {
   const verdict = await judgeToday()
   result.verdict = verdict
 
+  // Gap-day guard — rest/gap days belong to NO run. No nudge, no email.
+  if (_isGapDay(result.date)) {
+    result.errors.push(`GAP_DAY — ${result.date} is a rest/gap day (Day 1 = ${_day1Label()}). No nudge.`)
+    return result
+  }
+
   // Pre-chapter guard — chapter hasn't started yet. System dormant.
   if (verdict.chapterDay < 1) {
     result.errors.push(`PRE_CHAPTER — Chapter 02 hasn't started (day=${verdict.chapterDay}). No-op.`)
@@ -1341,6 +1369,15 @@ async function runVerdict(opts?: { force?: 'WIN' | 'MISS'; date?: string; republ
   // live activity. To publish a real post, run the verdict without force.
   if (opts?.force) {
     result.errors.push(`FORCED ${opts.force} — test verdict. IG publish + ledger write intentionally skipped so synthetic data can't reach the feed. Run without force to publish the real activity.`)
+    return result
+  }
+
+  // Gap-day guard — rest/gap days between the last break and the new Day 1
+  // belong to NO run: no ledger row, no slip, no IG post, no email. Without
+  // this, the retired-era fallback numbers the gap 65/66 and a quiet training
+  // log gets judged a MISS. Force flags bypass this (for testing).
+  if (_isGapDay(result.date) && !opts?.force) {
+    result.errors.push(`GAP_DAY — ${result.date} is a rest/gap day (Day 1 = ${_day1Label()}). No verdict recorded.`)
     return result
   }
 
@@ -3358,7 +3395,28 @@ ${bodyHtml}
 </table></td></tr></table></body></html>`
 }
 
+// One rest-day note shared by the 04:30 morning reminder and the 06:30 streak
+// update on gap days — the counter is quiet between the last break and Day 1.
+function _gapDayNote(): { subject: string; html: string; text: string } {
+  const html = _emailShell('Rest day · counter quiet.',
+    `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 18px">Rest day. The counter is quiet.</p>
+<p>Run 1 of the RETURN closed; the new run has not begun. Nothing is owed today, nothing is judged.</p>
+<p><b style="color:#D4A843">Day 1 begins ${_day1Label()}.</b> The normal flow resumes then — 04:30 morning reminder · 06:30 check-in · 21:00 nudge · 23:30 verdict.</p>
+<p style="font-size:12px;color:rgba(240,234,216,0.5);margin-top:28px">— Rest-day note from the system you built.</p>`,
+    'REST DAY')
+  return {
+    subject: `[FL] Rest day — Day 1 begins ${_day1Label()}`,
+    html,
+    text: `Rest day. The counter is quiet. Day 1 begins ${_day1Label()}. Normal emails resume then.`
+  }
+}
+
 async function emailMorningReminder() {
+  if (_isGapDay()) {
+    const note = _gapDayNote()
+    await _sendEmail(note.subject, note.html, note.text)
+    return { sent: 'rest-note', day: null }
+  }
   const dn = _daysSinceStart()
   const html = _emailShell(`Day ${String(dn).padStart(3, '0')}.`,
     `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 18px">A new day. Pick one.</p>
@@ -3371,6 +3429,11 @@ async function emailMorningReminder() {
 }
 
 async function emailStreakUpdate() {
+  if (_isGapDay()) {
+    const note = _gapDayNote()
+    await _sendEmail(note.subject, note.html, note.text)
+    return { sent: 'rest-note', day: null }
+  }
   const dn = _daysSinceStart()
   const stats = await _todayRunStats()
   if (stats) {
@@ -3413,6 +3476,7 @@ ${stats ? `<p style="font-family:'Courier New',monospace;font-size:14px;color:rg
 }
 
 async function emailEodReport() {
+  if (_isGapDay()) return { sent: false, reason: 'gap rest day — no day-numbered email before Day 1', day: null }
   const dn = _daysSinceStart()
   const stats = await _todayRunStats()
   const html = _emailShell(`Day ${String(dn).padStart(3, '0')} · 90 min to verdict.`,
@@ -3495,6 +3559,7 @@ async function emailResetReminder() {
 }
 
 async function emailWeeklyRecap() {
+  if (_isGapDay()) return { sent: false, reason: 'gap rest day — no day-numbered email before Day 1', day: null }
   const dn = _daysSinceStart()
   const today = new Date()
   const sevenDaysAgo = new Date(today.getTime() - 7 * 86400000).toISOString().slice(0, 10)
