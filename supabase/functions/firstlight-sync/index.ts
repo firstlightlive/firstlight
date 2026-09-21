@@ -4403,7 +4403,7 @@ Deno.serve(async (req) => {
       if (chk.food === 'clean') { /* held */ }
       else violations.push({ rule: 'FOOD CODE — RULE 02', km: 50, note: chk.food === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
       if (chk.night === 'clean') { /* held */ }
-      else violations.push({ rule: 'NIGHT FOOD — RULE 03', km: 60, note: chk.night === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
+      else violations.push({ rule: 'NIGHT FOOD — RULE 03', km: 50, note: chk.night === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
       if (violations.length === 0) {
         return new Response(JSON.stringify({ ok: true, verdict: 'CLEAN — all rules held', date }), { headers })
       }
