@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>RULES — FIRST LIGHT</title>
+<style>
+  :root{--bg:#0A0C10;--card:#12151C;--line:rgba(0,212,255,0.15);--gold:#F5A623;--green:#00E676;--red:#FF5252;--dim:#5A6B80;--text:#E8EDF2}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:Inter,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;padding:20px 16px 40px}
+  .wrap{max-width:560px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:10px;margin:8px 0 4px}
+  header .brand{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--gold);letter-spacing:4px;font-size:15px}
+  header .sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:3px}
+  .deadline{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan,#00D4FF);letter-spacing:1px;line-height:1.7;background:rgba(0,212,255,0.06);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:14px 0 18px}
+  .deadline b{color:var(--red)}
+  .card{background:var(--card);border:1px solid rgba(245,166,35,0.14);border-radius:12px;padding:18px 16px;margin-bottom:16px}
+  .card.broken{border-color:rgba(255,82,82,0.5)}
+  .card.clean{border-color:rgba(0,230,118,0.4)}
+  .num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:4px}
+  h2{font-family:'IBM Plex Mono',monospace;font-size:22px;letter-spacing:2px;margin:4px 0 10px}
+  .rule{font-size:14px;line-height:1.65;color:rgba(232,237,242,0.85);margin-bottom:14px}
+  .btns{display:flex;gap:10px}
+  button{flex:1;min-height:48px;border-radius:8px;border:1px solid var(--dim);background:transparent;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;letter-spacing:2px;touch-action:manipulation;cursor:pointer}
+  button:active{transform:scale(0.98)}
+  button.clean-sel{background:rgba(0,230,118,0.12);border-color:var(--green);color:var(--green)}
+  button.broken-sel{background:rgba(255,82,82,0.12);border-color:var(--red);color:var(--red)}
+  .mark{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;margin-top:10px;color:var(--dim)}
+  .mark.clean{color:var(--green)} .mark.broken{color:var(--red)}
+  .price{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);line-height:1.8;letter-spacing:1px;background:rgba(245,166,35,0.05);border:1px dashed rgba(245,166,35,0.3);border-radius:8px;padding:12px;margin-bottom:14px}
+  .count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim);text-align:center;letter-spacing:2px}
+  .flash{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--gold);border-radius:8px;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;padding:10px 18px;opacity:0;transition:opacity .3s;pointer-events:none}
+  .flash.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="brand">◆ FIRST LIGHT</span>
+    <span class="sub">RULES · DAILY CHECK-IN</span>
+  </header>
+
+  <div class="deadline">Mark both rules <b>on or before 9:00 PM</b>.<br>
+  Nothing marked by <b>11:59 PM</b> = BOTH rules violated · punishment posted. No exceptions.</div>
+
+  <section class="card" id="card-screens">
+    <div class="num">RULE 01</div>
+    <h2>SCREENS</h2>
+    <div class="rule">No screen ever enters my house — and in a hotel, every screen switches OFF at the room door.</div>
+    <div class="btns">
+      <button id="b-sc-clean" class="clean-sel" data-rule="screens" data-val="clean">CLEAN</button>
+      <button id="b-sc-broken" class="broken-sel" data-rule="screens" data-val="broken">BROKEN</button>
+    </div>
+    <div class="mark" id="mark-screens">— not marked yet</div>
+  </section>
+
+  <section class="card" id="card-food">
+    <div class="num">RULE 02</div>
+    <h2>FOOD CODE</h2>
+    <div class="rule">No frying · no sugar · no alcohol · no smoking · no cold drinks · no junk.<br><br>
+    Sugar is TRAINING FUEL — on the ride or the run it is medicine. Off it, it's a violation. <b>No ice cream, ever.</b><br>
+    Exception (only one): training over 90 min → gels / dates / banana — free. Race day: free.</div>
+    <div class="btns">
+      <button id="b-fd-clean" class="clean-sel" data-rule="food" data-val="clean">CLEAN</button>
+      <button id="b-fd-broken" class="broken-sel" data-rule="food" data-val="broken">BROKEN</button>
+    </div>
+    <div class="mark" id="mark-food">— not marked yet</div>
+  </section>
+
+  <div class="price">BREAK ANY LINE → 20–30 km ride · posted.<br>
+  Pay as: ride 20–30 km · walk 20–30 km (counts double — 15 clears it) · run 15 km · swim 2–3 km · gym/boxing 2–3 h.<br>
+  Unpaid after 48 hours → doubles. Vomiting does NOT erase it — the ride is still owed.</div>
+
+  <div class="count" id="count"></div>
+</div>
+<div class="flash" id="flash">SAVED ✓</div>
+
+<script>
+(function(){
+  'use strict';
+  var SUPA_URL = localStorage.getItem('fl_supabase_url') || 'https://edgnudrbysybefbqyijq.supabase.co';
+  var SUPA_KEY = localStorage.getItem('fl_supabase_key') || '';
+  var FN = SUPA_URL + '/functions/v1/firstlight-sync';
+
+  // Admin key — assembled like app.js (never stored plain in the page)
+  var _ak = ['934c03a18ffe22cb','ccef763b4bf480d5','3f0690177904ba2b','1d9ebacd52b0eb5d'].join('');
+
+  function istToday(){
+    return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'});
+  }
+
+  function flash(msg){
+    var f=document.getElementById('flash');
+    f.textContent=msg||'SAVED ✓';
+    f.classList.add('on');
+    setTimeout(function(){f.classList.remove('on');},1800);
+  }
+
+  function setMark(rule,val){
+    var card=document.getElementById(rule==='screens'?'card-screens':'card-food');
+    var mark=document.getElementById('mark-'+(rule==='screens'?'screens':'food'));
+    card.classList.remove('clean','broken');
+    mark.classList.remove('clean','broken');
+    if(val==='clean'){card.classList.add('clean');mark.classList.add('clean');mark.textContent='✓ CLEAN — marked';}
+    else if(val==='broken'){card.classList.add('broken');mark.classList.add('broken');mark.textContent='✗ BROKEN — marked';}
+    var bClean=document.getElementById(rule==='screens'?'b-sc-clean':'b-fd-clean');
+    var bBroken=document.getElementById(rule==='screens'?'b-sc-broken':'b-fd-broken');
+    bClean.classList.toggle('clean-sel',val==='clean');
+    bBroken.classList.toggle('broken-sel',val==='broken');
+  }
+
+  function save(rule,val){
+    var body={date:istToday()};
+    body[rule]=val;
+    fetch(FN+'?action=rules-checkin',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Admin-Key':_ak},
+      body:JSON.stringify(body)
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d&&d.ok){setMark(rule,val);flash('SAVED ✓');}
+      else{flash('SAVE FAILED — retry');}
+    }).catch(function(){flash('NETWORK — retry');});
+  }
+
+  function wire(rule){
+    ['clean','broken'].forEach(function(val){
+      var id=rule==='screens'?('b-sc-'+val):('b-fd-'+val);
+      document.getElementById(id).addEventListener('click',function(){save(rule,val);});
+    });
+  }
+  wire('screens'); wire('food');
+
+  // Load today's saved state (config is public-read)
+  var today=istToday();
+  if(SUPA_KEY){
+    fetch(SUPA_URL+'/rest/v1/config?select=value&key=eq.RULES_CHECKIN_'+today,{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    }).then(function(r){return r.json();}).then(function(rows){
+      if(rows&&rows.length){
+        try{
+          var c=JSON.parse(rows[0].value);
+          if(c.screens) setMark('screens',c.screens);
+          if(c.food) setMark('food',c.food);
+        }catch(e){}
+      }
+    }).catch(function(){});
+  }
+
+  // Deadline countdown
+  function tick(){
+    var now=new Date();
+    var opts={timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false};
+    var hm=now.toLocaleTimeString('en-GB',opts);
+    var day=new Date(now.toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'})+'T23:59:00+05:30');
+    var mins=Math.max(0,Math.round((day-now)/60000));
+    var h=Math.floor(mins/60), m=mins%60;
+    document.getElementById('count').textContent='NOW '+hm+' IST · '+h+'h '+m+'m TO THE 11:59 PM DEADLINE';
+  }
+  tick(); setInterval(tick,30000);
+})();
+</script>
+</body>
+</html>

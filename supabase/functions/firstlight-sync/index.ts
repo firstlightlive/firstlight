@@ -4220,24 +4220,13 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify(result), { headers })
     }
 
-    // ── RULE BROKEN POST — one public slide when ANY rule breaks ──
-    // POST ?action=publish-violation   body: { rule, km, note?, dryRun? }
-    // Renders the RULE_BROKEN variant through the Worker and publishes a single
-    // image. The slide shows the DATE (no day number), so it works on rest/gap
-    // days too. Anti-spam: caption = identity + honest record only — no links,
-    // no handle, no ₹/charity language. dryRun renders without publishing.
-    if (action === 'publish-violation') {
-      const body = await req.json().catch(() => ({}))
-      const rule = String(body.rule || '').toUpperCase().slice(0, 40)
-      const km = Math.max(1, Math.min(999, Math.round(Number(body.km) || 20)))
-      const note = String(body.note || '').slice(0, 120)
-      const dryRun = body.dryRun === true || body.dryRun === '1' || body.dryRun === 1
-      if (!rule) {
-        return new Response(JSON.stringify({ error: 'rule is required (e.g. FOOD CODE)' }), { status: 400, headers })
-      }
-      const date = todayIST()
+    // ── RULE-BROKEN PIPELINE — render slide + publish helpers ──
+    // The slide shows the DATE (no day number), so it works on rest/gap days.
+    // Anti-spam: captions carry identity + the honest record only — no links,
+    // no handle, no ₹/charity language.
+    const _renderRuleSlide = async (rule: string, km: number, note: string, date: string): Promise<string> => {
       const renderBase = (await getSecret('render_worker_base')) || 'https://firstlight.live'
-      const renderResp = await fetch(`${renderBase}/api/render`, {
+      const resp = await fetch(`${renderBase}/api/render`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -4248,33 +4237,143 @@ Deno.serve(async (req) => {
           payload: { violation: { rule, km, note } }
         })
       })
-      const renderJson = await renderResp.json().catch(() => ({})) as Record<string, unknown>
-      const publicUrl = String(renderJson.publicUrl || renderJson.url || '')
-      if (!publicUrl) {
-        return new Response(JSON.stringify({ error: 'render failed', detail: renderJson }), { status: 502, headers })
+      const json = await resp.json().catch(() => ({})) as Record<string, unknown>
+      const url = String(json.publicUrl || json.url || '')
+      if (!url) throw new Error('render failed: ' + JSON.stringify(json))
+      return url
+    }
+    const _publishRuleSlides = async (urls: string[], caption: string): Promise<{ media_id: string; permalink: string | null }> => {
+      const multi = urls.length > 1
+      const childIds: string[] = []
+      for (const u of urls) {
+        const params: Record<string, string> = { image_url: u }
+        if (multi) params.is_carousel_item = 'true'
+        else params.caption = caption
+        const c = await igProxy({ endpoint: `${IG_ACCOUNT_ID}/media`, params }) as { id?: string }
+        if (!c || !c.id) throw new Error('IG container failed: ' + JSON.stringify(c))
+        childIds.push(c.id)
       }
-      if (dryRun) {
-        return new Response(JSON.stringify({ ok: true, dryRun: true, publicUrl, rule, km }), { headers })
+      let containerId = childIds[0]
+      if (multi) {
+        const car = await igProxy({ endpoint: `${IG_ACCOUNT_ID}/media`, params: { media_type: 'CAROUSEL', children: childIds.join(','), caption } }) as { id?: string }
+        if (!car || !car.id) throw new Error('IG carousel failed: ' + JSON.stringify(car))
+        containerId = car.id
       }
+      let status = ''
+      for (let i = 0; i < 12; i++) {
+        await new Promise(r => setTimeout(r, 3000))
+        const st = await igProxy({ endpoint: containerId, method: 'GET', params: { fields: 'status_code' } }) as { status_code?: string }
+        status = String(st.status_code || '')
+        if (status === 'FINISHED') break
+        if (status === 'ERROR') throw new Error('IG rejected the media')
+      }
+      if (status !== 'FINISHED') throw new Error('IG container never finished: ' + status)
+      const pub = await igProxy({ endpoint: `${IG_ACCOUNT_ID}/media_publish`, params: { creation_id: containerId } }) as { id?: string }
+      if (!pub || !pub.id) throw new Error('IG publish failed: ' + JSON.stringify(pub))
+      const perm = await igProxy({ endpoint: pub.id, method: 'GET', params: { fields: 'permalink' } }) as { permalink?: string }
+      return { media_id: pub.id, permalink: perm.permalink || null }
+    }
+
+    // ── RULE BROKEN POST — one public slide when ANY rule breaks ──
+    // POST ?action=publish-violation   body: { rule, km, note?, dryRun? }
+    if (action === 'publish-violation') {
+      const body = await req.json().catch(() => ({}))
+      const rule = String(body.rule || '').toUpperCase().slice(0, 40)
+      const km = Math.max(1, Math.min(999, Math.round(Number(body.km) || 20)))
+      const note = String(body.note || '').slice(0, 120)
+      const dryRun = body.dryRun === true || body.dryRun === '1' || body.dryRun === 1
+      if (!rule) {
+        return new Response(JSON.stringify({ error: 'rule is required (e.g. FOOD CODE)' }), { status: 400, headers })
+      }
+      const date = todayIST()
       try {
-        const caption = `RULE BROKEN — ${rule}.\n\n${km} km — owed. The debt is distance. Posted. No hiding from it.${note ? '\n\n' + note : ''}\n\n#discipline #notoday #indianrunners #triathlonindia`
-        const created = await igProxy({ endpoint: `${IG_ACCOUNT_ID}/media`, params: { image_url: publicUrl, caption } }) as { id?: string; error?: unknown }
-        if (!created || !created.id) throw new Error('IG container failed: ' + JSON.stringify(created))
-        let status = ''
-        for (let i = 0; i < 12; i++) {
-          await new Promise(r => setTimeout(r, 3000))
-          const st = await igProxy({ endpoint: created.id as string, method: 'GET', params: { fields: 'status_code' } }) as { status_code?: string }
-          status = String(st.status_code || '')
-          if (status === 'FINISHED') break
-          if (status === 'ERROR') throw new Error('IG rejected the media: ' + JSON.stringify(st))
+        const publicUrl = await _renderRuleSlide(rule, km, note, date)
+        if (dryRun) {
+          return new Response(JSON.stringify({ ok: true, dryRun: true, publicUrl, rule, km }), { headers })
         }
-        if (status !== 'FINISHED') throw new Error('IG container never finished: ' + status)
-        const pub = await igProxy({ endpoint: `${IG_ACCOUNT_ID}/media_publish`, params: { creation_id: created.id as string } }) as { id?: string }
-        if (!pub || !pub.id) throw new Error('IG publish failed: ' + JSON.stringify(pub))
-        const perm = await igProxy({ endpoint: pub.id, method: 'GET', params: { fields: 'permalink' } }) as { permalink?: string }
-        return new Response(JSON.stringify({ ok: true, published: true, media_id: pub.id, permalink: perm.permalink || null, rule, km }), { headers })
+        const caption = `RULE BROKEN — ${rule}.\n\n${km} km — owed. The debt is distance. Posted. No hiding from it.${note ? '\n\n' + note : ''}\n\n#discipline #notoday #indianrunners #triathlonindia`
+        const pub = await _publishRuleSlides([publicUrl], caption)
+        return new Response(JSON.stringify({ ok: true, published: true, media_id: pub.media_id, permalink: pub.permalink, rule, km }), { headers })
       } catch (e) {
         return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers })
+      }
+    }
+
+    // ── DAILY RULES CHECK-IN — RULE 01 SCREENS · RULE 02 FOOD CODE ──
+    // POST ?action=rules-checkin   body: { screens: 'clean'|'broken', food: 'clean'|'broken', note?, date? }
+    // Stored in config as RULES_CHECKIN_<date> (JSONB — no schema change).
+    // Deadline: on or before 9 PM IST. Unlogged by 11:59 PM = both violated.
+    if (action === 'rules-checkin') {
+      const body = await req.json().catch(() => ({}))
+      const date = String(body.date || todayIST())
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return new Response(JSON.stringify({ error: 'bad date' }), { status: 400, headers })
+      }
+      const screens = body.screens === 'broken' ? 'broken' : body.screens === 'clean' ? 'clean' : ''
+      const food = body.food === 'broken' ? 'broken' : body.food === 'clean' ? 'clean' : ''
+      if (!screens && !food) {
+        return new Response(JSON.stringify({ error: 'mark screens and/or food as clean|broken' }), { status: 400, headers })
+      }
+      const key = `RULES_CHECKIN_${date}`
+      const { data: rows } = await supaAdmin.from('config').select('value').eq('key', key).limit(1)
+      let prev: Record<string, unknown> = {}
+      try { prev = rows && rows[0] ? JSON.parse((rows[0] as { value: string }).value) : {} } catch (_e) { prev = {} }
+      if (screens) prev.screens = screens
+      if (food) prev.food = food
+      if (body.note) prev.note = String(body.note).slice(0, 120)
+      prev.ts = new Date().toISOString()
+      await supaUpsert('config', { key, value: JSON.stringify(prev) }, 'key')
+      return new Response(JSON.stringify({ ok: true, date, checkin: prev }), { headers })
+    }
+
+    // ── DAILY RULES VERDICT — 23:59 IST cron ──
+    // GET ?action=rules-verdict&date=YYYY-MM-DD&dryRun=1
+    // Reads RULES_CHECKIN_<date>; any rule not marked clean = violated → renders
+    // RULE_BROKEN slides and posts them (one carousel when both fell). Idempotent
+    // via RULES_POST_<date>. Emails the operator. dryRun renders without posting.
+    if (action === 'rules-verdict') {
+      const dryRun = url.searchParams.get('dryRun') === '1' || url.searchParams.get('dry') === '1'
+      const date = url.searchParams.get('date') || todayIST()
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return new Response(JSON.stringify({ error: 'bad date' }), { status: 400, headers })
+      }
+      const postedKey = `RULES_POST_${date}`
+      if (!dryRun) {
+        const { data: postedRows } = await supaAdmin.from('config').select('value').eq('key', postedKey).limit(1)
+        if (postedRows && postedRows.length > 0) {
+          return new Response(JSON.stringify({ ok: true, alreadyPosted: true, date }), { headers })
+        }
+      }
+      const { data: chkRows } = await supaAdmin.from('config').select('value').eq('key', `RULES_CHECKIN_${date}`).limit(1)
+      let chk: { screens?: string; food?: string; note?: string } = {}
+      try { chk = chkRows && chkRows[0] ? JSON.parse((chkRows[0] as { value: string }).value) : {} } catch (_e) { chk = {} }
+      const violations: Array<{ rule: string; km: number; note: string }> = []
+      if (chk.screens === 'clean') { /* held */ }
+      else violations.push({ rule: chk.screens === 'broken' ? 'SCREENS — RULE 01' : 'SCREENS — RULE 01', km: 50, note: chk.screens === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
+      if (chk.food === 'clean') { /* held */ }
+      else violations.push({ rule: 'FOOD CODE — RULE 02', km: 25, note: chk.food === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
+      if (violations.length === 0) {
+        return new Response(JSON.stringify({ ok: true, verdict: 'CLEAN — both rules held', date }), { headers })
+      }
+      const urls: string[] = []
+      for (const v of violations) urls.push(await _renderRuleSlide(v.rule, v.km, v.note, date))
+      if (dryRun) {
+        return new Response(JSON.stringify({ ok: true, dryRun: true, date, violations, urls }), { headers })
+      }
+      const names = violations.map(v => v.rule.replace(' — RULE 0', ''))
+      const kms = violations.map(v => `${v.km} km`)
+      const caption = `RULES BROKEN — ${names.join(' + ')}.\n\n${kms.join(' + ')} — owed. The debt is distance. Posted. No hiding from it.\n\n#discipline #notoday #indianrunners #triathlonindia`
+      try {
+        const pub = await _publishRuleSlides(urls, caption)
+        await supaUpsert('config', { key: postedKey, value: JSON.stringify({ posted: violations.map(v => v.rule), media_id: pub.media_id, ts: new Date().toISOString() }) }, 'key')
+        try {
+          await _sendEmail(`[FL] Rules verdict ${date} — ${violations.length} rule${violations.length > 1 ? 's' : ''} broken`,
+            _emailShell('Rules verdict', `<p style="font-family:'Courier New',monospace">${violations.map(v => `${v.rule} — ${v.km} KM`).join('<br>')}</p><p>Posted to Instagram. The debt is distance.</p>`),
+            `Rules broken on ${date}: ${violations.map(v => v.rule).join(', ')}`)
+        } catch (_e) { /* tolerate */ }
+        return new Response(JSON.stringify({ ok: true, published: true, date, violations, media_id: pub.media_id, permalink: pub.permalink }), { headers })
+      } catch (e) {
+        return new Response(JSON.stringify({ error: (e as Error).message, date, violations }), { status: 500, headers })
       }
     }
 
