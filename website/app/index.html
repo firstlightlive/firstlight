@@ -552,7 +552,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
       <div class="food-code-bar" id="foodCodeBar">
         <div class="fci-top">
           <span class="fci-badge" id="foodCodeBadge">⚡ FOOD CODE: CLEAN</span>
-          <span class="fci-penalty">BREAK → 20–30KM WALK · POSTED</span>
+          <span class="fci-penalty">BREAK → 50KM RIDE · POSTED</span>
         </div>
         <div class="fci-rules"><span>✗ NO FRYING</span> &nbsp;·&nbsp; <span>✗ NO SUGAR</span> &nbsp;·&nbsp; <span>✗ NO ALCOHOL</span> &nbsp;·&nbsp; <span>✗ NO SMOKING</span> &nbsp;·&nbsp; <span>✗ NO COLD DRINKS</span> &nbsp;·&nbsp; <span>✗ NO JUNK</span></div>
       </div>
@@ -562,7 +562,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
         <div style="flex:1">
           <div style="font:700 10px 'Rajdhani',sans-serif;color:#FF5252;letter-spacing:1px;margin-bottom:4px">FOOD CODE BROKEN — WALK PENALTY</div>
           <div style="display:flex;align-items:center;gap:6px">
-            <input type="number" id="walkKm" class="stat-in" style="width:80px;padding:6px;font-size:14px" placeholder="km" min="20" max="30" inputmode="numeric">
+            <input type="number" id="walkKm" class="stat-in" style="width:80px;padding:6px;font-size:14px" placeholder="km" min="25" max="50" inputmode="numeric">
             <span style="font:500 10px 'JetBrains Mono',monospace;color:var(--smoke)">KM WALKED &nbsp;<span style="color:#FF5252">→ WILL BE POSTED</span></span>
           </div>
         </div>
@@ -3684,7 +3684,7 @@ function _generateInner(){
     if(sleepHrs)cap+=`\n😴 Fuel: ${sleepHrs}hrs sleep`;
     if(moodLine)cap+=`\n💭 "${moodLine}"`;
     if(!food&&walkKm)cap+=`\n🚶 FOOD CODE BROKEN — walked ${walkKm}km as penalty. Posted. No hiding.`;
-    else if(!food)cap+=`\n⚠ FOOD CODE BROKEN — walk 20–30km penalty incoming. Posted.`;
+    else if(!food)cap+=`\n⚠ FOOD CODE BROKEN — ride 50km penalty incoming. Posted.`;
     let fine=0;if(!run)fine+=200;if(!gym)fine+=200;
     if(fine>0)cap+=`\n💸 ₹${fine} fine — accountability is real`;
   }
@@ -5149,7 +5149,7 @@ function slideLastLight(day,dateStr,handleIG,handleX,streak,d,total){
   c.fillStyle=P.light?'rgba(0,0,0,0.60)':'rgba(255,255,255,0.65)';
   c.fillText('NO FRYING · SUGAR · ALCOHOL · SMOKING · COLD DRINKS · JUNK',W/2,fcBlkY+38);
   if(!d.llFood){c.font='800 13px "Rajdhani",sans-serif';c.fillStyle=P.danger;
-    c.fillText(d.walkKm?`PENALTY: WALKED ${d.walkKm}KM · POSTED`:'PENALTY: WALK 20–30KM · WILL POST',W/2,fcBlkY+52);}
+    c.fillText(d.walkKm?`PENALTY: WALKED ${d.walkKm}KM · POSTED`:'PENALTY: RIDE 50KM · WILL POST',W/2,fcBlkY+52);}
 
   // Pledge banner
   const pledgeY=fcBlkY+fcBlkH+14;
@@ -9622,7 +9622,7 @@ async function generateReel(){
           // Penalty line — bright, readable
           c.textAlign='left';c.font='800 20px "Rajdhani",sans-serif';
           c.fillStyle=food?'rgba(0,230,118,0.90)':'#FF3B5C';c.globalAlpha=fca;
-          c.fillText(food?'BREAK ANY RULE → 20–30KM WALK · POSTED':(walkKm?`PENALTY: WALKED ${walkKm}KM · POSTED`:'PENALTY: WALK 20–30KM · WILL POST'),80,fcSY+fcH-14);
+          c.fillText(food?'BREAK ANY RULE → 50KM RIDE · POSTED':(walkKm?`PENALTY: WALKED ${walkKm}KM · POSTED`:'PENALTY: RIDE 50KM · WILL POST'),80,fcSY+fcH-14);
           c.restore();
         }
 

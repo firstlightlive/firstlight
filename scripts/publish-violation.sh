@@ -22,7 +22,7 @@ DRY=0
 
 if [[ -z "$RULE" || "$RULE" == "--dry-run" ]]; then
   echo "usage: $0 \"RULE NAME\" KM [\"note\"] [--dry-run]" >&2
-  echo "  e.g. bash scripts/publish-violation.sh \"FOOD CODE\" 25 \"1 kg ice cream\" --dry-run" >&2
+  echo "  e.g. bash scripts/publish-violation.sh \"FOOD CODE\" 50 \"1 kg ice cream\" --dry-run" >&2
   exit 1
 fi
 

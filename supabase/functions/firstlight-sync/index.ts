@@ -4357,7 +4357,7 @@ Deno.serve(async (req) => {
       if (chk.screens === 'clean') { /* held */ }
       else violations.push({ rule: chk.screens === 'broken' ? 'SCREENS — RULE 01' : 'SCREENS — RULE 01', km: 50, note: chk.screens === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
       if (chk.food === 'clean') { /* held */ }
-      else violations.push({ rule: 'FOOD CODE — RULE 02', km: 25, note: chk.food === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
+      else violations.push({ rule: 'FOOD CODE — RULE 02', km: 50, note: chk.food === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
       if (violations.length === 0) {
         return new Response(JSON.stringify({ ok: true, verdict: 'CLEAN — both rules held', date }), { headers })
       }
