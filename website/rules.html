@@ -68,8 +68,20 @@
     <div class="mark" id="mark-food">— not marked yet</div>
   </section>
 
-  <div class="price">BREAK ANY LINE → <b>50 km ride</b> · posted.<br>
-  Pay as: ride 50 km · walk 25 km (counts double) · run 25 km · swim 5 km · gym/boxing 5 h.<br>
+  <section class="card" id="card-night">
+    <div class="num">RULE 03</div>
+    <h2>NIGHT FOOD</h2>
+    <div class="rule">No solid food after <b>6:00 PM</b>. No ordering at night — no Zomato, no Swiggy, no ice-cream runs. The ORDER itself is the violation.<br><br>
+    Warm milk / water / decaf are allowed — that's the ritual, not food.</div>
+    <div class="btns">
+      <button id="b-nt-clean" class="clean-sel" data-rule="night" data-val="clean">CLEAN</button>
+      <button id="b-nt-broken" class="broken-sel" data-rule="night" data-val="broken">BROKEN</button>
+    </div>
+    <div class="mark" id="mark-night">— not marked yet</div>
+  </section>
+
+  <div class="price">BREAK ANY LINE → <b>50 km ride</b> (FOOD CODE &amp; SCREENS) · <b>60 km ride</b> (NIGHT FOOD) · posted.<br>
+  Pay as: ride 1× · walk/run counts double (25 km walk clears 50 · 30 km walk clears 60) · swim 10× · gym/boxing 10/h.<br>
   Unpaid after 48 hours → doubles. Vomiting does NOT erase it — the ride is still owed.</div>
 
   <div class="count" id="count"></div>
@@ -98,14 +110,14 @@
   }
 
   function setMark(rule,val){
-    var card=document.getElementById(rule==='screens'?'card-screens':'card-food');
-    var mark=document.getElementById('mark-'+(rule==='screens'?'screens':'food'));
+    var card=document.getElementById(rule==='screens'?'card-screens':(rule==='food'?'card-food':'card-night'));
+    var mark=document.getElementById('mark-'+(rule==='screens'?'screens':(rule==='food'?'food':'night')));
     card.classList.remove('clean','broken');
     mark.classList.remove('clean','broken');
     if(val==='clean'){card.classList.add('clean');mark.classList.add('clean');mark.textContent='✓ CLEAN — marked';}
     else if(val==='broken'){card.classList.add('broken');mark.classList.add('broken');mark.textContent='✗ BROKEN — marked';}
-    var bClean=document.getElementById(rule==='screens'?'b-sc-clean':'b-fd-clean');
-    var bBroken=document.getElementById(rule==='screens'?'b-sc-broken':'b-fd-broken');
+    var bClean=document.getElementById(rule==='screens'?'b-sc-clean':(rule==='food'?'b-fd-clean':'b-nt-clean'));
+    var bBroken=document.getElementById(rule==='screens'?'b-sc-broken':(rule==='food'?'b-fd-broken':'b-nt-broken'));
     bClean.classList.toggle('clean-sel',val==='clean');
     bBroken.classList.toggle('broken-sel',val==='broken');
   }
@@ -125,11 +137,11 @@
 
   function wire(rule){
     ['clean','broken'].forEach(function(val){
-      var id=rule==='screens'?('b-sc-'+val):('b-fd-'+val);
+      var id=rule==='screens'?('b-sc-'+val):(rule==='food'?('b-fd-'+val):('b-nt-'+val));
       document.getElementById(id).addEventListener('click',function(){save(rule,val);});
     });
   }
-  wire('screens'); wire('food');
+  wire('screens'); wire('food'); wire('night');
 
   // Load today's saved state (config is public-read)
   var today=istToday();
@@ -142,6 +154,7 @@
           var c=JSON.parse(rows[0].value);
           if(c.screens) setMark('screens',c.screens);
           if(c.food) setMark('food',c.food);
+          if(c.night) setMark('night',c.night);
         }catch(e){}
       }
     }).catch(function(){});
