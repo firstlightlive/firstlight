@@ -4323,6 +4323,7 @@ Deno.serve(async (req) => {
       if (screens) prev.screens = screens
       if (food) prev.food = food
       if (night) prev.night = night
+      if (body.screensKm) prev.screensKm = Math.max(1, Math.min(999, Math.round(Number(body.screensKm) || 50)))
       if (body.note) prev.note = String(body.note).slice(0, 120)
       prev.ts = new Date().toISOString()
       await supaUpsert('config', { key, value: JSON.stringify(prev) }, 'key')
@@ -4389,11 +4390,12 @@ Deno.serve(async (req) => {
         }
       }
       const { data: chkRows } = await supaAdmin.from('config').select('value').eq('key', `RULES_CHECKIN_${date}`).limit(1)
-      let chk: { screens?: string; food?: string; night?: string; note?: string } = {}
+      let chk: { screens?: string; food?: string; night?: string; screensKm?: number; note?: string } = {}
       try { chk = chkRows && chkRows[0] ? JSON.parse((chkRows[0] as { value: string }).value) : {} } catch (_e) { chk = {} }
       const violations: Array<{ rule: string; km: number; note: string }> = []
+      const screensKm = chk.screens === 'broken' ? Math.max(1, Math.min(999, Math.round(Number(chk.screensKm) || 50))) : 50
       if (chk.screens === 'clean') { /* held */ }
-      else violations.push({ rule: chk.screens === 'broken' ? 'SCREENS — RULE 01' : 'SCREENS — RULE 01', km: 50, note: chk.screens === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
+      else violations.push({ rule: 'SCREENS — RULE 01', km: screensKm, note: chk.screens === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
       if (chk.food === 'clean') { /* held */ }
       else violations.push({ rule: 'FOOD CODE — RULE 02', km: 50, note: chk.food === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
       if (chk.night === 'clean') { /* held */ }
