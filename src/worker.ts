@@ -479,7 +479,7 @@ interface RenderRequest {
   date: string                          // YYYY-MM-DD
   chapterDay: number
   chapter?: string                      // footer brand e.g. "CHAPTER 03 · FIRST LIGHT" — supplied by the edge fn (single source of truth for chapter identity)
-  variant: 'WIN' | 'MISS' | 'WIN_ROUTE' | 'WIN_MULTI_HERO' | 'WIN_MULTI_MAP' | 'WIN_MULTI_GRID' | 'WIN_MULTI_SUMMARY' | 'MONTHLY_RECAP' | 'CHAPTER_KICKOFF_HERO' | 'CHAPTER_KICKOFF_PROMISE' | 'CHAPTER_KICKOFF_MENU' | 'RESTART_HERO' | 'RESTART_RECORD' | 'RESTART_RULE'
+  variant: 'WIN' | 'MISS' | 'WIN_ROUTE' | 'WIN_MULTI_HERO' | 'WIN_MULTI_MAP' | 'WIN_MULTI_GRID' | 'WIN_MULTI_SUMMARY' | 'MONTHLY_RECAP' | 'CHAPTER_KICKOFF_HERO' | 'CHAPTER_KICKOFF_PROMISE' | 'CHAPTER_KICKOFF_MENU' | 'RESTART_HERO' | 'RESTART_RECORD' | 'RESTART_RULE' | 'RULE_BROKEN'
   orientation: 'post' | 'story'
   payload: {
     // WIN-specific (single activity)
@@ -502,6 +502,8 @@ interface RenderRequest {
     // MISS-specific
     penance?: string                    // Chapter 04 debt, e.g. '100 KM CYCLE'
     reason?: string                     // short failure reason
+    // RULE_BROKEN — a named violation and its distance debt (food code, screens, rituals…)
+    violation?: { rule: string; km: number; note?: string }
     // Monthly recap
     monthly?: MonthlyRecapPayload
     monthlySlide?: 1 | 2 | 3 | 4 | 5 | 6 | 7
@@ -581,6 +583,7 @@ async function renderAndStore(req: RenderRequest, env: Env): Promise<RenderResul
             : req.variant === 'RESTART_RECORD'            ? renderRestartRecordSvg(req)
             : req.variant === 'RESTART_RULE'              ? renderRestartRuleSvg(req)
             : req.variant === 'MISS'                      ? renderMissSvg(req)
+            : req.variant === 'RULE_BROKEN'              ? renderRuleBrokenSvg(req)
             // An unrecognised variant used to fall through to renderMissSvg, so a
             // typo (or calling a variant before this Worker was deployed) silently
             // published a MISS/charity slide under the requested name — and the
@@ -855,6 +858,82 @@ function renderMissSvg(req: RenderRequest): string {
   <text x="${W / 2}" y="${H - (isStory ? 140 : 80)}" text-anchor="middle"
         font-family="'Roboto Mono', monospace" font-size="${fz(24)}" font-weight="500"
         fill="${COLORS.dim}" letter-spacing="6"></text>
+</svg>`
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RULE_BROKEN — one public slide when ANY rule breaks (food code, sugar, screens,
+// ritual, prohibition). No day number — the DATE is shown instead, so the slide
+// works on rest/gap days too. The debt is distance, never money.
+// ─────────────────────────────────────────────────────────────────────────────
+function renderRuleBrokenSvg(req: RenderRequest): string {
+  const W = 1080
+  const H = req.orientation === 'story' ? 1920 : 1080
+  const v = req.payload.violation || { rule: 'RULE', km: 20 }
+  const rule = escapeXml(String(v.rule).toUpperCase().slice(0, 40))
+  const km = Math.max(1, Math.min(999, Math.round(Number(v.km) || 20)))
+  const note = escapeXml(String(v.note || '').slice(0, 120))
+  const date = new Date(req.date + 'T00:00:00+05:30').toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()
+
+  const isStory = req.orientation === 'story'
+  const cy = isStory ? H * 0.45 : H / 2
+  const s = isStory ? 1.3 : 1
+  const fz = (n: number) => Math.round(n * s)
+  const off = (n: number) => Math.round(n * (isStory ? 1.15 : 1))
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="${COLORS.red}" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="${COLORS.bg}" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rule-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="${COLORS.text}"/>
+      <stop offset="100%" stop-color="${COLORS.gold}"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="${W}" height="${H}" fill="${COLORS.bg}"/>
+  <rect width="${W}" height="${H}" fill="url(#halo)"/>
+
+  <!-- Brand bar -->
+  <text x="${W / 2}" y="${cy - off(360)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(28)}" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="6">◆ FIRST LIGHT</text>
+  <text x="${W / 2}" y="${cy - off(312)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(20)}" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="6">${date}</text>
+
+  <!-- Verdict -->
+  <text x="${W / 2}" y="${cy - off(120)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(26)}" font-weight="500"
+        fill="${COLORS.red}" letter-spacing="10">RULE BROKEN</text>
+
+  <!-- The rule that fell -->
+  <text x="${W / 2}" y="${cy + off(20)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(rule.length > 16 ? 84 : 110)}" font-weight="700"
+        fill="url(#rule-grad)" letter-spacing="2">${rule}</text>
+
+  <line x1="${W / 2 - 60}" y1="${cy + off(80)}" x2="${W / 2 + 60}" y2="${cy + off(80)}"
+        stroke="${COLORS.gold}" stroke-width="3"/>
+
+  <!-- The debt -->
+  <text x="${W / 2}" y="${cy + off(165)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(58)}" font-weight="700"
+        fill="${COLORS.gold}" letter-spacing="4">${km} KM</text>
+  <text x="${W / 2}" y="${cy + off(220)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(22)}" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="4">OWED. THE DEBT IS DISTANCE.</text>
+
+  ${note ? `<text x="${W / 2}" y="${cy + off(280)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(22)}" font-weight="500"
+        fill="${COLORS.dim}" letter-spacing="2">${note}</text>` : ''}
+
+  <!-- Footer -->
+  <text x="${W / 2}" y="${H - (isStory ? 150 : 80)}" text-anchor="middle"
+        font-family="'Roboto Mono', monospace" font-size="${fz(26)}" font-weight="700"
+        fill="${COLORS.red}" letter-spacing="8">NOT TODAY.</text>
 </svg>`
 }
 

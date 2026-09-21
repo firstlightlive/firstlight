@@ -4220,6 +4220,64 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify(result), { headers })
     }
 
+    // ── RULE BROKEN POST — one public slide when ANY rule breaks ──
+    // POST ?action=publish-violation   body: { rule, km, note?, dryRun? }
+    // Renders the RULE_BROKEN variant through the Worker and publishes a single
+    // image. The slide shows the DATE (no day number), so it works on rest/gap
+    // days too. Anti-spam: caption = identity + honest record only — no links,
+    // no handle, no ₹/charity language. dryRun renders without publishing.
+    if (action === 'publish-violation') {
+      const body = await req.json().catch(() => ({}))
+      const rule = String(body.rule || '').toUpperCase().slice(0, 40)
+      const km = Math.max(1, Math.min(999, Math.round(Number(body.km) || 20)))
+      const note = String(body.note || '').slice(0, 120)
+      const dryRun = body.dryRun === true || body.dryRun === '1' || body.dryRun === 1
+      if (!rule) {
+        return new Response(JSON.stringify({ error: 'rule is required (e.g. FOOD CODE)' }), { status: 400, headers })
+      }
+      const date = todayIST()
+      const renderBase = (await getSecret('render_worker_base')) || 'https://firstlight.live'
+      const renderResp = await fetch(`${renderBase}/api/render`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date,
+          chapterDay: chapterDay(new Date(`${date}T12:00:00+05:30`)),
+          variant: 'RULE_BROKEN',
+          orientation: 'post',
+          payload: { violation: { rule, km, note } }
+        })
+      })
+      const renderJson = await renderResp.json().catch(() => ({})) as Record<string, unknown>
+      const publicUrl = String(renderJson.publicUrl || renderJson.url || '')
+      if (!publicUrl) {
+        return new Response(JSON.stringify({ error: 'render failed', detail: renderJson }), { status: 502, headers })
+      }
+      if (dryRun) {
+        return new Response(JSON.stringify({ ok: true, dryRun: true, publicUrl, rule, km }), { headers })
+      }
+      try {
+        const caption = `RULE BROKEN — ${rule}.\n\n${km} km — owed. The debt is distance. Posted. No hiding from it.${note ? '\n\n' + note : ''}\n\n#discipline #notoday #indianrunners #triathlonindia`
+        const created = await igProxy({ endpoint: `${IG_ACCOUNT_ID}/media`, params: { image_url: publicUrl, caption } }) as { id?: string; error?: unknown }
+        if (!created || !created.id) throw new Error('IG container failed: ' + JSON.stringify(created))
+        let status = ''
+        for (let i = 0; i < 12; i++) {
+          await new Promise(r => setTimeout(r, 3000))
+          const st = await igProxy({ endpoint: created.id as string, method: 'GET', params: { fields: 'status_code' } }) as { status_code?: string }
+          status = String(st.status_code || '')
+          if (status === 'FINISHED') break
+          if (status === 'ERROR') throw new Error('IG rejected the media: ' + JSON.stringify(st))
+        }
+        if (status !== 'FINISHED') throw new Error('IG container never finished: ' + status)
+        const pub = await igProxy({ endpoint: `${IG_ACCOUNT_ID}/media_publish`, params: { creation_id: created.id as string } }) as { id?: string }
+        if (!pub || !pub.id) throw new Error('IG publish failed: ' + JSON.stringify(pub))
+        const perm = await igProxy({ endpoint: pub.id, method: 'GET', params: { fields: 'permalink' } }) as { permalink?: string }
+        return new Response(JSON.stringify({ ok: true, published: true, media_id: pub.id, permalink: perm.permalink || null, rule, km }), { headers })
+      } catch (e) {
+        return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers })
+      }
+    }
+
     if (action === 'upload') {
       const body = await req.json()
       const result = await uploadMedia(body)
