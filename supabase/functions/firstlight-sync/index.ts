@@ -3082,6 +3082,65 @@ async function healthIngest(body: Record<string, unknown>): Promise<{ success: b
 // ═══════════════════════════════════════════
 // IG PROXY — Token injected server-side
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// RULES DEBT SETTLEMENT — Strava pays the debt
+// ═══════════════════════════════════════════
+// Violations write RULES_DEBT_<date> = { km, rules, ts } (verdict + manual
+// publish-violation). Settlement recomputes from scratch: every OPEN debt is
+// paid by activities on strava_activities that STARTED after the oldest open
+// debt — ride 1×, walk/run 2×, swim 10×. When paid >= owed, every open debt
+// row is marked cleared and the operator gets an email. Runs piggybacked on
+// the daily sync crons + ?action=rules-ledger (read state for the page).
+async function settleRulesDebt(log: string[] = []): Promise<{ openKm: number; paidKm: number; remaining: number; cleared: boolean }> {
+  const { data: debtRows } = await supaAdmin.from('config').select('key,value').like('key', 'RULES_DEBT_%')
+  const open: Array<{ key: string; km: number; ts: string }> = []
+  for (const r of (debtRows || []) as Array<{ key: string; value: string }>) {
+    try {
+      const v = JSON.parse(r.value)
+      if (!v.cleared && Number(v.km) > 0) open.push({ key: r.key, km: Number(v.km), ts: String(v.ts || '') })
+    } catch (_e) { /* skip malformed */ }
+  }
+  if (open.length === 0) return { openKm: 0, paidKm: 0, remaining: 0, cleared: true }
+
+  const totalOpen = Math.round(open.reduce((s, d) => s + d.km, 0) * 10) / 10
+  const oldestTs = open.map(d => d.ts).filter(Boolean).sort()[0] || new Date(0).toISOString()
+
+  const { data: acts } = await supaAdmin.from('strava_activities').select('type,distance,start_date_local')
+    .gte('start_date_local', oldestTs.slice(0, 19))
+  let paidKm = 0
+  for (const a of (acts || []) as Array<{ type?: string; distance?: number }>) {
+    const km = (Number(a.distance) || 0) / 1000
+    const t = String(a.type || '')
+    if (t === 'Run' || t === 'Walk' || t === 'Hike') paidKm += km * 2
+    else if (t === 'Ride' || t === 'VirtualRide' || t === 'EBikeRide') paidKm += km * 1
+    else if (t === 'Swim') paidKm += km * 10
+  }
+  paidKm = Math.round(paidKm * 10) / 10
+
+  if (paidKm >= totalOpen) {
+    const nowIso = new Date().toISOString()
+    for (const d of open) {
+      const { data: curRows } = await supaAdmin.from('config').select('value').eq('key', d.key).limit(1)
+      let v: Record<string, unknown> = {}
+      try { v = curRows && curRows[0] ? JSON.parse((curRows[0] as { value: string }).value) : {} } catch (_e) { v = {} }
+      v.cleared = true
+      v.clearedAt = nowIso
+      v.paidKm = totalOpen
+      await supaUpsert('config', { key: d.key, value: JSON.stringify(v) }, 'key')
+    }
+    log.push(`RULES_DEBT cleared: ${totalOpen} km paid by Strava since ${oldestTs}`)
+    try {
+      await _sendEmail(`[FL] Debt cleared — ${totalOpen} km paid on Strava`,
+        _emailShell('Debt cleared',
+          `<p style="font-size:18px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 18px">The ledger is clean.</p>
+<p>The open rules debt of <b style="color:#D4A843">${totalOpen} km</b> is paid — Strava shows the distance. Ride on.</p>`),
+        `Rules debt ${totalOpen} km cleared by Strava activities since ${oldestTs}.`)
+    } catch (_e) { /* tolerate */ }
+    return { openKm: totalOpen, paidKm, remaining: 0, cleared: true }
+  }
+  return { openKm: totalOpen, paidKm, remaining: Math.round((totalOpen - paidKm) * 10) / 10, cleared: false }
+}
+
 async function igProxy(body: Record<string, unknown>) {
   const igToken = await getSecret('ig_access')
   if (!igToken) throw new Error('No IG token — check secrets table')
@@ -4293,6 +4352,15 @@ Deno.serve(async (req) => {
         }
         const caption = `RULE BROKEN — ${rule}.\n\n${km} km — owed. The debt is distance. Posted. No hiding from it.${note ? '\n\n' + note : ''}\n\n#discipline #notoday #indianrunners #triathlonindia`
         const pub = await _publishRuleSlides([publicUrl], caption)
+        // A manual violation post also opens a debt that Strava can clear.
+        const debtKey = `RULES_DEBT_${date}`
+        const { data: dRows } = await supaAdmin.from('config').select('value').eq('key', debtKey).limit(1)
+        const dVal: { km?: number; rules?: string[]; ts?: string } = {}
+        try { Object.assign(dVal, dRows && dRows[0] ? JSON.parse((dRows[0] as { value: string }).value) : {}) } catch (_e) { /* fresh */ }
+        dVal.km = (Number(dVal.km) || 0) + km
+        dVal.rules = [...new Set([...(dVal.rules || []), rule])]
+        dVal.ts = dVal.ts || new Date().toISOString()
+        await supaUpsert('config', { key: debtKey, value: JSON.stringify(dVal) }, 'key')
         return new Response(JSON.stringify({ ok: true, published: true, media_id: pub.media_id, permalink: pub.permalink, rule, km }), { headers })
       } catch (e) {
         return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers })
@@ -4332,6 +4400,14 @@ Deno.serve(async (req) => {
       prev.ts = new Date().toISOString()
       await supaUpsert('config', { key, value: JSON.stringify(prev) }, 'key')
       return new Response(JSON.stringify({ ok: true, date, checkin: prev }), { headers })
+    }
+
+    // ── RULES LEDGER — read settlement state (page + verification) ──
+    // GET ?action=rules-ledger → { openKm, paidKm, remaining, cleared }
+    // Recomputes settlement live (also clears debts that are now paid).
+    if (action === 'rules-ledger') {
+      const s = await settleRulesDebt()
+      return new Response(JSON.stringify({ ok: true, ...s }), { headers })
     }
 
     // ── RULES REMINDER — 21:30 IST email nudge if the day is not fully marked ──
@@ -4576,6 +4652,7 @@ Deno.serve(async (req) => {
       await syncStrava(log)
       await syncInstagram(log)
       await syncProofArchive(log)
+      await settleRulesDebt(log)
     }
 
     if (action === 'refresh-token') {

@@ -113,6 +113,7 @@
     <button id="b-note">SAVE</button>
   </div>
   <div class="debt" id="debt" style="display:none"></div>
+  <div class="debt" id="ledger" style="display:none"></div>
   <div id="history" style="margin-top:18px"></div>
 </div>
 <div class="flash" id="flash">SAVED ✓</div>
@@ -243,6 +244,15 @@
         }catch(e){}
       }
     }).catch(function(){});
+
+    // Open ledger — Strava settlement state (recomputed live by the edge fn)
+    fetch(FN+'?action=rules-ledger',{headers:{'X-Admin-Key':_ak}})
+      .then(function(r){return r.json();}).then(function(d){
+        var el=document.getElementById('ledger');
+        if(!d||!d.ok||(d.cleared&&d.openKm===0)){el.style.display='none';return;}
+        el.innerHTML='OPEN DEBT: <b>'+d.openKm+' KM</b><br>paid by Strava: '+d.paidKm+' km · remaining: <b>'+d.remaining+' km</b><br>ride 1× · walk/run 2× · swim 10× — clears automatically as Strava logs the distance';
+        el.style.display='block';
+      }).catch(function(){});
 
     // Last 7 days history
     var days=[];
