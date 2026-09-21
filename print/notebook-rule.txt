@@ -29,7 +29,9 @@ L5 · Two slips in 7 days
 EXTRA · Unpaid after 48 hours → DOUBLES.
 
 PAYMENT
-cycle 1 km = 1 · walk 1 = 1 · run 1 = 1 · swim 1 km = 4
+cycle 1 km = 1 · walk/run 1 km = 2 · swim 1 km = 10
+boxing / gym / any other activity: 1 hour = 10
+Log every payment in the panel. 2-hour reminders until paid.
 Proof to the witness.
 
 NOT TODAY.

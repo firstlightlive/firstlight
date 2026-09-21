@@ -19,7 +19,17 @@
     lieKm: 400,              // faked exception / lying / guard off / WiFi re-enabled
     doubleKm: 500,           // never-miss-twice broken (2 slips in 7 days)
     dnsKm: 20,               // cycle km per 15-min blocked-site session
-    doubleHours: 48          // unpaid debts double after this many hours
+    doubleHours: 48,         // unpaid debts double after this many hours
+    // Payment conversions — how each activity pays off debt km
+    payModes: {
+      cycle:  { unit: 'km',    per: 1  },
+      walk:   { unit: 'km',    per: 2  },
+      run:    { unit: 'km',    per: 2  },
+      swim:   { unit: 'km',    per: 10 },
+      boxing: { unit: 'hours', per: 10 },
+      gym:    { unit: 'hours', per: 10 },
+      other:  { unit: 'hours', per: 10 }
+    }
   };
 
   var MILESTONES = [
@@ -94,6 +104,26 @@
     return km;
   }
 
+  function paidKm(d) {
+    var s = 0;
+    (d.payments || []).forEach(function (p) { s += p.kmOff || 0; });
+    return s;
+  }
+
+  function remainingKm(d) {
+    return Math.max(0, debtKmNow(d) - paidKm(d));
+  }
+
+  function openRemainingKm(st) {
+    var t = 0;
+    st.debts.forEach(function (d) { if (!d.paid) t += remainingKm(d); });
+    return t;
+  }
+
+  function planLine(rem) {
+    return 'PAY PLAN: ride ' + rem + ' km · walk/run ' + Math.ceil(rem / 2) + ' km · swim ' + (rem / 10) + ' km · or ' + Math.ceil(rem / 10) + 'h gym/boxing/other.';
+  }
+
   function fmtAge(iso) {
     var h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
     if (h < 1) return 'just now';
@@ -114,7 +144,7 @@
     var st = load();
     var d = dayNum();
     var lap = lapDays(st);
-    var openKm = openDebtKm(st);
+    var openKm = openRemainingKm(st);
 
     var html = '';
     html += '<div style="padding:24px 0 8px">' +
@@ -136,12 +166,15 @@
     // Travel protocol — reward trips and hotels
     html += '<div style="font:500 10px var(--font-mono);color:var(--cyan,#00D4FF);letter-spacing:1px;margin-bottom:16px">● TRAVEL PROTOCOL — SCREENS OFF WHEREVER I SLEEP: devices powered down from room-entry to morning; dumb phone stays ON (witness line, family, emergencies); day/transit use allowed out in the world. A declared trip is a reward, not a break.</div>';
 
+    // Debt reminder banner (updates every 2 hours + on load)
+    html += '<div id="rcReminder" style="display:none;font:600 10px var(--font-mono);color:#FF5252;background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.3);border-radius:10px;padding:10px 12px;margin-bottom:14px"></div>';
+
     // Stat cards
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px">';
     html += statCard('DAY', d, 'since ' + DAY1);
     html += statCard('LAP', lap, lap === d ? 'first clean day' : 'days clean on this lap');
     html += statCard('LAPS', st.laps.length, 'total, honest, immutable');
-    html += statCard('OPEN DEBT', openKm + ' km', 'cycle km — paid by cycle, walk, run or swim');
+    html += statCard('OPEN DEBT', openKm + ' km left', 'cycle-km debt remaining — plan below');
     html += '</div>';
 
     // Milestones
@@ -203,7 +236,7 @@
 
     // Debt ledger
     html += sectionTitle('DEBT LEDGER — THE PENAL CODE');
-    html += '<div style="font:400 9px var(--font-mono);color:var(--text-dim,#6a6f78);margin-bottom:10px">CONNECTION (per hour, no base): ' + PENALTY.hourDay + ' km cycle/h day · ' + PENALTY.hourNight + ' km/h night (rounded up, min 1h) · USED ' + PENALTY.usedKm + ' · NIGHT ' + PENALTY.nightKm + ' · LIE/TAMPER ' + PENALTY.lieKm + ' · NEVER-MISS-TWICE ' + PENALTY.doubleKm + ' · DNS ' + PENALTY.dnsKm + ' · unpaid doubles at ' + PENALTY.doubleHours + 'h. Pay: 1 km cycle/walk/run = 1 km off · 1 km swim = 4 km off. Mix freely.</div>';
+    html += '<div style="font:400 9px var(--font-mono);color:var(--text-dim,#6a6f78);margin-bottom:10px">CONNECTION (per hour, no base): ' + PENALTY.hourDay + ' km cycle/h day · ' + PENALTY.hourNight + ' km/h night (rounded up, min 1h) · USED ' + PENALTY.usedKm + ' · NIGHT ' + PENALTY.nightKm + ' · LIE/TAMPER ' + PENALTY.lieKm + ' · NEVER-MISS-TWICE ' + PENALTY.doubleKm + ' · DNS ' + PENALTY.dnsKm + ' · unpaid doubles at ' + PENALTY.doubleHours + 'h. PAY: cycle 1 km = 1 · walk/run 1 km = 2 · swim 1 km = 10 · boxing/gym/other 1h = 10 — log each payment, progress tracked, 2h reminders.</div>';
     html += '<div style="font:400 9px var(--font-mono);color:var(--cyan,#00D4FF);background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.15);border-radius:8px;padding:8px 10px;margin-bottom:12px">QUALIFIED PENANCE: dedicated session labeled PENANCE · outdoors, GPS-logged · EXTRA (above the daily ritual workout) · within 48h · proof to witness (Strava/photo) · one session = one debt, no double-dip · indoor counts HALF · witness marks PAID.</div>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:10px">' +
       '<div><label class="rc-label">TYPE</label><select id="rcDebtType" class="rc-input"><option value="connection">connection (door)</option><option value="used">used in house</option><option value="night">bedroom / night</option><option value="lie">lie / tamper</option><option value="dns">blocked site (dns)</option><option value="double">never-miss-twice</option></select></div>' +
@@ -220,14 +253,36 @@
     } else {
       debtsSorted.forEach(function (dd, i) {
         var km = debtKmNow(dd);
+        var paid = paidKm(dd);
+        var rem = remainingKm(dd);
         var doubled = !dd.paid && km !== (dd.km || 0);
-        html += '<div style="display:flex;gap:10px;align-items:center;padding:8px 10px;margin-bottom:6px;background:var(--bg2,rgba(255,255,255,0.03));border:1px solid ' +
-          (dd.paid ? 'rgba(0,230,118,0.25)' : (doubled ? 'rgba(255,82,82,0.4)' : 'rgba(245,166,35,0.3)')) + ';border-radius:8px">' +
+        var pct = km > 0 ? Math.min(100, Math.round(paid / km * 100)) : 0;
+        html += '<div style="padding:10px 12px;margin-bottom:8px;background:var(--bg2,rgba(255,255,255,0.03));border:1px solid ' +
+          (dd.paid ? 'rgba(0,230,118,0.25)' : (doubled ? 'rgba(255,82,82,0.4)' : 'rgba(245,166,35,0.3)')) + ';border-radius:10px">' +
+          '<div style="display:flex;gap:10px;align-items:center">' +
           '<div style="flex:1"><div style="font:700 10px var(--font-mono);color:' + (dd.paid ? 'var(--green,#00E676)' : 'var(--gold,#F5A623)') + '">' +
           esc(dd.device) + ' · ' + esc(dd.type) + ' · ' + (dd.hours || '—') + 'h → ' + km + ' KM' + (doubled ? ' (DOUBLED)' : '') + '</div>' +
-          '<div style="font:400 8px var(--font-mono);color:var(--text-dim,#6a6f78)">' + fmtAge(dd.opened) + (dd.paid ? ' · PAID — ' + esc(dd.proof || 'proof accepted') : ' · OPEN') + '</div></div>' +
-          (!dd.paid ? '<button class="rc-btn rc-btn-small" data-act="pay" data-i="' + i + '">PAY</button>' : '') +
+          '<div style="font:400 8px var(--font-mono);color:var(--text-dim,#6a6f78)">' + fmtAge(dd.opened) + (dd.paid ? ' · PAID — ' + esc(dd.proof || 'proof accepted') : ' · PAID ' + paid + ' / ' + km + ' KM · LEFT ' + rem + ' KM') + '</div></div>' +
+          '<div style="display:flex;gap:8px;align-items:center;margin-top:6px">' +
+          '<div style="flex:1;height:6px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#00E676,#00D4FF);border-radius:3px"></div></div>' +
+          '<span style="font:600 8px var(--font-mono);color:var(--text-dim,#6a6f78)">' + pct + '%</span>' +
+          (!dd.paid ? '<button class="rc-btn rc-btn-small" data-act="pay" data-i="' + i + '">FULL PAY</button>' : '') +
           '<button class="rc-btn rc-btn-small" data-act="ignote" data-i="' + i + '">IG NOTE</button></div>';
+        if (!dd.paid) {
+          html += '<div style="font:400 8.5px var(--font-mono);color:var(--cyan,#00D4FF);margin-top:6px">' + planLine(rem) + '</div>' +
+            '<div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap">' +
+            '<select id="rcPayMode_' + i + '" class="rc-input" style="width:auto;padding:6px 8px;font-size:10px">' +
+            '<option value="cycle">CYCLE (1 km = 1)</option><option value="walk">WALK (1 km = 2)</option>' +
+            '<option value="run">RUN (1 km = 2)</option><option value="swim">SWIM (1 km = 10)</option>' +
+            '<option value="boxing">BOXING (1h = 10)</option><option value="gym">GYM (1h = 10)</option>' +
+            '<option value="other">OTHER (1h = 10)</option></select>' +
+            '<input type="number" id="rcPayVal_' + i + '" value="10" min="1" step="1" class="rc-input" style="width:90px;padding:6px 8px;font-size:10px" placeholder="km or hours">' +
+            '<button class="rc-btn rc-btn-small" data-act="payadd" data-i="' + i + '">LOG PAYMENT</button></div>';
+          (dd.payments || []).slice().reverse().slice(0, 4).forEach(function (p) {
+            html += '<div style="font:400 8px var(--font-mono);color:var(--text-dim,#6a6f78);margin-top:4px">↳ ' + esc(p.mode) + ' ' + p.amount + ' ' + p.unit + ' = ' + p.kmOff + ' km off</div>';
+          });
+        }
+        html += '</div>';
       });
     }
 
@@ -254,10 +309,12 @@
     html += '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
       '<button class="rc-btn rc-btn-small" id="rcExport">EXPORT JSON</button>' +
       '<button class="rc-btn rc-btn-small" id="rcImport">IMPORT JSON</button>' +
+      '<button class="rc-btn rc-btn-small" id="rcNotify">ENABLE 2H REMINDERS</button>' +
       '<input type="file" id="rcImportFile" accept=".json" style="display:none"></div>';
 
     root.innerHTML = html;
     bindEvents(st);
+    startDebtReminders();
   }
 
   function statCard(label, value, sub) {
@@ -385,9 +442,55 @@
         alert('IG note copied (never the reason):\n\n' + note);
       });
     });
+
+    root.querySelectorAll('[data-act="payadd"]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var s = load();
+        var i = parseInt(b.dataset.i, 10);
+        var modeSel = document.getElementById('rcPayMode_' + i);
+        var valEl = document.getElementById('rcPayVal_' + i);
+        var mode = modeSel ? modeSel.value : 'cycle';
+        var val = parseFloat(valEl ? valEl.value : 0) || 0;
+        var pm = PENALTY.payModes[mode] || PENALTY.payModes.cycle;
+        var kmOff = Math.round(val * pm.per);
+        if (kmOff <= 0) return;
+        s.debts[i].payments = s.debts[i].payments || [];
+        s.debts[i].payments.push({ ts: new Date().toISOString(), mode: mode, amount: val, unit: pm.unit, kmOff: kmOff });
+        save(s); renderRecovery();
+      });
+    });
+
+    if ($('rcNotify')) $('rcNotify').addEventListener('click', function () {
+      if ('Notification' in window) Notification.requestPermission();
+    });
   }
 
   var root = document.getElementById('recoveryRoot');
   window.renderRecovery = renderRecovery;
+
+  // Debt reminder engine — re-alerts every 2 hours while a punishment is open
+  var reminderTimer = null;
+  function startDebtReminders() {
+    if (reminderTimer) return;
+    function check() {
+      var st = load();
+      var rem = 0;
+      st.debts.forEach(function (d) { if (!d.paid) rem += remainingKm(d); });
+      var banner = document.getElementById('rcReminder');
+      if (!banner) return;
+      if (rem > 0) {
+        banner.style.display = 'block';
+        banner.textContent = '⚠ PUNISHMENT OPEN — ' + rem + ' km remaining. ' + planLine(rem);
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try { new Notification('NOT TODAY — DEBT REMAINING', { body: rem + ' km left. ' + planLine(rem) }); } catch (e) {}
+        }
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+    check();
+    reminderTimer = setInterval(check, 2 * 3600 * 1000); // every 2 hours
+  }
+
   if (root && document.querySelector('.cc-panel#p-recovery.active')) renderRecovery();
 })();
