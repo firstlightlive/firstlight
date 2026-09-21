@@ -405,7 +405,7 @@
 
     const TODAY = todayStr();
     const DAY = Math.max(0, dayNum(TODAY));
-    document.getElementById('p-day-num').textContent = DAY;
+    document.getElementById('p-day-num').textContent = DAY > 0 ? DAY : 'REST';
     document.getElementById('p-date').textContent = TODAY;
 
     // Lock button → wipes session + reload

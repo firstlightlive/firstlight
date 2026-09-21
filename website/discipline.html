@@ -177,7 +177,8 @@
 
   function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function render(){
-    document.getElementById('dayline').textContent='DAY '+Math.max(0,dayNum(today));
+    var dn=dayNum(today);
+    document.getElementById('dayline').textContent = dn>0 ? ('DAY '+dn) : 'REST DAY — DAY 1 = WED 23 SEP';
     var rit=document.getElementById('rituals'); rit.innerHTML='';
     RITUALS.forEach(function(r){
       var on=todayEntry[r.k];

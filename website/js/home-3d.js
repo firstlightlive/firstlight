@@ -74,14 +74,18 @@
 
   function populateDayNumbers() {
     var day = getDayNum();
+    // Gap days (between the last break and Day 1 = Wed 23 Sep 2026) show REST,
+    // not 0 — the counter is quiet until the new run starts.
+    var gap = day === 0;
+    var label = gap ? 'REST' : String(day);
     var el = document.getElementById('heroDayNum');
-    if (el) animateCounter(el, day);
+    if (el) { if (gap) el.textContent = 'REST'; else animateCounter(el, day); }
     var navDay = document.getElementById('navDay');
-    if (navDay) navDay.textContent = day;
+    if (navDay) navDay.textContent = label;
     var footDay = document.getElementById('footDay');
-    if (footDay) footDay.textContent = day;
+    if (footDay) footDay.textContent = label;
     var streakDays = document.getElementById('streakDays');
-    if (streakDays) animateCounter(streakDays, day);
+    if (streakDays) { if (gap) streakDays.textContent = 'REST'; else animateCounter(streakDays, day); }
     // Total at risk (₹1,500 per missed day → Akshaya Patra)
     var totalRisk = document.getElementById('totalRisk');
     if (totalRisk) {
