@@ -4303,6 +4303,7 @@ Deno.serve(async (req) => {
     // POST ?action=rules-checkin   body: { screens: 'clean'|'broken', food: 'clean'|'broken', note?, date? }
     // Stored in config as RULES_CHECKIN_<date> (JSONB — no schema change).
     // Deadline: every day by 11:59 PM IST. Unlogged by 11:59 PM = both violated.
+    // The check-in STARTS 2026-09-22 — earlier dates are skipped by the verdict.
     if (action === 'rules-checkin') {
       const body = await req.json().catch(() => ({}))
       const date = String(body.date || todayIST())
@@ -4336,6 +4337,11 @@ Deno.serve(async (req) => {
       const date = url.searchParams.get('date') || todayIST()
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return new Response(JSON.stringify({ error: 'bad date' }), { status: 400, headers })
+      }
+      // The daily check-in starts 2026-09-22 (announced the day before).
+      // Any earlier date is skipped — no verdict, no post.
+      if (date < '2026-09-22') {
+        return new Response(JSON.stringify({ ok: true, skipped: true, date, reason: 'rules check-in starts 2026-09-22' }), { headers })
       }
       const postedKey = `RULES_POST_${date}`
       if (!dryRun) {

@@ -41,7 +41,7 @@
     <span class="sub">RULES · DAILY CHECK-IN</span>
   </header>
 
-  <div class="deadline">You can update <b>any time of day</b>.<br>
+  <div class="deadline" id="deadline">You can update <b>any time of day</b>.<br>
   Both rules marked by <b>11:59 PM</b> = day held. Nothing marked by <b>11:59 PM</b> = BOTH rules violated · punishment posted. No exceptions.</div>
 
   <section class="card" id="card-screens">
@@ -152,7 +152,12 @@
     var now=new Date();
     var opts={timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false};
     var hm=now.toLocaleTimeString('en-GB',opts);
-    var day=new Date(now.toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'})+'T23:59:00+05:30');
+    var today=istToday();
+    if(today<'2026-09-22'){
+      document.getElementById('count').textContent='RULES START TOMORROW — FIRST CHECK-IN TUE 22 SEP';
+      return;
+    }
+    var day=new Date(today+'T23:59:00+05:30');
     var mins=Math.max(0,Math.round((day-now)/60000));
     var h=Math.floor(mins/60), m=mins%60;
     document.getElementById('count').textContent='NOW '+hm+' IST · '+h+'h '+m+'m TO THE 11:59 PM DEADLINE';
