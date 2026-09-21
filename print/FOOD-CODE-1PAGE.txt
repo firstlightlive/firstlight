@@ -38,9 +38,11 @@ RULE 03 (NIGHT FOOD) CLEAN or BROKEN at
 firstlight.live/rules.html
 
 RULE 03 · NIGHT FOOD
-No solid food after 6:00 PM. No ordering at night —
-no Zomato, no Swiggy, no ice-cream runs. The ORDER
-itself is the violation. Warm milk / water / decaf = fine.
+No food after 10:00 PM — NO exceptions
+(parties, dinners, festivals, travel — all finish by 10).
+No ordering after 10:00 PM — no Zomato, no Swiggy,
+no ice-cream runs. The ORDER itself is the violation.
+Warm milk / water / decaf = fine after 10.
 Break → 60 km ride (or 30 km walk — counts double).
 
 Nothing marked by 11:59 PM =
