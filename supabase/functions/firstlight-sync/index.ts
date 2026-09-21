@@ -4302,7 +4302,7 @@ Deno.serve(async (req) => {
     // ── DAILY RULES CHECK-IN — RULE 01 SCREENS · RULE 02 FOOD CODE ──
     // POST ?action=rules-checkin   body: { screens: 'clean'|'broken', food: 'clean'|'broken', note?, date? }
     // Stored in config as RULES_CHECKIN_<date> (JSONB — no schema change).
-    // Deadline: on or before 9 PM IST. Unlogged by 11:59 PM = both violated.
+    // Deadline: every day by 11:59 PM IST. Unlogged by 11:59 PM = both violated.
     if (action === 'rules-checkin') {
       const body = await req.json().catch(() => ({}))
       const date = String(body.date || todayIST())
