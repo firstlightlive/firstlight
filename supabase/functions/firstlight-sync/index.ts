@@ -4310,6 +4310,10 @@ Deno.serve(async (req) => {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return new Response(JSON.stringify({ error: 'bad date' }), { status: 400, headers })
       }
+      if (body.reset === true || body.reset === '1') {
+        await supaAdmin.from('config').delete().eq('key', `RULES_CHECKIN_${date}`)
+        return new Response(JSON.stringify({ ok: true, reset: true, date }), { headers })
+      }
       const screens = body.screens === 'broken' ? 'broken' : body.screens === 'clean' ? 'clean' : ''
       const food = body.food === 'broken' ? 'broken' : body.food === 'clean' ? 'clean' : ''
       const night = body.night === 'broken' ? 'broken' : body.night === 'clean' ? 'clean' : ''
