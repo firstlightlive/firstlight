@@ -92,14 +92,16 @@
     if (footDay) footDay.textContent = label;
     var streakDays = document.getElementById('streakDays');
     if (streakDays) { if (gap) streakDays.textContent = 'REST'; else animateCounter(streakDays, day); }
-    // Total at risk (₹1,500 per missed day → Akshaya Patra)
+    // Total owed. Chapter 06 has no money: a miss costs MISS_PENANCE_KM (100 km)
+    // on the cycle, so this counts distance, not rupees.
     var totalRisk = document.getElementById('totalRisk');
     if (totalRisk) {
-      var amt = getCumulativeUnclaimedHome(day);
-      if (typeof formatINR === 'function') {
-        totalRisk.textContent = '₹' + formatINR(amt);
+      if (FL && !FL.STAKE_PER_DAY) {
+        totalRisk.textContent = '0 km';        // nothing owed until a miss posts
       } else {
-        totalRisk.textContent = '₹' + amt.toLocaleString('en-IN');
+        var amt = getCumulativeUnclaimedHome(day);
+        totalRisk.textContent = (typeof formatINR === 'function')
+          ? '₹' + formatINR(amt) : '₹' + amt.toLocaleString('en-IN');
       }
     }
   }

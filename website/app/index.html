@@ -435,7 +435,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
   </div>
 
   <!-- Time bar -->
-  <div class="time-bar safe" id="timeBar">⏱ BEFORE 6:00 AM — ₹15,000 IS SAFE</div>
+  <div class="time-bar safe" id="timeBar">⏱ BEFORE 6:00 AM — 100 km IS SAFE</div>
 
   <!-- Day -->
   <div class="sec">
@@ -461,11 +461,11 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;">
         <div style="text-align:center;">
           <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--smoke);margin-bottom:4px;">CURRENT PENALTY</div>
-          <div style="font-size:20px;font-weight:700;color:#FF3B5C;">₹<span id="currentStake">15,000</span></div>
+          <div style="font-size:20px;font-weight:700;color:#FF3B5C;"><span id="currentStake">100</span> km</div>
         </div>
         <div style="text-align:center;">
           <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--smoke);margin-bottom:4px;">TOTAL SAVED</div>
-          <div style="font-size:20px;font-weight:700;color:var(--gold);">₹<span id="totalSaved">0</span></div>
+          <div style="font-size:20px;font-weight:700;color:var(--gold);"><span id="totalSaved">0</span> days</div>
         </div>
       </div>
       <div id="stakeWarning" style="display:none;font-size:10px;font-family:'JetBrains Mono',monospace;color:#FFA500;text-align:center;padding:6px;background:rgba(255,165,0,0.1);border-radius:6px;"></div>
@@ -651,16 +651,16 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
 
   <!-- THE PUBLIC PLEDGE -->
   <div class="sec" id="pledgeSec">
-    <div class="sec-label" style="color:#FF3B5C">⚠️ THE ₹15,000 PLEDGE — REAL CASH. REAL FOLLOWER.</div>
+    <div class="sec-label" style="color:#FF3B5C">⚠️ THE 100 km PLEDGE — REAL CASH. REAL FOLLOWER.</div>
     <div class="card" style="padding:12px;border:1px solid rgba(255,59,92,.15)">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:var(--smoke);margin-bottom:8px">IF I MISS MY DAILY PROOF BY 6:00 AM — ₹15,000 ($200) CASH TO A RANDOM FOLLOWER</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:var(--smoke);margin-bottom:8px">IF I MISS MY DAILY PROOF BY 6:00 AM — 100 km  CASH TO A RANDOM FOLLOWER</div>
       <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
         <div class="s-card on" data-key="deadline" onclick="tap(this);calcPledge()" style="flex:1;padding:8px">
           <div class="s-emoji" style="font-size:18px">⏰</div>
           <div class="s-name" style="font-size:8px">6 AM DEADLINE</div>
           <div class="s-val" style="font-size:10px">MET</div>
         </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);flex:2;line-height:1.5">TAP IF YOU MISSED THE 6 AM DEADLINE. I PAY ₹15,000 ($200) TO ONE RANDOM FOLLOWER. THEY KEEP IT ALL. NO QUESTIONS.</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--smoke);flex:2;line-height:1.5">TAP IF YOU MISSED THE DEADLINE. THE MISS IS PAID IN DISTANCE — 100 KM ON THE CYCLE, GPS-LOGGED. NO EXCEPTIONS.</div>
       </div>
     </div>
   </div>
@@ -1650,10 +1650,10 @@ function updateTime(){
   if(h<6){
     const left=((5-h)*60)+(60-m);
     bar.className='time-bar safe';
-    bar.textContent=`⏱ ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} — ${left} MIN · ₹15,000 STILL SAFE`;
+    bar.textContent=`⏱ ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} — ${left} MIN · 100 km STILL SAFE`;
   } else {
     bar.className='time-bar warn';
-    bar.textContent='⚠ PAST 6:00 AM — ₹15,000 FINE ZONE';
+    bar.textContent='⚠ PAST 6:00 AM — 100 km FINE ZONE';
   }
 }
 
@@ -1719,13 +1719,13 @@ function tap(el){
 }
 
 const linerBank=[
-  '₹15,000 still in my pocket. The streak lives.',
+  '100 km still in my pocket. The streak lives.',
   'Before 6. Done. The clock never lies.',
   'They sleep. I run. They wonder. I don\'t explain.',
-  'The ₹15,000 jar is watching. So is the streak.',
+  'The 100 km jar is watching. So is the streak.',
   'Zero negotiation with the alarm. Zero.',
   'Discipline is the only currency that never inflates.',
-  'One wrong morning and ₹15,000 walks out the door.',
+  'One wrong morning and 100 km walks out the door.',
   'Same fire. Same 3:30 AM. Different version of me.',
   'The clock hit 6:00. I was already done.',
   'Not luck. Not talent. Just the same cold floor every day.',
@@ -1736,7 +1736,7 @@ const linerBank=[
   'The world wakes up. I\'m already done.',
   'Not for applause. For the person I\'m becoming.',
   'First light hits different when you\'ve already earned it.',
-  'Today was hard. The ₹15,000 didn\'t move. I did.',
+  'Today was hard. The 100 km didn\'t move. I did.',
   'Pain ends. The streak doesn\'t. Go.',
   'Another morning the old me would have wasted.',
   'Clean food. Real run. No excuses. That\'s the entire system.',
@@ -1755,7 +1755,7 @@ function useSuggestion(){
 }
 
 function calcPledge(){
-  // Pledge is flat ₹15,000 ($200 USD) — triggered by deadline toggle
+  // Pledge is flat 100 km (100 km USD) — triggered by deadline toggle
   const met=document.querySelector('[data-key="deadline"]');
   if(met)localStorage.setItem('fl_deadline',met.classList.contains('on')?'met':'missed');
 }
@@ -2721,9 +2721,9 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
   const mY=290;
   c.textAlign='center';c.font='900 160px "Rajdhani",sans-serif';
   c.save();c.shadowColor=P.acR+'0.60)';c.shadowBlur=50;
-  c.fillStyle=P.accent;c.fillText('\u20B915,000',W/2,mY);
+  c.fillStyle=P.accent;c.fillText('100 KM',W/2,mY);
   c.restore();
-  c.fillStyle=P.accent;c.fillText('\u20B915,000',W/2,mY);
+  c.fillStyle=P.accent;c.fillText('100 KM',W/2,mY);
   c.font='700 34px "Rajdhani",sans-serif';c.fillStyle=P.text;
   try{c.letterSpacing='3px';}catch(e){}
   c.fillText('LOGGED PUBLIC. SAME DAY.',W/2,mY+58);
@@ -2733,7 +2733,7 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
   divG.addColorStop(0.85,P.acR+'0.45)');divG.addColorStop(1,'transparent');
   c.fillStyle=divG;c.fillRect(W/2-200,mY+76,400,2);
   c.font='700 26px "Rajdhani",sans-serif';c.fillStyle=P.text;
-  c.fillText('If I miss even 1 day, you get \u20B915,000 cash.',W/2,mY+106);
+  c.fillText('If I miss even 1 day, I owe 100 km on the cycle.',W/2,mY+106);
 
   // ═══ ZONE 2: 3-STEP VERTICAL with proper spacing ═══
   const stepY=mY+146;
@@ -2742,8 +2742,8 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
   const stepH=80;
   const stepData=[
     {n:'01',label:'I MISS A DAY',sub:'I skip one day',em:0},
-    {n:'02',label:'YOU COMMENT FIRST',sub:'You comment first on the post',em:0},
-    {n:'03',label:'YOU GET \u20B915,000',sub:'You get the cash. Direct transfer.',em:1}
+    {n:'02',label:'THE SLIP IS POSTED',sub:'Logged the same day. Immutable.',em:0},
+    {n:'03',label:'I RIDE 100 KM',sub:'GPS-logged. Within 48 hours.',em:1}
   ];
   stepData.forEach(function(s,i){
     const sy=stepY+i*(stepH+stepGap);
@@ -2771,11 +2771,11 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
   c.fillText(day+' DAYS  \u00B7  ZERO MISSES',W/2,infoY+24);
   c.font='900 34px "Rajdhani",sans-serif';c.fillStyle=P.accent;
   c.save();c.shadowColor=P.acR+'0.45)';c.shadowBlur=14;
-  c.fillText('\u20B9'+_unclaimedAmt+' DEFENDED',W/2,infoY+62);
+  c.fillText(_unclaimedAmt+' DAYS HELD',W/2,infoY+62);
   c.restore();
   // Background pill
   c.font='900 34px "Rajdhani",sans-serif';
-  const spW2=Math.max(c.measureText('\u20B9'+_unclaimedAmt+' DEFENDED').width,c.measureText(day+' DAYS  \u00B7  ZERO MISSES').width)+70;
+  const spW2=Math.max(c.measureText(_unclaimedAmt+' DAYS HELD').width,c.measureText(day+' DAYS  \u00B7  ZERO MISSES').width)+70;
   c.save();c.globalCompositeOperation='destination-over';
   c.fillStyle=P.acR+'0.08)';rr(c,W/2-spW2/2,infoY-4,spW2,76,16);c.fill();
   c.strokeStyle=P.acR+'0.25)';c.lineWidth=0.7;rr(c,W/2-spW2/2,infoY-4,spW2,76,16);c.stroke();
@@ -2803,9 +2803,9 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
     c.fillText(_fc<100?'Kam followers = jeetne ka zyada chance. Abhi follow karo.':'Abhi follow karo. Baad mein chance kam hoga.',W/2,oddsY+28);
   }else{
     c.font='800 22px "JetBrains Mono",monospace';c.fillStyle=P.accent;
-    c.fillText('\u20B915,000 DAILY STAKE \u2014 SAB PUBLIC HAI',W/2,oddsY);
+    c.fillText('100 KM PER MISS \u2014 SAB PUBLIC HAI',W/2,oddsY);
     c.font='700 20px "Rajdhani",sans-serif';c.fillStyle=P.text;
-    c.fillText('Jis din miss karunga, \u20B915,000 jayega \u2014 slip public hogi. Sab dekhenge.',W/2,oddsY+30);
+    c.fillText('Jis din miss karunga, 100 km cycle chalana padega \u2014 slip public hogi.',W/2,oddsY+30);
   }
 
   // ═══ ZONE 4: THE ACTION ═══
@@ -3531,13 +3531,13 @@ function _ensureCaptionPopulated(){
   var km=(document.getElementById('km')||document.getElementById('tkm')||{value:''}).value;
   var handle=document.getElementById('handleIG')?document.getElementById('handleIG').value:'@firstlightlive';
   if(capEl&&!capEl.textContent.trim()){
-    capEl.textContent='Day '+day+'. '+(km?km+' km. ':'')+'Before 6 AM.\n\n\u20B915,000 on the line. Every single day.\nEvery miss goes public. Same day.\n\n'+day+'-day streak. Zero misses.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n\uD83D\uDCF8 '+handle;
+    capEl.textContent='Day '+day+'. '+(km?km+' km. ':'')+'Before 6 AM.\n\n100 km on the line. Every single day.\nEvery miss goes public. Same day.\n\n'+day+'-day streak. Zero misses.\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n\uD83D\uDCF8 '+handle;
   }
   if(htEl&&!htEl.textContent.trim()){
     htEl.textContent='#firstlightlive #accountability #noexcuses #streak #running';
   }
   if(fcEl&&!fcEl.textContent.trim()){
-    fcEl.textContent='\u26A1 THE STAKE:\nMiss 1 day = \u20B915,000 gone. Logged public, same day.\n\n'+day+'-day streak.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+    fcEl.textContent='\u26A1 THE TERMS:\nMiss 1 day = 100 km on the cycle. Logged, same day.\n\n'+day+'-day streak.\nSet your alarm. Check tomorrow at 6 AM.\n\n#firstlightlive #accountability #noexcuses #streak #running';
   }
 }
 
@@ -3593,7 +3593,7 @@ function _generateInner(){
   const sTime=mode!=='lastlight'?(document.getElementById('sTime')?.value.trim()||''):'';
   const stravaStats=(sActs||sDist||sTime)?{acts:sActs,dist:sDist,time:sTime}:null;
 
-  // Public pledge — flat ₹15,000 ($200 USD)
+  // Public pledge — flat 100 km (100 km USD)
   const deadlineMet=document.querySelector('[data-key="deadline"]')?document.querySelector('[data-key="deadline"]').classList.contains('on'):true;
   const pledgeFine=deadlineMet?0:15000;
 
@@ -3642,7 +3642,7 @@ function _generateInner(){
     cap+=`\n💗 ${hr} avg bpm · 🧍 ${stand} stand hrs`;
     cap+=`\n\n🛏 Bed: ${shFmt} · 🍽→🛏 ${mealGap}h gap`;
     cap+=`\n\n📋 Rules: 🏃${llRun?'✅':'❌'} 🏋️${llGym?'✅':'❌'} 🍱${llFood?'✅':'❌'}`;
-    if(fine>0)cap+=`\n💸 ₹${fine} fine — The Tax of Laziness`;
+    if(fine>0)cap+=`\n💸 100 km fine — The Tax of Laziness`;
     else cap+=`\n✅ All rules followed — clean day`;
 
   }else if(mode==='travel'){
@@ -3668,8 +3668,8 @@ function _generateInner(){
 
     const _tAllDone=(food&&run&&calOk);
     const _tHook=_tAllDone
-      ?`Day ${day}. Travelling. No excuse accepted.\n₹15,000 stays mine. ✈️`
-      :`Day ${day}. On the road — almost let the travel be the reason.\n₹15,000 on the line if I quit.`;
+      ?`Day ${day}. Travelling. No excuse accepted.\n100 km stays mine. ✈️`
+      :`Day ${day}. On the road — almost let the travel be the reason.\n100 km on the line if I quit.`;
     cap=_tHook+`\n\n`;
     cap+=`Day ${day} ✈️ ${loc||'On the road'}\n🍱${food?'✅':'❌'} 🏃${run?'✅':'❌'} 🔥${kc?kc+' kcal':'300+ cal'}`;
     if(km)cap+=`\n📏 ${km} km`;if(mn)cap+=` ⏱ ${mn} min`;
@@ -3677,7 +3677,7 @@ function _generateInner(){
     if(sleepHrs)cap+=`\n😴 Fuel: ${sleepHrs}hrs sleep`;
     if(moodLine)cap+=`\n💭 "${moodLine}"`;
     let fine=0;if(!food)fine+=200;if(!run)fine+=200;if(!calOk)fine+=200;
-    if(fine>0)cap+=`\n💸 ₹${fine} fine — accountability is real`;
+    if(fine>0)cap+=`\n💸 100 km fine — accountability is real`;
     cap+=`\n\n✈️ #BoardAndBurn — ticket posted, 5K done after landing.`;
     cap+=`\nTravel doesn't break the streak.`;
 
@@ -3731,8 +3731,8 @@ function _generateInner(){
     // ── Hook line first — curiosity gap + vulnerability stops the scroll ──
     const _allDone=(food&&run&&gym);
     const _hookLine=_allDone
-      ?`Day ${day} done. All 3. Before 6AM.\n₹15,000 stays mine. 🤝`
-      :`Day ${day}. I almost talked myself out of it this morning.\n₹15,000 on the line if I quit — and everyone will see it.`;
+      ?`Day ${day} done. All 3. Before 6AM.\n100 km stays mine. 🤝`
+      :`Day ${day}. I almost talked myself out of it this morning.\n100 km on the line if I quit — and everyone will see it.`;
     cap=_hookLine+`\n\n`;
     cap+=`Day ${day} — ${dateStr}\n🍱${food?'✅':'❌'} 🏃${run?'✅':'❌'} 🏋️${gym?'✅':'❌'}`;
     if(km)cap+=`\n📏 ${km} km`;if(mn)cap+=` ⏱ ${mn} min`;if(kc)cap+=` 🔥 ${kc} kcal`;
@@ -3742,7 +3742,7 @@ function _generateInner(){
     if(!food&&walkKm)cap+=`\n🚶 FOOD CODE BROKEN — walked ${walkKm}km as penalty. Posted. No hiding.`;
     else if(!food)cap+=`\n⚠ FOOD CODE BROKEN — ride 50km penalty incoming. Posted.`;
     let fine=0;if(!run)fine+=200;if(!gym)fine+=200;
-    if(fine>0)cap+=`\n💸 ₹${fine} fine — accountability is real`;
+    if(fine>0)cap+=`\n💸 100 km fine — accountability is real`;
   }
 
   if(liner)cap+=`\n\n${liner}`;
@@ -3780,9 +3780,9 @@ function _generateInner(){
 
   // Pledge in caption
   if(!deadlineMet){
-    cap+=`\n\n🚨 PLEDGE BROKEN — ₹15,000 penalty. Logged public. Paid. Done.`;
+    cap+=`\n\n🚨 PLEDGE BROKEN — 100 km penance. Logged public. Paid. Done.`;
   }else if(document.querySelector('[data-key="deadline"]')){
-    cap+=`\n\n⚡ Public Pledge: Miss even 1 day → ₹15,000 penalty, logged public the same day. Not theory. Real cash.`;
+    cap+=`\n\n⚡ Public Pledge: Miss even 1 day → 100 km penance, logged the same day. Not theory. Real cash.`;
   }
 
   // ═══ SMART CAPTION ENGINE ═══
@@ -3804,20 +3804,20 @@ function _generateInner(){
   const _wxT=document.getElementById('wxTemp')?.value.trim()||'';
 
   // Part 0: Deal Hook (ALWAYS first line — strategy requirement)
-  const _dealHook='₹'+_stake+' ON THE LINE. EVERY SINGLE DAY.';
+  const _dealHook='the record ON THE LINE. EVERY SINGLE DAY.';
 
   // Part 1: Hook (5 types, rotating by day)
   const _hookBank=[
     // Shocking Stat
-    [_sleepH>0&&_sleepH<5?_sleepH+'h sleep. '+(_kmVal>0?_kmVal+'K run. ':'')+'Before the sun came up.':'Day '+_day+'. Zero alarms snoozed. ₹'+_stake+' on the line.'],
+    [_sleepH>0&&_sleepH<5?_sleepH+'h sleep. '+(_kmVal>0?_kmVal+'K run. ':'')+'Before the sun came up.':'Day '+_day+'. Zero alarms snoozed. the record on the line.'],
     // Bold Claim
-    ['Day '+_day+'. Zero misses. ₹'+_stake+' stays mine.'],
+    ['Day '+_day+'. Zero misses. the record stays mine.'],
     // Vulnerable Confession
     ['I almost didn\'t get up this morning. Then I remembered the bet.'],
     // Counter-Intuitive
     ['Discipline isn\'t about willpower. It\'s about making quitting expensive.'],
     // Question
-    ['What would you do for ₹'+_stake+'? I run 5K every day to keep mine.']
+    ['What would you do for the record? I run 5K every day to keep mine.']
   ];
   const _hookIdx=_day%5;
   const _hook=_hookBank[_hookIdx][0];
@@ -3841,8 +3841,8 @@ function _generateInner(){
   const _food=document.querySelector('[data-key="food"]')?.classList.contains('on');
   const _run=document.querySelector('[data-key="run"]')?.classList.contains('on');
   const _gym=document.querySelector('[data-key="gym"]')?.classList.contains('on');
-  if(_food&&_run&&_gym) _result='Gym done. Food code: clean. ₹'+_unclaimed+' defended.';
-  else _result='₹'+_unclaimed+' defended. Day '+_day+'. The streak lives.';
+  if(_food&&_run&&_gym) _result='Gym done. Food code: clean. the record defended.';
+  else _result='the record defended. Day '+_day+'. The streak lives.';
 
   const _soar=_situation+'\n'+_obstacle+'\n'+_action+'\n'+_result;
 
@@ -3903,7 +3903,7 @@ function _generateInner(){
   const _todayHashtags=_htPicked.slice(0,_htTier.total).join(' ');
 
   // Assemble Instagram Caption (hashtags in caption — max 5, Instagram 2026)
-  const _igCaption=_dealHook+'\n\n'+_hook+'\n\n'+_soar+'\n\n'+_stats+'\n\n'+_cta+'\n\nwww.firstlight.live\n\n'+_todayHashtags+'\n\n📸 '+_handleIG;
+  const _igCaption=_dealHook+'\n\n'+_hook+'\n\n'+_soar+'\n\n'+_stats+'\n\n'+_cta+'\n\n'+_todayHashtags+'\n\n📸 '+_handleIG;
   // Twitter/X caption (shorter)
   const _xCaption='Day '+_day+'. '+_hook+'\n\n'+_result+'\n\n𝕏 '+(document.getElementById('handleX')?.value||'@firstlightdly');
 
@@ -3928,7 +3928,7 @@ function _generateInner(){
    - Result: ${_result}
 3. CTA (last line): "${_cta}"
 
-Context: Day ${_day} of infinite streak. ₹${_stake} penalty if missed. Mode: ${modeLabel}.
+Context: Day ${_day} of infinite streak. 100 km penalty if missed. Mode: ${modeLabel}.
 ${_oneLiner?'Personal note: "'+_oneLiner+'"':''}
 Tone: Raw, direct, like a soldier reporting. Short sentences. Specific numbers. Max 2-3 emojis.
 Do NOT include hashtags. End with: 📸 ${_handleIG}
@@ -3968,7 +3968,7 @@ Return ONLY the caption text.`;
       aiText=aiText.replace(/^["']|["']$/g,'').trim();
       // Strip any AI-generated hashtags, then append our curated 5
       aiText=aiText.replace(/#\w+/g,'').trim();
-      aiText+='\n\nwww.firstlight.live\n\n'+_todayHashtags+'\n\n📸 '+_handleIG;
+      aiText+='\n\n'+_todayHashtags+'\n\n📸 '+_handleIG;
       document.getElementById('capIG').textContent=aiText;
       // capX removed
       document.getElementById('hashtagText').textContent=_todayHashtags;
@@ -4005,19 +4005,19 @@ Return ONLY the caption text.`;
   if(_fcb){
     const _stakeAmt=formatIndianCurrency(getCurrentStake(_day));
     const _totalAmt=formatIndianCurrency(getTotalAtRisk(_day));
-    _fcb.textContent='\u26A1 THE STAKE:\nMiss 1 day = \u20B9'+_stakeAmt+' gone. Logged public, same day.\n\n'+_day+'-day streak. \u20B9'+_totalAmt+' defended.\nSet your alarm. Check tomorrow at 6 AM.\nThe proof will be here \u2014 or the slip will.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+    _fcb.textContent='\u26A1 THE TERMS:\nMiss 1 day = 100 km on the cycle. Logged, same day.\n\n'+_day+'-day streak.\nSet your alarm. Check tomorrow at 6 AM.\nThe proof will be here \u2014 or the slip will.\n\n#firstlightlive #accountability #noexcuses #streak #running';
   }
 
   // Alt Text — accessibility descriptions per slide
   const _altEl=document.getElementById('altTextContent');
   if(_altEl){
     const _altLines=[];
-    _altLines.push('Slide 1: Day '+_day+' First Light fitness accountability \u2014 photo with \u20B9'+formatIndianCurrency(getCurrentStake(_day))+' bet overlay, streak counter');
+    _altLines.push('Slide 1: Day '+_day+' First Light fitness accountability \u2014 photo with the 100 km penance overlay, streak counter');
     if(mode!=='lastlight') _altLines.push('Slide 2: Gym check-in with food code checklist \u2014 7 dietary rules status');
     if(mode!=='lastlight') _altLines.push('Slide 3: Apple Watch running data \u2014 '+(_kmVal>0?_kmVal+' km, ':'')+'pace, heart rate, monthly heatmap');
     if(iM&&mode!=='lastlight') _altLines.push('Route Map: GPS running route \u2014 Strava/Apple Maps screenshot with pace and distance overlay');
     if(document.getElementById('tab4')?.style.display!=='none') _altLines.push('Slide 4: Sleep data \u2014 '+(_sleepH>0?_sleepH+' hours':'')+'battery icon, progress bar');
-    _altLines.push('Stakes: \u20B9'+formatIndianCurrency(getCurrentStake(_day))+' accountability bet \u2014 3-step mechanic, follow to win');
+    _altLines.push('Penance: 100 km on the cycle \u2014 3-step mechanic, follow to win');
     _altEl.textContent=_altLines.join('\n');
   }
 
@@ -4028,10 +4028,10 @@ Return ONLY the caption text.`;
     // Fallback — at minimum populate caption with basic info
     var _fbDay=document.getElementById('dayNum').value||'1';
     var _fbKm=(document.getElementById('km')||document.getElementById('tkm')||{value:''}).value;
-    var _fbCaption='Day '+_fbDay+'. '+(_fbKm?_fbKm+' km. ':'')+'Before 6 AM.\n\n₹15,000 on the line. Every single day.\nEvery miss goes public. Same day.\n\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n📸 @firstlightlive';
+    var _fbCaption='Day '+_fbDay+'. '+(_fbKm?_fbKm+' km. ':'')+'Before 6 AM.\n\n100 km on the line. Every single day.\nEvery miss goes public. Same day.\n\n#firstlightlive #accountability #noexcuses #streak #running\n\n📸 @firstlightlive';
     var _fbEl=document.getElementById('capIG');if(_fbEl)_fbEl.textContent=_fbCaption;
     var _fbHt=document.getElementById('hashtagText');if(_fbHt)_fbHt.textContent='#firstlightlive #accountability #noexcuses #streak #running';
-    var _fbFc=document.getElementById('firstCommentText');if(_fbFc)_fbFc.textContent='⚡ THE DEAL:\nMiss 1 day = ₹15,000 to first comment.\nNo questions. No delays.\n\n'+_fbDay+'-day streak.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+    var _fbFc=document.getElementById('firstCommentText');if(_fbFc)_fbFc.textContent='⚡ THE TERMS:\nMiss 1 day = 100 km on the cycle.\nGPS-logged. No exceptions.\n\n'+_fbDay+'-day streak.\n\n#firstlightlive #accountability #noexcuses #streak #running';
   }
 }
 
@@ -4300,7 +4300,7 @@ function slide1(day,dateStr,handleIG,handleX,food,run,gym,km,mn,kc,streak,loc,to
     c.textAlign='center';
     // Stake context line (small)
     c.font='500 11px "JetBrains Mono",monospace';c.fillStyle=muted;
-    c.fillText('₹15,000  STAKE   ·   LOGGED PUBLIC   ·   EVERY MORNING',W/2,H-160);
+    c.fillText('100 km  STAKE   ·   LOGGED PUBLIC   ·   EVERY MORNING',W/2,H-160);
     // Thin accent rule above the URL
     c.strokeStyle=P.accent;c.lineWidth=1;
     c.beginPath();c.moveTo(W/2-260,H-130);c.lineTo(W/2+260,H-130);c.stroke();
@@ -4411,7 +4411,7 @@ function slide2(day,km,mn,kc,loc,total,handleIG,handleX,wStart,wEnd,bpmVal,strav
     c.shadowColor=P.acR+'0.6)';c.shadowBlur=20;
     c.fillText('firstlight.live',W/2,H-32);c.shadowBlur=0;
     c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.55)';
-    c.fillText('₹15,000 STAKE · LOGGED PUBLIC · '+(handleIG||'@firstlightlive'),W/2,H-12);
+    c.fillText('100 km STAKE · LOGGED PUBLIC · '+(handleIG||'@firstlightlive'),W/2,H-12);
   }
 
   // ── PHOTO FULL-BLEED (the hero)
@@ -4515,7 +4515,7 @@ function slide3Sleep(day,total,handleIG,handleX,sleepHrs,wxStr,km,wStart){
     ['HEART RATE',(bpm||'—')+'  BPM'],
     ['SLEEP',(sleepHrs||'—')+'  HRS'],
     ['CALORIES',(kcal||'—')+'  KCAL'],
-    ['STAKE','₹15,000'],
+    ['STAKE','100 km'],
     ['STATUS','DEFENDED'],
     ['WITNESS','PUBLIC'],
     ['SIGNED','ANUPAM']
@@ -4573,7 +4573,7 @@ function slide4(day,total,handleIG,handleX,moodLine,food){
     c.shadowColor='rgba(0,0,0,0.8)';c.shadowBlur=28;
     c.fillText('WALLET SAFE.',60,H-160);c.shadowBlur=0;
     c.font='600 14px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.55)';
-    c.fillText('Rs. 15,000 DEFENDED  ·  STREAK UNBROKEN',60,H-126);
+    c.fillText('EVERY DAY LOGGED  ·  STREAK UNBROKEN',60,H-126);
     c.restore();
     drawCorners(c,W,H,P.acR+'0.12)');drawBrand(c);
     // DAY pill badge — matching Slide 1 style
@@ -5016,7 +5016,7 @@ function slideMilestone(day,dateStr,handleIG,handleX,streak){
   const _ptx=isLight?'rgba(0,0,0,0.88)':'rgba(255,255,255,0.88)';
   const _ptxSub=isLight?'rgba(0,0,0,0.50)':'rgba(255,255,255,0.50)';
   c.font='700 15px "Rajdhani",sans-serif';c.fillStyle=_ptx;
-  c.fillText('⚡  MISS 1 DAY → ₹15,000 ($200) TO A FOLLOWER',W/2,_msSepY+26);
+  c.fillText('⚡  MISS 1 DAY → 100 km  TO A FOLLOWER',W/2,_msSepY+26);
   c.font='400 11px "JetBrains Mono",monospace';c.fillStyle=_ptxSub;
   c.fillText('NOT CHARITY. REAL CASH. FOLLOW ME — YOU COULD BE NEXT.',W/2,_msSepY+46);
 
@@ -5183,7 +5183,7 @@ function slideLastLight(day,dateStr,handleIG,handleX,streak,d,total){
   const fineY=ry+68;
   if(d.fine>0){
     c.textAlign='left';c.font='500 13px "JetBrains Mono",monospace';c.fillStyle=P.danger;
-    c.fillText('⚠ ₹'+d.fine+' FINE — THE TAX OF LAZINESS',60,fineY);
+    c.fillText('⚠ the record FINE — THE TAX OF LAZINESS',60,fineY);
   }else{
     c.textAlign='left';c.font='500 13px "JetBrains Mono",monospace';c.fillStyle=P.mint;
     c.fillText('✅ ALL RULES FOLLOWED — CLEAN DAY',60,fineY);
@@ -5217,7 +5217,7 @@ function slideLastLight(day,dateStr,handleIG,handleX,streak,d,total){
   const ptx=pillDarkPur?'#FFFFFF':'rgba(0,0,0,0.9)';
   const ptxSub=pillDarkPur?'rgba(255,255,255,0.7)':'rgba(0,0,0,0.55)';
   c.textAlign='left';c.font='800 14px "Rajdhani",sans-serif';c.fillStyle=ptx;
-  c.fillText('⚡  MISS 1 DAY → ₹15,000 ($200) TO A FOLLOWER',pledgeX+18,pledgeY+24);
+  c.fillText('⚡  MISS 1 DAY → 100 km  TO A FOLLOWER',pledgeX+18,pledgeY+24);
   c.font='500 9px "JetBrains Mono",monospace';c.fillStyle=ptxSub;
   c.fillText('NOT CHARITY. REAL CASH. FOLLOW ME — YOU COULD BE NEXT.',pledgeX+18,pledgeY+44);
 
@@ -5421,7 +5421,7 @@ function downloadYTThumb(){
     rr(c,64,H-270,320,52,10);c.fill();
     c.font=`800 28px "Rajdhani",sans-serif`;
     c.fillStyle='#fff';c.letterSpacing='2px';
-    c.fillText('₹15,000 PENALTY',80,H-236);
+    c.fillText('100 KM PENANCE',80,H-236);
     c.restore();
   }
 
@@ -5562,7 +5562,7 @@ function downloadIGCover(){
   rr(c,36,bannerY,W-72,68,12);c.fill();
   c.font=`800 36px "Rajdhani",sans-serif`;
   c.fillStyle=missed2?'#fff':P.accent;c.textAlign='center';c.letterSpacing='3px';
-  c.fillText(missed2?'₹15,000 PENALTY — MISSED':'₹15,000 ON THE LINE — DELIVERED',W/2,bannerY+44);
+  c.fillText(missed2?'100 KM PENANCE — OWED':'100 KM ON THE LINE — DELIVERED',W/2,bannerY+44);
   c.textAlign='left';c.restore();
 
   // IG handle bottom-right
@@ -5809,7 +5809,7 @@ function downloadStoriesCard(){
   rr(c,40,banY,W-80,54,12); c.fill();
   c.font='800 26px "Rajdhani",sans-serif'; c.letterSpacing='2px';
   c.fillStyle=missed?'#fff':P.accent; c.textAlign='center';
-  c.fillText(missed?'₹15,000 PENALTY — MISSED':'₹15,000 ON THE LINE — DELIVERED',W/2,banY+34);
+  c.fillText(missed?'100 KM PENANCE — OWED':'100 KM ON THE LINE — DELIVERED',W/2,banY+34);
   c.textAlign='left';
 
   // Divider
@@ -5963,7 +5963,7 @@ function genStoryTemplate(idx){
     c.fillText('firstlight.live',W/2,H-50);c.shadowBlur=0;
     // Handle + stake
     c.font='600 14px "JetBrains Mono",monospace';c.fillStyle=darkBg?'rgba(255,255,255,0.55)':P.acR+'0.55)';
-    c.fillText('₹15,000 STAKE  ·  '+(handleIG||'@firstlightlive')+'  ·  CHAPTER 02',W/2,H-18);
+    c.fillText('100 km STAKE  ·  '+(handleIG||'@firstlightlive')+'  ·  CHAPTER 02',W/2,H-18);
   }
 
   var T=[
@@ -6115,7 +6115,7 @@ function genStoryTemplate(idx){
         ['HR',(bpmV||'—')+' BPM'],
         ['SLEEP',(sleepH||'—')+' HRS'],
         ['CALORIES',(kcal||'—')+' KCAL'],
-        ['STAKE','₹15,000'],
+        ['STAKE','100 km'],
         ['STATUS','DEFENDED'],
         ['WITNESS','PUBLIC'],
         ['SIGNED','ANUPAM']
@@ -6157,7 +6157,7 @@ function genStoryTemplate(idx){
         {t:'04:00',l:'PREP · WATER · LACE',s:'',main:false},
         {t:wStart||'04:48',l:'RUN START',s:'GPS LOCK · STRAVA OPEN',main:true},
         {t:runEnd||'05:21',l:'RUN COMPLETE',s:(km||'—')+' KM · '+(mn||'—')+' MIN',main:true},
-        {t:'06:00',l:'DEADLINE',s:'POST OR PAY ₹15,000',main:false}
+        {t:'06:00',l:'DEADLINE',s:'POST OR PAY 100 km',main:false}
       ];
       var lineX=190,topY=300,bottomY=H-280;
       c.strokeStyle=P.acR+'0.3)';c.lineWidth=2;
@@ -6289,7 +6289,7 @@ function genStoryTemplate(idx){
       c.font='400 76px "Bodoni Moda","DM Serif Display",serif';c.fillStyle=ink;
       c.fillText('firstlight.live',W/2,H-58);
       c.font='600 13px "JetBrains Mono",monospace';c.fillStyle='rgba(26,20,8,0.55)';
-      c.fillText('₹15,000 stake · '+(handleIG||'@firstlightlive')+' · CHAPTER 02',W/2,H-22);
+      c.fillText('100 km stake · '+(handleIG||'@firstlightlive')+' · CHAPTER 02',W/2,H-22);
       return Promise.resolve();
     },
 
@@ -6621,7 +6621,7 @@ function genStoryTemplate(idx){
         c.fillText('firstlight.live',W-60,H-100);c.shadowBlur=0;
         c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.65)';
         c.fillText(handleIG+' · CHAPTER 02 · BANGALORE',W-60,H-65);
-        c.fillText('₹15,000 STAKE · LOGGED PUBLIC · EVERY MORNING',W-60,H-40);
+        c.fillText('100 km STAKE · LOGGED PUBLIC · EVERY MORNING',W-60,H-40);
       });
     },
 
@@ -6794,7 +6794,7 @@ function genStoryTemplate(idx){
         c.textAlign='right';c.font='400 38px "Bodoni Moda","DM Serif Display",serif';c.fillStyle='#FFD700';
         c.fillText('firstlight.live',W-80,tbY+130);
         c.font='500 10px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.55)';
-        c.fillText('₹15,000 STAKE · '+handleIG,W-80,tbY+150);
+        c.fillText('100 km STAKE · '+handleIG,W-80,tbY+150);
         return Promise.resolve();
       });
     },
@@ -6910,7 +6910,7 @@ function genStoryTemplate(idx){
         c.shadowColor='#00FF95';c.shadowBlur=24;
         c.fillText('firstlight.live',W/2,H-80);c.shadowBlur=0;
         c.font='600 12px "JetBrains Mono",monospace';c.fillStyle='rgba(0,255,149,0.7)';
-        c.fillText('₹15,000 STAKE · '+handleIG+' · CHAPTER 02',W/2,H-46);
+        c.fillText('100 km STAKE · '+handleIG+' · CHAPTER 02',W/2,H-46);
       });
     },
 
@@ -7337,7 +7337,7 @@ async function igPublishCarousel(){
       var _d=document.getElementById('dayNum').value||'1';
       var _k=(document.getElementById('km')||document.getElementById('tkm')||{value:''}).value.trim();
       var _hig=document.getElementById('handleIG')?document.getElementById('handleIG').value:'@firstlightlive';
-      caption='Day '+_d+'. '+(_k?_k+' km. ':'')+'Before 6 AM.\n\n\u20B9'+formatIndianCurrency(getCurrentStake(parseInt(_d)||1))+' on the line. Every single day.\nEvery miss goes public. Same day.\n\n'+_d+'-day streak. Zero misses.\nwww.firstlight.live\n\n\uD83D\uDCF8 '+_hig;
+      caption='Day '+_d+'. '+(_k?_k+' km. ':'')+'Before 6 AM.\n\n100 km on the line. Every single day.\nEvery miss goes public. Same day.\n\n'+_d+'-day streak. Zero misses.\n\n\uD83D\uDCF8 '+_hig;
       _igLog(log,'Caption auto-generated (no custom caption found)','var(--gold)');
     }
     _igLog(log,'Caption: '+caption.substring(0,80)+'...','var(--smoke)');
@@ -7348,7 +7348,7 @@ async function igPublishCarousel(){
       var _d2=document.getElementById('dayNum').value||'1';
       var _stk2=formatIndianCurrency(getCurrentStake(parseInt(_d2)||1));
       var _tot2=formatIndianCurrency(getTotalAtRisk(parseInt(_d2)||1));
-      firstComment='\u26A1 THE STAKE:\nMiss 1 day = \u20B9'+_stk2+' gone. Logged public, same day.\n\n'+_d2+'-day streak. \u20B9'+_tot2+' defended.\nSet your alarm. Check tomorrow at 6 AM.\nwww.firstlight.live\n\n#firstlightlive #accountability #noexcuses #streak #running';
+      firstComment='\u26A1 THE TERMS:\nMiss 1 day = 100 km on the cycle. Logged, same day.\n\n'+_d2+'-day streak.\nSet your alarm. Check tomorrow at 6 AM.\n\n#firstlightlive #accountability #noexcuses #streak #running';
       _igLog(log,'First comment auto-generated','var(--gold)');
     }
 
@@ -7955,8 +7955,8 @@ function _getAIKey(){
 async function fetchReelHook(day,km,streak){
   const key=_getAIKey();if(!key)return null;
   const raw=await _aiReq(key,[
-    {role:'system',content:'You write 5-9 word ALL CAPS hooks for fitness accountability Instagram Reels. Raw, intense, no punctuation except em-dash. No quotes. Examples: "EARNED BEFORE SUNRISE — CLOCK NEVER LIED" / "THE PENALTY STAYS UNTIL THE STREAK DOES" / "BEFORE 6AM OR PAY A STRANGER ₹15,000"'},
-    {role:'user',content:`Day ${day} of First Light challenge. ${km?km+'km run. ':''}Streak: ${streak}. ₹15,000 penalty if missed. Write ONE hook line.`}
+    {role:'system',content:'You write 5-9 word ALL CAPS hooks for fitness accountability Instagram Reels. Raw, intense, no punctuation except em-dash. No quotes. Examples: "EARNED BEFORE SUNRISE — CLOCK NEVER LIED" / "THE PENALTY STAYS UNTIL THE STREAK DOES" / "BEFORE 6AM OR PAY A STRANGER 100 km"'},
+    {role:'user',content:`Day ${day} of First Light challenge. ${km?km+'km run. ':''}Streak: ${streak}. 100 km penance if missed. Write ONE hook line.`}
   ],20,1.15,4500);
   return raw?raw.replace(/^["'""]+|["'""]+$/g,'').toUpperCase():null;
 }
@@ -7987,7 +7987,7 @@ async function fetchDailyVerdict(km,mn,sleepHrs,weather){
   if(kmN>0&&mnN>0){const pMin=Math.floor(mnN/kmN);const pSec=Math.round((mnN/kmN-pMin)*60);paceStr=`${pMin}:${String(pSec).padStart(2,'0')} min/km`;}
   const raw=await _aiReq(key,[
     {role:'system',content:'You are a hardcore cyberpunk virtual running coach. Write ONLY a 5-to-7 word verdict. No hashtags, no emojis. Sound like a system log or terminal readout. Short punchy sentences separated by periods. Output the verdict text only — nothing else.'},
-    {role:'user',content:`First Light challenge. ₹15,000 penalty if I miss.\n- Distance: ${km||'?'} km\n- Pace: ${paceStr}\n- Sleep: ${sleepHrs||'?'} hrs\n- Weather: ${weather||'clear'}\nExamples: "Sleep deprived. Pace held. System stable." / "5km done. Clock beat. Body charged."\nWrite the verdict.`}
+    {role:'user',content:`First Light challenge. 100 km penance if I miss.\n- Distance: ${km||'?'} km\n- Pace: ${paceStr}\n- Sleep: ${sleepHrs||'?'} hrs\n- Weather: ${weather||'clear'}\nExamples: "Sleep deprived. Pace held. System stable." / "5km done. Clock beat. Body charged."\nWrite the verdict.`}
   ],22,0.92,5000);
   return raw?raw.replace(/^["'""\s]+|["'""\s]+$/g,'').toUpperCase():null;
 }
@@ -8002,7 +8002,7 @@ async function fetchReelScript(day,km,mn,kcal,sleepHrs,bpm,statusColor,streak,ha
   if(hasWakeVid)assets.unshift('waking-up / yawn video');
   if(hasJarVid)assets.splice(hasWakeVid?1:0,0,'physical penalty jar video');
   const sys='You are a viral Instagram Reels strategist for high-stakes fitness content. Return ONLY raw JSON — no markdown, no explanation.';
-  const usr=`Challenge: "First Light" — run 5km + gym before 6AM or pay a ₹15,000 penalty, logged public.\nDay: ${day} | Streak: ${streak}\nStats: ${km}km · ${mn}min · ${kcal}kcal${bpm?' · '+bpm+'BPM':''}\nSleep: ${sleepHrs||'?'}hrs | Performance: ${statusColor||'YELLOW'}\nAssets: ${assets.join(', ')}\nProblem: 90% reel skip rate. Fix the first 3 seconds.\nReturn ONLY this JSON (no markdown):\n{"negativeHook":"2-second spoken/text line — near-miss tension, references ₹15,000","pacingGuide":[{"time":"0.0–1.5s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"1.5–3.0s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"3.0–4.5s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"4.5–6.0s","clip":"exact asset + camera note","text":"ALL CAPS overlay"}],"heroStatLine":"stats as mission-accomplished — max 8 words all caps","ctaLine":"save-or-follow CTA — max 12 words, no giveaway or payout language","captionHook":"caption first line — FOMO, max 15 words"}`;
+  const usr=`Challenge: "First Light" — run 5km + gym before 6AM or owe a 100 km penance, logged public.\nDay: ${day} | Streak: ${streak}\nStats: ${km}km · ${mn}min · ${kcal}kcal${bpm?' · '+bpm+'BPM':''}\nSleep: ${sleepHrs||'?'}hrs | Performance: ${statusColor||'YELLOW'}\nAssets: ${assets.join(', ')}\nProblem: 90% reel skip rate. Fix the first 3 seconds.\nReturn ONLY this JSON (no markdown):\n{"negativeHook":"2-second spoken/text line — near-miss tension, references the 100 km penance","pacingGuide":[{"time":"0.0–1.5s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"1.5–3.0s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"3.0–4.5s","clip":"exact asset + camera note","text":"ALL CAPS overlay"},{"time":"4.5–6.0s","clip":"exact asset + camera note","text":"ALL CAPS overlay"}],"heroStatLine":"stats as mission-accomplished — max 8 words all caps","ctaLine":"save-or-follow CTA — max 12 words, no giveaway or payout language","captionHook":"caption first line — FOMO, max 15 words"}`;
   const raw=await _aiReq(key,[{role:'system',content:sys},{role:'user',content:usr}],680,0.8,9000);
   if(!raw)return null;
   try{
@@ -8304,7 +8304,7 @@ function drawTypewriter(c,text,x,y,progress,font,color){
   c.restore();
 }
 
-// ===== REEL ANIMATION ENGINE v3 — SCROLL-STOPPING HOOK + ₹10K =====
+// ===== REEL ANIMATION ENGINE v3 — SCROLL-STOPPING HOOK =====
 
 // --- GENERATE REEL ---
 async function generateReel(){
@@ -8362,13 +8362,13 @@ async function generateReel(){
   else if(dn>=7)streak='WEEK '+Math.ceil(dn/7);
 
   const hookLines=[
-    '₹15,000 ON THE LINE. EVERY SINGLE DAY.',
+    '100 km ON THE LINE. EVERY SINGLE DAY.',
     'BEFORE 6. OR IT COSTS ME.',
     'THE VERSION OF ME THAT QUITS IS DEAD.',
     'EARNED BEFORE SUNRISE. PENALTY STILL IN THE JAR.',
     'MISS ONCE. PAY A STRANGER. SIMPLE.',
     'ZERO NEGOTIATION WITH THE DEADLINE.',
-    'THE CLOCK DOESN\'T CARE. NEITHER DOES ₹15,000.',
+    'THE CLOCK DOESN\'T CARE. NEITHER DOES 100 km.',
     'NOT A CHALLENGE. A LIFE SENTENCE I CHOSE.'
   ];
   const hookLine=hookLines[dn%hookLines.length];
@@ -8493,10 +8493,10 @@ async function generateReel(){
       const vid=document.getElementById('reelVideo');
       vid.src=url;
       vid.load();
-      // Seek to 0.75s on load — ₹15,000 slam fully visible in BOTH normal + ultra mode
+      // Seek to 0.75s on load — 100 km slam fully visible in BOTH normal + ultra mode
       // This is more reliable than vid.poster (which browsers often ignore after vid.load())
       vid.addEventListener('loadedmetadata',function(){vid.currentTime=0.75;},{once:true});
-      // After video ends, snap back to ₹15,000 frame so the freeze-stat last-frame is never shown
+      // After video ends, snap back to 100 km frame so the freeze-stat last-frame is never shown
       vid.addEventListener('ended',function(){vid.currentTime=0.75;},{once:false});
       window._reelPosterURL=null;
       document.getElementById('reelPreview').classList.add('show');prog.classList.remove('show');
@@ -8518,10 +8518,10 @@ async function generateReel(){
     const _rvid=document.getElementById('runVidHidden');
     if(_rvid){_rvid._reelStarted=false;_rvid.pause();}
 
-    // ── PRE-DRAW: paint ₹15,000 to canvas BEFORE recorder.start() ──────────────────
+    // ── PRE-DRAW: paint 100 km to canvas BEFORE recorder.start() ──────────────────
     // captureStream has ~0.5–2s of latency before the codec captures its first keyframe.
     // Without this, the codec's first I-frame is pure black (canvas was empty).
-    // With this, the first keyframe IS the ₹15,000 slam — the scroll-stopping thumbnail.
+    // With this, the first keyframe IS the 100 km slam — the scroll-stopping thumbnail.
     {
       // Compute rgba prefixes for danger + accent inline (dangerR not yet defined here)
       const _dr=(()=>{const v=(P.danger||'#E53935').replace('#','');return`rgba(${parseInt(v.slice(0,2),16)},${parseInt(v.slice(2,4),16)},${parseInt(v.slice(4,6),16)},`})();
@@ -8546,10 +8546,10 @@ async function generateReel(){
       c.strokeStyle=_dr+'0.65)';c.lineWidth=1.5;rr(c,W/2-210,H*0.16-36,420,52,26);c.stroke();
       c.font='700 26px "JetBrains Mono",monospace';c.fillStyle=_dr+'0.92)';
       c.fillText('T H E   P E N A L T Y',W/2,H*0.16);
-      // ₹15,000 — strong secondary
+      // 100 km — strong secondary
       c.font='900 196px "Rajdhani",sans-serif';
       c.fillStyle='rgba(255,255,255,0.95)';c.shadowColor=_dr+'0.80)';c.shadowBlur=55;
-      c.fillText('₹15,000',W/2,H*0.39);c.shadowBlur=0;
+      c.fillText('100 km',W/2,H*0.39);c.shadowBlur=0;
       // Separator
       c.fillStyle='rgba(255,255,255,0.14)';c.fillRect(W*0.18,H*0.445,W*0.64,1.5);
       // "STREAK" label
@@ -8604,7 +8604,7 @@ async function generateReel(){
     if(isUltraMode){
       // ── ⚡ 12s ULTRA: 4 scenes (penalty → run → stats → gym) ──
       SC=[
-        {s:0.000, e:0.167, id:'ultraPenalty'},  // 0–2s:  ₹15,000 SLAM
+        {s:0.000, e:0.167, id:'ultraPenalty'},  // 0–2s:  100 km SLAM
         {s:0.167, e:0.417, id:'ultraRun'},       // 2–5s:  run proof fullbleed
         {s:0.417, e:0.750, id:'ultraStats'},     // 5–9s:  hard-cut stat flash
         {s:0.750, e:1.000, id:'ultraGym'},       // 9–12s: gym selfie + CTA
@@ -8612,7 +8612,7 @@ async function generateReel(){
     }else if(hasRunVid&&hasStrava){
       // 8 content scenes — each = 0.940/8 = 0.1175 (≈3.9s @ 33s)
       SC=[
-        {s:0.000,  e:0.118, id:'close'},   // ₹15,000 SLAM (hook!)
+        {s:0.000,  e:0.118, id:'close'},   // 100 km SLAM (hook!)
         {s:0.118,  e:0.235, id:'hook'},    // "BEFORE 6 DIES"
         {s:0.235,  e:0.353, id:'runvid'},  // running video clip
         {s:0.353,  e:0.470, id:'watch'},   // run proof breathes
@@ -8625,7 +8625,7 @@ async function generateReel(){
     }else if(hasRunVid){
       // 7 content scenes — each = 0.940/7 ≈ 0.134 (≈4.4s @ 33s)
       SC=[
-        {s:0.000,  e:0.134, id:'close'},   // ₹15,000 SLAM (hook!)
+        {s:0.000,  e:0.134, id:'close'},   // 100 km SLAM (hook!)
         {s:0.134,  e:0.269, id:'hook'},    // "BEFORE 6 DIES"
         {s:0.269,  e:0.403, id:'runvid'},  // running video clip
         {s:0.403,  e:0.537, id:'watch'},   // run proof
@@ -8637,7 +8637,7 @@ async function generateReel(){
     }else if(hasStrava){
       // 7 content scenes — each = 0.940/7 ≈ 0.134 (≈4.4s @ 33s)
       SC=[
-        {s:0.000,  e:0.134, id:'close'},   // ₹15,000 SLAM (hook!)
+        {s:0.000,  e:0.134, id:'close'},   // 100 km SLAM (hook!)
         {s:0.134,  e:0.269, id:'hook'},    // "BEFORE 6 DIES"
         {s:0.269,  e:0.403, id:'watch'},   // run proof breathes
         {s:0.403,  e:0.537, id:'strava'},  // Strava monthly stats
@@ -8649,7 +8649,7 @@ async function generateReel(){
     }else{
       // 6 content scenes — each = 0.940/6 ≈ 0.157 (≈5.2s @ 33s)
       SC=[
-        {s:0.000,  e:0.157, id:'close'},   // ₹15,000 SLAM (hook!)
+        {s:0.000,  e:0.157, id:'close'},   // 100 km SLAM (hook!)
         {s:0.157,  e:0.313, id:'hook'},    // "BEFORE 6 DIES"
         {s:0.313,  e:0.470, id:'watch'},   // run proof breathes
         {s:0.470,  e:0.627, id:'sleep'},   // sleep data
@@ -8749,21 +8749,21 @@ async function generateReel(){
 
       // ==================================================
       // SCENE 1: HOOK — STAKES-FIRST (0–4s)
-      // Phase 1 (Days  1-21) : ₹15,000 daily hero → scroll-stops cold audience
+      // Phase 1 (Days  1-21) : 100 km daily hero → scroll-stops cold audience
       // Phase 2 (Days 22-50) : Cumulative total hero → escalating drama
-      // Phase 3 (Days 51-100): ₹15L challenge arc → media-event territory
+      // Phase 3 (Days 51-100): the long-run arc → media-event territory
       // Phase 4 (Day 100+)   : Legend territory
       // ==================================================
       if(sc.id==='hook'){
         // ── PHASE AWARENESS ──────────────────────────────────────
         const _dn=parseInt(day)||1;
         const _phase=_dn<=21?1:_dn<=50?2:_dn<=100?3:4;
-        const _cumTotal=_dn*15000;
-        const _heroNum=_phase===1?'₹15,000':'₹'+_cumTotal.toLocaleString('en-IN');
+        const _cumTotal=_dn;   // days, not money — this chapter stakes nothing
+        const _heroNum='100 km';   // no money in this chapter — the penance is the number
         const _heroFz=_heroNum.length<=7?258:_heroNum.length<=9?218:_heroNum.length<=11?178:148;
-        const _sub1=_phase===1?'GONE. LOGGED PUBLIC.':'DEFENDED  ·  ZERO MISSES';
-        const _sub2=_phase===1?'IF I MISS EVEN 1 DAY  →  YOU GET PAID':'DAY '+_dn+'  ·  ₹15,000 PER MISS  ·  NO EXCEPTIONS';
-        const _phLabel=_phase===1?'T H E   S T A K E S':_phase===2?'C U M U L A T I V E   S T A K E S':_phase<=3?'₹ 1 5   L A K H   C H A L L E N G E':'L E G E N D   T E R R I T O R Y';
+        const _sub1=_phase===1?'OWED. LOGGED PUBLIC.':'HELD  ·  ZERO MISSES';
+        const _sub2=_phase===1?'IF I MISS EVEN 1 DAY  →  100 KM ON THE CYCLE':'DAY '+_dn+'  ·  100 km PER MISS  ·  NO EXCEPTIONS';
+        const _phLabel=_phase===1?'T H E   P E N A N C E':_phase===2?'C U M U L A T I V E   P E N A N C E':_phase<=3?'T H E   P U N I S H M E N T   C Y C L E':'L E G E N D   T E R R I T O R Y';
 
         // ── LAYOUT Y ANCHORS (H=1920) — shift with hero font size ──
         const _moneyY=H*0.22;
@@ -8842,7 +8842,7 @@ async function generateReel(){
         {
           const _shIn=easeOut(Math.min(pt*12,1));
           // Hold through the money slam — start fading only at pt=0.42 (scene half-way)
-          // so viewer can read the rule while ₹ number lands below, then text gives way
+          // so viewer can read the rule while the number lands below, then text gives way
           const _shOut=easeOut(Math.min(Math.max(pt-0.42,0)/0.30,1));
           const _shA=_shIn*(1-_shOut);
           if(_shA>0.005){
@@ -8850,7 +8850,7 @@ async function generateReel(){
             const _spokeDangerR=isL?'rgba(255,59,92,':dangerR;
             c.save();c.globalAlpha=_shA;c.textAlign='center';c.textBaseline='middle';
             // Positioned ABOVE the money number zone (money center=H*0.22=422, top edge≈329)
-            // so spoken text and ₹ number occupy completely separate vertical zones — NO overlap.
+            // so spoken text and the number occupy completely separate vertical zones — NO overlap.
             const _sy1=168; // line 1 top-center, below brand (y=80), above money (y=329)
             const _sy2=256; // line 2 just below, 45px gap to money top edge
             // Line 1 — the condition (white, large)
@@ -8863,9 +8863,9 @@ async function generateReel(){
             c.font='900 64px "Rajdhani",sans-serif';
             c.fillStyle=_spokeDanger;
             c.shadowColor='rgba(0,0,0,0.95)';c.shadowBlur=28;
-            c.fillText('I PAY ₹15,000. LOGGED PUBLIC.',W/2,_sy2);
+            c.fillText('I PAY 100 km. LOGGED PUBLIC.',W/2,_sy2);
             c.shadowColor=_spokeDangerR+'0.45)';c.shadowBlur=44;
-            c.fillText('I PAY ₹15,000. LOGGED PUBLIC.',W/2,_sy2);
+            c.fillText('I PAY 100 km. LOGGED PUBLIC.',W/2,_sy2);
             c.shadowBlur=0;
             c.restore();
           }
@@ -8887,7 +8887,7 @@ async function generateReel(){
           const _fla=easeOut(Math.min((pt-0.06)/0.16,1));
           c.save();c.globalAlpha=_fla*0.80;c.textAlign='center';
           c.font='600 17px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.90)';
-          c.fillText('₹15,000  ×  DAY '+_dn+'  ·  ZERO MISSED',W/2,_sub2Y);
+          c.fillText('100 km  ×  DAY '+_dn+'  ·  ZERO MISSED',W/2,_sub2Y);
           c.restore();
         }
 
@@ -9894,7 +9894,7 @@ async function generateReel(){
           rr(c,-_scW/2,-_scH/2,_scW,_scH,36);c.stroke();c.shadowBlur=0;
           c.fillStyle=P.accent;rr(c,-_scW/2,-_scH/2,8,_scH,4);c.fill();
           c.font='900 28px "Rajdhani",sans-serif';c.fillStyle='rgba(255,255,255,0.97)';
-          c.fillText('FOLLOW  ·  ONE MISS = ₹15,000 TO YOU',0,-8);
+          c.fillText('FOLLOW  ·  ONE MISS = 100 km TO YOU',0,-8);
           c.font='600 16px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.78)';
           c.fillText(handleIG+'  ·  DAY '+day+'  ·  STREAK UNBROKEN',0,18);
           c.restore();c.restore();
@@ -9999,7 +9999,7 @@ async function generateReel(){
           c.font='900 50px "Rajdhani",sans-serif';
           c.fillStyle=P.accent;
           c.shadowColor=P.acR+'0.65)';c.shadowBlur=28;
-          c.fillText('FOLLOW TO BE NEXT FOR THE ₹15K',W/2,H*0.775);
+          c.fillText('EVERY MISS IS PAID IN DISTANCE',W/2,H*0.775);
           c.shadowBlur=0;c.restore();
         }
 
@@ -10046,20 +10046,20 @@ async function generateReel(){
         c.strokeStyle=dangerR+'0.65)';c.lineWidth=1.5;rr(c,W/2-220,152,440,52,26);c.stroke();
         c.font='700 28px "JetBrains Mono",monospace';c.fillStyle=dangerR+'0.95)';
         c.fillText('T H E   P E N A L T Y',W/2,188);c.restore();
-        // ₹15,000 SLAMS center — easeOutBack fast
+        // 100 km SLAMS center — easeOutBack fast
         const _upSl=easeOutBack(Math.min(pt*8,1));
         c.save();c.globalAlpha=_upSl;c.textAlign='center';
         c.font='900 258px "Rajdhani",sans-serif';
         c.fillStyle='rgba(255,255,255,0.97)';
         c.shadowColor=dangerR+'0.85)';c.shadowBlur=70;
-        c.fillText('₹15,000',W/2,H*0.50+20*(1-_upSl));
+        c.fillText('100 km',W/2,H*0.50+20*(1-_upSl));
         c.shadowBlur=0;c.restore();
-        // "MISS A RUN = LOSE ₹15,000"
+        // "MISS A RUN = LOSE 100 km"
         if(pt>0.15){
           const _upSA=easeOut(Math.min((pt-0.15)/0.18,1));
           c.save();c.globalAlpha=_upSA*0.82;c.textAlign='center';
           c.font='600 22px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.72)';
-          c.fillText('MISS A RUN = LOSE  ₹15,000',W/2,H*0.63);c.restore();
+          c.fillText('MISS A RUN = LOSE  100 km',W/2,H*0.63);c.restore();
         }
         // DAY badge top-left
         const _upDA=easeOut(Math.min(pt*10,1));
@@ -10069,7 +10069,7 @@ async function generateReel(){
         c.textAlign='center';c.font='700 20px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.90)';
         c.fillText('DAY  '+day,128,80);c.restore();
         CN(_upDA);/* letterbox removed */
-        // Poster capture — ₹15,000 fully landed, red glow hot, perfect hook thumbnail
+        // Poster capture — 100 km fully landed, red glow hot, perfect hook thumbnail
         if(pt>=0.68&&pt<0.74&&!window._reelPosterURL){
           try{window._reelPosterURL=cv.toDataURL('image/jpeg',0.95);}catch(e){}
         }
@@ -10170,7 +10170,7 @@ async function generateReel(){
           c.save();c.globalAlpha=_uhEa;c.textAlign='center';
           c.font='600 17px "JetBrains Mono",monospace';c.fillStyle=P.acR+'0.60)';
           c.fillText('A I   V E R D I C T',W/2,H*0.37);
-          const _hl=finalHookLine||'₹15,000 ON THE LINE. EVERY SINGLE DAY.';
+          const _hl=finalHookLine||'100 km ON THE LINE. EVERY SINGLE DAY.';
           c.font='900 58px "Rajdhani",sans-serif';c.fillStyle=P.accent;
           c.shadowColor=P.acR+'0.45)';c.shadowBlur=28;
           const _hlW=c.measureText(_hl).width;
@@ -10229,12 +10229,12 @@ async function generateReel(){
         c.fillText('WALLET SAFE.',W/2,H*0.40);
         c.fillText('FOR NOW.',W/2,H*0.40+105);
         c.shadowBlur=0;c.restore();
-        // "FOLLOW TO CLAIM THE ₹15k IF I QUIT"
+        // "THE PENANCE IS THE CONTRACT"
         if(pt>0.20){
           const _ugSA=easeOut(Math.min((pt-0.20)/0.22,1));
           c.save();c.globalAlpha=_ugSA*0.82;c.textAlign='center';
           c.font='600 24px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.72)';
-          c.fillText('FOLLOW TO CLAIM THE ₹15k IF I QUIT',W/2,H*0.56);c.restore();
+          c.fillText('THE PENANCE IS THE CONTRACT',W/2,H*0.56);c.restore();
         }
         // DAY badge — top left
         const _ugDA=easeOut(Math.min(pt*8,1));
@@ -10254,12 +10254,12 @@ async function generateReel(){
       }
 
       // ==================================================
-      // SCENE 6: CLOSING HOOK — ₹15,000 + CTA (28.5–30s)
+      // SCENE 6: CLOSING HOOK — 100 km + CTA (28.5–30s)
       // ==================================================
       else if(sc.id==='close'){
         c.fillStyle='#060304';c.fillRect(0,0,W,H);
 
-        // ── GYM FACE — visible from frame 1: face + ₹15,000 = scroll-stopper ──
+        // ── GYM FACE — visible from frame 1: face + 100 km = scroll-stopper ──
         // Face is the human anchor that stops the thumb; money is the cognitive hook.
         // Together in the same frame they are the strongest cold-audience opening possible.
         const _faceSrc=gymImg||watchImg;
@@ -10275,7 +10275,7 @@ async function generateReel(){
           // Left-to-right gradient: near-black left (text area) → clear right (face shows)
           const _lGr=c.createLinearGradient(0,0,W,0);
           _lGr.addColorStop(0,'rgba(6,3,4,0.94)');    // left: text lives here, fully readable
-          _lGr.addColorStop(0.46,'rgba(6,3,4,0.80)'); // centre: ₹15,000 stays legible
+          _lGr.addColorStop(0.46,'rgba(6,3,4,0.80)'); // centre: 100 km stays legible
           _lGr.addColorStop(0.70,'rgba(6,3,4,0.50)'); // right-centre: face shows through
           _lGr.addColorStop(1,'rgba(6,3,4,0.20)');    // right edge: face clearly visible
           c.fillStyle=_lGr;c.fillRect(0,0,W,H);
@@ -10324,7 +10324,7 @@ async function generateReel(){
         // Line 2 — the consequence (danger red)
         c.font='700 21px "JetBrains Mono",monospace';c.fillStyle=_closeDanger;
         c.shadowColor=_closeDangerR+'0.55)';c.shadowBlur=10;
-        c.fillText('MISS ONCE  →  A FOLLOWER WINS ₹15,000',W/2,189);c.shadowBlur=0;
+        c.fillText('MISS ONCE  →  A FOLLOWER WINS 100 km',W/2,189);c.shadowBlur=0;
         c.restore();
 
         // AI system log from status engine — appears just below the eyebrow pill
@@ -10338,15 +10338,15 @@ async function generateReel(){
           c.restore();
         }
 
-        // ₹15,000 — MASSIVE SLAM (starts visible at 55% scale — no blank opening)
+        // 100 km — MASSIVE SLAM (starts visible at 55% scale — no blank opening)
         const mSl=Math.max(0.75,easeOutBack(Math.min(pt*4,1)));
         const mShk=mSl<0.80?getShake((1-mSl/0.80)*5):{x:0,y:0};
         c.save();c.translate(W/2+mShk.x,H*.38+mShk.y);c.scale(mSl*bp(sec,.04),mSl*bp(sec,.04));
         c.textAlign='center';c.textBaseline='middle';
         c.font='900 230px "Rajdhani",sans-serif';
         c.shadowColor=dangerR+'0.70)';c.shadowBlur=150;
-        c.fillStyle=P.danger;c.fillText('₹15,000',0,0);
-        c.shadowBlur=70;c.fillText('₹15,000',0,0);c.shadowBlur=0;c.restore();
+        c.fillStyle=P.danger;c.fillText('100 km',0,0);
+        c.shadowBlur=70;c.fillText('100 km',0,0);c.shadowBlur=0;c.restore();
         if(pt<0.03)drawFlash(c,W,H,(1-pt/0.03)*0.35,P.danger);
 
         // "DAY X — STILL MINE." — moved up, away from cluttered middle zone
@@ -10401,10 +10401,10 @@ async function generateReel(){
           c.textAlign='center';c.font='900 30px "Rajdhani",sans-serif';
           c.fillStyle='rgba(255,255,255,0.97)';
           c.shadowColor=P.acR+'0.35)';c.shadowBlur=10;
-          c.fillText('FOLLOW  →  CLAIM ₹15K IF I QUIT',0,-12);c.shadowBlur=0;
+          c.fillText('MISS  →  100 KM ON THE CYCLE',0,-12);c.shadowBlur=0;
           // Mechanic explainer — larger, white, unmissable
           c.font='700 22px "JetBrains Mono",monospace';c.fillStyle='rgba(255,255,255,0.95)';
-          c.fillText('1 MISS  ·  1 FOLLOWER  ·  ₹15,000',0,22);
+          c.fillText('1 MISS  ·  1 FOLLOWER  ·  100 km',0,22);
           c.restore();
           c.restore();
         }
@@ -10433,7 +10433,7 @@ async function generateReel(){
           c.globalAlpha=_ta*0.72;
           c.font='500 16px "JetBrains Mono",monospace';
           c.fillStyle='rgba(255,255,255,0.80)';
-          c.fillText('Follow or miss the day someone wins ₹15,000',W/2,H*.835+66);
+          c.fillText('Follow or miss the day someone wins 100 km',W/2,H*.835+66);
           c.restore();
         }
 
@@ -10535,7 +10535,7 @@ function shareReel(){
 // AUTOMATION MODULE v2.0 - Clean Rewrite
 // ═════════════════════════════════════════════════════════════
 
-// Calculate stake for a specific day — flat ₹15,000/day, no escalation
+// Calculate stake for a specific day — flat 100 km/day, no escalation
 function getCurrentStake(day) {
   return 15000;
 }
@@ -10596,7 +10596,7 @@ function getMilestoneType(day){
   if(ms) return{type:ms.tier,label:ms.label,emoji:ms.tier==='B3'?'👑':ms.tier==='B2'?'🏆':'🔥'};
   return null;
 }
-function generateFirstCommentBlock(day){const stake=getCurrentStake(day);const total=getTotalAtRisk(day);const stakeFormatted=formatIndianCurrency(stake);const totalFormatted=formatIndianCurrency(total);return '━━━━━━━━━━━━━━━━━━━━━━\n⚡ THE STAKE:\nIf my next post isn\'t before 6 AM → ₹'+stakeFormatted+' gone. Logged public, same day.\n\n'+day+'-day streak. ₹'+totalFormatted+' defended so far.\n\nSet your alarm. Check tomorrow at 6:00 AM.\nThe proof will be here → or the slip will.\n━━━━━━━━━━━━━━━━━━━━━━';}
+function generateFirstCommentBlock(day){const stake=getCurrentStake(day);const total=getTotalAtRisk(day);const stakeFormatted=formatIndianCurrency(stake);const totalFormatted=formatIndianCurrency(total);return '━━━━━━━━━━━━━━━━━━━━━━\n⚡ THE STAKE:\nIf my next post isn\'t before 6 AM → 100 km owed on the cycle. Logged, same day.\n\n'+day+'-day streak. every day logged so far.\n\nSet your alarm. Check tomorrow at 6:00 AM.\nThe proof will be here → or the slip will.\n━━━━━━━━━━━━━━━━━━━━━━';}
 function generateCaption(day){
   if(!canGenerateWithConfirmedFood())throw new Error('Food is unconfirmed. Mark it in the owner Food & Rules Check-in first.');
   day=parseInt(day)||1;
@@ -10618,15 +10618,15 @@ function generateCaption(day){
   const kmV=parseFloat(km)||0;
 
   // Deal Hook
-  const dealHook='₹'+stake+' ON THE LINE. EVERY SINGLE DAY.';
+  const dealHook='the record ON THE LINE. EVERY SINGLE DAY.';
 
   // Hook (5 types rotating)
   const hooks=[
-    sl>0&&sl<5?sl+'h sleep. '+(kmV>0?kmV+'K run. ':'')+'Before the sun came up.':'Day '+day+'. Zero alarms snoozed. ₹'+stake+' on the line.',
-    'Day '+day+'. Zero misses. ₹'+stake+' stays mine.',
+    sl>0&&sl<5?sl+'h sleep. '+(kmV>0?kmV+'K run. ':'')+'Before the sun came up.':'Day '+day+'. Zero alarms snoozed. the record on the line.',
+    'Day '+day+'. Zero misses. the record stays mine.',
     'I almost didn\'t get up this morning. Then I remembered the bet.',
     'Discipline isn\'t about willpower. It\'s about making quitting expensive.',
-    'What would you do for ₹'+stake+'? I run 5K every day to keep mine.'
+    'What would you do for the record? I run 5K every day to keep mine.'
   ];
   const hook=hooks[day%5];
 
@@ -10634,7 +10634,7 @@ function generateCaption(day){
   let situation='Day '+day+'.'+(wStart?' Alarm went off at '+wStart+'.':' Another morning.');
   let obstacle=sl>0&&sl<5?'Only slept '+sl+' hours. Body said no.':'The bed was warm. The road was cold.';
   let action=kmV>0?'Laced up anyway. '+kmV+' km'+(mn?' in '+mn+' min':'')+(wStart?' starting at '+wStart:'')+'.'  :'Got up. Showed up. Did the work.';
-  let result=food&&run&&gym?'Gym done. Food code: clean. ₹'+unclaimed+' defended.':'₹'+unclaimed+' defended. Day '+day+'. The streak lives.';
+  let result=food&&run&&gym?'Gym done. Food code: clean. Day held.':'Day held. Day '+day+'. The streak lives.';
 
   // Stats
   let stats='🍱'+(food?'✅':'❌')+' 🏃'+(run?'✅':'❌')+' 🏋️'+(gym?'✅':'❌');
@@ -10659,11 +10659,11 @@ function generateCaption(day){
   const milestone=getMilestoneType(day);
   if(milestone&&(day===14||day===21||day===30||day===50||day===100)){
     const totalF=formatIndianCurrency(getTotalAtRisk(day));
-    if(day===14) return dealHook+'\n\n'+stats+'\n\nTWO WEEKS.\n\nThe alarm still sucks. My bed is still comfortable.\nBut something shifted.\n\nDay 1: I woke up to prove I could.\nDay 14: I wake up because it\'s who I am now.\n\n₹'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
-    if(day===21) return dealHook+'\n\n'+stats+'\n\n21 DAYS. HABIT LOCKED.\n\nI stopped negotiating. The alarm goes off. My feet hit the floor.\n\n₹'+totalF+' defended. 21 alarms. 21 decisions. 0 excuses.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
-    if(day===30) return dealHook+'\n\n'+stats+'\n\n1 MONTH. 30 days. 30 alarms. 0 excuses.\n\n₹'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
-    if(day===50) return dealHook+'\n\n'+stats+'\n\n50 DAYS. HALF CENTURY.\n\n₹'+totalF+' defended.\nStakes increase to ₹20,000 at Day 101.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
-    if(day===100) return '₹20,000 ON THE LINE NOW — STAKES INCREASED.\n\n'+stats+'\n\n100 DAYS. TRIPLE DIGITS.\n\n₹'+totalF+' defended. The game just changed.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===14) return dealHook+'\n\n'+stats+'\n\nTWO WEEKS.\n\nThe alarm still sucks. My bed is still comfortable.\nBut something shifted.\n\nDay 1: I woke up to prove I could.\nDay 14: I wake up because it\'s who I am now.\n\nNot one day skipped.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===21) return dealHook+'\n\n'+stats+'\n\n21 DAYS. HABIT LOCKED.\n\nI stopped negotiating. The alarm goes off. My feet hit the floor.\n\nNot one day skipped. 21 alarms. 21 decisions. 0 excuses.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===30) return dealHook+'\n\n'+stats+'\n\n1 MONTH. 30 days. 30 alarms. 0 excuses.\n\nNot one day skipped.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===50) return dealHook+'\n\n'+stats+'\n\n50 DAYS. HALF CENTURY.\n\nNot one day skipped.\nThe penance never softens.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    if(day===100) return '100 km ON THE LINE NOW — STAKES INCREASED.\n\n'+stats+'\n\n100 DAYS. TRIPLE DIGITS.\n\nNot one day skipped. The game just changed.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
   }
 
   // Generic milestone caption (for all other milestone days)
@@ -10671,7 +10671,7 @@ function generateCaption(day){
   if(_msDetect){
     const totalF=formatIndianCurrency(getTotalAtRisk(day));
     const tierEmoji=_msDetect.tier==='B3'?'👑':_msDetect.tier==='B2'?'🏆':'🔥';
-    return dealHook+'\n\n'+stats+'\n\n'+tierEmoji+' '+_msDetect.label+'\n\nDay '+day+'. \u20B9'+totalF+' defended.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
+    return dealHook+'\n\n'+stats+'\n\n'+tierEmoji+' '+_msDetect.label+'\n\nDay '+day+'. Not one day skipped.\n\n'+cta+'\n\n'+_tags+'\n\n📸 '+handleIG;
   }
 
   // Standard daily caption
@@ -10703,13 +10703,13 @@ function updateStakesDisplay(){
     if(warningEl){
       if(day>=50&&day<100){
         warningEl.style.display='block';
-        warningEl.textContent='⚠️ Stakes increase to ₹20,000 at Day 101 ('+(101-day)+' days)';
+        warningEl.textContent='⚠️ Stakes increase to 100 km at Day 101 ('+(101-day)+' days)';
       }else if(day>=100&&day<200){
         warningEl.style.display='block';
-        warningEl.textContent='⚠️ Current penalty: ₹20,000 | Next increase at Day 201';
+        warningEl.textContent='⚠️ Current penalty: 100 km | Next increase at Day 201';
       }else if(day>=200&&day<365){
         warningEl.style.display='block';
-        warningEl.textContent='⚠️ Current penalty: ₹25,000 | Final tier';
+        warningEl.textContent='⚠️ Current penalty: 100 km | Final tier';
       }else{
         warningEl.style.display='none';
       }

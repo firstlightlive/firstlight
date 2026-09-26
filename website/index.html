@@ -33,7 +33,7 @@
     "name": "First Light",
     "alternateName": "FirstLight Personal Accountability Journal",
     "url": "https://firstlight.live/",
-    "description": "A personal accountability journal documenting one individual's daily training for Ironman 140.6. Read-only for visitors. The ₹ amounts referenced are self-imposed personal commitments paid by the operator to themselves — not gambling, not wagering, not a financial service.",
+    "description": "A personal accountability journal documenting one individual's daily training for Ironman 140.6. Read-only for visitors. Missed days are settled by the operator in self-imposed physical penance (additional logged distance) — no money changes hands, and this is not gambling, not wagering, and not a financial service.",
     "inLanguage": "en",
     "author": {
       "@type": "Person",
@@ -932,19 +932,23 @@
        ============================================ -->
   <section class="stakes-section" id="stakes">
     <div class="holo-card reveal-scale" id="holoCard">
-      <div class="holo-amount"><span class="currency">&#8377;</span><span id="stakeAmount">1,500</span></div>
-      <div class="holo-label">PER MISS — TO AKSHAYA PATRA</div>
+      <!-- Chapter 06 stakes NO money — a miss is paid in DISTANCE. This card
+           read "₹1,500 / PER MISS — TO AKSHAYA PATRA" until 2026-09-26; the ₹
+           was written as the HTML entity &#8377;, which is why it survived
+           several passes that grepped for the literal character. -->
+      <div class="holo-amount"><span id="stakeAmount">100</span><span class="currency"> KM</span></div>
+      <div class="holo-label">PER MISS — ON THE CYCLE</div>
       <div class="holo-stats">
         <div class="holo-stat">
           <div class="holo-stat-val" id="totalRisk">--</div>
-          <div class="holo-stat-label">TOTAL AT RISK</div>
+          <div class="holo-stat-label">TOTAL OWED</div>
         </div>
         <div class="holo-stat">
           <div class="holo-stat-val" id="daysMissed" style="color:var(--green)">0</div>
           <div class="holo-stat-label">DAYS MISSED</div>
         </div>
         <div class="holo-stat">
-          <div class="holo-stat-val" id="claimedAmountHero" style="color:var(--cyan)">₹0</div>
+          <div class="holo-stat-val" id="claimedAmountHero" style="color:var(--cyan)">—</div>
           <div class="holo-stat-label">CLAIMED</div>
         </div>
         <div class="holo-stat">
@@ -957,11 +961,11 @@
       <div style="margin-top:40px; padding-top:40px; border-top: 1px solid rgba(0,212,255,0.1); max-width:400px; margin-left:auto; margin-right:auto;">
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
           <div style="text-align:center; padding:12px; background:rgba(0,212,255,0.05); border-radius:8px;">
-            <div style="font-family:var(--font-mono); font-size:clamp(1.2rem, 3vw, 1.6rem); font-weight:800; color:#00D4FF; margin-bottom:4px;" id="homeClaimedBreakdown">₹0</div>
+            <div style="font-family:var(--font-mono); font-size:clamp(1.2rem, 3vw, 1.6rem); font-weight:800; color:#00D4FF; margin-bottom:4px;" id="homeClaimedBreakdown">—</div>
             <div style="font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,0.5); text-transform:uppercase;">CLAIMED</div>
           </div>
           <div style="text-align:center; padding:12px; background:rgba(245,166,35,0.05); border-radius:8px;">
-            <div style="font-family:var(--font-mono); font-size:clamp(1.2rem, 3vw, 1.6rem); font-weight:800; color:#F5A623; margin-bottom:4px;" id="homeUnclaimedBreakdown">₹1,500</div>
+            <div style="font-family:var(--font-mono); font-size:clamp(1.2rem, 3vw, 1.6rem); font-weight:800; color:#F5A623; margin-bottom:4px;" id="homeUnclaimedBreakdown">—</div>
             <div style="font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,0.5); text-transform:uppercase;">PENDING DONATION</div>
           </div>
         </div>
@@ -1102,17 +1106,17 @@
       <!-- CLAIMS IMPACT METRICS -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; margin-bottom: 60px;">
         <div class="reveal-up" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; text-align: center;">
-          <div style="font-family: var(--font-mono); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; color: #FF4444; margin-bottom: 8px;" id="totalClaimable">₹1,500</div>
+          <div style="font-family: var(--font-mono); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; color: #FF4444; margin-bottom: 8px;" id="totalClaimable">—</div>
           <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.5); text-transform: uppercase;">Per Miss</div>
         </div>
 
         <div class="reveal-up" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; text-align: center;">
-          <div style="font-family: var(--font-mono); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; color: #00D4FF; margin-bottom: 8px;" id="totalClaimed">₹0</div>
+          <div style="font-family: var(--font-mono); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; color: #00D4FF; margin-bottom: 8px;" id="totalClaimed">—</div>
           <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.5); text-transform: uppercase;">Claimed</div>
         </div>
 
         <div class="reveal-up" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; text-align: center;">
-          <div style="font-family: var(--font-mono); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; color: #00E5A0; margin-bottom: 8px;" id="charityDonated">₹0</div>
+          <div style="font-family: var(--font-mono); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; color: #00E5A0; margin-bottom: 8px;" id="charityDonated">—</div>
           <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.5); text-transform: uppercase;">To Charity</div>
         </div>
 
@@ -1148,7 +1152,7 @@
         <a href="terms.html">TERMS</a>
       </div>
       <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px">◆ <span id="visitorCount">—</span> visitors since Day 1</div>
-      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto">Personal accountability journal · Single-user · Not gambling, not a financial service. ₹ amounts shown are self-imposed personal commitments.</div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto">Personal accountability journal · Single-user · Not gambling, not a financial service. Missed days are settled in self-imposed physical penance — no money changes hands.</div>
       <div class="fl-footer-copy">&copy; 2026 Anupam Kumar</div>
     </div>
   </footer>

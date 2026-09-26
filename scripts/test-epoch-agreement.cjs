@@ -164,6 +164,49 @@ check(/WATCH_SYNC_HEALTH/.test(pre), 'the pre-flight surfaces the watch telemetr
 check(!/INSERT|UPDATE|DELETE|ALTER|CREATE|DROP/i.test(pre.replace(/--.*$/gm, '')),
   'the pre-flight really is read-only');
 
+process.stdout.write('\nNO MONEY ON A PUBLIC SURFACE\n');
+
+// ₹ hides in FOUR spellings, and each survived a pass that only looked for the
+// others: the literal character, the JS escape \\u20B9, the HTML entity &#8377;
+// (how "₹1,500 PER MISS — TO AKSHAYA PATRA" stayed on the homepage), and plain
+// "Rs." (drawn onto a published image). Check all four — but only in CONTENT:
+// ₹ legitimately appears in explanatory comments and in the historical-chapter
+// code paths that still price Chapters 01-03.
+function contentOnly(src) {
+  return src
+    .replace(/<!--[\s\S]*?-->/g, '')     // HTML comments
+    .replace(/^\s*\/\/.*$/gm, '')        // JS line comments
+    .replace(/\/\*[\s\S]*?\*\//g, '');   // JS block comments
+}
+const MONEY = /₹|\\u20B9|&#8377;|&rupee;|Rs\.\s?[0-9]/i;
+// These must be clean of money in rendered content. home-3d.js is excluded: it
+// still holds the historical-chapter branch, guarded by FL.STAKE_PER_DAY.
+[['website/index.html', 'index.html'],
+ ['website/covenant.html', 'covenant.html'],
+ ['website/app/index.html', 'the caption generator']].forEach(([f, label]) => {
+  const bad = contentOnly(read(f)).split('\n').filter(l => MONEY.test(l));
+  check(bad.length === 0, label + ' shows no money in any spelling'
+    + (bad.length ? ' — e.g. ' + bad[0].trim().slice(0, 70) : ''));
+});
+check(/FL\.STAKE_PER_DAY\) return 0/.test(read('website/js/home-3d.js')),
+  'home-3d.js gates its historical money path on a zero stake');
+
+// accountability.html keeps ₹ in ONE place only: rendering archived Chapter 01
+// slips, which record what was actually paid at the time. The live mechanic
+// must not mention money or a charity.
+const acc = read('website/accountability.html');
+check(!/DONATION MECHANIC/.test(acc), 'accountability.html no longer advertises a donation mechanic');
+check(!/Akshaya Patra \(school meals\)/.test(acc), 'the charity pledge copy is gone from the live mechanic');
+check(/PENANCE MECHANIC — PAID IN DISTANCE/.test(acc), 'it states the distance mechanic instead');
+check(/Chapter 01 \/ REBUILD legacy/.test(acc), 'the archived Chapter 01 money rendering is deliberately kept');
+
+// The generator must not promise anyone a payout, in any wording.
+const gen = read('website/app/index.html');
+['random follower','you get the cash','direct transfer','YOU GET PAID','CLAIM ₹'].forEach(ph => {
+  check(!gen.includes(ph), 'generator has no "' + ph + '" payout promise');
+});
+check(!/\\n\\nwww\.firstlight\.live/.test(gen), 'no site link inside a published caption');
+
 process.stdout.write('\nDISCIPLINE LEDGER — must not live on one device\n');
 
 const disc = read('website/discipline.html');
