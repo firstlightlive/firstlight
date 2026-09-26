@@ -191,6 +191,14 @@ const MONEY = /₹|\\u20B9|&#8377;|&rupee;|Rs\.\s?[0-9]/i;
 check(/FL\.STAKE_PER_DAY\) return 0/.test(read('website/js/home-3d.js')),
   'home-3d.js gates its historical money path on a zero stake');
 
+// The charity name is the other half of the footprint CLAUDE.md names. It may
+// remain in ONE place: accountability.html's archived Chapter 01 slip renderer.
+[['website/index.html','index.html'],
+ ['website/covenant.html','covenant.html'],
+ ['website/app/index.html','the caption generator']].forEach(([f,label]) => {
+  check(!/akshaya/i.test(contentOnly(read(f))), label + ' does not name a charity');
+});
+
 // accountability.html keeps ₹ in ONE place only: rendering archived Chapter 01
 // slips, which record what was actually paid at the time. The live mechanic
 // must not mention money or a charity.
