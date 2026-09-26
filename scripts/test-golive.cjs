@@ -70,6 +70,11 @@ const PAGES = ['index.html','rules.html','discipline.html','daily-sheet.html','p
             window.scrollTo(0,0);
             return {
               days,
+              // Chapter 06 stakes NOTHING — a miss is paid in distance. Any ₹
+              // figure on a live surface is both wrong and the exact pattern
+              // that got the IG account restricted.
+              rupees:(txt.match(/₹\s?[1-9][0-9,]*/g)||[]).slice(0,3),
+              danglingUnclaimed:/·\s*UNCLAIMED/i.test(txt),
               negative:/DAY\s+-\d/i.test(txt),
               nan:/NaN|undefined|Infinity/.test(txt),
               overflow:moved,
@@ -84,7 +89,7 @@ const PAGES = ['index.html','rules.html','discipline.html','daily-sheet.html','p
     }
   } finally { await browser.close(); server.close(); }
 
-  let bad=0;
+  let bad=0; const warn=[];
   for(const d of Object.keys(results)){
     process.stdout.write(`\n══ ${d} ${d==='2026-09-26'?'(gap day — Day 1 is tomorrow)':'(DAY 1 — go-live)'}\n`);
     for(const pg of PAGES){
@@ -93,6 +98,13 @@ const PAGES = ['index.html','rules.html','discipline.html','daily-sheet.html','p
       const flags=[];
       if(r.negative){flags.push('NEGATIVE DAY');bad++;}
       if(r.nan){flags.push('NaN/undefined');bad++;}
+      // WARN, not fail. The remaining ₹ figures are static PROSE (the Akshaya
+      // Patra line on accountability.html, and the ₹15,000 payout premise baked
+      // 78× into the app/index.html caption generator) — not live counters.
+      // Removing them is a deliberate content decision, so this surfaces it on
+      // every run without blocking a deploy that is otherwise correct.
+      if(r.rupees&&r.rupees.length){warn.push(pg+': static ₹ copy '+r.rupees.join(' '));}
+      if(r.danglingUnclaimed){flags.push('dangling "· UNCLAIMED"');bad++;}
       // >2px of genuine movement is a real sideways scroll on a phone.
       if(r.overflow>2){flags.push('SCROLLS '+r.overflow+'px sideways');bad++;}
       else if(r.reported>2){flags.push('(clipped '+r.reported+'px — not user-visible)');}
@@ -101,6 +113,12 @@ const PAGES = ['index.html','rules.html','discipline.html','daily-sheet.html','p
       const mark=flags.length?'✘':'✓';
       console.log(`  ${mark} ${pg.padEnd(20)} ${(r.days.join(' | ')||'(no day text)').padEnd(22)} ${flags.join(' · ')}`);
     }
+  }
+  if(warn.length){
+    console.log('\n\x1b[33m⚠ STATIC ₹ COPY STILL ON PUBLIC PAGES\x1b[0m — CLAUDE.md forbids money on a');
+    console.log('  public surface (it is the pattern that got the IG account restricted).');
+    console.log('  These are prose, not counters, so they need a content decision:');
+    [...new Set(warn)].forEach(w=>console.log('    · '+w));
   }
   console.log('\n'+(bad?`✘ ${bad} problem(s)`:'✓ no negative days, no NaN, no JS errors, no overflow'));
   process.exit(bad?1:0);

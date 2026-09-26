@@ -45,6 +45,12 @@
   //  DAY NUMBERS
   // ══════════════════════════════════
   function getCumulativeUnclaimedHome(day) {
+    // THE CURRENT CHAPTER DECIDES. Chapter 06 stakes nothing — penance is
+    // DISTANCE — so a zero STAKE_PER_DAY means zero, full stop. This function
+    // called getCumulativeUnclaimed() directly, bypassing getUnclaimed()'s
+    // zero-stake guard, which is why the homepage still printed ₹1,500 after
+    // that guard was added. Do not "simplify" this back.
+    if (typeof FL !== 'undefined' && FL && !FL.STAKE_PER_DAY) return 0;
     // Mirror STAKE_SCHEDULE from app.js
     if (typeof getCumulativeUnclaimed === 'function') return getCumulativeUnclaimed(day);
     var schedule = [

@@ -200,7 +200,12 @@ function getDayNumber() {
 }
 
 function getUnclaimed(dayNum) {
-  // Use stake schedule if available, otherwise flat rate
+  // THE CURRENT CHAPTER DECIDES. Chapter 06 has NO money — a miss is paid in
+  // DISTANCE (the Punishment Cycle) — so STAKE_PER_DAY is 0 and the answer is 0.
+  // STAKE_SCHEDULE survives only for Chapters 01-03 historical ledger maths, and
+  // consulting it unconditionally is what printed "₹1,500 UNCLAIMED" on a
+  // chapter that stakes nothing. See CLAUDE.md: no ₹ on any public surface.
+  if (!FL.STAKE_PER_DAY) return 0;
   if (typeof getCumulativeUnclaimed === 'function') return getCumulativeUnclaimed(dayNum);
   return dayNum * FL.STAKE_PER_DAY;
 }
@@ -277,7 +282,9 @@ var STAKE_SCHEDULE = [
 ];
 
 function getCurrentStake(day) {
-  day = parseInt(day) || 1;
+  // NOT `|| 1`: parseInt(0) is falsy, so a gap day (Day 0) silently became Day 1.
+  day = parseInt(day, 10);
+  if (!isFinite(day) || day < 1) return 0;
   var stake = STAKE_SCHEDULE[0].amount;
   for (var i = 0; i < STAKE_SCHEDULE.length; i++) {
     if (day >= STAKE_SCHEDULE[i].fromDay) stake = STAKE_SCHEDULE[i].amount;
@@ -286,7 +293,10 @@ function getCurrentStake(day) {
 }
 
 function getCumulativeUnclaimed(day) {
-  day = parseInt(day) || 1;
+  // Same falsy-zero trap as getCurrentStake — this is what turned Day 0 into
+  // "₹1,500 unclaimed" on the live dashboard.
+  day = parseInt(day, 10);
+  if (!isFinite(day) || day < 1) return 0;
   var total = 0;
   var prevEnd = 0;
   for (var i = 0; i < STAKE_SCHEDULE.length; i++) {
@@ -317,8 +327,36 @@ function updateCounters() {
         var dailyStakeStr = (typeof formatStakeINR === 'function') ? formatStakeINR(dailyStake) : new Intl.NumberFormat('en-IN').format(dailyStake);
 
         document.querySelectorAll('[data-day]').forEach(function(el) { el.textContent = day; });
-        document.querySelectorAll('[data-unclaimed]').forEach(function(el) { el.textContent = '₹' + formatINRFull(unclaimed); });
-        document.querySelectorAll('[data-unclaimed-plain]').forEach(function(el) { el.textContent = formatINRFull(unclaimed); });
+        // A no-money chapter shows no money at all. "₹0" reads as a broken
+        // counter, and money on a public surface is the precise pattern that got
+        // the IG account restricted (CLAUDE.md anti-spam rules). Chapter 06 pays
+        // in DISTANCE, so say that instead.
+        //
+        // The word "UNCLAIMED" is static markup OUTSIDE the span, so blanking
+        // the span alone leaves "DAY 0 · UNCLAIMED". Two shapes to handle:
+        //   .footer-stats  — rewrite the whole line
+        //   everything else — an isolated figure, so a dash is enough
+        var showStake = unclaimed > 0;
+        document.querySelectorAll('[data-unclaimed]').forEach(function(el) {
+          el.textContent = showStake ? '₹' + formatINRFull(unclaimed) : '—';
+        });
+        document.querySelectorAll('[data-unclaimed-plain]').forEach(function(el) {
+          el.textContent = showStake ? formatINRFull(unclaimed) : '—';
+        });
+        if (!showStake) {
+          // Figures hardcoded in the markup (index.html #totalClaimable,
+          // covenant.html, the homepage breakdown) are never written by JS, so
+          // they survived every counter fix. Blank them here, centrally.
+          document.querySelectorAll('#totalClaimable, #homeUnclaimedBreakdown').forEach(function(el) {
+            if (/₹/.test(el.textContent)) el.textContent = '—';
+          });
+          document.querySelectorAll('.footer-stats').forEach(function(el) {
+            if (!/UNCLAIMED/i.test(el.textContent)) return;
+            el.innerHTML = 'DAY ' + day +
+              ' · <span style="color:var(--gold)">PENANCE IN KM</span>' +
+              ' · <span style="color:var(--green)">STREAK ALIVE</span>';
+          });
+        }
         document.querySelectorAll('[data-stake-daily]').forEach(function(el) { el.textContent = dailyStakeStr; });
         document.querySelectorAll('[data-nav-day]').forEach(function(el) { el.textContent = 'DAY ' + day; });
       } catch(e) { console.error('applyCounters error:', e); }
@@ -2729,7 +2767,8 @@ function updateBreakdownVisualization(claimed, unclaimed, total) {
     }
 
     if (homeClaimedBreakdown) homeClaimedBreakdown.textContent = (claimed > 0 ? '₹' : '₹') + claimed.toLocaleString('en-IN');
-    if (homeUnclaimedBreakdown) homeUnclaimedBreakdown.textContent = '₹' + unclaimed.toLocaleString('en-IN');
+    if (homeUnclaimedBreakdown) homeUnclaimedBreakdown.textContent =
+      FL.STAKE_PER_DAY ? '₹' + unclaimed.toLocaleString('en-IN') : '—';
   }
 
   // Update home breakdown labels
