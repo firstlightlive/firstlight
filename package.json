@@ -16,7 +16,8 @@
     "test:rules": "command -v deno >/dev/null && deno test supabase/functions/firstlight-sync/rules.test.ts || echo '(deno not installed \u2014 skipping rules unit test)'",
     "test:discipline": "node scripts/test-discipline-sync.cjs",
     "verify:live": "bash scripts/verify-live.sh",
-    "check:debt": "node scripts/check-debt.mjs"
+    "check:debt": "node scripts/check-debt.mjs",
+    "check:ig": "node scripts/check-ig.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.5",

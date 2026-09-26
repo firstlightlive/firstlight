@@ -865,16 +865,19 @@ const WIN_OPENERS = [
   'The body is willing. The bed was warmer.'
 ]
 
-const MISS_OPENERS = [
-  '1 child got a year of school lunches today. Because I didn\'t train.',
-  'Today the streak broke. So a kid in India eats lunch for a year.',
-  'I missed. 1 child sponsored for an entire academic year at Akshaya Patra.',
-  'No run. No ride. No swim. 1 child fed for 200 school days instead.',
-  'The body said no today. 1 child said yes to lunch — every day for a year.',
-  'Day {DAY} missed. Akshaya Patra now sponsors 1 child for a full school year.',
-  'Lost today. The kid still won. A year of meals.',
-  'My miss = their year. 200 school lunches, 1 child.'
-]
+// A miss is paid in DISTANCE. No money, no charity, no link — that combination
+  // is what got this account restricted, and the caption body below already
+  // promised exactly that while this pool still contradicted it.
+  const MISS_OPENERS = [
+    'Missed today. The cycle collects what the morning did not.',
+    'The streak broke. The debt does not.',
+    'No session today. 100 km owed, and it will be ridden.',
+    'Today the body said no. The odometer still has to say yes.',
+    'Day {DAY} missed. Nothing is forgiven, only rescheduled.',
+    'No run. No ride. No swim. The penance is now on the board.',
+    'Lost the day. Logged it anyway. That is the whole system.',
+    'A miss is not a reset. It is an invoice, paid in kilometres.'
+  ]
 
 // Standard hashtags — 5 niche tags max (research: sub-500K post tags outperform megatags).
 // Rotates by sport so WIN posts vary by activity.
@@ -1855,9 +1858,10 @@ function _generateMonthlyCaption(agg: MonthlyRecapAggregate): string {
   lines.push('')
   lines.push(`${agg.hitDays}/${agg.daysInWindow} days held · ${heroPct}%`)
   lines.push(`${agg.totalKm.toFixed(1)} km across ${agg.uniqueSports} disciplines`)
-  if (agg.donatedTotal > 0) {
-    lines.push(`Rs ${agg.donatedTotal.toLocaleString('en-IN')} → Akshaya Patra · ${agg.childrenFedYears} child${agg.childrenFedYears===1?'':'ren'} sponsored`)
-  } else {
+  // No money, no charity in a published recap: report the distance it cost.
+    if (agg.missDays > 0) {
+      lines.push(`${agg.missDays} miss${agg.missDays === 1 ? '' : 'es'} · ${agg.missDays * MISS_PENANCE_KM} km owed to the cycle`)
+    } else {
     lines.push('Zero misses. Streak held all month.')
   }
   lines.push('')
