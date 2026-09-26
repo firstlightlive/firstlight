@@ -89,6 +89,8 @@
       display: flex; align-items: center; gap: 8px;
     }
     .p-card-emoji { font-size: 16px; }
+    .p-food-link { display: block; min-height: 44px; padding: 12px; border: 1px solid rgba(245,166,35,.45); border-radius: 9px; color: var(--gold); font: 700 11px var(--mono); letter-spacing: 1px; text-decoration: none; text-align: center; }
+    .p-food-note { margin-top: 9px; color: var(--text-muted); font: 500 10px/1.5 var(--mono); }
     .p-card-meta { font-family: var(--mono); font-size: 9px; color: var(--text-muted); }
     .p-saved-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 6px; transition: all .25s; opacity: 0; }
     .p-saved-dot.on { opacity: 1; }
@@ -301,17 +303,13 @@
       </div>
     </section>
 
-    <!-- FOOD CODE -->
+    <!-- Food status is recorded only through the owner Rules check-in. -->
     <section class="p-card">
       <div class="p-card-head">
         <div class="p-card-title"><span class="p-card-emoji">🍱</span> FOOD CODE</div>
-        <div class="p-card-meta"><span class="p-saved-dot" id="p-saved-food"></span></div>
       </div>
-      <div class="p-toggles" id="p-food-toggles">
-        <button class="p-tog" data-val="clean">CLEAN</button>
-        <button class="p-tog" data-val="warn">WARN</button>
-        <button class="p-tog" data-val="broken">BROKEN</button>
-      </div>
+      <a class="p-food-link" href="/rules.html">OPEN FOOD &amp; RULES CHECK-IN →</a>
+      <div class="p-food-note">This Punch form does not set food status or create food debt. Only an explicit BROKEN mark in the owner check-in can create the 50 km penalty.</div>
     </section>
 
     <!-- BRAHMA -->
@@ -356,7 +354,6 @@
         <div class="p-slip-row">
           <select class="p-slip-select" id="p-slip-type">
             <option value="run">RUN MISSED</option>
-            <option value="food">FOOD BROKEN</option>
             <option value="sleep">SLEEP &lt; 6h</option>
             <option value="brahma">BRAHMA BREAK</option>
             <option value="mastery">MASTERY MISS</option>
@@ -395,8 +392,8 @@
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     }
 
-    // Run 2 restart: 2026-09-23 = Day 1 (run 1 broke Sep 20-21, rest day Sep 22)
-    const STREAK_START = '2026-09-23';
+    // New run: 2026-09-27 = Day 1.
+    const STREAK_START = '2026-09-27';
     function dayNum(dateStr) {
       const today = new Date(dateStr + 'T00:00:00');
       const start = new Date(STREAK_START + 'T00:00:00');
@@ -436,7 +433,6 @@
       const s = readScratch();
       ['p-km','p-min','p-kcal','p-bpm','p-start','p-end','p-sleep','p-bedtime','p-wake','p-urge','p-brahma-note','p-mast-input']
         .forEach(id => { const el = document.getElementById(id); if (el && s[id] != null) el.value = s[id]; });
-      if (s.food) setToggle('p-food-toggles', s.food);
       if (s.brahma) setToggle('p-brahma-toggles', s.brahma);
       if (s.mastery_count != null) updateMastery(s.mastery_count);
       renderSlips();
@@ -486,7 +482,6 @@
         btn.classList.add(val === 'clean' ? 'on-good' : val === 'warn' || val === 'urge' ? 'on-warn' : 'on-bad');
       }
     }
-    setupToggles('p-food-toggles', 'food');
     setupToggles('p-brahma-toggles', 'brahma');
 
     // ── Mastery ──
@@ -590,7 +585,8 @@
 
       const upserts = [];
 
-      // 1. daily_checkin — run + sleep + food + brahma + mastery summary
+      // 1. daily_checkin — run + sleep + brahma + mastery summary.
+      // Never overwrite food_status: the owner Rules check-in is authoritative.
       const checkinPayload = {
         date: TODAY,
         run_km: parseFloat(v('p-km')) || null,
@@ -600,7 +596,6 @@
         run_start: v('p-start') || null,
         run_end: v('p-end') || null,
         sleep_hrs: parseFloat(v('p-sleep')) || null,
-        food_status: s.food || null,
         brahma_clean: s.brahma === 'clean',
         urge: parseInt(v('p-urge')) || 0,
         mastery_count: parseInt(v('p-mast-input')) || 0,

@@ -41,13 +41,12 @@ function initTheme() {
 
 // ── CONFIG — Live config system. Defaults here, overrides from localStorage ──
 const FL_DEFAULTS = {
-  // THE public day counter. RESET 2026-09-23 — rest day after the overnight work;
-  // Day 1 = Wed 23 Sep 2026. The Sep 13 epoch retired with the Sep 20-21 break.
+  // THE public day counter. Day 1 of the new run = Sun 27 Sep 2026.
   // Chapters change the rule and the branding; only a break resets this number.
   // Must stay equal to DAY_EPOCH in supabase/functions/firstlight-sync/index.ts
   // and FL_CURRENT_CHAPTER.dayEpoch in js/chapters.js, or the site, the emails
   // and the Instagram captions print different day numbers for the same day.
-  STREAK_START: '2026-09-23',
+  STREAK_START: '2026-09-27',
   STAKE_PER_DAY: 0,            // Chapter 04 — NO money. Penance is DISTANCE (Punishment Cycle → discipline.html)
   HANDLE_IG: '@firstlightlive',
   HANDLE_X: '@firstlightlive',
@@ -2573,7 +2572,7 @@ async function updateDaysMissed() {
   var slips = JSON.parse(localStorage.getItem('fl_slips') || '[]');
 
   // Chapter dates (string-based for ISO-8601 safety)
-  var streakStart = FL_DEFAULTS.STREAK_START; // '2026-09-13' — day-counter epoch (post-fever restart)
+  var streakStart = FL_DEFAULTS.STREAK_START; // current public day-counter epoch
 
   // Count slips per chapter (string comparison, no timezone issues)
   var priorSlips = slips.filter(function(slip) {
@@ -2632,7 +2631,7 @@ async function updateClaimedAmount() {
     }
 
     // Only count current-chapter claims (from STREAK_START onwards, string-based for safety)
-    var streakStart = FL_DEFAULTS.STREAK_START; // '2026-09-13'
+    var streakStart = FL_DEFAULTS.STREAK_START; // current public day-counter epoch
     console.log('[Claims] Streak start constant:', streakStart);
 
     var chapter2Claims = data.filter(function(c) {

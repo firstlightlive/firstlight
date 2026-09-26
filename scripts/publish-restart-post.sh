@@ -23,19 +23,17 @@
 set -euo pipefail
 
 # ── The break being announced — edit these, everything else derives ──
-# ⚠️ POST_DATE updated to run 2 (Day 1 = Wed 23 Sep 2026). LAST_DAY / LAST_DATE /
-# BREAK_* / CAUSE below are still the OLD fever-break values — verify against
-# the record (run 1: wins through Sep 17 on the ledger; broke Sep 20-21; rest
-# day Sep 22) before publishing the restart carousel.
+# The Sep 22 walk is preserved in the workout archive. The gap below describes
+# the public day-counter transition, not an assertion that no activity occurred.
 DAY=1                            # the new Day 1
-POST_DATE='2026-09-23'           # date the new run starts
-CHAPTER='CHAPTER 05 · RETURN'
-LAST_DAY=47                      # day number the retired run reached
-LAST_DATE='2026-09-03'           # last logged session
-BREAK_DAYS=9
-BREAK_FROM='2026-09-04'
-BREAK_TO='2026-09-12'
-CAUSE='Fever'
+POST_DATE='2026-09-27'           # date the new run starts
+CHAPTER='CHAPTER 06 · RETURN'
+LAST_DAY=5                       # last verified day of the Sep 13 run
+LAST_DATE='2026-09-17'
+BREAK_DAYS=7
+BREAK_FROM='2026-09-18'
+BREAK_TO='2026-09-24'
+CAUSE='Day counter restart'
 
 WORKER='https://firstlight.live'
 SUPA_HOST='edgnudrbysybefbqyijq.supabase.co'
@@ -114,19 +112,13 @@ done
 
 # ── 2 · THE CAPTION ──────────────────────────────────────────────────────
 read -r -d '' CAPTION <<'CAP' || true
-47 held. Then a fever took nine.
+Five verified workout days, 13–17 September. The 5.1 km walk on 22 September stays in the workout archive.
 
-Day 1 · 13 Sep 2026.
+Day 1 · 27 Sep 2026.
 
-Not a taper, not a deload — I stopped. No training, no logging, nothing to post. Swipe to slide two and count the gap bar by bar. It's all there.
+The public counter starts again. The earlier record stays visible. Unconfirmed food and rules are never reported as violations.
 
-The counter resets. The record doesn't.
-
-Any workout anchors the day. Wake before 4, meditate, train, journal, sleep. Miss the workout and it's 100 km on the bike. Miss all five and it's 220.
-
-No money this chapter — the debt is distance, and distance doesn't take excuses.
-
-Starting at one when you've already reached 47 is the whole skill.
+Any workout anchors the day. The five daily rituals and rules are tracked separately. Confirmed breaks are recorded honestly.
 
 #runnersofindia #indianrunners #triathlonindia #ironmantraining #discipline
 CAP

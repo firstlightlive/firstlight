@@ -1,14 +1,27 @@
 // ═══════════════════════════════════════════
-// FIRST LIGHT — RECOVERY (private 60-day system)
-// Day counter · laps · debt ledger · milestones
-// Storage: localStorage ONLY (private data never leaves the device).
+// FIRST LIGHT — RECOVERY (private LIFETIME system)
+// Day counter · laps · debt ledger · milestones · today's food
+//
+// NOT a 60-day programme. The screens-free house is the permanent design of
+// this life: the laptop never crosses the door, ever. 60 was only the length of
+// the first experiment; the law has no end date, so the milestone ladder runs
+// past a year and keeps going. Nothing here expires on Day 61.
+//
+// Storage: localStorage ONLY (private data never leaves the device). The food
+// block is the one exception — it renders the shared lifetime food log via
+// FLFood so there is never a second, diverging food store.
 // ═══════════════════════════════════════════
 
 (function () {
   'use strict';
 
   var LS_KEY = 'fl_recovery_v1';
-  var DAY1 = '2026-09-23'; // Must equal FL_DEFAULTS.STREAK_START · FL_CURRENT_CHAPTER.dayEpoch · DAY_EPOCH
+  // INDEPENDENT CLOCK. This is the screens-free house, not the workout run, so
+  // it does NOT move when the public day counter resets. Enforcement went live
+  // 06:00 IST Wed 23 Sep 2026 and has not broken since, so Day 1 stays there.
+  // Do not "sync" this to DAY_EPOCH / STREAK_START — that silently deletes
+  // clean days from a streak that never lapsed.
+  var DAY1 = '2026-09-23';
 
   var PENALTY = {
     hourDay: 50,             // cycle km per connected hour, daytime (no base — starts from zero)
@@ -43,7 +56,15 @@
     { day: 75,  name: 'SEVENTY-FIVE',   reward: '15-day INDIA trip — ~₹50,000' },
     { day: 90,  name: 'NINETY DAYS',    reward: 'THE GUARD ITSELF — Raspberry Pi deployed to watch the permanently dry house + spa day — ₹15,000. The laptop never comes home — the machine is the only computer that ever lives here.' },
     { day: 120, name: 'ONE-TWENTY',     reward: 'Home gym setup — dumbbells, bench, resistance — ₹25,000 (your call; the ₹1.2L cycle you own is already the penance machine)' },
-    { day: 180, name: 'HALF YEAR',      reward: '10-day INTERNATIONAL trip — a new country + ₹20,000 clothing shopping. Repeats every 180 clean days: next country each time.' }
+    { day: 180, name: 'HALF YEAR',      reward: '10-day INTERNATIONAL trip — a new country + ₹20,000 clothing shopping. Repeats every 180 clean days: next country each time.' },
+    // Past here the ladder is deliberately open. The rule is for life, so the
+    // list must not dead-end at 180 and imply a finish line. Rewards for these
+    // are set with the witness when they come into range — not pre-invented.
+    { day: 270,  name: 'NINE MONTHS',   reward: 'Three quarters, house dry. Reward set with the witness. The 180-day trip keeps its own cycle.' },
+    { day: 365,  name: 'ONE YEAR',      reward: 'One full year with no screens at home. Reward set with the witness.' },
+    { day: 730,  name: 'TWO YEARS',     reward: 'Reward set with the witness.' },
+    { day: 1095, name: 'THREE YEARS',   reward: 'Reward set with the witness.' },
+    { day: 1825, name: 'FIVE YEARS',    reward: 'Reward set with the witness. The ladder continues — there is no last milestone.' }
   ];
 
   // ── state helpers ──────────────────────────────
@@ -72,9 +93,11 @@
   }
 
   function lapDays(st) {
+    if (dayNum() === 0) return 0;
     var laps = st.laps.slice().sort(function (a, b) { return a.ts < b.ts ? 1 : -1; });
     if (!laps.length) return dayNum();
     var last = new Date(laps[0].ts + 'T00:00:00');
+    if (last < new Date(DAY1 + 'T00:00:00')) return dayNum();
     var now = new Date(); now.setHours(0, 0, 0, 0);
     return Math.max(0, Math.floor((now - last) / 86400000));
   }
@@ -148,8 +171,11 @@
 
     var html = '';
     html += '<div style="padding:24px 0 8px">' +
-      '<div class="cc-panel-title">⛓ RECOVERY — THE 60-DAY SYSTEM</div>' +
-      '<div class="cc-panel-sub">Private. Local only. Honest logging is the whole game.</div></div>';
+      '<div class="cc-panel-title">⛓ RECOVERY — THE LIFETIME SYSTEM</div>' +
+      '<div class="cc-panel-sub">No end date. The screens-free house is permanent — 60 days was only the first experiment. Private. Honest logging is the whole game.</div></div>';
+    html += '<div style="margin:4px 0 16px;padding:12px;border:1px solid rgba(245,166,35,0.35);border-radius:8px;font:500 10px var(--font-mono);line-height:1.6">' +
+      'FOOD + DAILY RULES CHECK-IN: <a href="rules.html" style="color:var(--gold,#F5A623)">OPEN CHECK-IN →</a><br>' +
+      'Sign in with the owner account. Food is recorded there from 27 Sep; an unmarked rule is unconfirmed, never an automatic 50 km penalty.</div>';
 
     // Guard status
     html += '<div style="font:500 10px var(--font-mono);color:var(--gold,#F5A623);letter-spacing:1px;margin-bottom:8px">' +
@@ -177,6 +203,15 @@
     html += statCard('OPEN DEBT', openKm + ' km left', 'cycle-km debt remaining — plan below');
     html += '</div>';
 
+    // Food — today's intake + the lifetime log, rendered from the shared store
+    // (js/admin-food.js). Deliberately NOT a second food log: same table, same
+    // cache, same offline queue, so the two panels can never disagree.
+    html += sectionTitle('FOOD — TODAY · LIFETIME LOG');
+    html += '<div style="font:400 9px var(--font-mono);color:var(--text-dim,#6a6f78);margin-bottom:10px">' +
+      'Logged for life, not for 60 days. Hand-logging works with the WiFi off; scans need signal. ' +
+      'AI findings are advisory — only an explicit BROKEN mark in the check-in creates the 50 km food penalty.</div>';
+    html += '<div id="recoveryFoodBox" style="margin-bottom:18px"></div>';
+
     // Milestones
     html += sectionTitle('MILESTONES & REWARDS');
     html += '<div style="font:400 9px var(--font-mono);color:var(--text-dim,#6a6f78);margin-bottom:10px">TREAT BUDGET: ₹20,000/month — small rewards come from it, unspent rolls over. Trips from savings. Clean windows only. Witness pre-approves. Physical, offline, real-world only.</div>';
@@ -197,7 +232,7 @@
         '<div style="height:100%;width:' + prog + '%;background:var(--cyan,#00D4FF)"></div></div>' +
         '<div style="font:500 8px var(--font-mono);color:var(--text-dim,#6a6f78);margin-top:4px">' + d + ' / ' + next.day + ' clean days</div></div>';
     } else {
-      html += '<div style="font:600 10px var(--font-mono);color:var(--green,#00E676);margin-bottom:14px">ALL MILESTONES EARNED. THE MACHINE IS YOURS.</div>';
+      html += '<div style="font:600 10px var(--font-mono);color:var(--green,#00E676);margin-bottom:14px">EVERY LISTED MILESTONE EARNED. SET THE NEXT ONE WITH THE WITNESS — THE LADDER DOES NOT END.</div>';
     }
     MILESTONES.forEach(function (m) {
       var unlocked = d >= m.day && lapsSince(st, m.day) === 0;
@@ -314,7 +349,23 @@
 
     root.innerHTML = html;
     bindEvents(st);
+    renderFoodBox();
     startDebtReminders();
+  }
+
+  // admin-food.js loads AFTER this module, so FLFood is resolved lazily at
+  // render time (the panel only paints on user navigation). If it is genuinely
+  // missing we say so rather than rendering a silently empty box.
+  function renderFoodBox() {
+    var box = document.getElementById('recoveryFoodBox');
+    if (!box) return;
+    if (window.FLFood && typeof window.FLFood.renderInto === 'function') {
+      try { window.FLFood.renderInto(box, { compact: true }); return; }
+      catch (e) { console.warn('[recovery] food box failed:', e.message); }
+    }
+    box.innerHTML = '<div style="padding:12px;border:1px dashed rgba(255,255,255,0.14);border-radius:8px;' +
+      'font:500 10px var(--font-mono);color:var(--text-dim,#6a6f78);line-height:1.6">' +
+      'Food module not loaded on this page. <a href="rules.html" style="color:var(--gold,#F5A623)">OPEN CHECK-IN →</a></div>';
   }
 
   function statCard(label, value, sub) {

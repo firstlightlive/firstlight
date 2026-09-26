@@ -34,7 +34,7 @@ case "${1:-}" in
   *) echo "usage: $0 [--worker|--fn]" >&2; exit 1 ;;
 esac
 
-# ── Pre-flight: the four day-counter constants must agree, or the site and the
+# ── Pre-flight: all public/current-run day-counter constants must agree, or the site and the
 # Instagram captions print different day numbers for the same day. ──────────
 echo "── checking day-counter agreement ──"
 EPOCH_APP=$(sed -n "s/.*STREAK_START: '\([0-9-]*\)'.*/\1/p" website/app.js | head -1)
@@ -44,15 +44,21 @@ EPOCH_CH=$(sed -n "s/.*dayEpoch: '\([0-9-]*\)'.*/\1/p" website/js/chapters.js | 
 EPOCH_FN=$(sed -n "s/.*const DAY_EPOCH = new Date('\([0-9-]*\)T.*/\1/p" supabase/functions/firstlight-sync/index.ts | head -1)
 # The content generator is self-contained (no app.js) and has drifted before.
 EPOCH_GEN=$(sed -n "s/.*const STREAK_START='\([0-9-]*\)';.*/\1/p" website/app/app.html | head -1)
+EPOCH_SOCIAL=$(sed -n "s/.*const STREAK_ORIGIN_ISO='\([0-9-]*\)';.*/\1/p" website/app/index.html | head -1)
+EPOCH_PUNCH=$(sed -n "s/.*const STREAK_START = '\([0-9-]*\)';.*/\1/p" website/punch.html | head -1)
+EPOCH_DISC=$(sed -n "s/.*var START='\([0-9-]*\)';.*/\1/p" website/discipline.html | head -1)
 echo "  app.js       : ${EPOCH_APP:-<none>}"
 echo "  chapters.js  : ${EPOCH_CH:-<none>}"
 echo "  edge fn      : ${EPOCH_FN:-<none>}"
 echo "  app/app.html : ${EPOCH_GEN:-<none>}"
-if [[ -z "$EPOCH_APP" || "$EPOCH_APP" != "$EPOCH_CH" || "$EPOCH_APP" != "$EPOCH_FN" || "$EPOCH_APP" != "$EPOCH_GEN" ]]; then
+echo "  app/index.html: ${EPOCH_SOCIAL:-<none>}"
+echo "  punch.html   : ${EPOCH_PUNCH:-<none>}"
+echo "  discipline   : ${EPOCH_DISC:-<none>}"
+if [[ -z "$EPOCH_APP" || "$EPOCH_APP" != "$EPOCH_CH" || "$EPOCH_APP" != "$EPOCH_FN" || "$EPOCH_APP" != "$EPOCH_GEN" || "$EPOCH_APP" != "$EPOCH_SOCIAL" || "$EPOCH_APP" != "$EPOCH_PUNCH" || "$EPOCH_APP" != "$EPOCH_DISC" ]]; then
   echo "✘ Day-counter epochs disagree — fix before deploying." >&2
   exit 1
 fi
-echo "  ✓ all four agree"
+echo "  ✓ all current-run epochs agree"
 
 # ── Syntax gates ───────────────────────────────────────────────────────────
 echo "── syntax check ──"

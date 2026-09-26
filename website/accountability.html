@@ -37,8 +37,11 @@
     .container { max-width:900px; margin:0 auto; padding:0 24px; }
 
     /* ═══ HERO ═══ */
+    /* overflow:hidden clips the 900px decorative glow below. body{overflow-x:hidden}
+       already hid it, but the oversized pseudo-element still left the document a
+       few px wider than the viewport. Clipping at the source removes the cause. */
     .hero { min-height:100vh; display:flex; align-items:center; justify-content:center;
-      text-align:center; padding:120px 24px 80px; position:relative; }
+      text-align:center; padding:120px 24px 80px; position:relative; overflow:hidden; }
     .hero::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
       width:900px; height:900px; border-radius:50%;
       background:radial-gradient(circle, rgba(255,82,82,0.06) 0%, rgba(245,166,35,0.03) 35%, transparent 65%);
@@ -276,7 +279,7 @@
 
   <!-- Active Rules — compact, below stats -->
   <div class="rules-card reveal">
-    <div class="rules-title">ACTIVE RULES — CHAPTER 05 · RETURN · FROM 23 SEP 2026</div>
+    <div class="rules-title">ACTIVE RULES — CHAPTER 06 · RETURN · FROM 27 SEP 2026</div>
     <div class="rules-row"><div class="rules-key">DAILY</div><div class="rules-val"><strong>Any workout anchors the day</strong> — walk, run, cycle, swim, or an HR-elevated session. GPS/HR-verified.</div></div>
     <div class="rules-row"><div class="rules-key">RITUALS</div><div class="rules-val">Five, every day — <strong>wake before 4:00 AM · meditation 3:45 AM · workout · journal · sleep 6.5 h</strong>. Each miss carries its own distance.</div></div>
     <div class="rules-row"><div class="rules-key">MISS</div><div class="rules-val">Paid in <span class="rules-danger">DISTANCE, not money</span> — the Punishment Cycle. Workout missed = +100 km cycle; any other ritual = +30 km. Unlogged by 11:59 PM IST = every punishment applies automatically.</div></div>

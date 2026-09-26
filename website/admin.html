@@ -643,7 +643,7 @@
       <div class="cc-group open" data-group="recovery">
         <div class="cc-group-header"><span class="cc-arrow">▶</span> 🛡 RECOVERY</div>
         <div class="cc-group-items">
-          <div class="cc-item" data-panel="recovery"><span class="cc-icon">⛓</span> 60-Day System</div>
+          <div class="cc-item" data-panel="recovery"><span class="cc-icon">⛓</span> Lifetime System</div>
         </div>
       </div>
 
@@ -653,6 +653,8 @@
         <div class="cc-group-items">
           <div class="cc-item active" data-panel="dashboard"><span class="cc-icon">◈</span> Dashboard</div>
           <div class="cc-item" data-panel="checkin"><span class="cc-icon">✓</span> Today Check-in</div>
+          <a class="cc-item" href="food.html"><span class="cc-icon">📅</span> Food Calendar</a>
+          <a class="cc-item" href="rules.html"><span class="cc-icon">🍽</span> Food &amp; Rules Check-in</a>
           <div class="cc-item" data-panel="tomorrow"><span class="cc-icon">&#9654;</span> Tomorrow Plan</div>
         </div>
       </div>
@@ -678,7 +680,7 @@
           <div class="cc-item" data-panel="evening"><span class="cc-icon">🌙</span> Evening Rituals</div>
           <div class="cc-item" data-panel="deepwork"><span class="cc-icon">⚡</span> Deep Work</div>
           <div class="cc-item" data-panel="body-weight"><span class="cc-icon">⚖</span> Body Weight</div>
-          <div class="cc-item" data-panel="food-scanner"><span class="cc-icon">&#127860;</span> Food Scanner</div>
+          <div class="cc-item" data-panel="food-scanner"><span class="cc-icon">&#127860;</span> Food Log (lifetime)</div>
           <div class="cc-item" data-panel="gym-log"><span class="cc-icon">🏋</span> Log Workout</div>
           <div class="cc-item" data-panel="races"><span class="cc-icon">🏃</span> Races</div>
           <div class="cc-item" data-panel="ekadashi"><span class="cc-icon">🙏</span> Ekadashi</div>
@@ -1090,6 +1092,7 @@
         <div class="cc-panel-header">
           <div class="cc-panel-title">TODAY CHECK-IN</div>
           <div class="cc-panel-desc">One form. Every signal. Seal the day.</div>
+          <a class="btn btn-outline" href="rules.html" style="display:inline-flex;align-items:center;min-height:44px;margin-top:12px">OPEN FOOD &amp; RULES CHECK-IN</a>
         </div>
         <div id="checkin-container"></div>
         <div id="finance-checkin-widget"></div>
@@ -1556,7 +1559,7 @@ firstlight.live</textarea>
         <div id="reviewRoot" style="padding-top:16px"></div>
       </div>
 
-      <!-- ═══ RECOVERY — private 60-day system (js/admin-recovery.js) ═══ -->
+      <!-- ═══ RECOVERY — private LIFETIME system (js/admin-recovery.js) ═══ -->
       <div class="cc-panel" id="p-recovery">
         <div id="recoveryRoot" style="padding-top:16px"></div>
       </div>
@@ -3746,7 +3749,7 @@ firstlight.live</textarea>
   <script src="js/admin-seal.js"></script>
   <script src="js/admin-profile.js?v=20260620r2"></script>
   <script src="js/admin-storage.js"></script>
-  <script src="js/admin-food.js"></script>
+  <script src="js/admin-food.js?v=20260924a"></script>
   <script src="js/admin-gym.js"></script>
   <script src="js/admin-voice.js"></script>
   <script src="js/admin-checkin.js?v=20260727a"></script>

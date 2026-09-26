@@ -57,6 +57,19 @@ window.FL_CHAPTERS = [
     escalations: 'NONE — PENANCE IS DISTANCE',
     status: 'COMPLETE',
     closingNote: 'Thirty-nine days, Day 9 to Day 47, on the covenant that replaced money with distance. It did not end by choice: a nine-day fever (Sep 4–12) took it to zero. The chapter had only one size of day — all of it or none — so when the body broke, the whole system went with it. That is the lesson RETURN was built on.'
+  },
+  {
+    id: 5,
+    name: 'RETURN',
+    start: '2026-09-13',
+    end: '2026-09-17',
+    dayEpoch: '2026-09-13',
+    days: 5,
+    rule: 'ANY WORKOUT ANCHORS THE DAY · 5 RITUALS · 3 DAY MODES',
+    stakePerDay: 0,
+    escalations: 'NONE — PENANCE IS DISTANCE',
+    status: 'COMPLETE',
+    closingNote: 'Five verified workout days, Sep 13–17. Later activity and check-in records remain in the archive; the next public Day 1 begins Sep 27.'
   }
 ];
 
@@ -81,28 +94,27 @@ window.FL_BREAKS = [
     closed: 'CH04 DISCIPLINE'
   },
   {
-    date: '2026-09-22',
-    through: '2026-09-22',
-    days: 1,
-    reason: 'Rest day — ride deferred to Sep 23. Day 1 = Wed 23 Sep, locked.',
+    date: '2026-09-18',
+    through: '2026-09-26',
+    days: 9,
+    reason: 'Counter transition before the 27 September restart. The run was first set to open Sep 25, but Sep 25-26 produced no kept day, so they stay orphans with the rest of the transition. Existing workout evidence is preserved.',
     stakePaid: 0,
     acknowledged: true,
-    closed: 'CH05 RETURN (run 1)'
+    closed: 'CH05 RETURN'
   }
 ];
 // Back-compat: the most recent break.
 window.FL_BREAK = window.FL_BREAKS[window.FL_BREAKS.length - 1];
 
 window.FL_CURRENT_CHAPTER = {
-  id: 5,
+  id: 6,
   name: 'RETURN',
-  // ONE chapter, ONE epoch: start === dayEpoch. Chapter 04 ended at the fever
-  // (Sep 3) and this chapter opened on the other side of it, so no chapter has to
-  // hold two day-counter runs. Run 1 (Sep 13–20) broke; run 2 restarts at Day 1
-  // on Sep 23 — same chapter label. Must stay equal to FL_DEFAULTS.STREAK_START
-  // (app.js) and DAY_EPOCH (supabase/functions/firstlight-sync/index.ts).
-  start: '2026-09-23',
-  dayEpoch: '2026-09-23',
+  // One chapter, one epoch. The verified Sep 13–17 run is archived above.
+  // Chapter 06 was first set to open Sep 25; it recorded no kept day, so the
+  // opening slid to Sep 27 rather than forking a second run inside one chapter.
+  // Must match app.js and the edge function day epoch.
+  start: '2026-09-27',
+  dayEpoch: '2026-09-27',
   rule: 'ANY WORKOUT ANCHORS THE DAY · 5 RITUALS · 3 DAY MODES',
   stakePerDay: 0,
   escalations: 'NONE — PENANCE IS DISTANCE',
@@ -118,9 +130,9 @@ window.FL_CURRENT_CHAPTER = {
   // Ramp back from the fever. The wake steps in, the lights-out steps with it;
   // Study 1+2 absorbs the whole cut so no ritual is what gets dropped.
   ramp: [
-    { week: 1, from: '2026-09-13', to: '2026-09-19', wake: '4:30 AM', lightsOut: '9:45 PM' },
-    { week: 2, from: '2026-09-20', to: '2026-09-26', wake: '4:00 AM', lightsOut: '9:15 PM' },
-    { week: 3, from: '2026-09-27', to: null,         wake: '3:30 AM', lightsOut: '8:45 PM' }
+    { week: 1, from: '2026-09-27', to: '2026-10-03', wake: '4:30 AM', lightsOut: '9:45 PM' },
+    { week: 2, from: '2026-10-04', to: '2026-10-10', wake: '4:00 AM', lightsOut: '9:15 PM' },
+    { week: 3, from: '2026-10-11', to: null,         wake: '3:30 AM', lightsOut: '8:45 PM' }
   ],
   prohibitions: [
     'Masturbation / porn — 100 km cycle',

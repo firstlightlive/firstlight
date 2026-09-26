@@ -9,7 +9,9 @@
   :root{--bg:#0A0C10;--card:#12151C;--line:rgba(0,212,255,0.15);--gold:#F5A623;--green:#00E676;--red:#FF5252;--dim:#5A6B80;--text:#E8EDF2}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{background:var(--bg);color:var(--text);font-family:Inter,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;padding:20px 16px 40px}
-  .wrap{max-width:560px;margin:0 auto}
+  .wrap{max-width:560px;margin:0 auto;display:none}
+  .auth-message{max-width:560px;margin:15vh auto;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.8;color:var(--text)}
+  .auth-message a{color:var(--gold)}
   header{display:flex;align-items:baseline;gap:10px;margin:8px 0 4px}
   header .brand{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--gold);letter-spacing:4px;font-size:15px}
   header .sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:3px}
@@ -50,16 +52,19 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="auth-message" id="auth-message">Checking your sign-in…</div>
+<div class="wrap" id="rules-app">
   <header>
     <span class="brand">◆ FIRST LIGHT</span>
     <span class="sub">RULES · DAILY CHECK-IN</span>
   </header>
 
   <div class="banner" id="daystatus">· loading…</div>
+  <!-- Offline / not-yet-synced / late state. Hidden when everything is on the server. -->
+  <div id="syncline" style="display:none;margin:8px 0 0;padding:9px 11px;border:1px solid rgba(245,166,35,0.4);border-radius:8px;font-family:var(--font-mono,monospace);font-size:10px;line-height:1.6;letter-spacing:0.5px;color:#F5A623"></div>
 
   <div class="deadline" id="deadline">You can update <b>any time of day</b>.<br>
-  All rules marked by <b>11:59 PM</b> = day held. Nothing marked by <b>11:59 PM</b> = ALL rules violated · punishment posted. No exceptions.<br>
+  Mark each rule by <b>11:59 PM</b>. Only a rule you explicitly mark BROKEN can create a public penalty. Missing marks stay unconfirmed.<br>
   <span style="color:var(--dim)">One email nudge at 9:30 PM if the day isn't marked yet.</span></div>
 
   <section class="card" id="card-screens">
@@ -67,7 +72,7 @@
     <h2>SCREENS</h2>
     <div class="rule">No screen ever enters my house — and in a hotel, every screen switches OFF at the room door.</div>
     <div class="btns">
-      <button id="b-sc-clean" class="clean-sel" data-rule="screens" data-val="clean">CLEAN</button>
+      <button id="b-sc-clean" data-rule="screens" data-val="clean">CLEAN</button>
       <button id="b-sc-broken" class="broken-sel" data-rule="screens" data-val="broken">BROKEN</button>
     </div>
     <div class="kmrow" id="kmrow-screens" style="display:none">
@@ -84,7 +89,7 @@
     Sugar is TRAINING FUEL — on the ride or the run it is medicine. Off it, it's a violation. <b>No ice cream, ever.</b><br>
     Exception (only one): training over 90 min → gels / dates / banana — free. Race day: free.</div>
     <div class="btns">
-      <button id="b-fd-clean" class="clean-sel" data-rule="food" data-val="clean">CLEAN</button>
+      <button id="b-fd-clean" data-rule="food" data-val="clean">CLEAN</button>
       <button id="b-fd-broken" class="broken-sel" data-rule="food" data-val="broken">BROKEN</button>
     </div>
     <div class="mark" id="mark-food">— not marked yet</div>
@@ -97,7 +102,7 @@
     No ordering after 10:00 PM — no Zomato, no Swiggy, no ice-cream runs. The ORDER itself is the violation.<br><br>
     Warm milk / water / decaf are allowed after 10 — that's the ritual, not food.</div>
     <div class="btns">
-      <button id="b-nt-clean" class="clean-sel" data-rule="night" data-val="clean">CLEAN</button>
+      <button id="b-nt-clean" data-rule="night" data-val="clean">CLEAN</button>
       <button id="b-nt-broken" class="broken-sel" data-rule="night" data-val="broken">BROKEN</button>
     </div>
     <div class="mark" id="mark-night">— not marked yet</div>
@@ -108,6 +113,7 @@
   Unpaid after 48 hours → doubles. Vomiting does NOT erase it — the ride is still owed.</div>
 
   <div class="count" id="count"></div>
+  <div class="count" style="margin-top:10px"><a href="food.html" style="color:var(--cyan,#00D4FF);text-decoration:none">FOOD CALENDAR — WHICH DAYS I TRACKED →</a></div>
   <div class="note-row">
     <input id="day-note" placeholder="day note — e.g. party tonight, ate by 9:45" maxlength="120">
     <button id="b-note">SAVE</button>
@@ -118,15 +124,113 @@
 </div>
 <div class="flash" id="flash">SAVED ✓</div>
 
+<script src="js/config.js"></script>
 <script>
-(function(){
+(async function(){
   'use strict';
-  var SUPA_URL = localStorage.getItem('fl_supabase_url') || 'https://edgnudrbysybefbqyijq.supabase.co';
-  var SUPA_KEY = localStorage.getItem('fl_supabase_key') || '';
+  var SUPA_URL = window.FL.SUPABASE_URL;
+  var SUPA_KEY = window.FL.SUPABASE_ANON_KEY;
   var FN = SUPA_URL + '/functions/v1/firstlight-sync';
+  var OWNER = 'firstlightlive@gmail.com';
 
-  // Admin key — assembled like app.js (never stored plain in the page)
-  var _ak = ['934c03a18ffe22cb','ccef763b4bf480d5','3f0690177904ba2b','1d9ebacd52b0eb5d'].join('');
+  // ── OFFLINE-CAPABLE CHECK-IN ────────────────────────────────────────────
+  // The home network is a permanent dead zone, so this page must open and
+  // record marks with no connectivity at all. Three stores make that safe:
+  //   fl_rules_local   — the marks themselves, per date, shown on reload
+  //   fl_rules_pending — marks not yet accepted by the server, retried
+  //   fl_rules_owner   — proof this device has verified as the owner ONLINE
+  // A mark is written locally the instant it is tapped, so it can never be
+  // lost to a failed request; the network is only how it gets home.
+  var LOCAL_KEY='fl_rules_local', PEND_KEY='fl_rules_pending', OWNER_KEY='fl_rules_owner';
+
+  function readSession(){
+    try{return JSON.parse(localStorage.getItem('fl_supabase_session')||'null');}catch(e){return null;}
+  }
+  function jget(k,d){ try{return JSON.parse(localStorage.getItem(k)||d);}catch(e){ return JSON.parse(d); } }
+  function jset(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+
+  function localGet(date){ return (jget(LOCAL_KEY,'{}')[date])||{}; }
+  function localSet(date,patch){
+    var all=jget(LOCAL_KEY,'{}');
+    all[date]=Object.assign({},all[date]||{},patch);
+    jset(LOCAL_KEY,all);
+  }
+  function pendLoad(){ var a=jget(PEND_KEY,'[]'); return Array.isArray(a)?a:[]; }
+  function pendSave(a){ jset(PEND_KEY,a.slice(-200)); }
+  function pendAdd(body){
+    var a=pendLoad();
+    // One pending entry per date+field: a re-tap replaces, never stacks.
+    var field=body.screens?'screens':(body.food?'food':(body.night?'night':'note'));
+    a=a.filter(function(x){
+      var f=x.body.screens?'screens':(x.body.food?'food':(x.body.night?'night':'note'));
+      return !(x.body.date===body.date&&f===field);
+    });
+    a.push({body:body,at:Date.now(),field:field});
+    pendSave(a);
+  }
+
+  async function ownerToken(){
+    var s=readSession();
+    if(!s||!s.access_token)throw new Error('Sign in to record your food and rules.');
+
+    // OFFLINE — trust the cached session, but only on a device that has
+    // verified as the owner against the server at least once.
+    if(!navigator.onLine){
+      if(!localStorage.getItem(OWNER_KEY))throw new Error('Sign in once while online, then this check-in works offline.');
+      return s.access_token;
+    }
+
+    if((s.expires_at||0)*1000<Date.now()+60000){
+      if(!s.refresh_token)throw new Error('Your session expired. Sign in again.');
+      try{
+        var renewed=await fetch(SUPA_URL+'/auth/v1/token?grant_type=refresh_token',{
+          method:'POST',headers:{'apikey':SUPA_KEY,'Content-Type':'application/json'},
+          body:JSON.stringify({refresh_token:s.refresh_token})
+        });
+        if(renewed.status>=400&&renewed.status<500)throw new Error('Your session expired. Sign in again.');
+        if(renewed.ok){
+          s=await renewed.json();
+          localStorage.setItem('fl_supabase_session',JSON.stringify(s));
+        }
+      }catch(e){
+        if(/session expired/i.test(e.message))throw e;
+        // Network died mid-refresh. Fall through on the cached token; the
+        // pending queue replays whatever the server refuses now.
+        if(!localStorage.getItem(OWNER_KEY))throw new Error('Sign in once while online, then this check-in works offline.');
+        return s.access_token;
+      }
+    }
+
+    try{
+      var user=await fetch(SUPA_URL+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+s.access_token}});
+      if(user.status===401||user.status===403)throw new Error('Your session expired. Sign in again.');
+      if(user.ok){
+        var info=await user.json();
+        if((info.email||'').toLowerCase()!==OWNER)throw new Error('This check-in is for the owner account.');
+        localStorage.setItem(OWNER_KEY,'1');   // this device may now go offline
+      }
+    }catch(e){
+      if(/session expired|owner account/i.test(e.message))throw e;
+      if(!localStorage.getItem(OWNER_KEY))throw new Error('Sign in once while online, then this check-in works offline.');
+    }
+    return s.access_token;
+  }
+  async function ownerFetch(url,options){
+    options=options||{};
+    options.headers=Object.assign({},options.headers||{}, {'Authorization':'Bearer '+await ownerToken(),'apikey':SUPA_KEY});
+    return fetch(url,options);
+  }
+  try {
+    await ownerToken();
+    var todayForGate=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'});
+    if(todayForGate<'2026-09-27')throw new Error('The new food and rules check-in opens on 27 September. No unconfirmed penalty will post before then.');
+    document.getElementById('rules-app').style.display='block';
+    document.getElementById('auth-message').style.display='none';
+  } catch(e) {
+    document.getElementById('auth-message').innerHTML=String(e.message).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+
+      '<br><a href="login.html?next=rules.html">SIGN IN</a>';
+    return;
+  }
 
   function istToday(){
     return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'});
@@ -141,7 +245,7 @@
       el.textContent='✓ DAY HELD — ALL THREE CLEAN';
       el.classList.add('held');
     }else if(STATE.screens==='broken'||STATE.food==='broken'||STATE.night==='broken'){
-      el.textContent='✗ DAY BROKEN — POSTED AT 11:59 PM';
+      el.textContent='✗ BREAK MARKED — WILL POST AT 11:59 PM';
       el.classList.add('broken');
     }else{
       el.textContent='· PENDING — MARK ALL THREE BEFORE 11:59 PM';
@@ -173,35 +277,64 @@
     banner();
   }
 
+  // Submit one mark. Distinguishes three outcomes, because they need different
+  // handling: accepted, retryable (network), and LATE (server refused the date
+  // because the check-in window for it has closed — retrying can never help,
+  // and pretending otherwise would hide a missed day).
+  async function submit(body){
+    try{
+      var r=await ownerFetch(FN+'?action=rules-checkin',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(body)
+      });
+      var d=null; try{ d=await r.json(); }catch(e){}
+      if(r.ok&&d&&d.ok) return {ok:true,grace:!!(d.checkin&&d.checkin.graceSubmit)};
+      if(r.status===400) return {ok:false,late:true,detail:(d&&(d.detail||d.error))||'outside the check-in window'};
+      return {ok:false,retry:true};
+    }catch(e){ return {ok:false,retry:true}; }
+  }
+
+  function markLate(body,detail){
+    var all=jget('fl_rules_late','[]');
+    if(!Array.isArray(all)) all=[];
+    all.push({body:body,detail:detail,at:Date.now()});
+    jset('fl_rules_late',all.slice(-50));
+  }
+
   function save(rule,val){
-    var body={date:istToday()};
+    var date=istToday();
+    var body={date:date};
     body[rule]=val;
     if(rule==='screens'&&val==='broken'){
       var k=parseInt(document.getElementById('sc-km').value,10);
       if(k>0) body.screensKm=k;
     }
-    fetch(FN+'?action=rules-checkin',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Admin-Key':_ak},
-      body:JSON.stringify(body)
-    }).then(function(r){return r.json();}).then(function(d){
-      if(d&&d.ok){setMark(rule,val);flash('SAVED ✓');}
-      else{flash('SAVE FAILED — retry');}
-    }).catch(function(){flash('NETWORK — retry');});
+    // Record the owner's mark locally FIRST. The tap is the decision; the
+    // request is only delivery. This is what makes the dead zone survivable.
+    setMark(rule,val);
+    localSet(date,body);
+
+    submit(body).then(function(res){
+      if(res.ok){ flash(res.grace?'SAVED ✓ (GRACE WINDOW)':'SAVED ✓'); }
+      else if(res.late){ markLate(body,res.detail); flash('LATE — NOT RECORDED'); }
+      else { pendAdd(body); flash(navigator.onLine?'QUEUED — WILL RETRY':'OFFLINE — QUEUED ✓'); }
+      renderPending();
+    });
   }
 
   // Day note
   document.getElementById('b-note').addEventListener('click',function(){
     var n=document.getElementById('day-note').value.trim();
     if(!n){flash('NOTE EMPTY');return;}
-    fetch(FN+'?action=rules-checkin',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Admin-Key':_ak},
-      body:JSON.stringify({date:istToday(),note:n})
-    }).then(function(r){return r.json();}).then(function(d){
-      if(d&&d.ok){flash('NOTE SAVED ✓');}
-      else{flash('SAVE FAILED — retry');}
-    }).catch(function(){flash('NETWORK — retry');});
+    var body={date:istToday(),note:n};
+    localSet(body.date,{note:n});
+    submit(body).then(function(res){
+      if(res.ok){flash('NOTE SAVED ✓');}
+      else if(res.late){markLate(body,res.detail);flash('LATE — NOT RECORDED');}
+      else{pendAdd(body);flash(navigator.onLine?'QUEUED — WILL RETRY':'OFFLINE — QUEUED ✓');}
+      renderPending();
+    });
   });
 
   function wire(rule){
@@ -212,8 +345,20 @@
   }
   wire('screens'); wire('food'); wire('night');
 
-  // Load today's saved state (config is public-read)
+  // Paint from the local store first — this is the only source that is
+  // guaranteed to answer with the home network off. The server read below
+  // overwrites it when it succeeds (the server is still the source of truth).
   var today=istToday();
+  (function(){
+    var c=localGet(today);
+    if(c.screens){setMark('screens',c.screens);if(c.screensKm)document.getElementById('sc-km').value=c.screensKm;}
+    if(c.food) setMark('food',c.food);
+    if(c.night) setMark('night',c.night);
+    if(c.note) document.getElementById('day-note').value=c.note;
+    banner();
+  })();
+
+  // Load today's saved state (config is public-read)
   if(SUPA_KEY){
     fetch(SUPA_URL+'/rest/v1/config?select=value&key=eq.RULES_CHECKIN_'+today,{
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
@@ -225,6 +370,7 @@
           if(c.food) setMark('food',c.food);
           if(c.night) setMark('night',c.night);
           if(c.note) document.getElementById('day-note').value=c.note;
+          localSet(today,c);   // keep the offline cache in step with the server
         }catch(e){}
       }
       banner();
@@ -246,7 +392,7 @@
     }).catch(function(){});
 
     // Open ledger — Strava settlement state (recomputed live by the edge fn)
-    fetch(FN+'?action=rules-ledger',{headers:{'X-Admin-Key':_ak}})
+    ownerFetch(FN+'?action=rules-ledger')
       .then(function(r){return r.json();}).then(function(d){
         var el=document.getElementById('ledger');
         if(!d||!d.ok||(d.cleared&&d.openKm===0)){el.style.display='none';return;}
@@ -281,14 +427,67 @@
     }).catch(function(){});
   }
 
+  // ── PENDING / OFFLINE STATE ──────────────────────────────────────────
+  // One honest line at the top of the card: what is not yet on the server,
+  // and what was too late to record. Never claims a mark landed when it did not.
+  function renderPending(){
+    var el=document.getElementById('syncline');
+    if(!el) return;
+    var pend=pendLoad();
+    var late=jget('fl_rules_late','[]'); if(!Array.isArray(late)) late=[];
+    var bits=[];
+    if(!navigator.onLine) bits.push('OFFLINE — marks are saved on this device');
+    if(pend.length) bits.push(pend.length+' mark'+(pend.length===1?'':'s')+' waiting to sync');
+    if(late.length) bits.push(late.length+' LATE — not recorded for their day');
+    if(!bits.length){ el.style.display='none'; el.textContent=''; return; }
+    el.textContent=bits.join(' · ');
+    el.style.display='block';
+    el.style.color = late.length ? '#FF5252' : '#F5A623';
+    el.style.borderColor = late.length ? 'rgba(255,82,82,0.4)' : 'rgba(245,166,35,0.4)';
+  }
+
+  var _flushing=false;
+  async function flushPending(){
+    if(_flushing||!navigator.onLine) return;
+    var a=pendLoad();
+    if(!a.length) return;
+    _flushing=true;
+    var keep=[];
+    try{
+      for(var i=0;i<a.length;i++){
+        var res=await submit(a[i].body);
+        if(res.ok) continue;
+        if(res.late){ markLate(a[i].body,res.detail); continue; }
+        keep.push(a[i]);
+        if(!navigator.onLine) { keep=keep.concat(a.slice(i+1)); break; }
+      }
+    } finally {
+      pendSave(keep);
+      _flushing=false;
+    }
+    renderPending();
+  }
+
+  renderPending();
+  flushPending();
+  window.addEventListener('online',function(){ renderPending(); flushPending(); });
+  window.addEventListener('offline',renderPending);
+  setInterval(function(){ renderPending(); flushPending(); },60000);
+
+  // Register the service worker so this page is precached and openable with
+  // the home network off (SHELL_ASSETS in sw.js now includes it).
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+  }
+
   // Deadline countdown
   function tick(){
     var now=new Date();
     var opts={timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false};
     var hm=now.toLocaleTimeString('en-GB',opts);
     var today=istToday();
-    if(today<'2026-09-22'){
-      document.getElementById('count').textContent='RULES START TOMORROW — FIRST CHECK-IN TUE 22 SEP';
+    if(today<'2026-09-27'){
+      document.getElementById('count').textContent='FIRST CHECK-IN SUN 27 SEP';
       return;
     }
     var day=new Date(today+'T23:59:00+05:30');

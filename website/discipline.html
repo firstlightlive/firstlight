@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Chapter 05 · RETURN</title>
+<title>Chapter 06 · RETURN</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#0A0C10;--card:#12151C;--card2:#171b24;--line:rgba(255,255,255,0.08);
@@ -51,7 +51,8 @@
   .btn.clear{background:var(--green);color:#0A0C10}
   .btn:active{transform:scale(.99)}
   .clearrow{display:flex;gap:8px;margin-top:6px}
-  .clearrow input{flex:1;min-width:0;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:0 10px;height:44px;text-align:center}
+  .clearrow>div{flex:1;min-width:0}
+  .clearrow input{width:100%;min-width:0;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:0 10px;height:44px;text-align:center}
   .clearrow label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--faint);display:block;text-align:center;margin-bottom:4px}
   .note{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);line-height:1.6;margin-top:10px}
   .hist{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim);padding:8px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
@@ -62,7 +63,7 @@
 </head>
 <body>
 <header><div class="hrow">
-  <a class="brand" href="index.html">◆ CHAPTER 05 <small>· RETURN</small></a>
+  <a class="brand" href="index.html">◆ CHAPTER 06 <small>· RETURN</small></a>
   <div class="day" id="dayline">—</div>
 </div></header>
 
@@ -78,9 +79,14 @@
     <div class="hint" style="margin:0">Private porn / compulsion recovery — clean-streak, the noon rule, honest relapse log &amp; penance, your "why". Tap to open →</div>
   </a>
 
+  <a class="sec" href="rules.html" style="display:block;border-color:rgba(245,166,35,0.35)">
+    <h2 style="color:var(--gold)">Food &amp; Daily Rules Check-in →</h2>
+    <div class="hint" style="margin:0">The owner check-in is the only place to mark food CLEAN or BROKEN. Missing food marks are unconfirmed; this local tracker never creates a food penalty.</div>
+  </a>
+
   <div class="sec">
     <h2>Today's Log</h2>
-    <div class="hint">Log before <b class="countdown" id="cd">11:59 PM</b> — miss it and <b style="color:var(--red)">every</b> punishment applies automatically.</div>
+    <div class="hint">Log before <b class="countdown" id="cd">11:59 PM</b>. This page tracks local ritual debt only; food is checked in separately above.</div>
     <div id="rituals"></div>
     <div id="prohibitions" style="margin-top:6px"></div>
     <div class="cost" id="todayCost" style="text-align:left;margin-top:12px">Penance today: 0 km</div>
@@ -109,7 +115,7 @@
 
 <script>
 (function(){
-  var START='2026-09-23';  // day-counter epoch — run 2 of RETURN starts Day 1 on Sep 23
+  var START='2026-09-27';  // new run starts Day 1 on Sep 27
   // ── Penance rules (edit here to retune) ──
   var RITUALS=[
     {k:'wake',       nm:'Wake',       sub:'before 4:00 AM · watch-tracked', miss:{cycle:30}, altWalk:15},
@@ -120,7 +126,6 @@
   ];
   var PROHIB=[
     {k:'masturbation', nm:'Masturbation / Porn',  sub:'100 km cycle / 14 days',  cost:{cycle:100}},
-    {k:'nightFood',    nm:'Solid food at night', sub:'clean = good',           cost:{walk:30}},
     {k:'phoneAnyRoom', nm:'Phone in any room',  sub:'phone-free rooms',       cost:{cycle:50}},
     {k:'daySleep',     nm:'Daytime sleep',       sub:'none 4 AM–5 PM · watch',  cost:{cycle:30}}
   ];
@@ -132,8 +137,10 @@
   function dayNum(d){ return Math.floor((new Date(d+'T00:00:00')-new Date(START+'T00:00:00'))/86400000)+1; }
   function load(){ try{return JSON.parse(localStorage.getItem('fl_ch4_log')||'{}');}catch(e){return {};} }
   function save(o){ localStorage.setItem('fl_ch4_log', JSON.stringify(o)); }
-  function loadCleared(){ try{return JSON.parse(localStorage.getItem('fl_ch4_cleared')||'{"cycle":0,"run":0,"walk":0}');}catch(e){return {cycle:0,run:0,walk:0};} }
-  function saveCleared(c){ localStorage.setItem('fl_ch4_cleared', JSON.stringify(c)); }
+  // Keep old entries/payments in localStorage, but do not carry them into the Sep 27 run.
+  var CLEARED_KEY='fl_ch6_cleared_2026-09-27';
+  function loadCleared(){ try{return JSON.parse(localStorage.getItem(CLEARED_KEY)||'{"cycle":0,"run":0,"walk":0}');}catch(e){return {cycle:0,run:0,walk:0};} }
+  function saveCleared(c){ localStorage.setItem(CLEARED_KEY, JSON.stringify(c)); }
   function add(a,b){ a.cycle=(a.cycle||0)+(b.cycle||0); a.run=(a.run||0)+(b.run||0); a.walk=(a.walk||0)+(b.walk||0); return a; }
 
   // penance for a given day-entry (or worst-case if entry null / unlogged)
@@ -144,14 +151,14 @@
       if(!done){ if(r.k==='wake' && e && e.wakeAsWalk){ p.walk+=r.altWalk; } else { add(p,r.miss); } }
     });
     PROHIB.forEach(function(pr){
-      var bad = e ? e[pr.k] : true; // unlogged → assume violated
+      var bad = e ? e[pr.k] === true : false; // unlogged is not a confirmed prohibition breach
       if(bad) add(p,pr.cost);
     });
     return p;
   }
 
   var log=load(), cleared=loadCleared(), today=istToday();
-  var todayEntry = log[today] || {wake:false,meditation:false,workout:false,journal:false,sleep:false,masturbation:false,nightFood:false,bedroomDevice:false,wakeAsWalk:false,logged:false};
+  var todayEntry = log[today] || {wake:false,meditation:false,workout:false,journal:false,sleep:false,masturbation:false,bedroomDevice:false,wakeAsWalk:false,logged:false};
 
   // ── 11:59 auto-default: any PAST day with no logged entry = all punishments ──
   (function autoDefault(){
@@ -161,7 +168,7 @@
     while(d<end){
       var ds=d.toLocaleDateString('en-CA');
       if(!log[ds] || !log[ds].logged){
-        log[ds]={autoDefault:true,logged:true,wake:false,meditation:false,workout:false,journal:false,sleep:false,masturbation:true,nightFood:true,bedroomDevice:true,penance:penance(null)};
+        log[ds]={autoDefault:true,logged:true,wake:false,meditation:false,workout:false,journal:false,sleep:false,penance:penance(null)};
         changed=true;
       }
       d.setDate(d.getDate()+1);
@@ -171,14 +178,14 @@
 
   function totalOwed(){
     var t={cycle:0,run:0,walk:0};
-    Object.keys(log).forEach(function(ds){ if(log[ds] && log[ds].penance) add(t,log[ds].penance); });
+    Object.keys(log).forEach(function(ds){ if(ds>=START && log[ds] && log[ds].penance) add(t,log[ds].penance); });
     return {cycle:Math.max(0,t.cycle-cleared.cycle), run:Math.max(0,t.run-cleared.run), walk:Math.max(0,t.walk-cleared.walk)};
   }
 
   function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function render(){
     var dn=dayNum(today);
-    document.getElementById('dayline').textContent = dn>0 ? ('DAY '+dn) : 'REST DAY — DAY 1 = WED 23 SEP';
+    document.getElementById('dayline').textContent = dn>0 ? ('DAY '+dn) : 'NEW DAY 1 = SUN 27 SEP';
     var rit=document.getElementById('rituals'); rit.innerHTML='';
     RITUALS.forEach(function(r){
       var on=todayEntry[r.k];
@@ -203,11 +210,11 @@
     document.getElementById('logState').textContent = todayEntry.logged ? '✓ Logged. Re-log to update.' : 'Not logged yet today.';
     // history
     var h=document.getElementById('hist'); h.innerHTML='';
-    Object.keys(log).sort().reverse().slice(0,10).forEach(function(ds){
+    Object.keys(log).filter(function(ds){return ds>=START;}).sort().reverse().slice(0,10).forEach(function(ds){
       var e=log[ds], p=e.penance||penance(e), s=(p.cycle||0)+(p.run||0)+(p.walk||0);
       h.insertAdjacentHTML('beforeend','<div class="hist'+(e.autoDefault?' auto':'')+'"><span>Day '+dayNum(ds)+' · '+ds+(e.autoDefault?' · auto (unlogged)':'')+'</span><span>'+(s>0?('+'+s+' km'):'clean ✓')+'</span></div>');
     });
-    if(!Object.keys(log).length) h.innerHTML='<div class="hist"><span>No entries yet.</span></div>';
+    if(!Object.keys(log).some(function(ds){return ds>=START;})) h.innerHTML='<div class="hist"><span>No entries yet in this run. Earlier history is preserved locally.</span></div>';
   }
 
   document.getElementById('rituals').addEventListener('click',function(e){
@@ -239,6 +246,11 @@
   tick(); setInterval(tick,60000);
   render();
 })();
+</script>
+<script>
+// Precache this page so it opens with the home network off (see SHELL_ASSETS
+// in sw.js). Registration only — all logging here is already localStorage-based.
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}
 </script>
 </body>
 </html>

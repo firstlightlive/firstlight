@@ -74,7 +74,7 @@
 
   function populateDayNumbers() {
     var day = getDayNum();
-    // Gap days (between the last break and Day 1 = Wed 23 Sep 2026) show REST,
+    // Gap days (between the last run and Day 1 = Sun 27 Sep 2026) show REST,
     // not 0 — the counter is quiet until the new run starts.
     var gap = day === 0;
     var label = gap ? 'REST' : String(day);

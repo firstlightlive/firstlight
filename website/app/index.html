@@ -536,12 +536,12 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
     <div class="sec-label">STATUS — TAP TO TOGGLE</div>
     <div class="card" style="padding:12px">
       <div class="status-row normal" id="normalRow">
-        <div class="s-card on" data-key="food" onclick="tap(this)"><div class="s-emoji">🍱</div><div class="s-name">FOOD</div><div class="s-val">DONE</div></div>
+        <div class="s-card" data-key="food"><div class="s-emoji">🍱</div><div class="s-name">FOOD</div><div class="s-val">UNCONFIRMED</div></div>
         <div class="s-card on" data-key="run" onclick="tap(this)"><div class="s-emoji">🏃</div><div class="s-name">RUN</div><div class="s-val">DONE</div></div>
         <div class="s-card on" data-key="gym" onclick="tap(this)"><div class="s-emoji">🏋️</div><div class="s-name">GYM</div><div class="s-val">DONE</div></div>
       </div>
       <div class="status-row travel" id="travelRow" style="display:none">
-        <div class="s-card on" data-key="tfood" onclick="tap(this)"><div class="s-emoji">🍱</div><div class="s-name">FOOD</div><div class="s-val">DONE</div></div>
+        <div class="s-card" data-key="tfood"><div class="s-emoji">🍱</div><div class="s-name">FOOD</div><div class="s-val">UNCONFIRMED</div></div>
         <div class="s-card on" data-key="trun" onclick="tap(this)"><div class="s-emoji">🏃</div><div class="s-name">RUN / WALK</div><div class="s-val">DONE</div></div>
         <div class="s-card on" data-key="tcal" onclick="tap(this)"><div class="s-emoji">🔥</div><div class="s-name">300+ CAL</div><div class="s-val">DONE</div></div>
       </div>
@@ -551,19 +551,20 @@ if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then
       <!-- FOOD CODE rules — always visible in all modes (food rule never changes) -->
       <div class="food-code-bar" id="foodCodeBar">
         <div class="fci-top">
-          <span class="fci-badge" id="foodCodeBadge">⚡ FOOD CODE: CLEAN</span>
-          <span class="fci-penalty">BREAK → 50KM RIDE · POSTED</span>
+          <span class="fci-badge" id="foodCodeBadge">FOOD CODE: UNCONFIRMED</span>
+          <span class="fci-penalty">ONLY EXPLICIT BROKEN → 50 KM</span>
         </div>
         <div class="fci-rules"><span>✗ NO FRYING</span> &nbsp;·&nbsp; <span>✗ NO SUGAR</span> &nbsp;·&nbsp; <span>✗ NO ALCOHOL</span> &nbsp;·&nbsp; <span>✗ NO SMOKING</span> &nbsp;·&nbsp; <span>✗ NO COLD DRINKS</span> &nbsp;·&nbsp; <span>✗ NO JUNK</span></div>
+        <div style="margin-top:8px;font:500 10px 'JetBrains Mono',monospace;color:var(--smoke)">Food status comes from the owner <a href="../rules.html" style="color:#F5A623">Food &amp; Rules Check-in →</a>. Unconfirmed food cannot be generated or published.</div>
       </div>
       <!-- Food penalty walk input — shown when FOOD is toggled to MISSED (any mode) -->
       <div id="foodPenaltyRow" style="display:none;align-items:center;gap:10px;margin-top:8px;padding:10px 12px;background:rgba(255,59,92,.06);border:1px solid rgba(255,59,92,.25);border-radius:10px">
         <div style="font:900 20px 'Rajdhani',sans-serif;color:#FF5252">⚠</div>
         <div style="flex:1">
-          <div style="font:700 10px 'Rajdhani',sans-serif;color:#FF5252;letter-spacing:1px;margin-bottom:4px">FOOD CODE BROKEN — WALK PENALTY</div>
+          <div style="font:700 10px 'Rajdhani',sans-serif;color:#FF5252;letter-spacing:1px;margin-bottom:4px">FOOD CODE BROKEN — WALK PAYMENT</div>
           <div style="display:flex;align-items:center;gap:6px">
             <input type="number" id="walkKm" class="stat-in" style="width:80px;padding:6px;font-size:14px" placeholder="km" min="25" max="50" inputmode="numeric">
-            <span style="font:500 10px 'JetBrains Mono',monospace;color:var(--smoke)">KM WALKED &nbsp;<span style="color:#FF5252">→ WILL BE POSTED</span></span>
+            <span style="font:500 10px 'JetBrains Mono',monospace;color:var(--smoke)">KM WALKED &nbsp;<span style="color:#FF5252">→ CONFIRM BEFORE POSTING</span></span>
           </div>
         </div>
       </div>
@@ -1344,9 +1345,84 @@ function genTheme(t,e){
 
 function getDateStr(){const n=streakRenderDate();return `${D[n.getDay()]} · ${n.getDate()} ${M[n.getMonth()]} ${n.getFullYear()}`}
 
-// ===== STREAK ORIGIN — Chapter 02 ENDURANCE · Jun 20, 2026 =====
+// ===== CURRENT RUN — Chapter 06 · Day 1 = Sep 27, 2026 =====
 // MUST be declared before the INIT block — getDateStr()/updateStreak() read it at load time (TDZ)
-const STREAK_ORIGIN=new Date(2026,5,20); // Jan=0, so 5=Jun, day=20
+const STREAK_ORIGIN_ISO='2026-09-27';
+const STREAK_ORIGIN=new Date(STREAK_ORIGIN_ISO+'T12:00:00');
+let canonicalFoodStatus=null;
+let canonicalFoodDate='';
+let generatedFoodStatus=null;
+let generatedFoodDate='';
+let generatedRunDay=0;
+
+function istTodayKey(){
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const value=type=>parts.find(part=>part.type===type).value;
+  return value('year')+'-'+value('month')+'-'+value('day');
+}
+
+function istCalendarDate(){
+  const key=istTodayKey();
+  const [year,month,day]=key.split('-').map(Number);
+  return new Date(year,month-1,day,12);
+}
+
+function showCanonicalFoodStatus(status){
+  for(const key of ['food','tfood']){
+    const el=document.querySelector('[data-key="'+key+'"]');
+    if(!el)continue;
+    el.classList.toggle('on',status==='clean');
+    el.classList.toggle('off',status==='broken');
+    const label=el.querySelector('.s-val');
+    if(label)label.textContent=status==='clean'?'DONE':status==='broken'?'MISSED':'UNCONFIRMED';
+  }
+  const badge=document.getElementById('foodCodeBadge');
+  if(badge){
+    badge.textContent=status==='clean'?'⚡ FOOD CODE: CLEAN':status==='broken'?'⚠ FOOD CODE: BROKEN':'FOOD CODE: UNCONFIRMED';
+    badge.classList.toggle('broken',status==='broken');
+  }
+  const bar=document.getElementById('foodCodeBar');
+  if(bar)bar.classList.toggle('broken',status==='broken');
+  const payment=document.getElementById('foodPenaltyRow');
+  if(payment)payment.style.display=status==='broken'?'flex':'none';
+}
+
+async function refreshCanonicalFoodStatus(){
+  const date=istTodayKey();
+  let status=null;
+  try{
+    if(date<STREAK_ORIGIN_ISO)throw new Error('Current run begins on Sep 27');
+    const response=await fetch(_FL_SB_URL+'/rest/v1/config?select=value&key=eq.RULES_CHECKIN_'+date,{
+      headers:{apikey:_FL_SB_KEY,Authorization:'Bearer '+_FL_SB_KEY},cache:'no-store'
+    });
+    if(!response.ok)throw new Error('Food check-in unavailable');
+    const rows=await response.json();
+    if(rows&&rows.length){
+      const checkin=JSON.parse(rows[0].value);
+      if(checkin.food==='clean'||checkin.food==='broken')status=checkin.food;
+    }
+  }catch(e){console.warn('[Food check-in] Unconfirmed:',e.message);}
+  if(generatedFoodDate&&(generatedFoodDate!==date||generatedFoodStatus!==status)){
+    generatedFoodStatus=null;
+    generatedFoodDate='';
+    generatedRunDay=0;
+    const publishStatus=document.getElementById('igPubStatus');
+    if(publishStatus)publishStatus.textContent='CHECK-IN CHANGED — REGENERATE BEFORE PUBLISHING';
+  }
+  canonicalFoodDate=date;
+  canonicalFoodStatus=status;
+  showCanonicalFoodStatus(status);
+  return status;
+}
+
+function canGenerateWithConfirmedFood(){
+  const ready=canonicalFoodDate===istTodayKey()&&!!canonicalFoodStatus;
+  if(!ready){
+    const status=document.getElementById('igPubStatus');
+    if(status)status.textContent='FOOD UNCONFIRMED — OPEN FOOD & RULES CHECK-IN FIRST';
+  }
+  return ready;
+}
 
 // ===== INIT =====
 document.getElementById('dateStr').textContent=getDateStr();
@@ -1370,45 +1446,30 @@ if('serviceWorker' in navigator){
 // if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 
 function computeStreakDay(){
-  const now=new Date();
-  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const today=istCalendarDate();
   if(today<STREAK_ORIGIN) return 1; // pre-start: generator previews Day 1 assets
-  return Math.floor((today-STREAK_ORIGIN)/86400000)+1;
+  return Math.floor((Date.UTC(today.getFullYear(),today.getMonth(),today.getDate())-Date.UTC(STREAK_ORIGIN.getFullYear(),STREAK_ORIGIN.getMonth(),STREAK_ORIGIN.getDate()))/86400000)+1;
 }
 
 // Generator date labels: before the chapter starts, render the START date (Day 1 preview),
 // not today's date — so assets made on the eve carry tomorrow's date.
 function streakRenderDate(){
-  const now=new Date();
-  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  return today<STREAK_ORIGIN ? new Date(STREAK_ORIGIN) : now;
+  const today=istCalendarDate();
+  return today<STREAK_ORIGIN ? new Date(STREAK_ORIGIN) : today;
 }
 
-// Pre-fill fl_log with done:true for every day from chapter start → yesterday
-// (only sets days not already explicitly logged, preserves real data)
-function initStreakLog(){
-  try{
-    const log=JSON.parse(localStorage.getItem('fl_log')||'{}');
-    const today=new Date();
-    today.setHours(0,0,0,0);
-    let changed=false;
-    for(let d=new Date(STREAK_ORIGIN);d<today;d.setDate(d.getDate()+1)){
-      const dk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-      if(!log[dk]){
-        const dayN=Math.floor((d-STREAK_ORIGIN)/86400000)+1;
-        log[dk]={done:true,day:dayN};
-        changed=true;
-      }
-    }
-    if(changed)localStorage.setItem('fl_log',JSON.stringify(log));
-  }catch(e){}
-}
-initStreakLog();
+// Keep older local history, but never fabricate completed days for this run.
 
-// Auto-calculate day number from streak origin (Chapter 02 · Jun 13, 2026) — refreshes every minute
-function refreshDayNum(){document.getElementById('dayNum').value=String(computeStreakDay());}
+// Auto-calculate current-run day number — refreshes across IST midnight.
+function refreshDayNum(){
+  document.getElementById('dayNum').value=String(computeStreakDay());
+  document.getElementById('dateStr').textContent=getDateStr();
+  updateStreak();
+}
 refreshDayNum();
 setInterval(refreshDayNum,60000); // re-check at midnight edge cases
+refreshCanonicalFoodStatus();
+setInterval(refreshCanonicalFoodStatus,60000);
 // Still allow manual override (saved to localStorage but overridden on next load)
 document.getElementById('dayNum').addEventListener('change',function(){localStorage.setItem('fl_day',this.value)});
 
@@ -1647,22 +1708,13 @@ function setMode(m){
 }
 
 function tap(el){
+  // Food cannot be toggled in the generator; the owner check-in is authoritative.
+  if(['food','tfood','llFood'].includes(el.dataset.key))return;
   el.classList.toggle('on');el.classList.toggle('off');
   el.querySelector('.s-val').textContent=el.classList.contains('on')?'DONE':'MISSED';
   // Update deadline toggle text
   if(el.dataset.key==='deadline'){
     el.querySelector('.s-val').textContent=el.classList.contains('on')?'MET':'MISSED';
-  }
-  // Show food penalty walk row when food code is broken — any food key (normal/travel/lastlight)
-  if(el.dataset.key==='food'||el.dataset.key==='tfood'||el.dataset.key==='llFood'){
-    const broken=el.classList.contains('off');
-    const pr=document.getElementById('foodPenaltyRow');
-    const cb=document.getElementById('foodCodeBar');
-    const badge=document.getElementById('foodCodeBadge');
-    if(pr)pr.style.display=broken?'flex':'none';
-    if(cb){cb.classList.toggle('broken',broken);}
-    if(badge){badge.textContent=broken?'⚠ FOOD CODE: BROKEN':'⚡ FOOD CODE: CLEAN';
-      badge.classList.toggle('broken',broken);}
   }
 }
 
@@ -2443,7 +2495,7 @@ function drawHeatmapPanels(c,W,H,stravaImg,stravaStats){
   c.textAlign='center';c.font='800 20px "Rajdhani",sans-serif';
   c.fillStyle=P.accent;c.shadowColor=P.acR+'0.5)';c.shadowBlur=10;
   c.fillText(String(yr),LX+LW/2,LY+24);c.shadowBlur=0;
-  c.font='400 7px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('STREAK · SINCE 13 JUN',LX+LW/2,LY+35);
+  c.font='400 7px "JetBrains Mono",monospace';c.fillStyle=P.smoke;c.fillText('CURRENT RUN · SINCE 27 SEP',LX+LW/2,LY+35);
   // Accent rule
   const ug=c.createLinearGradient(LX+20,0,LX+LW-20,0);
   ug.addColorStop(0,'transparent');ug.addColorStop(0.5,P.acR+'0.35)');ug.addColorStop(1,'transparent');
@@ -2451,8 +2503,8 @@ function drawHeatmapPanels(c,W,H,stravaImg,stravaStats){
   // Month rows
   const mLblW=26;const cSz=5;const cGp=1;const mStartX=LX+8+mLblW+4;const mStartY=LY+48;
   const rowH=(LH-52)/12;
-  // Streak origin: Chapter 02 ENDURANCE · Jun 20, 2026
-  const streakOriginMs=new Date(2026,5,20).getTime();
+  // Earlier saved history remains stored, but is outside the current run.
+  const streakOriginMs=STREAK_ORIGIN.getTime();
   for(let m=0;m<12;m++){
     const ry=mStartY+m*rowH;
     // Month label
@@ -2785,7 +2837,7 @@ function slideStakes(day,total,handleIG,handleX,followerCount){
 
 // ===== FONT-SAFE GENERATE WRAPPER =====
 function onGenerate(){
-  document.fonts.ready.then(()=>{
+  refreshCanonicalFoodStatus().then(()=>document.fonts.ready).then(()=>{
     setTimeout(()=>{try{generate()}catch(e){console.error('Generate error:',e)}},300);
   }).catch(()=>{try{generate()}catch(e){console.error('Generate error:',e)}});
 }
@@ -3490,6 +3542,10 @@ function _ensureCaptionPopulated(){
 }
 
 function generate(){
+  if(!canGenerateWithConfirmedFood())return;
+  generatedFoodStatus=canonicalFoodStatus;
+  generatedFoodDate=canonicalFoodDate;
+  generatedRunDay=computeStreakDay();
   // Auto-pull Strava if not already loaded
   if(!_stravaCache)pullStravaLive().catch(()=>{});
   try{_generateInner();}catch(e){
@@ -5535,6 +5591,7 @@ function downloadIGCover(){
 // Clean daily check-in: DAY N + status ticks + stats + photo proof + penalty
 // ─────────────────────────────────────────────────────────────────────────────
 function downloadStoriesCard(){
+  if(!canGenerateWithConfirmedFood())return;
   const day=parseInt(document.getElementById('dayNum').value)||1;
   // Load images first — i1/i2/i3 are data URL strings, must convert to Image objects
   function _lI(src){if(!src)return Promise.resolve(null);return new Promise(r=>{const m=new Image();m.crossOrigin='anonymous';m.onload=()=>r(m);m.onerror=()=>r(null);m.src=src;});}
@@ -7213,6 +7270,21 @@ async function _igPublishCarouselContainer(childIds,caption){
   return pd.id;
 }
 
+async function verifyCurrentFoodBeforePublish(log,status){
+  const fresh=await refreshCanonicalFoodStatus();
+  if(!fresh){
+    _igStatus(status,'FOOD UNCONFIRMED — NOT PUBLISHED');
+    _igLog(log,'Food has not been explicitly marked in the owner Rules check-in. Nothing was uploaded or published.','var(--gold)');
+    return false;
+  }
+  if(generatedFoodStatus!==fresh||generatedFoodDate!==canonicalFoodDate||generatedRunDay!==computeStreakDay()){
+    _igStatus(status,'CHECK-IN CHANGED — REGENERATE FIRST');
+    _igLog(log,'The check-in or day changed since these assets were generated. Regenerate before publishing.','var(--gold)');
+    return false;
+  }
+  return true;
+}
+
 // Post first comment (hashtags)
 async function _igPostComment(mediaId,text){
   return _igAPI(mediaId+'/comments',{message:text});
@@ -7226,6 +7298,7 @@ async function igPublishCarousel(){
   _igLog(log,'Starting carousel publish...','var(--gold)');
 
   try{
+    if(!await verifyCurrentFoodBeforePublish(log,status))return;
     const canvasIds=_getSlideCanvases();
     if(!canvasIds.length){_igStatus(status,'GENERATE SLIDES FIRST');return;}
     const c1=document.getElementById('c1');
@@ -7315,6 +7388,7 @@ async function igPublishStory(){
   _igLog(log,'Generating story card...','var(--gold)');
 
   try{
+    if(!await verifyCurrentFoodBeforePublish(log,status))return;
     const day=document.getElementById('dayNum').value||'0';
     const fname='day'+day+'_story_'+Date.now()+'.jpg';
 
@@ -10524,6 +10598,7 @@ function getMilestoneType(day){
 }
 function generateFirstCommentBlock(day){const stake=getCurrentStake(day);const total=getTotalAtRisk(day);const stakeFormatted=formatIndianCurrency(stake);const totalFormatted=formatIndianCurrency(total);return '━━━━━━━━━━━━━━━━━━━━━━\n⚡ THE STAKE:\nIf my next post isn\'t before 6 AM → ₹'+stakeFormatted+' gone. Logged public, same day.\n\n'+day+'-day streak. ₹'+totalFormatted+' defended so far.\n\nSet your alarm. Check tomorrow at 6:00 AM.\nThe proof will be here → or the slip will.\n━━━━━━━━━━━━━━━━━━━━━━';}
 function generateCaption(day){
+  if(!canGenerateWithConfirmedFood())throw new Error('Food is unconfirmed. Mark it in the owner Food & Rules Check-in first.');
   day=parseInt(day)||1;
   const stake=formatIndianCurrency(getCurrentStake(day));
   const unclaimed=formatIndianCurrency(getTotalAtRisk(day));

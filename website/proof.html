@@ -331,7 +331,7 @@
     var CHAPTERS = [];
     (window.FL_CHAPTERS || []).forEach(function(c) { CHAPTERS.push({ id: c.id, name: c.name, start: c.start, end: c.end, days: c.days, dayEpoch: c.dayEpoch || c.start, live: false }); });
     if (window.FL_CURRENT_CHAPTER) CHAPTERS.push({ id: window.FL_CURRENT_CHAPTER.id, name: window.FL_CURRENT_CHAPTER.name, start: window.FL_CURRENT_CHAPTER.start, end: null, days: null, dayEpoch: window.FL_CURRENT_CHAPTER.dayEpoch || window.FL_CURRENT_CHAPTER.start, live: true });
-    if (!CHAPTERS.length) CHAPTERS.push({ id: 1, name: 'STREAK', start: (window.FL && FL.STREAK_START) || '2026-09-23', end: null, live: true });
+    if (!CHAPTERS.length) CHAPTERS.push({ id: 1, name: 'STREAK', start: (window.FL && FL.STREAK_START) || '2026-09-27', end: null, live: true });
 
     function chapterOf(dateStr) {
       for (var i = CHAPTERS.length - 1; i >= 0; i--) {
@@ -786,7 +786,7 @@
     _proofRows = rows;
 
     // Build day-by-day timeline for the chapter's date range (capped at 730 cells per render)
-    var startStr = (chapter && chapter.start) || ((window.FL && FL.STREAK_START) || '2026-09-23');
+    var startStr = (chapter && chapter.start) || ((window.FL && FL.STREAK_START) || '2026-09-27');
     var endStr = (chapter && chapter.end) || null;
     var chStart = new Date(startStr + 'T00:30:00+05:30');
     var chEnd = endStr ? new Date(endStr + 'T00:30:00+05:30') : null;

@@ -159,14 +159,14 @@ function renderCheckin() {
   html += '<div style="display:flex;flex-direction:column;gap:16px">';
 
   // Food clean toggle
-  var foodClean = existing.food_clean !== false;
+  var foodClean = existing.food_clean;
   html += '<div>';
   html += '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px">FOOD CLEAN</div>';
   html += '<div class="bf-toggle">';
-  html += '<div class="bf-toggle-btn' + (foodClean ? ' active-no' : '') + '" onclick="setCheckinToggle(\'food_clean\',true)"' + disAttr + '>YES</div>';
-  html += '<div class="bf-toggle-btn' + (!foodClean ? ' active-yes' : '') + '" onclick="setCheckinToggle(\'food_clean\',false)"' + disAttr + '>NO</div>';
+  html += '<div class="bf-toggle-btn' + (foodClean === true ? ' active-no' : '') + '" onclick="setCheckinToggle(\'food_clean\',true)"' + disAttr + '>YES</div>';
+  html += '<div class="bf-toggle-btn' + (foodClean === false ? ' active-yes' : '') + '" onclick="setCheckinToggle(\'food_clean\',false)"' + disAttr + '>NO</div>';
   html += '</div>';
-  html += '<div id="ci-violation-wrap" style="margin-top:6px;display:' + (foodClean ? 'none' : 'block') + '">';
+  html += '<div id="ci-violation-wrap" style="margin-top:6px;display:' + (foodClean === false ? 'block' : 'none') + '">';
   html += '<input type="text" class="form-input" style="font-size:11px;padding:8px 10px" placeholder="What was the violation?" id="ci-food-violation" value="' + ((existing.food_violation || '').replace(/"/g, '&quot;')) + '" oninput="setCheckinField(\'food_violation\',this.value)"' + disAttr + '>';
   html += '</div></div>';
 
@@ -391,7 +391,7 @@ function sealTheDay() {
   var data = Object.assign({}, signals, {
     app_updated:          manual.app_updated === true,
     app_updated_at:       manual.app_updated_at || null,
-    food_clean:           manual.food_clean !== false,
+    food_clean:           typeof manual.food_clean === 'boolean' ? manual.food_clean : null,
     food_violation:       manual.food_violation || '',
     wake_time:            manual.wake_time || '',
     lights_out:           manual.lights_out || '',

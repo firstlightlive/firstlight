@@ -17,6 +17,26 @@
   .bar .print{background:#F5A623;color:#111;border-color:#F5A623}
 
   .sheet{max-width:1000px;margin:0 auto 30px;background:#fff;padding:26px 30px;box-shadow:0 6px 30px rgba(0,0,0,.4)}
+
+  /* ── PHONE (screen only — print layout below is untouched) ──
+     This is an A4 sheet, so .bt carries ~444px of fixed column widths. On a
+     390px phone that used to scroll the WHOLE PAGE sideways by 130px. Let the
+     table scroll inside its own box instead, and let the ramp row wrap. */
+  @media screen and (max-width:760px){
+    .sheet{padding:18px 14px}
+    .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+    .rmr{flex-wrap:wrap}
+    .rmr .cut{margin-left:0;flex-basis:100%}
+    /* Flex rows whose long label cannot shrink push their trailing fill-line
+       (.fl, flex:1) past the edge. Let the row wrap and the rule drop under. */
+    .todayrule{flex-wrap:wrap}
+    .todayrule .fl{flex-basis:100%;flex-grow:1}
+    .tr{flex-wrap:wrap}
+  }
+  /* Never let a stray wide child drag the page; the table above can still be
+     read because it scrolls on its own. */
+  @media screen{ body{overflow-x:hidden} .tscroll{max-width:100%} }
+  @media print{ .tscroll{overflow:visible;max-width:none} }
   .meta{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:10px}
   .meta h1{font-size:17px;letter-spacing:2px;margin:0}
   .meta .sub{font-size:10px;color:var(--dim);letter-spacing:1px;margin-top:2px}
@@ -191,12 +211,12 @@
 
 <div class="sheet">
   <div class="meta">
-    <div><h1>◆ CHAPTER 05 · RETURN</h1><div class="sub">FIRST LIGHT — the full daily protocol</div></div>
+    <div><h1>◆ CHAPTER 06 · RETURN</h1><div class="sub">FIRST LIGHT — the full daily protocol</div></div>
     <div class="day">DAY <span class="wr"></span><br>DATE <span class="wrd"></span></div>
   </div>
   <div class="motto">HM SEP 27 · TMM JAN 17 · 70.3 FEB 17 · 100K DEC 27 · IRONMAN JAN 28</div>
 
-  <!-- CHAPTER 05 COVENANT -->
+  <!-- CHAPTER 06 COVENANT -->
   <div class="cov">
     <div class="ct">The Covenant — the 5 that anchor the day</div>
     <div class="grid">
@@ -364,6 +384,7 @@
     <div class="chainrow" id="chainRow"></div>
   </div>
 
+  <div class="tscroll">
   <table class="bt">
     <thead><tr>
       <th></th><th>Start</th><th>Block</th><th>The ONE thing — written before you start</th>
@@ -371,6 +392,7 @@
     </tr></thead>
     <tbody id="btBody"></tbody>
   </table>
+  </div>
 
   <div class="gauge">
     <div class="rh">◇ Day Gauge — fill at 6:40 PM with the log</div>
@@ -411,7 +433,7 @@
 <script src="js/admin-rituals.js"></script>
 <script>
 (function(){
-  var START='2026-09-23';  // day-counter epoch — run 2 of RETURN starts Day 1 on Sep 23
+  var START='2026-09-27';  // new run starts Day 1 on Sep 27
   function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function ritualHtml(r){
     return '<div class="ri"><span class="cb"></span><span class="tm">'+esc(r.time||'')+'</span><span class="ti">'+esc(r.title)+(r.tier===1?' <b>★</b>':'')+'</span></div>';
@@ -465,9 +487,9 @@
 
   // ── Return ramp ── wake/lights-out step back to 3:30 over three weeks
   var RAMP=[
-    {w:'W1', from:'2026-09-13', to:'2026-09-19', wake:'4:30 AM', med:'4:45', lights:'9:45 PM', cut:'Study 1+2 \u2192 40 min'},
-    {w:'W2', from:'2026-09-20', to:'2026-09-26', wake:'4:00 AM', med:'4:15', lights:'9:15 PM', cut:'Study 1+2 \u2192 65 min'},
-    {w:'W3', from:'2026-09-27', to:null,         wake:'3:30 AM', med:'3:45', lights:'8:45 PM', cut:'Study 1+2 \u2192 full 90 min'}
+    {w:'W1', from:'2026-09-27', to:'2026-10-03', wake:'4:30 AM', med:'4:45', lights:'9:45 PM', cut:'Study 1+2 \u2192 40 min'},
+    {w:'W2', from:'2026-10-04', to:'2026-10-10', wake:'4:00 AM', med:'4:15', lights:'9:15 PM', cut:'Study 1+2 \u2192 65 min'},
+    {w:'W3', from:'2026-10-11', to:null,         wake:'3:30 AM', med:'3:45', lights:'8:45 PM', cut:'Study 1+2 \u2192 full 90 min'}
   ];
   var phase=RAMP[RAMP.length-1];
   for(var i=0;i<RAMP.length;i++){ if(!RAMP[i].to || sheetFor<=parseYMD(RAMP[i].to)){ phase=RAMP[i]; break; } }
@@ -550,6 +572,11 @@
 
   document.getElementById('printBtn').addEventListener('click',function(){window.print();});
 })();
+</script>
+<script>
+// Precache this page so it opens with the home network off (see SHELL_ASSETS
+// in sw.js). Registration only — all logging here is already localStorage-based.
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}
 </script>
 </body>
 </html>

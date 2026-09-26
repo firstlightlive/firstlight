@@ -6,7 +6,7 @@
 // IMPORTANT: bump SHELL_VERSION on every deploy that ships changes to the
 // precached files (HTML/CSS/JS in SHELL_ASSETS). Pre-deploy check warns if
 // you forget. Without a bump, installed PWAs stay pinned to the prior cache.
-const SHELL_VERSION = 'fl-shell-v24';
+const SHELL_VERSION = 'fl-shell-v26';
 const SUPA_CACHE   = 'fl-supa-reads-v3';
 const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 
@@ -15,6 +15,15 @@ const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 const SHELL_ASSETS = [
   '/admin.html',
   '/punch.html',
+  // THE DAILY LOGGING SURFACES. These must work with the WiFi off — they are
+  // what gets opened every day. rules.html is the canonical food + rules
+  // check-in; discipline.html holds the penance ledger; daily-sheet.html is
+  // the printable day. Missing from the shell until 2026-09-26.
+  '/rules.html',
+  '/food.html',
+  '/discipline.html',
+  '/daily-sheet.html',
+  '/covenant.html',
   '/install.html',
   '/login',
   '/index.html',
@@ -24,6 +33,7 @@ const SHELL_ASSETS = [
   '/icon-512.png',
   '/js/config.js',
   '/js/fl-offline.js',
+  '/js/fl-authread.js',
   '/js/fl-auth.js',
   '/js/admin-core.js',
   '/js/admin-init.js',

@@ -100,6 +100,9 @@
   <script src="js/config.js"></script>
   <script src="app.js?v=20260819a"></script>
   <script>
+    function loginDestination() {
+      return new URLSearchParams(window.location.search).get('next') === 'rules.html' ? 'rules.html' : 'admin.html';
+    }
     // ── DETECT RECOVERY TOKEN IN URL ──
     // Supabase sends: /login#access_token=...&type=recovery
     // Or newer PKCE flow: /login?code=...&type=recovery (via query params)
@@ -133,7 +136,7 @@
       if (_recoveryToken) {
         showResetView();
       } else if (isLoggedIn()) {
-        window.location.href = 'admin.html';
+        window.location.href = loginDestination();
       }
     })();
 
@@ -185,7 +188,7 @@
         _attempts = 0;
         localStorage.setItem('fl_login_attempts', '0');
         localStorage.removeItem('fl_login_lock_until');
-        window.location.href = 'admin.html';
+        window.location.href = loginDestination();
       } else {
         _attempts++;
         localStorage.setItem('fl_login_attempts', String(_attempts));

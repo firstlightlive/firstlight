@@ -234,9 +234,26 @@
     });
   }
 
+  // A queued write stores its headers verbatim, so a write parked while the
+  // home network was off replays days later with a long-dead JWT and 401s
+  // forever. Re-stamp the Authorization with a live owner token before replay.
+  // Anon-key writes are left exactly as they were — that key does not expire.
+  async function restampAuth(headers) {
+    const out = Object.assign({}, headers || {});
+    const SUPA_KEY = (window.FL && window.FL.SUPABASE_ANON_KEY);
+    const authKey = Object.keys(out).find((k) => k.toLowerCase() === 'authorization');
+    if (!authKey) return out;
+    const current = String(out[authKey] || '').replace(/^Bearer\s+/i, '');
+    if (!current || (SUPA_KEY && current === SUPA_KEY)) return out; // anon — never expires
+    const fresh = await flOwnerToken({ requireFresh: true });
+    if (fresh) out[authKey] = 'Bearer ' + fresh;
+    return out;
+  }
+
   async function retryOneItem(item) {
     try {
-      const resp = await fetch(item.url, { method: item.method, headers: item.headers, body: item.body });
+      const headers = await restampAuth(item.headers);
+      const resp = await fetch(item.url, { method: item.method, headers, body: item.body });
       if (resp.ok || resp.status === 409) {
         await deleteQueueItem(item.id);
         return { ok: true };
@@ -245,6 +262,37 @@
     } catch (e) {
       return { ok: false, error: e.message };
     }
+  }
+
+  // ── flDrain — client-side replay, with fresh auth ──
+  //
+  // The service worker also drains, but it cannot read localStorage, so it can
+  // never refresh an expired JWT. This path is the one that gets owner writes
+  // home after a long offline stretch. Both are safe to run: the queue row is
+  // deleted on success, and food_log upserts key on a client-minted uuid, so a
+  // double replay merges instead of duplicating.
+  let _draining = false;
+  async function flDrain() {
+    if (_draining || !navigator.onLine) return { success: 0, fail: 0 };
+    _draining = true;
+    let success = 0, fail = 0;
+    try {
+      const items = await getQueueItems();
+      for (const item of items) {
+        const r = await retryOneItem(item);
+        if (r.ok) success++;
+        else {
+          fail++;
+          if (r.error) break; // network dropped again — stop, keep the rest queued
+        }
+      }
+    } finally {
+      _draining = false;
+    }
+    const ld = document.getElementById('fl-last-drain');
+    if (ld) ld.textContent = success + ' ok · ' + fail + ' fail';
+    await refreshStatus();
+    return { success, fail };
   }
 
   function tableFromUrl(url) {
@@ -367,7 +415,9 @@
   }
 
   async function drainNow() {
-    if (!navigator.serviceWorker.controller) return;
+    // Client drain first: it is the only path that can refresh an expired JWT.
+    await flDrain();
+    if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
     navigator.serviceWorker.controller.postMessage({ type: 'fl-drain' });
   }
 
@@ -380,6 +430,120 @@
       await Promise.all(keys.map((k) => caches.delete(k)));
       alert('Local cache cleared. Reload the page.');
     } catch (e) { alert('Clear failed: ' + e.message); }
+  }
+
+  // ── CHANGE BUS — keeps every open page/tab in step ────────────────
+  //
+  // Three layers, because each covers a case the others cannot:
+  //   local  — this page wrote something (direct dispatch)
+  //   tab    — another tab or page on THIS device wrote (BroadcastChannel,
+  //            with a localStorage `storage` event as the fallback for
+  //            browsers/contexts where BroadcastChannel is unavailable)
+  //   remote — another DEVICE wrote (Supabase Realtime, below)
+  //
+  // Subscribers get {type, detail, source} and re-render. Without this, two
+  // pages open on the same phone (say the food page and the admin panel) read
+  // the same localStorage but never learn it changed until a manual reload.
+  //
+  // TAB_ID is per page load, NOT DEVICE_ID: every tab on one device shares the
+  // same DEVICE_ID, so filtering echoes by device would silently kill all
+  // cross-tab delivery.
+  const TAB_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const BUS_PING_KEY = 'fl_bus_ping';
+  let _bc = null;
+  try { _bc = new BroadcastChannel('fl-sync'); } catch (_) { _bc = null; }
+
+  const _busSubs = new Set();
+
+  function _busDeliver(msg, source) {
+    const payload = { type: msg.type, detail: msg.detail, source: source, at: msg.at };
+    _busSubs.forEach((fn) => { try { fn(payload); } catch (e) { console.warn('[FL bus]', e.message); } });
+    try { window.dispatchEvent(new CustomEvent('fl-changed', { detail: payload })); } catch (_) {}
+  }
+
+  // Announce a change made by THIS page.
+  function flEmit(type, detail) {
+    const msg = { type: type, detail: detail || null, tab: TAB_ID, at: Date.now() };
+    _busDeliver(msg, 'local');
+    try { if (_bc) _bc.postMessage(msg); } catch (_) {}
+    // storage fires only in OTHER tabs, which is exactly what we want here.
+    try { localStorage.setItem(BUS_PING_KEY, JSON.stringify(msg)); } catch (_) {}
+  }
+
+  function flOnChange(fn) {
+    if (typeof fn !== 'function') return function () {};
+    _busSubs.add(fn);
+    return function () { _busSubs.delete(fn); };
+  }
+
+  if (_bc) {
+    // BroadcastChannel never echoes to the sender, but guard anyway in case a
+    // polyfill does.
+    _bc.onmessage = (e) => {
+      const m = e && e.data;
+      if (!m || m.tab === TAB_ID) return;
+      _busDeliver(m, 'tab');
+    };
+  }
+  window.addEventListener('storage', (e) => {
+    if (e.key !== BUS_PING_KEY || !e.newValue) return;
+    try {
+      const m = JSON.parse(e.newValue);
+      if (!m || m.tab === TAB_ID) return;
+      // With BroadcastChannel working this is a duplicate; subscribers are
+      // expected to be idempotent re-renders, so a double render is harmless
+      // and losing an event is not.
+      _busDeliver(m, 'tab');
+    } catch (_) {}
+  });
+
+  // ── OWNER SESSION — the JWT that private tables (food_log, journal…) need ──
+  //
+  // The anon key cannot write an `authenticated`-only table, so owner writes
+  // carry the session JWT. Two rules make that survive a dead home network:
+  //
+  //  1. ONLINE  → refresh the token when it is close to expiry, so a write
+  //               never leaves with a token that dies mid-flight.
+  //  2. OFFLINE → hand back the cached token even if it is stale. The write
+  //               goes to the SW queue anyway, and flDrain() re-stamps it with
+  //               a live token at replay time. Refusing here would mean losing
+  //               the entry entirely, which is the one outcome worth avoiding.
+  const TOKEN_SKEW_MS = 120000; // refresh if it dies within 2 minutes
+
+  function readSession() {
+    try { return JSON.parse(localStorage.getItem('fl_supabase_session') || 'null'); }
+    catch (_) { return null; }
+  }
+
+  async function flOwnerToken(opts) {
+    opts = opts || {};
+    const s = readSession();
+    if (!s || !s.access_token) return null;
+    const expiresAt = (s.expires_at || 0) * 1000;
+    const stale = expiresAt < Date.now() + TOKEN_SKEW_MS;
+
+    if (!stale) return s.access_token;
+    // Stale. Offline → use it anyway; the drain will re-stamp on replay.
+    if (!navigator.onLine || !s.refresh_token) {
+      return opts.requireFresh ? null : s.access_token;
+    }
+    const SUPA_URL = (window.FL && window.FL.SUPABASE_URL);
+    const SUPA_KEY = (window.FL && window.FL.SUPABASE_ANON_KEY);
+    if (!SUPA_URL || !SUPA_KEY) return opts.requireFresh ? null : s.access_token;
+    try {
+      const r = await fetch(SUPA_URL + '/auth/v1/token?grant_type=refresh_token', {
+        method: 'POST',
+        headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: s.refresh_token }),
+      });
+      if (!r.ok) return opts.requireFresh ? null : s.access_token;
+      const fresh = await r.json();
+      if (!fresh || !fresh.access_token) return opts.requireFresh ? null : s.access_token;
+      localStorage.setItem('fl_supabase_session', JSON.stringify(fresh));
+      return fresh.access_token;
+    } catch (_) {
+      return opts.requireFresh ? null : s.access_token;
+    }
   }
 
   // ── flFetch — modules use this in place of fetch() for Supabase reads ──
@@ -411,9 +575,14 @@
     });
 
     const url = SUPA_URL + '/rest/v1/' + table + (opts.upsert !== false ? '?on_conflict=' + (opts.onConflict || 'id') : '');
+    // opts.owner → private table: RLS is granted to `authenticated`, so the
+    // anon key would be rejected. Falls back to the anon key only if no
+    // session exists at all, so the failure is a clean 401 rather than silence.
+    let bearer = SUPA_KEY;
+    if (opts.owner) bearer = (await flOwnerToken()) || SUPA_KEY;
     const headers = {
       'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Authorization': 'Bearer ' + bearer,
       'Content-Type': 'application/json',
       'Prefer': 'resolution=merge-duplicates,return=representation',
     };
@@ -435,6 +604,9 @@
         dirty: resp.status === 202 ? 1 : 0,
       });
     } catch (_) {}
+
+    // Tell every other page/tab that this table changed.
+    try { flEmit(table, { id: row.id || row.date || null, queued: resp.status === 202 }); } catch (_) {}
 
     // tickle the status indicator
     setTimeout(refreshStatus, 50);
@@ -462,6 +634,10 @@
     ['tomorrow_plan',        '?select=*&order=date.desc&limit=60',                        'tomorrow 60d'],
     ['health_daily',         '?select=*&order=date.desc&limit=120',                       'health 120d'],
     ['instagram_posts',      '?select=*&order=created_at.desc&limit=100',                 'ig 100'],
+    // Food is a lifetime record: no date window and no row cap, so the whole
+    // history is readable with the home network off. Ordered newest-first so a
+    // very long log still paints today's meals immediately.
+    ['food_log',             '?select=*&order=date.desc,logged_at.desc',                   'food lifetime'],
     ['config',               '?select=*',                                                 'config all'],
     ['finance_budgets',      '?select=*',                                                 'budgets'],
     ['finance_annual_budgets','?select=*',                                                'annual budgets'],
@@ -511,6 +687,7 @@
   // Subscribes to all sync tables. Other devices' writes land in IDB + emit
   // a 'fl-row' event modules can listen to so the UI refreshes instantly.
   let _realtime = null;
+  let _rtAuthTimer = null;
   function startRealtime() {
     if (_realtime || !navigator.onLine) return;
     const SUPA_URL = (window.FL && window.FL.SUPABASE_URL);
@@ -520,14 +697,35 @@
     try {
       const wsUrl = SUPA_URL.replace('https://', 'wss://') + '/realtime/v1/websocket?apikey=' + SUPA_KEY + '&vsn=1.0.0';
       _realtime = new WebSocket(wsUrl);
-      _realtime.onopen = () => {
+      _realtime.onopen = async () => {
+        // Join with the OWNER token when we have one. RLS applies to realtime
+        // too, so an anon-key join receives nothing at all from a private table
+        // (food_log, journal, checkin…) — the stream would look alive and be
+        // permanently silent.
+        let token = SUPA_KEY;
+        try { token = (await flOwnerToken()) || SUPA_KEY; } catch (_) {}
         const sub = {
           topic: 'realtime:public',
           event: 'phx_join',
-          payload: { config: { postgres_changes: [{ event: '*', schema: 'public' }] } },
+          payload: {
+            config: { postgres_changes: [{ event: '*', schema: 'public' }] },
+            access_token: token,
+          },
           ref: '1',
         };
-        _realtime.send(JSON.stringify(sub));
+        try { _realtime.send(JSON.stringify(sub)); } catch (_) { return; }
+        // Supabase closes the socket when the JWT expires; re-stamp periodically.
+        if (_rtAuthTimer) clearInterval(_rtAuthTimer);
+        _rtAuthTimer = setInterval(async () => {
+          if (!_realtime || _realtime.readyState !== 1) return;
+          try {
+            const fresh = (await flOwnerToken()) || SUPA_KEY;
+            _realtime.send(JSON.stringify({
+              topic: 'realtime:public', event: 'access_token',
+              payload: { access_token: fresh }, ref: 'auth',
+            }));
+          } catch (_) {}
+        }, 15 * 60 * 1000);
         console.log('[FL] Realtime subscribed');
       };
       _realtime.onmessage = (e) => {
@@ -537,11 +735,20 @@
             const d = m.payload.data;
             if (d.record && d.record.device_id === DEVICE_ID) return; // skip our own echo
             window.dispatchEvent(new CustomEvent('fl-row', { detail: { table: d.table, record: d.record, op: d.type } }));
+            // Also raise it on the change bus so a subscriber gets one uniform
+            // signal whether the write came from this tab, another tab, or
+            // another device.
+            _busDeliver({ type: d.table, detail: { record: d.record, op: d.type }, at: Date.now() }, 'remote');
           }
         } catch (_) {}
       };
       _realtime.onerror = () => { _realtime = null; setTimeout(startRealtime, 5000); };
-      _realtime.onclose = () => { _realtime = null; };
+      _realtime.onclose = () => {
+        _realtime = null;
+        if (_rtAuthTimer) { clearInterval(_rtAuthTimer); _rtAuthTimer = null; }
+        // Come back when there is network; startRealtime() no-ops if offline.
+        setTimeout(startRealtime, 8000);
+      };
     } catch (e) { console.warn('[FL] Realtime failed:', e); }
   }
 
@@ -609,4 +816,9 @@
   window.FL.queueSize = queueSize;
   window.FL.refreshStatus = refreshStatus;
   window.FL.prefetchAll = (force) => prefetchAllTables(!!force);
+  window.FL.ownerToken = flOwnerToken;
+  window.FL.emit = flEmit;
+  window.FL.onChange = flOnChange;
+  window.FL.tabId = TAB_ID;
+  window.FL.drain = flDrain;
 })();

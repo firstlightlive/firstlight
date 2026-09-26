@@ -5,7 +5,15 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
-    "test:reset": "bash scripts/test-reset.sh"
+    "test:reset": "bash scripts/test-reset.sh",
+    "test:food": "node scripts/test-food-reconcile.cjs",
+    "test:epoch": "node scripts/test-epoch-agreement.cjs",
+    "test:offline": "node scripts/test-offline-food.cjs",
+    "test": "npm run test:epoch && npm run test:rules && npm run test:reset && npm run test:golive && npm run test:food && npm run test:offline && npm run test:page",
+    "check:phone": "node scripts/check-phone-data.mjs",
+    "test:page": "node scripts/test-food-page-sync.cjs",
+    "test:golive": "node scripts/test-golive.cjs",
+    "test:rules": "command -v deno >/dev/null && deno test supabase/functions/firstlight-sync/rules.test.ts || echo '(deno not installed \u2014 skipping rules unit test)'"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.5",

@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════════════════
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { evaluateRulesCheckin } from './rules.ts'
 
 const SUPA_URL = Deno.env.get('SUPABASE_URL') || ''
 const SUPA_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
@@ -39,34 +40,28 @@ const CHAPTER_3_CUTOFF_HOUR = 6           // run must START before 06:00 local
 const CHAPTER_4_START = new Date('2026-07-27T00:00:00+05:30')
 // Chapter 04 ended at the fever, not by choice. Sep 4-12 belong to NO chapter.
 const CHAPTER_4_END = new Date('2026-09-04T00:00:00+05:30')   // exclusive — Day 47 = Sep 3
-const CHAPTER_5_START = new Date('2026-09-23T00:00:00+05:30') // === DAY_EPOCH (run 2)
+const CHAPTER_5_START = new Date('2026-09-13T00:00:00+05:30')
+const CHAPTER_5_END = new Date('2026-09-18T00:00:00+05:30') // exclusive, last verified day Sep 17
+const CHAPTER_6_START = new Date('2026-09-27T00:00:00+05:30') // === DAY_EPOCH
 
 // ── THE PUBLIC DAY COUNTER ─────────────────────────────────────────────────
 // DAY_EPOCH is the single anchor for every day number the outside world sees:
 // IG captions, rendered slides, proof_archive.day_number, instagram_posts
 // .day_number and all five emails.
 //
-// RESET 2026-09-13, then again 2026-09-22. The counter ran from 2026-07-19
-// (Day 1) to 2026-09-03 (Day 47), then a fever stopped training for nine days
-// (Sep 4-12). The streak broke again on Sep 20-21 2026; a rest day moved the
-// restart — the ACTIVE epoch is now Day 1 = Wed 23 Sep 2026. chapterDay() keeps
-// the earlier epochs as fallback branches so every archived row from an old era
-// still renders its number.
+// Archived runs keep their own day numbers. The current run begins 27 Sep 2026.
 //
-// ⚠️ A NEW CHAPTER DOES NOT RESET THIS. Only a real break does. Adding Chapter
-// 5/6/7…: add the start date to chapterOf() and a label to CHAPTER_BRAND; do
-// NOT add a branch to chapterDay(). Must stay equal to FL_DEFAULTS.STREAK_START
+// Must stay equal to FL_DEFAULTS.STREAK_START
 // (website/app.js) and FL_CURRENT_CHAPTER.dayEpoch (website/js/chapters.js).
-const DAY_EPOCH = new Date('2026-09-23T00:00:00+05:30')
+const DAY_EPOCH = new Date('2026-09-27T00:00:00+05:30')
 
 // GAP DAYS — the orphan days between the last break and the new Day 1
-// (Sep 21-22 2026: run 1 broke Sep 20-21, rest day Sep 22, Day 1 = Sep 23).
-// chapterDay()'s retired-era fallback would number them 65/66, so every
+// (Sep 18-26 2026; prior workout evidence remains in the archive). Every
 // day-numbered surface is guarded by _isGapDay(): the 04:30/06:30 emails send
 // a rest-day note, the 22:00 EOD + weekly recap are skipped, and the 21:00
 // nudge + 23:30 verdict record NOTHING (no ledger row, no slip, no IG post).
 // When the next break moves DAY_EPOCH, move GAP_START to the first orphan day.
-const GAP_START = new Date('2026-09-21T00:00:00+05:30')
+const GAP_START = new Date('2026-09-18T00:00:00+05:30')
 
 // Pull the day number a published caption actually prints ("...\n\nDay 31.\n...").
 // Used by the IG sync so a late post's stored day_number mirrors what the public
@@ -78,7 +73,9 @@ function _captionDay(caption?: string | null): number | null {
 }
 function chapterOf(date: Date | string): number {
   const d = (date instanceof Date) ? date : new Date(date)
-  if (d.getTime() >= CHAPTER_5_START.getTime()) return 5
+  if (d.getTime() >= CHAPTER_6_START.getTime()) return 6
+  if (d.getTime() >= CHAPTER_5_START.getTime() && d.getTime() < CHAPTER_5_END.getTime()) return 5
+  if (d.getTime() >= CHAPTER_4_END.getTime()) return 0
   if (d.getTime() >= CHAPTER_4_START.getTime() && d.getTime() < CHAPTER_4_END.getTime()) return 4
   if (d.getTime() >= CHAPTER_3_START.getTime()) return 3
   if (d.getTime() >= CHAPTER_2_START.getTime()) return 2
@@ -87,9 +84,11 @@ function chapterOf(date: Date | string): number {
 }
 function chapterDay(date: Date | string): number {
   const d = (date instanceof Date) ? date : new Date(date)
-  // LIVE ERA — from the post-fever restart (Sep 13, 2026). One formula, no
-  // chapter boundaries. Never add a branch above this.
+  // Live run. Archived run numbers remain frozen below.
   if (d.getTime() >= DAY_EPOCH.getTime()) return Math.floor((d.getTime() - DAY_EPOCH.getTime()) / 86400000) + 1
+  if (d.getTime() >= GAP_START.getTime()) return 0
+  if (d.getTime() >= CHAPTER_5_START.getTime()) return Math.floor((d.getTime() - CHAPTER_5_START.getTime()) / 86400000) + 1
+  if (d.getTime() >= CHAPTER_4_END.getTime()) return 0
   // RETIRED CONTINUOUS ERA — Jul 19 2026 (Day 1) through Sep 12 2026 (Day 56).
   // Frozen so archived rows and old captions still resolve to their own numbers.
   if (d.getTime() >= CHAPTER_3_START.getTime()) return Math.floor((d.getTime() - CHAPTER_3_START.getTime()) / 86400000) + 1
@@ -110,6 +109,7 @@ const CHAPTER_BRAND: Record<number, string> = {
   3: 'CHAPTER 03 · FIRST LIGHT',
   4: 'CHAPTER 04 · DISCIPLINE',
   5: 'CHAPTER 05 · RETURN',
+  6: 'CHAPTER 06 · RETURN',
 }
 function chapterBrand(date: Date | string): string {
   return CHAPTER_BRAND[chapterOf(date)] || 'FIRST LIGHT'
@@ -236,7 +236,7 @@ function _isGapDay(dateStr?: string): boolean {
   return t >= GAP_START.getTime() && t < DAY_EPOCH.getTime()
 }
 
-// Day 1 as a human label (e.g. 'Wednesday 2026-09-23'), derived from DAY_EPOCH.
+// Day 1 as a human label, derived from DAY_EPOCH.
 function _day1Label(): string {
   return new Date(DAY_EPOCH.getTime()).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata', weekday: 'long' })
     + ' ' + new Date(DAY_EPOCH.getTime()).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
@@ -442,7 +442,7 @@ async function judgeToday(opts?: { date?: string; force?: 'WIN' | 'MISS'; dayOve
         stravaStatus = 'no-token'
       } else {
         strava = await _pullStravaForDate(date, token)
-        stravaStatus = 'ok'
+        stravaStatus = strava === null ? 'error' : 'ok'
       }
     } catch (_e) {
       stravaStatus = 'error'   // banned/unreachable — Apple carries the day
@@ -1140,13 +1140,19 @@ async function _recordVerdict(verdict: VerdictResult, post?: PublishedPost): Pro
     day_number: verdict.chapterDay,
     verdict: verdict.verdict
   }
+  const { data: existingProof, error: existingProofError } = await supaAdmin
+    .from('proof_archive').select('food_clean').eq('date', today).maybeSingle()
+  if (existingProofError) throw existingProofError
+  proofRow.food_clean = existingProof?.food_clean ?? null
   if (verdict.verdict === 'WIN' && verdict.matched) {
     proofRow.activity_type = verdict.matched.type
     proofRow.activity_name = verdict.matched.name
     if (verdict.matched.distanceKm) proofRow.run_km = verdict.matched.distanceKm  // legacy field reused
   }
   if (post?.media_id) proofRow.ig_post_id = post.media_id
-  try { await supaUpsert('proof_archive', proofRow, 'date') } catch (_e) { /* tolerate missing columns */ }
+  // This row is the idempotency lock. Publishing without it risks duplicate
+  // Instagram posts when the next scheduled run retries.
+  await supaUpsert('proof_archive', proofRow, 'date')
 
   // On MISS, append a slip.
   // Schema notes: slips.id is bigint (auto-increment) — do NOT set it.
@@ -2057,6 +2063,56 @@ async function runGrace(): Promise<EngineRunResult> {
   return result
 }
 
+// Revisit a pending day after the normal nightly verdict. The regular sync
+// schedule runs again after midnight, so late Strava/Apple uploads can be
+// published without a second cron installation. Never retry a day that already
+// has a recorded verdict: the IG call may have succeeded before its DB update.
+async function reconcileYesterday(log: string[]): Promise<void> {
+  const ist = new Date(Date.now() + 5.5 * 3600000)
+  const yesterday = new Date(ist.getTime() - 86400000).toISOString().slice(0, 10)
+  if (_isGapDay(yesterday) || yesterday < '2026-09-27') return
+
+  const { data: proof, error: proofError } = await supaAdmin.from('proof_archive')
+    .select('verdict,ig_post_id').eq('date', yesterday).maybeSingle()
+  if (proofError) throw proofError
+  if (proof?.verdict) {
+    if (proof.verdict === 'WIN' && !proof.ig_post_id &&
+        (await getSecret('ig_publish_enabled')) !== 'false') {
+      await alertOnce('missing_ig_' + yesterday, 24,
+        'Workout verdict has no confirmed Instagram post',
+        'The ' + yesterday + ' WIN is in proof_archive without an ig_post_id. Check Instagram before any manual retry to avoid a duplicate.')
+      log.push('Reconcile: ' + yesterday + ' already judged; IG post needs verification')
+    }
+    return
+  }
+
+  const { data: health } = await supaAdmin.from('health_daily')
+    .select('workout_count').eq('date', yesterday).maybeSingle()
+  // Query by Strava's UTC timestamp with exact IST day bounds. Comparing a
+  // timezone-less local clock to a TIMESTAMPTZ can miss early-morning workouts.
+  const dayStartUtc = new Date(yesterday + 'T00:00:00+05:30').toISOString()
+  const nextDayUtc = new Date(new Date(dayStartUtc).getTime() + 86400000).toISOString()
+  const { data: strava, error: stravaError } = await supaAdmin.from('strava_activities')
+    .select('id').gte('start_date', dayStartUtc)
+    .lt('start_date', nextDayUtc).limit(1)
+  if (stravaError) throw stravaError
+  if (!Number(health?.workout_count || 0) && !(strava && strava.length)) {
+    log.push('Reconcile: no workout evidence for ' + yesterday)
+    return
+  }
+
+  const verdict = await judgeToday({ date: yesterday })
+  if (verdict.verdict !== 'WIN') {
+    log.push('Reconcile: evidence exists for ' + yesterday + ' but live judge is ' + verdict.verdict)
+    await alertOnce('reconcile_pending_' + yesterday, 24,
+      'Workout evidence needs review', yesterday + ' has an uploaded workout but the verdict is ' + verdict.verdict + '. Check Strava scope, Health Auto Export, and the source activity.')
+    return
+  }
+  const result = await runVerdict({ date: yesterday })
+  log.push('Reconcile: ' + yesterday + ' ' + (result.publishedPost || result.publishedStory ? 'published' : result.alreadyDone ? 'already done' : 'not published'))
+  if (result.errors.length) log.push('Reconcile warnings: ' + result.errors.join('; '))
+}
+
 // ── Alerting via Resend (set RESEND_API_KEY in Edge Function secrets) ──
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
 const ALERT_TO = Deno.env.get('ALERT_TO') || 'firstlightlive@gmail.com'
@@ -2171,12 +2227,17 @@ async function syncStrava(log: string[]) {
 
   // Pull last 3 days of activities
   const threeDaysAgo = Math.floor(Date.now() / 1000) - (3 * 86400)
-  const activities = await fetch(
+  const activitiesResp = await fetch(
     `https://www.strava.com/api/v3/athlete/activities?per_page=30&after=${threeDaysAgo}`,
     { headers: { 'Authorization': `Bearer ${tokenResp.access_token}` } }
-  ).then(r => r.json())
+  )
+  const activities = await activitiesResp.json()
 
-  if (!Array.isArray(activities)) { log.push('Strava: no activities'); return }
+  if (!activitiesResp.ok || !Array.isArray(activities)) {
+    log.push('Strava: activities API failed (HTTP ' + activitiesResp.status + '): ' +
+      JSON.stringify(activities).slice(0, 250))
+    return
+  }
   log.push(`Strava: found ${activities.length} recent activities`)
 
   let synced = 0
@@ -2765,7 +2826,8 @@ async function syncProofForDate(targetDate: string, log: string[]) {
     swim_time_sec: swim ? swim.moving_time : null,
     gym: !!gym || (existing?.gym ?? false),
     gym_duration_min: gym ? Math.round(gym.moving_time / 60) : null,
-    food_clean: existing?.food_clean ?? true,
+    // Unknown food status must stay unknown until the owner records it.
+    food_clean: existing?.food_clean ?? null,
     run_source: 'strava',
     strava_id: run ? run.id : (ride ? ride.id : (swim ? swim.id : null))
   }
@@ -3725,10 +3787,24 @@ async function adminRead(body: Record<string, unknown>) {
 async function adminWrite(body: Record<string, unknown>) {
   const { table, data, onConflict = 'id' } = body as any
   if (!table || !data) throw new Error('Missing table or data')
+  // The legacy admin key is present in browser bundles. This generic proxy
+  // must not bypass the owner-authenticated rules check-in or forge its debt.
+  const rows = Array.isArray(data) ? data : [data]
+  if (table === 'config' && rows.some((row: any) =>
+    typeof row?.key === 'string' && row.key.startsWith('RULES_'))) {
+    throw new Error('Rules records must use the owner-authenticated rules endpoint')
+  }
 
   const { error } = await supaAdmin.from(table).upsert(data, { onConflict })
   if (error) throw error
   return { success: true, message: `Upserted into ${table}` }
+}
+
+async function rulesOwnerSession(req: Request): Promise<boolean> {
+  const token = /^Bearer\s+(.+)$/i.exec(req.headers.get('authorization') || '')?.[1]
+  if (!token || token === SUPA_ANON_KEY) return false
+  const { data, error } = await supaAdmin.auth.getUser(token)
+  return !error && data.user?.email?.toLowerCase() === 'firstlightlive@gmail.com'
 }
 
 // ═══════════════════════════════════════════
@@ -3907,6 +3983,11 @@ async function ritualSyncPost(body: Record<string, unknown>) {
 
   const pct = Math.min(100, Math.round((merged.length / totalActive) * 100))
 
+  // Heartbeat. Lets a health check tell "the watch is calling and succeeding"
+  // apart from "the watch has not called at all" — identical symptoms if the
+  // only signal is how fresh rituals_log happens to be.
+  await _watchSyncOk()
+
   // Mirror 1: legacy daily_rituals (best-effort; has history-lock trigger — map to warning)
   const wrote = { rituals_log: true, daily_rituals: false, daily_checkin: false }
   try {
@@ -3956,12 +4037,32 @@ async function ritualSyncPost(body: Record<string, unknown>) {
 }
 
 // Failure telemetry: config-row counter + max one alert email per IST day at ≥3 errors.
+// Last successful watch write, so silence has a recorded cause, not a guess.
+async function _watchSyncOk() {
+  try {
+    await setSecret('WATCH_SYNC_HEALTH', JSON.stringify({
+      date: _istParts().dateStr, errors: 0, alerted: false,
+      last_ok: new Date().toISOString(),
+    }))
+  } catch (_e) { /* telemetry must never break sync */ }
+}
+
 async function _watchSyncHealthBump(detail: string) {
   try {
     const today = _istParts().dateStr
     const raw = await getSecret('WATCH_SYNC_HEALTH')
-    let h: { date: string; errors: number; alerted: boolean } = { date: today, errors: 0, alerted: false }
-    if (raw) { try { const p = JSON.parse(raw); if (p.date === today) h = p } catch (_e) { /* reset */ } }
+    let h: { date: string; errors: number; alerted: boolean; last_ok?: string; last_error?: string } =
+      { date: today, errors: 0, alerted: false }
+    let lastOk: string | undefined
+    if (raw) {
+      try {
+        const p = JSON.parse(raw)
+        lastOk = p.last_ok
+        if (p.date === today) h = p
+      } catch (_e) { /* reset */ }
+    }
+    if (lastOk) h.last_ok = lastOk    // a failure must not erase the last success
+    h.last_error = detail.slice(0, 300)
     h.errors++
     if (h.errors >= 3 && !h.alerted) {
       h.alerted = true
@@ -3993,7 +4094,14 @@ Deno.serve(async (req) => {
   // Auth check — supports header OR URL param (pg_cron can't send custom headers reliably)
   const requestKey = req.headers.get('x-admin-key') || url.searchParams.get('admin_key') || ''
   const adminKey = await getSecret('admin_api_key')
-  const isAuthed = adminKey && requestKey === adminKey
+  // The rules check-in is owner-only. The legacy admin key is embedded in old
+  // clients, so it must not authorize a personal food declaration.
+  const ownerRulesAction = action === 'rules-checkin' || action === 'rules-ledger' || action === 'publish-violation'
+  const ownerAuthed = ownerRulesAction ? await rulesOwnerSession(req) : false
+  const isAuthed = (adminKey && requestKey === adminKey) || ownerAuthed
+  if (ownerRulesAction && !ownerAuthed) {
+    return new Response(JSON.stringify({ error: 'Sign in as the owner to manage rules and violations.' }), { status: 401, headers })
+  }
 
   // Health check — no auth needed
   if (action === 'health') {
@@ -4217,9 +4325,28 @@ Deno.serve(async (req) => {
   if (action === 'ritual-sync') {
     const watchKey = await getSecret('watch_api_key')
     const providedWatch = req.headers.get('x-watch-key') || ''
-    const watchAuthed = (watchKey && providedWatch === watchKey) || isAuthed
+    // supabase/watch_ritual_sync.sql ships '<32-hex>' as a literal placeholder.
+    // Run unedited, the secret IS that string and every watch call 403s —
+    // indistinguishable from a wrong key unless we name it.
+    const keyUnset = !watchKey || watchKey.trim() === '' ||
+                     /^<.*>$/.test(watchKey.trim()) || watchKey.trim().length < 16
+    const watchAuthed = (!keyUnset && providedWatch === watchKey) || isAuthed
     if (!watchAuthed) {
-      return new Response(JSON.stringify({ error: 'Unauthorized — missing or invalid API key' }), { status: 403, headers })
+      // TELEMETRY ON AUTH FAILURE. This used to return 403 with no bump and no
+      // alert, so a watch with a stale key — or a server whose key was never
+      // configured — failed silently for as long as nobody happened to look.
+      // Silence is the dangerous failure: rituals_log just stops growing and
+      // nothing says why. Three of these in a day now raise the email alert.
+      const why = keyUnset
+        ? 'watch_api_key secret is unset or still the <32-hex> placeholder — run supabase/watch_ritual_sync.sql with a real key'
+        : (providedWatch ? 'x-watch-key did not match the stored secret (stale key on the watch?)'
+                         : 'request carried no x-watch-key header')
+      await _watchSyncHealthBump(`auth: ${why}`)
+      return new Response(JSON.stringify({
+        error: 'Unauthorized — missing or invalid API key',
+        reason: keyUnset ? 'WATCH_KEY_NOT_CONFIGURED' : 'WATCH_KEY_MISMATCH',
+        detail: why,
+      }), { status: 403, headers })
     }
     try {
       if (req.method === 'GET') {
@@ -4370,13 +4497,33 @@ Deno.serve(async (req) => {
     // ── DAILY RULES CHECK-IN — RULE 01 SCREENS · RULE 02 FOOD CODE · RULE 03 NIGHT FOOD ──
     // POST ?action=rules-checkin   body: { screens: 'clean'|'broken', food: 'clean'|'broken', night: 'clean'|'broken', note?, date? }
     // Stored in config as RULES_CHECKIN_<date> (JSONB — no schema change).
-    // Deadline: every day by 11:59 PM IST. Unlogged by 11:59 PM = all violated.
-    // The check-in STARTS 2026-09-22 — earlier dates are skipped by the verdict.
+    // Deadline: every day by 11:59 PM IST. Missing marks remain unconfirmed.
+    // The new check-in starts with the 2026-09-27 reset.
     if (action === 'rules-checkin') {
       const body = await req.json().catch(() => ({}))
       const date = String(body.date || todayIST())
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return new Response(JSON.stringify({ error: 'bad date' }), { status: 400, headers })
+      }
+      // Accept the CURRENT day, plus yesterday while the documented 3:00 AM IST
+      // grace window is open — the same window rituals already use
+      // (_ritualDayWindow). This is what lets a check-in made with the home
+      // network off still land: the page keeps the marks locally and replays
+      // them when there is signal, and a replay just after midnight is still
+      // the day it was marked for. It deliberately does NOT open an unbounded
+      // back-dating path: past the window, a late mark is reported as late
+      // rather than silently recorded as on time.
+      const chkWin = _ritualDayWindow()
+      const chkAllowed = chkWin.graceActive
+        ? [chkWin.calendarToday, chkWin.effectiveToday]
+        : [chkWin.calendarToday]
+      if (chkAllowed.indexOf(date) === -1 || date < '2026-09-27') {
+        return new Response(JSON.stringify({
+          error: 'Only the current day from 2026-09-27 can be checked in.',
+          detail: `date ${date} is outside the check-in window`,
+          allowed: chkAllowed,
+          grace_active: chkWin.graceActive,
+        }), { status: 400, headers })
       }
       if (body.reset === true || body.reset === '1') {
         await supaAdmin.from('config').delete().eq('key', `RULES_CHECKIN_${date}`)
@@ -4385,7 +4532,7 @@ Deno.serve(async (req) => {
       const screens = body.screens === 'broken' ? 'broken' : body.screens === 'clean' ? 'clean' : ''
       const food = body.food === 'broken' ? 'broken' : body.food === 'clean' ? 'clean' : ''
       const night = body.night === 'broken' ? 'broken' : body.night === 'clean' ? 'clean' : ''
-      if (!screens && !food && !night) {
+      if (!screens && !food && !night && !body.note) {
         return new Response(JSON.stringify({ error: 'mark screens and/or food and/or night as clean|broken' }), { status: 400, headers })
       }
       const key = `RULES_CHECKIN_${date}`
@@ -4398,6 +4545,9 @@ Deno.serve(async (req) => {
       if (body.screensKm) prev.screensKm = Math.max(1, Math.min(999, Math.round(Number(body.screensKm) || 50)))
       if (body.note) prev.note = String(body.note).slice(0, 120)
       prev.ts = new Date().toISOString()
+      // Flag a mark that landed after midnight for the previous day, so the
+      // record shows it arrived in the grace window rather than on the day.
+      if (date !== chkWin.calendarToday) prev.graceSubmit = true
       await supaUpsert('config', { key, value: JSON.stringify(prev) }, 'key')
       return new Response(JSON.stringify({ ok: true, date, checkin: prev }), { headers })
     }
@@ -4416,8 +4566,8 @@ Deno.serve(async (req) => {
     // nudges the operator ~2.5h before it.
     if (action === 'rules-reminder') {
       const date = url.searchParams.get('date') || todayIST()
-      if (date < '2026-09-22') {
-        return new Response(JSON.stringify({ ok: true, skipped: true, date, reason: 'rules check-in starts 2026-09-22' }), { headers })
+      if (date < '2026-09-27') {
+        return new Response(JSON.stringify({ ok: true, skipped: true, date, reason: 'rules check-in starts 2026-09-27' }), { headers })
       }
       const { data: remRows } = await supaAdmin.from('config').select('value').eq('key', `RULES_REMIND_${date}`).limit(1)
       if (remRows && remRows.length > 0) {
@@ -4437,7 +4587,7 @@ Deno.serve(async (req) => {
           _emailShell('Rules check-in pending',
             `<p style="font-size:16px;font-style:italic;color:rgba(240,234,216,0.85);margin:0 0 18px">2.5 hours to the 11:59 PM deadline.</p>
 <p>Not yet marked: <b style="color:#D4A843">${list}</b></p>
-<p>Mark them CLEAN or BROKEN now — firstlight.live/rules.html. Anything unmarked at 11:59 PM is a violation and gets posted.</p>`),
+<p>Mark them CLEAN or BROKEN now — firstlight.live/rules.html. Missing marks remain unconfirmed and will not be posted as violations.</p>`),
           `Rules not yet marked for ${date}: ${list}. Deadline 11:59 PM IST.`)
         await supaUpsert('config', { key: `RULES_REMIND_${date}`, value: JSON.stringify({ ts: new Date().toISOString(), unmarked }) }, 'key')
         return new Response(JSON.stringify({ ok: true, reminded: true, date, unmarked }), { headers })
@@ -4448,8 +4598,9 @@ Deno.serve(async (req) => {
 
     // ── DAILY RULES VERDICT — 23:59 IST cron ──
     // GET ?action=rules-verdict&date=YYYY-MM-DD&dryRun=1
-    // Reads RULES_CHECKIN_<date>; any rule not marked clean = violated → renders
-    // RULE_BROKEN slides and posts them (one carousel when both fell). Idempotent
+    // Reads RULES_CHECKIN_<date>; only explicitly broken rules are violations.
+    // Missing marks remain unconfirmed and never create a public accusation.
+    // RULE_BROKEN slides are posted for confirmed breaks. Idempotent
     // via RULES_POST_<date>. Emails the operator. dryRun renders without posting.
     if (action === 'rules-verdict') {
       const dryRun = url.searchParams.get('dryRun') === '1' || url.searchParams.get('dry') === '1'
@@ -4457,38 +4608,37 @@ Deno.serve(async (req) => {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return new Response(JSON.stringify({ error: 'bad date' }), { status: 400, headers })
       }
-      // The daily check-in starts 2026-09-22 (announced the day before).
+      // The daily check-in starts with the September 25 reset.
       // Any earlier date is skipped — no verdict, no post.
-      if (date < '2026-09-22') {
-        return new Response(JSON.stringify({ ok: true, skipped: true, date, reason: 'rules check-in starts 2026-09-22' }), { headers })
+      if (date < '2026-09-27') {
+        return new Response(JSON.stringify({ ok: true, skipped: true, date, reason: 'rules check-in starts 2026-09-27' }), { headers })
       }
       const postedKey = `RULES_POST_${date}`
       if (!dryRun) {
         const { data: postedRows } = await supaAdmin.from('config').select('value').eq('key', postedKey).limit(1)
         if (postedRows && postedRows.length > 0) {
-          return new Response(JSON.stringify({ ok: true, alreadyPosted: true, date }), { headers })
+          let marker: { status?: string } = {}
+          try { marker = JSON.parse((postedRows[0] as { value: string }).value) } catch (_e) { /* old marker */ }
+          // A pre-deploy safety hold suppresses the old function. This version
+          // can process confirmed breaks after the owner login is available.
+          if (marker.status !== 'safety_hold_until_auth_fix') {
+            return new Response(JSON.stringify({ ok: true, alreadyPosted: true, date }), { headers })
+          }
         }
       }
       const { data: chkRows } = await supaAdmin.from('config').select('value').eq('key', `RULES_CHECKIN_${date}`).limit(1)
       let chk: { screens?: string; food?: string; night?: string; screensKm?: number; note?: string } = {}
       try { chk = chkRows && chkRows[0] ? JSON.parse((chkRows[0] as { value: string }).value) : {} } catch (_e) { chk = {} }
-      const violations: Array<{ rule: string; km: number; note: string }> = []
-      const screensKm = chk.screens === 'broken' ? Math.max(1, Math.min(999, Math.round(Number(chk.screensKm) || 50))) : 50
-      if (chk.screens === 'clean') { /* held */ }
-      else violations.push({ rule: 'SCREENS — RULE 01', km: screensKm, note: chk.screens === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
-      if (chk.food === 'clean') { /* held */ }
-      else violations.push({ rule: 'FOOD CODE — RULE 02', km: 50, note: chk.food === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
-      if (chk.night === 'clean') { /* held */ }
-      else violations.push({ rule: 'NIGHT FOOD — RULE 03', km: 50, note: chk.night === 'broken' ? 'Marked broken.' : 'Nothing marked by 11:59 PM — unlogged.' })
+      const { violations, unconfirmed } = evaluateRulesCheckin(chk)
       if (violations.length === 0) {
-        return new Response(JSON.stringify({ ok: true, verdict: 'CLEAN — all rules held', date }), { headers })
+        return new Response(JSON.stringify({ ok: true, verdict: unconfirmed.length ? 'PENDING — unconfirmed rules' : 'CLEAN — all rules held', date, unconfirmed }), { headers })
       }
       const urls: string[] = []
       for (const v of violations) urls.push(await _renderRuleSlide(v.rule, v.km, v.note, date))
       if (dryRun) {
         return new Response(JSON.stringify({ ok: true, dryRun: true, date, violations, urls }), { headers })
       }
-      const names = violations.map(v => v.rule.replace(' — RULE 0', ''))
+      const names = violations.map(v => v.rule.split(' — RULE ')[0])
       const kms = violations.map(v => `${v.km} km`)
       const caption = `RULES BROKEN — ${names.join(' + ')}.\n\n${kms.join(' + ')} — owed. The debt is distance. Posted. No hiding from it.\n\n#discipline #notoday #indianrunners #triathlonindia`
       try {
@@ -4652,6 +4802,8 @@ Deno.serve(async (req) => {
       await syncStrava(log)
       await syncInstagram(log)
       await syncProofArchive(log)
+      try { await reconcileYesterday(log) }
+      catch (e) { log.push('Reconcile failed: ' + (e as Error).message) }
       await settleRulesDebt(log)
     }
 

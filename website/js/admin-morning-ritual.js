@@ -97,7 +97,7 @@
     ctx.textAlign='left'; ctx.textBaseline='top';
     ctx.fillStyle=GOLD; ctx.font='700 30px '+MONO; ctx.fillText('◆ FIRST LIGHT', 64, 60);
     ctx.textAlign='right'; ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='600 20px '+MONO;
-    ctx.fillText('CHAPTER 05 · DAY '+day, W-64, 66);
+    ctx.fillText('CHAPTER 06 · DAY '+day, W-64, 66);
     ctx.textAlign='left';
   }
 

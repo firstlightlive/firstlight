@@ -206,11 +206,12 @@
     ctx.beginPath(); ctx.roundRect(cardX, cardY, cardW, cardH, 14); ctx.stroke();
 
     var foodBroken = s.foodClean === false;
+    var foodKnown = typeof s.foodClean === 'boolean';
     var rows = [
       ['STARTED', fmtClock(s.start)],
       ['ENDED', fmtClock(s.end)],
       ['DEADLINE', '06:00 AM'],
-      ['FOOD CODE', foodBroken ? '✗ BROKEN' : '✓ CLEAN', foodBroken ? RED : GREEN]
+      ['FOOD CODE', foodKnown ? (foodBroken ? '✗ BROKEN' : '✓ CLEAN') : '— UNCONFIRMED', foodKnown ? (foodBroken ? RED : GREEN) : T.dim]
     ];
     var ry = cardY + 68;
     rows.forEach(function(row) {
@@ -737,14 +738,14 @@
         if (currentStats && modeSelect && modeSelect.value === 'comeback') currentStats.comeback = true;
         fetch(SUPA + '/rest/v1/proof_archive?date=eq.' + dateStr + '&select=food_clean', { headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY } })
           .then(function(r) { return r.json(); })
-          .then(function(rows) { currentStats.foodClean = (rows && rows[0]) ? rows[0].food_clean !== false : true; })
-          .catch(function() { currentStats.foodClean = true; })
+          .then(function(rows) { currentStats.foodClean = (rows && rows[0]) ? rows[0].food_clean : null; })
+          .catch(function() { currentStats.foodClean = null; })
           .then(function() {
             renderBoth();
             captionEl.value = currentStats.comeback ? comebackCaption(currentStats) : generateCaption(currentStats);
             statusEl.textContent = 'Day ' + currentStats.day + ' · ' + currentStats.km.toFixed(1) + ' km · ' +
               (currentStats.made ? '✓ activity logged' : '✗ no activity — slip variant rendered') +
-              (currentStats.foodClean === false ? ' · food code BROKEN' : ' · food ✓');
+              (currentStats.foodClean === false ? ' · food code BROKEN' : currentStats.foodClean === true ? ' · food ✓' : ' · food unconfirmed');
             downloadPostBtn.style.display = '';
             downloadStoryBtn.style.display = '';
             copyCaptionBtn.style.display = '';
