@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════
 -- TABLE READINESS — READ ONLY. Changes nothing. Safe to re-run.
 --
--- Checks every one of the 65 tables this codebase actually reads or writes
+-- Checks every one of the 66 tables this codebase actually reads or writes
 -- (extracted from app.js SB_* lists, admin-sync.js, every rest/v1/ path in
 -- website/, and every from()/supaUpsert() in the edge function).
 --
@@ -30,6 +30,7 @@ WITH expected(t, kind, visibility) AS (VALUES
     ('daily_checkin','GO-LIVE','private'),
     ('daily_logs','GO-LIVE','private'),
     ('daily_rituals','GO-LIVE','private'),
+    ('discipline_log','GO-LIVE','private'),
     ('deep_work_sessions','feature','private'),
     ('deepwork_log','feature','private'),
     ('ekadashi_log','feature','private'),
@@ -134,6 +135,7 @@ WITH expected(t, kind) AS (VALUES
     ('daily_checkin','GO-LIVE'),
     ('daily_logs','GO-LIVE'),
     ('daily_rituals','GO-LIVE'),
+    ('discipline_log','GO-LIVE'),
     ('deep_work_sessions','feature'),
     ('deepwork_log','feature'),
     ('ekadashi_log','feature'),

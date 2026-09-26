@@ -6,7 +6,7 @@
 // IMPORTANT: bump SHELL_VERSION on every deploy that ships changes to the
 // precached files (HTML/CSS/JS in SHELL_ASSETS). Pre-deploy check warns if
 // you forget. Without a bump, installed PWAs stay pinned to the prior cache.
-const SHELL_VERSION = 'fl-shell-v26';
+const SHELL_VERSION = 'fl-shell-v27';
 const SUPA_CACHE   = 'fl-supa-reads-v3';
 const SUPA_HOST    = 'edgnudrbysybefbqyijq.supabase.co';
 
@@ -34,6 +34,7 @@ const SHELL_ASSETS = [
   '/js/config.js',
   '/js/fl-offline.js',
   '/js/fl-authread.js',
+  '/js/fl-discipline-sync.js',
   '/js/fl-auth.js',
   '/js/admin-core.js',
   '/js/admin-init.js',

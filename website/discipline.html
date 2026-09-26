@@ -113,6 +113,10 @@
   <div class="foot">No money. Debts are paid in distance. · <a href="index.html">← FIRST LIGHT</a> · <a href="reset.html">reset tracker</a></div>
 </div>
 
+<script src="js/config.js"></script>
+<script src="js/fl-authread.js"></script>
+<script src="js/fl-offline.js"></script>
+<script src="js/fl-discipline-sync.js"></script>
 <script>
 (function(){
   var START='2026-09-27';  // new run starts Day 1 on Sep 27
@@ -136,11 +140,19 @@
   }
   function dayNum(d){ return Math.floor((new Date(d+'T00:00:00')-new Date(START+'T00:00:00'))/86400000)+1; }
   function load(){ try{return JSON.parse(localStorage.getItem('fl_ch4_log')||'{}');}catch(e){return {};} }
-  function save(o){ localStorage.setItem('fl_ch4_log', JSON.stringify(o)); }
+  function save(o){
+    localStorage.setItem('fl_ch4_log', JSON.stringify(o));
+    // Mirror to Supabase. Local write FIRST so the page never depends on the
+    // network; FLDisc pushes only the days that actually changed.
+    if (window.FLDisc) FLDisc.syncDays(o);
+  }
   // Keep old entries/payments in localStorage, but do not carry them into the Sep 27 run.
   var CLEARED_KEY='fl_ch6_cleared_2026-09-27';
   function loadCleared(){ try{return JSON.parse(localStorage.getItem(CLEARED_KEY)||'{"cycle":0,"run":0,"walk":0}');}catch(e){return {cycle:0,run:0,walk:0};} }
-  function saveCleared(c){ localStorage.setItem(CLEARED_KEY, JSON.stringify(c)); }
+  function saveCleared(c){
+    localStorage.setItem(CLEARED_KEY, JSON.stringify(c));
+    if (window.FLDisc) FLDisc.syncCleared(c);
+  }
   function add(a,b){ a.cycle=(a.cycle||0)+(b.cycle||0); a.run=(a.run||0)+(b.run||0); a.walk=(a.walk||0)+(b.walk||0); return a; }
 
   // penance for a given day-entry (or worst-case if entry null / unlogged)
@@ -225,9 +237,21 @@
     var b=e.target.closest('[data-p]'); if(!b)return; var k=b.getAttribute('data-p'); todayEntry[k]=!todayEntry[k]; render();
   });
   document.getElementById('logBtn').addEventListener('click',function(){
-    todayEntry.logged=true; todayEntry.penance=penance(todayEntry); log[today]=todayEntry; save(log); render();
+    todayEntry.logged=true; todayEntry.penance=penance(todayEntry);
+    if (window.FLDisc) FLDisc.stamp(todayEntry);   // LWW needs a timestamp
+    log[today]=todayEntry; save(log); render();
     document.getElementById('logState').textContent='✓ Day logged at '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kolkata'})+'.';
   });
+  // Durable copy: pull the server's record, merge it in, and repaint. Keeps a
+  // second device (and a reinstalled browser) in step with this one.
+  if (window.FLDisc) {
+    FLDisc.init(START, CLEARED_KEY, function(){
+      log = load(); cleared = loadCleared();
+      todayEntry = log[today] || todayEntry;
+      render();
+    });
+  }
+
   document.getElementById('clearBtn').addEventListener('click',function(){
     var c=+document.getElementById('clC').value||0, r=+document.getElementById('clR').value||0, w=+document.getElementById('clW').value||0;
     cleared.cycle+=c; cleared.run+=r; cleared.walk+=w; saveCleared(cleared);
@@ -248,9 +272,8 @@
 })();
 </script>
 <script>
-// Precache this page so it opens with the home network off (see SHELL_ASSETS
-// in sw.js). Registration only — all logging here is already localStorage-based.
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}
+// The service worker is registered by js/fl-offline.js, which also owns the
+// write queue this page's Supabase mirror depends on.
 </script>
 </body>
 </html>

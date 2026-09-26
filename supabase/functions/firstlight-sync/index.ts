@@ -4047,6 +4047,63 @@ async function _watchSyncOk() {
   } catch (_e) { /* telemetry must never break sync */ }
 }
 
+// ── DEAD-CHANNEL ALARM ─────────────────────────────────────────────────
+// The dangerous failure in this system is silence, not error. The 23:30 verdict
+// refuses to declare a MISS without a confirmed data channel, so a dead feed
+// reads as "nothing happened" rather than raising anything. HAE stopped landing
+// on 2026-07-03 and went unnoticed until Jul 19; it stopped again on 2026-09-22
+// and was only found by running a diagnostic by hand on Sep 26.
+//
+// Runs off the existing 21:30 IST cron — no new schedule to install. One email
+// per channel per day, via a CHANNEL_ALERT_<channel>_<date> marker.
+async function _staleChannelCheck(): Promise<string[]> {
+  const today = _istParts().dateStr
+  const warned: string[] = []
+
+  // [table, date column, days tolerated before it counts as dead, label]
+  const CHANNELS: Array<[string, string, number, string]> = [
+    ['health_daily',      'date',              2, 'Apple Health (Health Auto Export)'],
+    ['strava_activities', 'start_date_local',  7, 'Strava activity sync'],
+  ]
+
+  for (const [table, col, tolerance, label] of CHANNELS) {
+    try {
+      const { data } = await supaAdmin.from(table).select(col).order(col, { ascending: false }).limit(1)
+      // Dynamic column name, so supabase-js infers GenericStringError here;
+      // route through unknown rather than widening the query types.
+      const newest = data && data[0]
+        ? String((data[0] as unknown as Record<string, unknown>)[col]).slice(0, 10)
+        : null
+      const behind = newest
+        ? Math.round((Date.parse(today + 'T00:00:00Z') - Date.parse(newest + 'T00:00:00Z')) / 86400000)
+        : 9999
+      if (behind <= tolerance) continue
+
+      const key = `CHANNEL_ALERT_${table}_${today}`
+      const { data: seen } = await supaAdmin.from('config').select('key').eq('key', key).limit(1)
+      if (seen && seen.length) { warned.push(`${table} (already alerted today)`); continue }
+
+      await sendAlert(
+        `[FIRSTLIGHT] ${label} has gone quiet`,
+        `${label} has no data newer than ${newest || 'ANY DATE'} — ${behind === 9999 ? 'the table is empty' : behind + ' days behind'}.\n\n` +
+        `This is reported because silence here is invisible everywhere else: the nightly verdict will not declare a MISS ` +
+        `without a confirmed data channel, so a dead feed looks like a rest day.\n\n` +
+        (table === 'health_daily'
+          ? `CHECK: open Health Auto Export on the phone, confirm the automation is enabled and that the REST endpoint ` +
+            `plus the x-webhook-secret header are still set. Run \`npm run check:phone\` for the day-by-day breakdown.`
+          : `CHECK: the Strava token refresh may be failing — inspect the secrets table. If you simply have not trained, ` +
+            `this is a training gap and nothing is broken.`)
+      )
+      await supaUpsert('config', { key, value: JSON.stringify({ behind, newest, ts: new Date().toISOString() }) }, 'key')
+      warned.push(`${table} ${behind}d behind — alerted`)
+    } catch (e) {
+      // Never let telemetry break the cron it rides on.
+      warned.push(`${table} check failed: ${(e as Error).message.slice(0, 80)}`)
+    }
+  }
+  return warned
+}
+
 async function _watchSyncHealthBump(detail: string) {
   try {
     const today = _istParts().dateStr
@@ -4565,6 +4622,9 @@ Deno.serve(async (req) => {
     // Idempotent via RULES_REMIND_<date>. Deadline stays 11:59 PM — this only
     // nudges the operator ~2.5h before it.
     if (action === 'rules-reminder') {
+      // Piggyback the dead-channel alarm on this existing 21:30 IST run so a
+      // silent feed surfaces the same evening instead of weeks later.
+      const staleReport = await _staleChannelCheck()
       const date = url.searchParams.get('date') || todayIST()
       if (date < '2026-09-27') {
         return new Response(JSON.stringify({ ok: true, skipped: true, date, reason: 'rules check-in starts 2026-09-27' }), { headers })

@@ -164,6 +164,40 @@ check(/WATCH_SYNC_HEALTH/.test(pre), 'the pre-flight surfaces the watch telemetr
 check(!/INSERT|UPDATE|DELETE|ALTER|CREATE|DROP/i.test(pre.replace(/--.*$/gm, '')),
   'the pre-flight really is read-only');
 
+process.stdout.write('\nDISCIPLINE LEDGER — must not live on one device\n');
+
+const disc = read('website/discipline.html');
+check(/fl-discipline-sync\.js/.test(disc), 'discipline.html loads the sync module');
+check(/fl-offline\.js/.test(disc), 'it loads the offline runtime (the write queue)');
+check(/FLDisc\.syncDays/.test(disc), 'every local save mirrors to Supabase');
+check(/FLDisc\.syncCleared/.test(disc), 'the paid-km ledger mirrors too');
+check(/FLDisc\.stamp/.test(disc), 'a logged day is timestamped for last-write-wins');
+check(/FLDisc\.init/.test(disc), 'it pulls the server record on boot');
+
+const ds = read('website/js/fl-discipline-sync.js');
+// The ordering bug this caught was real: a concurrent push overwrote a larger
+// paid total before the merge could protect it.
+check(/await pull\(\);[\s\S]{0,200}await syncDays\(\)/.test(ds),
+  'reconcile pulls BEFORE it pushes (a concurrent push corrupts the ledger)');
+check(/if \(num\(d\[k\]\) > num\(cl\[k\]\)\)/.test(ds),
+  'paid km merge by MAX — a payment already made can never be erased');
+check(/_busy/.test(ds), 'overlapping reconciles are guarded');
+
+const dsql = read('supabase/discipline_log.sql');
+check(/REVOKE ALL ON public\.discipline_log FROM anon/.test(dsql), 'the covenant record is private (anon revoked)');
+check(/NO history-lock trigger/.test(dsql), 'no history lock — an older debt must stay payable');
+check(/PRIMARY KEY \(date, kind\)/.test(dsql), 'one table holds both the day rows and the cleared ledger');
+check(/supabase_realtime ADD TABLE public\.discipline_log/.test(dsql), 'it streams for cross-device sync');
+check(read('website/sw.js').includes("'/js/fl-discipline-sync.js'"), 'the sync module is precached');
+check(/discipline_log/.test(read('website/js/fl-offline.js')), 'discipline_log is prefetched for offline reads');
+
+process.stdout.write('\nDEAD-CHANNEL ALARM — silence must be reported\n');
+const fnSrc = read('supabase/functions/firstlight-sync/index.ts');
+check(/async function _staleChannelCheck/.test(fnSrc), 'a stale-channel check exists');
+check(/health_daily[\s\S]{0,40}2,[\s\S]{0,60}Apple Health/.test(fnSrc), 'Apple Health is watched');
+check(/CHANNEL_ALERT_/.test(fnSrc), 'it is idempotent — one alert per channel per day');
+check(/const staleReport = await _staleChannelCheck\(\)/.test(fnSrc), 'it rides the existing 21:30 cron (no new schedule)');
+
 process.stdout.write('\nTABLE INVENTORY — must not drift\n');
 
 // Re-derive the table list the same way the inventory was built. If someone
@@ -178,11 +212,19 @@ function listBlock(src, marker) {
 }
 const appSrc = read('website/app.js');
 const edgeSrc = read('supabase/functions/firstlight-sync/index.ts');
+// Also scan the offline prefetch list and the standalone sync modules. The
+// original derivation missed both, so discipline_log existed in the code while
+// the readiness check silently did not cover it.
+const offSrc = read('website/js/fl-offline.js');
+const syncSrcs = ['website/js/fl-discipline-sync.js', 'website/js/admin-food.js']
+  .map(f => read(f)).join('\n');
 const derived = new Set([
   ...listBlock(appSrc, 'const SB_PUBLIC_TABLES'),
   ...listBlock(appSrc, 'const SB_NO_USERID_TABLES'),
   ...[...edgeSrc.matchAll(/from\('([a-z_]+)'\)/g)].map(m => m[1]),
   ...[...edgeSrc.matchAll(/supaUpsert\('([a-z_]+)'/g)].map(m => m[1]),
+  ...[...offSrc.matchAll(/\['([a-z_]+)',\s*'\?select=/g)].map(m => m[1]),
+  ...[...syncSrcs.matchAll(/var TABLE = '([a-z_]+)'/g)].map(m => m[1]),
   'food_log',
 ]);
 ['v1','functions','object','token','user','rpc'].forEach(x => derived.delete(x));

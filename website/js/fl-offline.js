@@ -638,6 +638,8 @@
     // history is readable with the home network off. Ordered newest-first so a
     // very long log still paints today's meals immediately.
     ['food_log',             '?select=*&order=date.desc,logged_at.desc',                   'food lifetime'],
+    // The covenant record + penance ledger: no window, it is a lifetime ledger.
+    ['discipline_log',       '?select=*&order=date.desc',                                 'discipline all'],
     ['config',               '?select=*',                                                 'config all'],
     ['finance_budgets',      '?select=*',                                                 'budgets'],
     ['finance_annual_budgets','?select=*',                                                'annual budgets'],
