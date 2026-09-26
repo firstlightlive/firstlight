@@ -246,6 +246,45 @@ if (fl.error) {
   if (untracked.length) console.log(`  ${C.y}   ${untracked.length}/${DAYS} days with NO meal logged: ${untracked.slice(0, 8).join(', ')}${untracked.length > 8 ? ` +${untracked.length - 8}` : ''}${C.x}`);
 }
 
+// ── 4b. Discipline ledger — the covenant record + Punishment Cycle debt ──
+// Until 2026-09-26 this lived in localStorage only. Confirm the table exists,
+// that it is genuinely private, and whether anything has synced into it yet.
+console.log(`\n${C.c}DISCIPLINE — covenant record + penance ledger${C.x}`);
+const dl = await adminRead('discipline_log', 'date,kind,updated_at', 400, 'date:desc');
+if (dl.error) {
+  if (/does not exist|relation|schema/i.test(dl.error)) {
+    console.log(`  ${C.r}✘ table not created${C.x} — apply supabase/discipline_log.sql, then re-run.`);
+    problems.push('discipline_log table missing — apply supabase/discipline_log.sql');
+  } else {
+    console.log(`  ${C.r}query failed:${C.x} ${dl.error}`);
+    problems.push('discipline_log query failed: ' + dl.error);
+  }
+} else {
+  const rows = dl.rows || [];
+  const days = rows.filter(r => r.kind === 'day');
+  const cleared = rows.filter(r => r.kind === 'cleared');
+  verdict('discipline_log', true, false, `table EXISTS · ${days.length} day row(s), ${cleared.length} cleared row(s)`);
+  if (rows.length === 0) {
+    console.log(`  ${C.d}   empty — nothing has synced yet. It fills the first time you log a day`);
+    console.log(`     in discipline.html on the deployed site (or when a queued write replays).${C.x}`);
+  } else {
+    const newest = days[0] || rows[0];
+    console.log(`  ${C.d}   newest ${newest.kind} row: ${newest.date} (written ${fmtAge(hoursSince(newest.updated_at))})${C.x}`);
+  }
+  // Privacy: the covenant record must NOT be readable with the public anon key.
+  try {
+    const r = await fetch(`${SUPA}/rest/v1/discipline_log?select=date&limit=1`,
+      { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } });
+    const body = await r.text();
+    const leaked = r.ok && !/permission denied|JWT|row-level/i.test(body);
+    verdict('discipline_log privacy', !leaked, false,
+      leaked ? `!! ANON CAN READ IT (HTTP ${r.status}) — re-run the REVOKE in discipline_log.sql`
+             : `anon blocked (HTTP ${r.status}) — private, as intended`);
+  } catch (e) {
+    console.log(`  ${C.d}   privacy probe failed: ${e.message}${C.x}`);
+  }
+}
+
 // ── 5. Rules check-in marks (config is where the owner's verdict lives) ──
 console.log(`\n${C.c}RULES CHECK-IN — owner marks${C.x}`);
 // The check-in only opens at the day-counter epoch; days before it were never

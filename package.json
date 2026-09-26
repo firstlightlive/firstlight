@@ -14,7 +14,8 @@
     "test:page": "node scripts/test-food-page-sync.cjs",
     "test:golive": "node scripts/test-golive.cjs",
     "test:rules": "command -v deno >/dev/null && deno test supabase/functions/firstlight-sync/rules.test.ts || echo '(deno not installed \u2014 skipping rules unit test)'",
-    "test:discipline": "node scripts/test-discipline-sync.cjs"
+    "test:discipline": "node scripts/test-discipline-sync.cjs",
+    "verify:live": "bash scripts/verify-live.sh"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.5",
